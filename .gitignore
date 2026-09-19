@@ -1,0 +1,6 @@
+/.env
+/.idea/
+/backend/vendor/
+/backend/var/data/*.sqlite
+/backend/public/uploads/*
+!/backend/public/uploads/.gitkeep

@@ -1,0 +1,5 @@
+<nav class="wiki-tabs">
+    {% for tab_slug, tab_config in categories %}
+        <a href="/dm/wiki/{{ tab_slug }}" class="wiki-tab{% if tab_slug == slug %} wiki-tab-active{% endif %}">{{ tab_config.label }}</a>
+    {% endfor %}
+</nav>
