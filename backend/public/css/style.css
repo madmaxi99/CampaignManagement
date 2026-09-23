@@ -1,35 +1,145 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Crimson+Text&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Crimson+Text:ital@0;1&display=swap');
 
 :root {
-    color-scheme: dark;
+    color-scheme: light;
+    --ink: #3a2f22;
+    --ink-soft: #6b5d47;
+    --parchment: #f3e8cd;
+    --parchment-dark: #e8d9b3;
+    --parchment-edge: #d8c391;
+    --accent: #7a2e2e;
+    --accent-hover: #973a3a;
+    --forest: #3d5c3a;
+    --forest-hover: #4f7549;
+    --gold: #a97c2f;
+    --error: #a3311b;
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    background: #1a1512;
-    background-image: radial-gradient(ellipse at top, #241d18 0%, #14100d 70%);
-    color: #e8dcc4;
+    background: var(--parchment-dark);
+    background-image:
+        radial-gradient(ellipse at top, #f7efd9 0%, var(--parchment-dark) 75%);
+    color: var(--ink);
     font-family: 'Crimson Text', serif;
     font-size: 18px;
 }
 
-.page {
-    max-width: 640px;
-    margin: 6rem auto;
-    padding: 2rem;
+h1, h2, h3 {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.03em;
+    color: var(--accent);
+    margin-top: 0;
 }
 
-h1 {
+a {
+    color: var(--forest);
+}
+
+.site-header {
+    background: var(--parchment);
+    border-bottom: 3px double var(--parchment-edge);
+    padding: 1rem 2rem;
+}
+
+.site-logo {
+    display: block;
     font-family: 'Cinzel', serif;
-    letter-spacing: 0.05em;
-    color: #d4af7a;
-    margin-bottom: 0.25rem;
+    font-size: 1.3rem;
+    color: var(--accent);
+    text-decoration: none;
+    margin-bottom: 0.75rem;
+}
+
+.site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+}
+
+.nav-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.nav-group-label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ink-soft);
+    margin-right: 0.25rem;
+}
+
+.nav-group a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.95rem;
+}
+
+.nav-group a:hover {
+    color: var(--ink);
+    background: var(--parchment-dark);
+}
+
+.nav-group a.nav-active {
+    color: var(--parchment);
+    background: var(--forest);
+}
+
+.page {
+    max-width: 860px;
+    margin: 2.5rem auto;
+    padding: 2rem 2.5rem;
+    background: var(--parchment);
+    border: 1px solid var(--parchment-edge);
+    border-radius: 4px;
+    box-shadow: 0 2px 14px rgba(58, 47, 34, 0.12);
 }
 
 .subtitle {
-    color: #8a7d68;
+    color: var(--ink-soft);
     margin-top: 0;
     margin-bottom: 2rem;
+}
+
+/* Forms & buttons, shared across wiki / places / character templates */
+
+.btn,
+button,
+.entry-form button,
+.wiki-form button {
+    padding: 0.55rem 1.1rem;
+    background: var(--accent);
+    color: var(--parchment);
+    border: 1px solid var(--accent-hover);
+    border-radius: 3px;
+    font-family: 'Cinzel', serif;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.btn:hover,
+button:hover {
+    background: var(--accent-hover);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--parchment-edge);
+}
+
+.btn-secondary:hover {
+    background: var(--parchment-dark);
 }
 
 .entry-form {
@@ -41,33 +151,19 @@ h1 {
 .entry-form input {
     flex: 1;
     padding: 0.6rem 0.8rem;
-    background: #2a221c;
-    border: 1px solid #4a3f33;
-    color: #e8dcc4;
+    background: #fffdf7;
+    border: 1px solid var(--parchment-edge);
+    color: var(--ink);
     font-family: inherit;
     font-size: 1rem;
     border-radius: 3px;
-}
-
-.entry-form button {
-    padding: 0.6rem 1.2rem;
-    background: #6b4a2a;
-    color: #f0e4cc;
-    border: 1px solid #8a6438;
-    border-radius: 3px;
-    font-family: 'Cinzel', serif;
-    cursor: pointer;
-}
-
-.entry-form button:hover {
-    background: #8a6438;
 }
 
 .entries {
     list-style: none;
     margin: 0;
     padding: 0;
-    border-top: 1px solid #3a2f26;
+    border-top: 1px solid var(--parchment-edge);
 }
 
 .entries li {
@@ -75,39 +171,22 @@ h1 {
     justify-content: space-between;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #3a2f26;
+    border-bottom: 1px solid var(--parchment-edge);
 }
 
 .entry-time {
-    color: #6f6250;
+    color: var(--ink-soft);
     font-size: 0.85rem;
     white-space: nowrap;
 }
 
 .entry-empty {
-    color: #6f6250;
+    color: var(--ink-soft);
     font-style: italic;
 }
 
-.wiki-tabs {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid #3a2f26;
-    padding-bottom: 0.75rem;
-}
-
-.wiki-tab {
-    color: #8a7d68;
-    text-decoration: none;
-    padding: 0.3rem 0.6rem;
-    border-radius: 3px;
-}
-
-.wiki-tab-active {
-    color: #d4af7a;
-    background: #2a221c;
+.dm-entry {
+    margin-bottom: 2rem;
 }
 
 .wiki-actions {
@@ -115,7 +194,9 @@ h1 {
 }
 
 .wiki-new-link {
-    color: #d4af7a;
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: none;
 }
 
 .wiki-entries {
@@ -125,17 +206,21 @@ h1 {
 }
 
 .wiki-entries li {
-    border-bottom: 1px solid #3a2f26;
+    border-bottom: 1px solid var(--parchment-edge);
     padding: 0.5rem 0;
 }
 
 .wiki-entries a {
-    color: #e8dcc4;
+    color: var(--ink);
     text-decoration: none;
 }
 
+.wiki-entries a:hover {
+    color: var(--accent);
+}
+
 .wiki-error {
-    color: #c96a4f;
+    color: var(--error);
 }
 
 .wiki-form {
@@ -150,54 +235,20 @@ h1 {
     gap: 0.3rem;
 }
 
+.wiki-field span {
+    font-weight: 600;
+    color: var(--ink-soft);
+}
+
 .wiki-field input,
-.wiki-field textarea {
-    background: #2a221c;
-    border: 1px solid #4a3f33;
-    color: #e8dcc4;
+.wiki-field textarea,
+.wiki-field select {
+    background: #fffdf7;
+    border: 1px solid var(--parchment-edge);
+    color: var(--ink);
     font-family: inherit;
     padding: 0.5rem;
     border-radius: 3px;
-}
-
-.dm-tiles {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.dm-tile {
-    display: block;
-    padding: 1.5rem 2rem;
-    border: 1px solid #4a3f33;
-    border-radius: 4px;
-    color: #d4af7a;
-    text-decoration: none;
-    font-family: 'Cinzel', serif;
-}
-
-.dm-tile-disabled {
-    color: #5a4f42;
-    cursor: default;
-}
-
-.dm-entry {
-    margin-bottom: 2rem;
-}
-
-.dm-button {
-    display: inline-block;
-    padding: 0.6rem 1.2rem;
-    background: #6b4a2a;
-    color: #f0e4cc;
-    border: 1px solid #8a6438;
-    border-radius: 3px;
-    font-family: 'Cinzel', serif;
-    text-decoration: none;
-}
-
-.dm-button:hover {
-    background: #8a6438;
 }
 
 .place-thumb {
@@ -218,7 +269,7 @@ h1 {
 .place-map-image {
     max-width: 100%;
     display: block;
-    border: 1px solid #3a2f26;
+    border: 1px solid var(--parchment-edge);
     border-radius: 3px;
 }
 
@@ -228,22 +279,315 @@ h1 {
     height: 14px;
     margin-left: -7px;
     margin-top: -7px;
-    background: #d4af7a;
-    border: 2px solid #1a1512;
+    background: var(--accent);
+    border: 2px solid var(--parchment);
     border-radius: 50%;
     cursor: pointer;
 }
 
 .place-breadcrumb {
     margin-bottom: 1rem;
-    color: #8a7d68;
+    color: var(--ink-soft);
 }
 
 .place-breadcrumb a {
-    color: #8a7d68;
+    color: var(--ink-soft);
     text-decoration: none;
 }
 
 .place-description {
     margin-bottom: 1.5rem;
+}
+
+/* Simple reference-data listing tables (Regelwerk placeholders, Bestiary, NPCs) */
+
+.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.ref-table th,
+.ref-table td {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--parchment-edge);
+    vertical-align: top;
+}
+
+.ref-table th {
+    font-family: 'Cinzel', serif;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+}
+
+/* Character list */
+
+.char-list {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.char-list-item {
+    display: block;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--parchment-edge);
+    border-radius: 4px;
+    text-decoration: none;
+    color: var(--ink);
+    background: #fffdf7;
+}
+
+.char-list-item:hover {
+    border-color: var(--accent);
+}
+
+.char-list-name {
+    font-family: 'Cinzel', serif;
+    color: var(--accent);
+    display: block;
+}
+
+.char-list-meta {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+/* Character creation wizard */
+
+.char-section {
+    border: 1px solid var(--parchment-edge);
+    border-radius: 4px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    background: #fffdf7;
+}
+
+.char-section[hidden] {
+    display: none;
+}
+
+.char-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 0.75rem;
+}
+
+.char-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1rem;
+}
+
+.char-hint {
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    margin-top: 0.25rem;
+}
+
+.char-derived {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+    font-family: 'Cinzel', serif;
+    font-size: 0.9rem;
+    color: var(--forest);
+}
+
+.char-skill-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.4rem;
+}
+
+.char-skill-list label {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--parchment-edge);
+    border-radius: 3px;
+}
+
+.char-skill-value {
+    color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+}
+
+.char-ability-list,
+.char-spell-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.4rem;
+}
+
+.char-ability-list label,
+.char-spell-list label {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--parchment-edge);
+    border-radius: 3px;
+}
+
+.char-ability-desc {
+    display: block;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+}
+
+/* Character sheet */
+
+.sheet-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.sheet-header h1 {
+    margin-bottom: 0.1rem;
+}
+
+.sheet-meta {
+    color: var(--ink-soft);
+}
+
+.sheet-vitals {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.sheet-vital {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.sheet-vital label {
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+}
+
+.sheet-vital input {
+    width: 5rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--parchment-edge);
+    border-radius: 3px;
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+.sheet-conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.sheet-conditions label {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--parchment-edge);
+    border-radius: 3px;
+}
+
+.sheet-section {
+    margin-bottom: 1.75rem;
+}
+
+.sheet-section h2 {
+    font-size: 1.05rem;
+    border-bottom: 1px solid var(--parchment-edge);
+    padding-bottom: 0.3rem;
+}
+
+.sheet-attributes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 0.75rem;
+    text-align: center;
+}
+
+.sheet-attribute {
+    border: 1px solid var(--parchment-edge);
+    border-radius: 4px;
+    padding: 0.5rem;
+    background: #fffdf7;
+}
+
+.sheet-attribute-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+}
+
+.sheet-attribute-value {
+    display: block;
+    font-size: 1.4rem;
+    color: var(--accent);
+}
+
+.sheet-skill-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.4rem;
+}
+
+.sheet-skill-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.6rem;
+    border: 1px solid var(--parchment-edge);
+    border-radius: 3px;
+}
+
+.sheet-skill-untrained {
+    color: var(--ink-soft);
+}
+
+.sheet-inventory {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.sheet-inventory li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--parchment-edge);
+}
+
+.sheet-inventory form {
+    display: inline;
+}
+
+.sheet-add-item {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
 }

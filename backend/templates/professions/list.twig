@@ -1,0 +1,33 @@
+{% extends 'layout.twig' %}
+{% block title %}Professionen — Regelwerk{% endblock %}
+{% block content %}
+    <h1>Professionen</h1>
+
+    <table class="ref-table">
+        <thead>
+            <tr><th>Name</th><th>Key Attribute</th><th>Core Skills</th><th>Heroic Ability</th></tr>
+        </thead>
+        <tbody>
+            {% for profession in professions %}
+                <tr>
+                    <td>{{ profession.name }}</td>
+                    <td>{{ profession.key_attribute }}</td>
+                    <td>
+                        {% for skill in core_skills[profession.id] ?? [] %}
+                            {{ skill.skill_name }}{% if skill.magic_school_name %} ({{ skill.magic_school_name }}){% endif %}{% if not loop.last %}, {% endif %}
+                        {% else %}
+                            &mdash;
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for ability in starting_abilities[profession.id] ?? [] %}
+                            {{ ability.name }}{% if not loop.last %} / {% endif %}
+                        {% else %}
+                            &mdash;
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

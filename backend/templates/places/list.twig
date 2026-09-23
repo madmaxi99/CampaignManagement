@@ -1,31 +1,22 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>Orte — Wiki</title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <main class="page">
-        <h1>Orte</h1>
-        {% include 'wiki/_tabs.twig' %}
+{% extends 'layout.twig' %}
+{% block title %}Orte — Weidenmark{% endblock %}
+{% block content %}
+    <h1>Orte</h1>
 
-        <p class="wiki-actions"><a href="/dm/wiki/places/new" class="wiki-new-link">+ Neu anlegen</a></p>
+    <p class="wiki-actions"><a href="/places/new" class="wiki-new-link">+ Neu anlegen</a></p>
 
-        <ul class="wiki-entries">
-            {% for place in places %}
-                <li>
-                    <a href="/dm/wiki/places/{{ place.id }}">
-                        {% if place.image_path %}
-                            <img src="/uploads/places/{{ place.image_path }}" alt="" class="place-thumb">
-                        {% endif %}
-                        {{ place.name }}
-                    </a>
-                </li>
-            {% else %}
-                <li class="entry-empty">Noch keine Orte.</li>
-            {% endfor %}
-        </ul>
-    </main>
-</body>
-</html>
+    <ul class="wiki-entries">
+        {% for place in places %}
+            <li>
+                <a href="/places/{{ place.id }}">
+                    {% if place.image_path %}
+                        <img src="/uploads/places/{{ place.image_path }}" alt="" class="place-thumb">
+                    {% endif %}
+                    {{ place.name }}
+                </a>
+            </li>
+        {% else %}
+            <li class="entry-empty">Noch keine Orte.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

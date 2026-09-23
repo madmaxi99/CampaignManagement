@@ -1,0 +1,20 @@
+<nav class="site-nav">
+    <div class="nav-group">
+        <span class="nav-group-label">Kampagne</span>
+        <a href="/characters" class="{% if nav_active == 'characters' %}nav-active{% endif %}">Charaktere</a>
+        <a href="/npcs" class="{% if nav_active == 'npcs' %}nav-active{% endif %}">NSCs</a>
+        <a href="/bestiary" class="{% if nav_active == 'bestiary' %}nav-active{% endif %}">Bestiary</a>
+        <a href="/places" class="{% if nav_active == 'places' %}nav-active{% endif %}">Orte</a>
+        <a href="/" class="{% if nav_active == 'chronicle' %}nav-active{% endif %}">Chronik</a>
+    </div>
+    <div class="nav-group">
+        <span class="nav-group-label">Regelwerk</span>
+        <a href="/professions" class="{% if nav_active == 'professions' %}nav-active{% endif %}">Professionen</a>
+        <a href="/kins" class="{% if nav_active == 'kins' %}nav-active{% endif %}">Kins</a>
+        <a href="/skills" class="{% if nav_active == 'skills' %}nav-active{% endif %}">Skills</a>
+        <a href="/heroic-abilities" class="{% if nav_active == 'heroic-abilities' %}nav-active{% endif %}">Heroic Abilities</a>
+        <a href="/magic" class="{% if nav_active == 'magic' %}nav-active{% endif %}">Magie</a>
+        <a href="/items" class="{% if nav_active == 'items' %}nav-active{% endif %}">Items</a>
+        <a href="/wiki/books" class="{% if nav_active == 'books' %}nav-active{% endif %}">Bücher</a>
+    </div>
+</nav>

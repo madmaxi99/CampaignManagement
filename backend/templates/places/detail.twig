@@ -1,43 +1,35 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ place.name }} — Orte</title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <main class="page">
-        <nav class="place-breadcrumb">
-            {% for crumb in breadcrumb %}
-                <a href="/dm/wiki/places/{{ crumb.id }}">{{ crumb.name }}</a>{% if not loop.last %} &raquo; {% endif %}
+{% extends 'layout.twig' %}
+{% block title %}{{ place.name }} — Orte{% endblock %}
+{% block content %}
+    <nav class="place-breadcrumb">
+        {% for crumb in breadcrumb %}
+            <a href="/places/{{ crumb.id }}">{{ crumb.name }}</a>{% if not loop.last %} &raquo; {% endif %}
+        {% endfor %}
+    </nav>
+
+    <h1>{{ place.name }}</h1>
+    {% if place.description %}<p class="place-description">{{ place.description }}</p>{% endif %}
+
+    <p class="wiki-actions">
+        <a href="/places/new?parent_id={{ place.id }}">+ Neuen Kind-Ort anlegen</a>
+        &middot;
+        <a href="/places/{{ place.id }}/edit">Bearbeiten</a>
+    </p>
+
+    {% if place.image_path %}
+        <div class="place-map">
+            <img src="/uploads/places/{{ place.image_path }}" alt="{{ place.name }}" class="place-map-image">
+            {% for child in pinned_children %}
+                <a href="/places/{{ child.id }}" class="place-pin" style="left: {{ child.pin_x }}%; top: {{ child.pin_y }}%;" title="{{ child.name }}"></a>
             {% endfor %}
-        </nav>
+        </div>
+    {% endif %}
 
-        <h1>{{ place.name }}</h1>
-        {% if place.description %}<p class="place-description">{{ place.description }}</p>{% endif %}
-
-        <p class="wiki-actions">
-            <a href="/dm/wiki/places/new?parent_id={{ place.id }}">+ Neuen Kind-Ort anlegen</a>
-            &middot;
-            <a href="/dm/wiki/places/{{ place.id }}/edit">Bearbeiten</a>
-        </p>
-
-        {% if place.image_path %}
-            <div class="place-map">
-                <img src="/uploads/places/{{ place.image_path }}" alt="{{ place.name }}" class="place-map-image">
-                {% for child in pinned_children %}
-                    <a href="/dm/wiki/places/{{ child.id }}" class="place-pin" style="left: {{ child.pin_x }}%; top: {{ child.pin_y }}%;" title="{{ child.name }}"></a>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        {% if unpinned_children|length > 0 %}
-            <ul class="wiki-entries">
-                {% for child in unpinned_children %}
-                    <li><a href="/dm/wiki/places/{{ child.id }}">{{ child.name }}</a></li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </main>
-</body>
-</html>
+    {% if unpinned_children|length > 0 %}
+        <ul class="wiki-entries">
+            {% for child in unpinned_children %}
+                <li><a href="/places/{{ child.id }}">{{ child.name }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

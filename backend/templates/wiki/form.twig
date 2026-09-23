@@ -1,32 +1,23 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ category.label }} — {{ mode == 'edit' ? 'Bearbeiten' : 'Neu anlegen' }}</title>
-    <link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
-    <main class="page">
-        <h1>{{ category.label }}: {{ mode == 'edit' ? 'Bearbeiten' : 'Neu anlegen' }}</h1>
-        {% include 'wiki/_tabs.twig' %}
+{% extends 'layout.twig' %}
+{% block title %}{{ category.label }} — {{ mode == 'edit' ? 'Bearbeiten' : 'Neu anlegen' }}{% endblock %}
+{% block content %}
+    <h1>{{ category.label }}: {{ mode == 'edit' ? 'Bearbeiten' : 'Neu anlegen' }}</h1>
 
-        {% if error %}
-            <p class="wiki-error">{{ error }}</p>
-        {% endif %}
+    {% if error %}
+        <p class="wiki-error">{{ error }}</p>
+    {% endif %}
 
-        <form method="post" action="{{ mode == 'edit' ? '/dm/wiki/' ~ slug ~ '/' ~ id : '/dm/wiki/' ~ slug }}" class="wiki-form">
-            {% for column in category.columns %}
-                <label class="wiki-field">
-                    <span>{{ column.label }}</span>
-                    {% if column.type == 'textarea' %}
-                        <textarea name="{{ column.name }}" rows="4">{{ entry[column.name] }}</textarea>
-                    {% else %}
-                        <input type="{{ column.type == 'number' ? 'number' : 'text' }}" name="{{ column.name }}" value="{{ entry[column.name] }}">
-                    {% endif %}
-                </label>
-            {% endfor %}
-            <button type="submit">Speichern</button>
-        </form>
-    </main>
-</body>
-</html>
+    <form method="post" action="{{ mode == 'edit' ? '/wiki/' ~ slug ~ '/' ~ id : '/wiki/' ~ slug }}" class="wiki-form">
+        {% for column in category.columns %}
+            <label class="wiki-field">
+                <span>{{ column.label }}</span>
+                {% if column.type == 'textarea' %}
+                    <textarea name="{{ column.name }}" rows="4">{{ entry[column.name] }}</textarea>
+                {% else %}
+                    <input type="{{ column.type == 'number' ? 'number' : 'text' }}" name="{{ column.name }}" value="{{ entry[column.name] }}">
+                {% endif %}
+            </label>
+        {% endfor %}
+        <button type="submit">Speichern</button>
+    </form>
+{% endblock %}

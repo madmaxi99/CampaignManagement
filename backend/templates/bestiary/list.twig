@@ -1,0 +1,33 @@
+{% extends 'layout.twig' %}
+{% block title %}Bestiary — Kampagne{% endblock %}
+{% block content %}
+    <h1>Bestiary</h1>
+
+    {% for monster in monsters %}
+        <h2>{{ monster.name }}</h2>
+        <p class="char-hint">
+            Ferocity {{ monster.ferocity }} &middot; Size {{ monster.size ?: '—' }} &middot;
+            Movement {{ monster.movement }} &middot; Armor {{ monster.armor ?? '—' }} &middot; HP {{ monster.hp }}
+        </p>
+        {% if monster.description %}<p>{{ monster.description }}</p>{% endif %}
+
+        <table class="ref-table">
+            <thead><tr><th>D6</th><th>Attacke</th><th>Beschreibung</th></tr></thead>
+            <tbody>
+                {% for attack in attacks[monster.id] ?? [] %}
+                    <tr><td>{{ attack.roll }}</td><td>{{ attack.name }}</td><td>{{ attack.description }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if passives[monster.id] ?? [] %}
+            <p><strong>Passives:</strong>
+                {% for passive in passives[monster.id] %}
+                    {{ passive.name }} ({{ passive.description }}){% if not loop.last %}; {% endif %}
+                {% endfor %}
+            </p>
+        {% endif %}
+    {% else %}
+        <p class="entry-empty">Noch keine Monster hinterlegt.</p>
+    {% endfor %}
+{% endblock %}
