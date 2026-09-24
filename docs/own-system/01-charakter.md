@@ -8,9 +8,25 @@ Klassische Fantasy-Völker im WoW/D&D-Stil, keine exotischen Eigenkreationen. Fi
 
 Herkunft/Beruf des Charakters — die Frage "was hast du vorher gemacht". Vergibt ein **vordefiniertes Set an Skills/Proficiencies** (ein Paket, kein freier Baukasten aus Einzelpunkten). Finale Liste (33 Professionen, inkl. Skill-Paket und Startgeld-Tendenz): siehe [12-katalog-professionen.md](12-katalog-professionen.md).
 
+## Alter
+
+Profession liefert ein **festes 5-Skill-Paket** (siehe [12-katalog-professionen.md](12-katalog-professionen.md)) — daran wird durch Alter nichts gekürzt oder ersetzt. Alter kommt stattdessen **immer zusätzlich obendrauf**: eine Anzahl frei wählbarer Extra-Skills aus dem kompletten Katalog ([13-katalog-skills.md](13-katalog-skills.md) — auch eine erste Zauberkategorie zählt als so ein Pick), plus ein Attribut-Trade-off. Kein Alter ist die klare Optimalwahl (Inspiration: Dragonbanes Alterssystem, siehe `docs/ruleset-comparison/04-dragonbane.md`).
+
+Beispiel: ein Schmied (Profession-Paket: Schmieden, Waffenkunde, Kraftakt, Verhandeln, Ausdauer), der viel gereist ist, nimmt seine Alters-Extra-Skills als Sprachen, Bogen-Skill (Waffenkunde: Bogen) und Fallenstellen — reine Spielerwahl, erzählt die individuelle Vergangenheit über die Profession hinaus.
+
+**Auswürfeln (1W10, bewusst jung-lastig):** 1–5 = Jung, 6–8 = Erwachsen, 9–10 = Alt.
+
+| Alter | Zusätzliche freie Skills | Attribut-Modifikator |
+|---|---|---|
+| Jung | 2 | +1 STR, −1 WIS (kräftig, aber wenig Lebenserfahrung) |
+| Erwachsen | 4 | keiner (Baseline) |
+| Alt | 6 | +1 WIS, −1 STR (weise, aber körperlich im Abbau) |
+
+Gesamt-Skill-Count bei der Erschaffung: **Profession (5) + Alters-Bonus (2/4/6) = 7/9/11**. Der zweite-Flaw-für-einen-Skill-Tausch (siehe Flaws unten) ist davon unabhängig und stapelt normal oben drauf.
+
 ## Attribute
 
-Die klassischen 6 Attribute — **STR, CON, DEX, INT, WIS, CHA** (Namen final, keine eingedeutschten Entsprechungen nötig). Generierung: **4d6, die 3 höchsten Würfel zählen**, Ergebnis frei auf die 6 Attribute verteilt. Skala 3–18, Modifikator-Tabelle siehe [02-kernmechanik.md](02-kernmechanik.md).
+Die klassischen 6 Attribute — **STR, CON, DEX, INT, WIS, CHA** (Namen final, keine eingedeutschten Entsprechungen nötig). Generierung: **4d6, die 3 höchsten Würfel zählen**, Ergebnis frei auf die 6 Attribute verteilt. Skala 3–18, Modifikator-Tabelle siehe [02-kernmechanik.md](02-kernmechanik.md). Alters-Modifikator (siehe oben) wird danach angewendet.
 
 ## Trefferpunkte (HP)
 

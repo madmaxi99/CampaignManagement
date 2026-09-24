@@ -40,6 +40,7 @@ Voll ausgearbeiteter Entwurf nach dem Statblock-Format aus [09-bestiary-und-npcs
 ## Wildtiere
 
 - **Wolf** (2 Moves, SI 2, 9 HP, AC 12, Angriff +4, meist im Rudel) — *Jagt nie allein, wenn er es vermeiden kann.* Move 1: *Biss* (1W6); Move 2: *Rudel-Hetzen* (Utility — Vorteil für weitere Wölfe gegen ein bereits gebissenes Ziel)
+- **Hund (Begleittier)** (1 Move, SI 1, 6 HP, AC 11, Angriff +3) — *Kein Kampfmonster, ein treuer Gefährte — schwächer als sein wilder Vetter, dem Wolf.* Move: *Biss* (1W4). Der Standard-Statblock für einen zahmen, käuflichen Begleiter (siehe [07-ausruestung-und-oekonomie.md](07-ausruestung-und-oekonomie.md)) — für andere kleine Begleittiere (Katze, Frettchen, Falke o. Ä.) einfach umbenennen, Werte bleiben gleich. Rein mundan, keine Magie nötig.
 - **Riesenspinne** (2 Moves, SI 4, 15 HP, AC 12, Angriff +4) — *Lauert in Netzen, meidet offenen Kampf — das Gift ist die eigentliche Gefahr, nicht der Biss selbst.* Move 1: *Biss* (1W6, vergiftet); Move 2: *Netz* (Utility — Restrained)
 - **Bär** (2 Moves, SI 6, 18 HP, AC 12, Angriff +5) — *Territorial, nicht grundsätzlich aggressiv — aber wehe, man kommt zu nah, dann trifft die Tatze richtig hart.* Move 1: *Tatzenhieb* (1W10); Move 2: *Umklammern* (Utility — Grapple-Effekt)
 - **Riesenschlange** (2 Moves, SI 4, 15 HP, AC 12, Angriff +4) — *Geduldig, fast unsichtbar bis zum Angriff — auch hier ist die Umklammerung das eigentliche Problem, nicht der Biss.* Move 1: *Biss* (1W6, vergiftet); Move 2: *Umschlingen* (Utility — Restrained)

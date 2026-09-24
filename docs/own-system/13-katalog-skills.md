@@ -4,6 +4,13 @@ Erweiterter Skill-Katalog aus [01-charakter.md](01-charakter.md). Design-Prinzip
 
 Es gibt drei Wege, mechanisch stärker zu werden: **Zauber lernen** (siehe [14-katalog-zauber.md](14-katalog-zauber.md)), **bessere Ausrüstung** (siehe [15-katalog-items.md](15-katalog-items.md)) oder **mehr/bessere Skills**. Dadurch lohnt sich eine breite, tiefe Skill-Liste — mehr Skills zu haben ist ein echter Vorteil, nicht nur Flavor.
 
+**Skills nach der Erschaffung dazulernen**: Profession + Alter (siehe [01-charakter.md](01-charakter.md)) ist nur der Startpunkt, kein Deckel. Genau wie Zauberränge (siehe [14-katalog-zauber.md](14-katalog-zauber.md)) wächst auch die Skill-Liste über die Kampagne, auf zwei Wegen:
+
+1. **Praxis** — einen Skill lange genug tatsächlich gebraucht und dabei überlebt. Konkreter Trigger für die kampfrelevanten Skills: **10 Kämpfe mit dieser Waffe(nklasse)/Rüstungskategorie überlebt** → Waffenkunde/Rüstungskunde dafür automatisch freigeschaltet. Ein Bauer, der ein Dutzend Kämpfe mit dem Schwert übersteht, muss nicht für immer der ungeübte Bauer aus dem Waffenkunde-Eintrag unten bleiben.
+2. **Lehrer/Meister** — ein NPC, der den Skill kann, bringt ihn in **1–2 Ingame-Tagen** gezielter Übung bei. Schneller als Weg 1, aber erst muss ein passender Lehrer gefunden werden — ein narrativer Flaschenhals, kein Freikauf.
+
+Bewusst kein Kostentabellen-/Skillpunkte-Zahlenwerk, GM-Adjudikation reicht. Beide Wege bremsen sich von selbst: Weg 1 braucht echte Kampf-Sessions (nicht offscreen grindbar), Weg 2 braucht einen Lehrer, den die Story erst hergeben muss — die Gruppe kann sich also nicht einfach "freispielen", ohne die Kampagne zu spielen.
+
 ## Körperlich / Athletik
 
 - **Acrobatics** — Klettern/Balancieren kann jeder. Skill: andere per Seil/Knoten unterstützen, riskante Stunts, Gleichgewicht auch unter widrigen Bedingungen.
@@ -68,7 +75,8 @@ Es gibt drei Wege, mechanisch stärker zu werden: **Zauber lernen** (siehe [14-k
 
 ## Kampfnah (non-weapon)
 
-- **Waffenkunde** — jeder kann eine Waffe halten (siehe 03-kampf.md). Skill: Waffe identifizieren/bewerten, Wartung verhindert Fehlfunktion.
+- **Waffenkunde** — jeder kann eine Waffe halten und damit zuschlagen. Ohne den Skill: Bane auf den Angriffswurf mit dieser Waffe(nklasse) — man führt sie ungelenk, trifft aber, wenn man trifft, genauso hart (Schaden ist unverändert). Mit Skill: kein Malus, normaler Angriffsbonus. Zusätzlich (Prosa/GM): Waffe identifizieren/bewerten, Wartung verhindert Fehlfunktion. Der Skill ist an die Waffe/Profession gebunden, nicht an die Person per se — ein Bauer, der beim Militär war, kann "Waffenkunde: Schwert" durchaus haben.
+- **Rüstungskunde** — jeder kann sich Rüstung anlegen, ein hartes Trainingserfordernis gibt es nicht (siehe [15-katalog-items.md](15-katalog-items.md)). **Leichte** Rüstung ist simpel genug, dass sie immer ihren vollen AC-Bonus gibt, kein Skill nötig. Bei **Mittlerer/Schwerer** Rüstung: ohne den Skill wird der AC-Bonus nicht realisiert (AC bleibt bei 10 + DEX-Mod, man trägt sie nur äußerlich). Mit Skill: voller AC-Bonus. Die gewichtsbasierten Mali (Bane auf körperliche Proben bei Mittel/Schwer, siehe [15-katalog-items.md](15-katalog-items.md)) gelten davon unabhängig für jeden Träger, trainiert oder nicht — Training macht die Rüstung wirksam, nicht leicht.
 - **Kampftaktik** — jeder kann angreifen. Skill: die Gruppe für einen spürbaren Vorteil in der nächsten Runde positionieren.
 - **Reiten** — jeder kann grob auf einem zahmen Reittier sitzen. Skill: im Kampf/unter Stress kontrolliert reiten, Kunststücke.
 - **Waffenloser Kampf** — jeder kann grob zuschlagen ohne Waffe. Skill: gezielte Griffe/Würfe, die einen Gegner entwaffnen/zu Boden bringen (Prone).
@@ -108,5 +116,5 @@ Weitere Skill-Ideen, gesammelt aber bewusst **nicht** ins Kernset oben übernomm
 
 ## Offen
 
-- **Final: Impact-Effekte bleiben bewusst in Prosa, nicht in exakten Zahlen** (Ausnahme: die Handvoll Skills mit echtem Kampf-/Zauber-Bezug, die bereits präzise sind, z. B. Waffenkunde im Angriffsbonus, Verteidigungshaltung). Ein "+2 auf X, Freischaltung Y" für alle ~58 Skills würde genau die Bürokratie erzeugen, vor der die Erweiterungsliste unten schon schützen soll — die GM-Adjudikation der Prosa-Effekte ist hier Feature, nicht Lücke.
+- **Final: Impact-Effekte bleiben bewusst in Prosa, nicht in exakten Zahlen** (Ausnahme: die Handvoll Skills mit echtem Kampf-/Zauber-Bezug, die bereits präzise sind, z. B. Waffenkunde/Rüstungskunde im Angriffsbonus bzw. AC, Verteidigungshaltung). Ein "+2 auf X, Freischaltung Y" für alle ~58 Skills würde genau die Bürokratie erzeugen, vor der die Erweiterungsliste unten schon schützen soll — die GM-Adjudikation der Prosa-Effekte ist hier Feature, nicht Lücke.
 - Weitere Skills nach Bedarf, sobald konkrete Spielsituationen sie verlangen — siehe Erweiterungsliste oben als Startpunkt

@@ -8,6 +8,10 @@ Siehe [03-kampf.md](03-kampf.md) — klassische Fantasy-Kategorien, keine granul
 
 Standard-Abenteurer-Ausrüstung, nichts Exotisches. Dazu eine Handvoll Flavor-Consumables (z. B. Bier, Wein) — keine erschöpfende Liste, nur ein paar Beispiele fürs Flair.
 
+## Begleittiere
+
+Ein zahmer Begleiter (Hund o. Ä.) ist käuflich, kein Magie-/Zauber-Feature — Statblock siehe **Hund (Begleittier)** in [16-katalog-bestiarium.md](16-katalog-bestiarium.md), reflavorbar für andere kleine Tiere (Katze, Frettchen, Falke). **Preis: 15 Silber**, auch für arme Charaktere erschwinglich. Kämpft mit im Statblock-Move, hat eigene HP (kann sterben), reagiert im Kampf auf **Tierumgang** (siehe [13-katalog-skills.md](13-katalog-skills.md)) — ohne den Skill folgt es nur groben, einfachen Kommandos.
+
 ## Währungssystem
 
 Klassisch: **Gold/Silber/Kupfer**.
