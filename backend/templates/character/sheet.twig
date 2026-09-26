@@ -6,14 +6,19 @@
 <div class="sheet" data-slug="{{ character.slug }}">
 
     <header class="sheet-header">
-        <h1>{{ character.name_de }}</h1>
-        <dl class="sheet-header-facts">
-            <div><dt>Volk</dt><dd>{{ character.kin_de }}</dd></div>
-            <div><dt>Alter</dt><dd>{{ character.age_de }}</dd></div>
-            <div><dt>Beruf</dt><dd>{{ character.profession_de }}</dd></div>
-            <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
-        </dl>
-        <p class="appearance">{{ character.appearance_de }}</p>
+        <div class="sheet-header-inner">
+            <img class="sheet-portrait" src="/images/characters/{{ character.slug }}.jpg" alt="{{ character.name_de }}" onerror="this.remove()">
+            <div class="sheet-header-text">
+                <h1>{{ character.name_de }}</h1>
+                <dl class="sheet-header-facts">
+                    <div><dt>Volk</dt><dd>{{ character.kin_de }}</dd></div>
+                    <div><dt>Alter</dt><dd>{{ character.age_de }}</dd></div>
+                    <div><dt>Beruf</dt><dd>{{ character.profession_de }}</dd></div>
+                    <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
+                </dl>
+                <p class="appearance">{{ character.appearance_de }}</p>
+            </div>
+        </div>
     </header>
 
     <section class="card attributes">
@@ -66,36 +71,73 @@
         </div>
     </section>
 
-    <section class="card skills">
-        <h2>Fertigkeiten</h2>
-        <div class="skill-columns">
-            <div class="skill-column">
-                <h3>Fertigkeiten</h3>
-                <ul class="skill-list">
-                    {% for skill in regularSkills %}
-                        <li><span class="skill-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span><span class="skill-value">{{ skill.value }}</span></li>
+    <section class="card skills-spells">
+        <div class="card-heading-row">
+            <h2>Fertigkeiten &amp; Zauber</h2>
+            <button type="button" id="downtime-button">Downtime</button>
+        </div>
+
+        <h3>Fertigkeiten</h3>
+        <ul class="entry-list" id="regular-skills-list">
+            {% for skill in regularSkills %}
+                <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': 'regular', 'value': skill.value}|json_encode|e('html_attr') }}">
+                    <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
+                        <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
+                    </label>
+                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                    <span class="entry-value">{{ skill.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Kampffertigkeiten</h3>
+        <ul class="entry-list">
+            {% for skill in combatSkills %}
+                <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': 'combat', 'value': skill.value}|json_encode|e('html_attr') }}">
+                    <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
+                        <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
+                    </label>
+                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                    <span class="entry-value">{{ skill.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <h3>Sekundäre Fertigkeiten</h3>
+        <ul class="entry-list">
+            {% for skill in secondarySkills %}
+                <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': 'secondary', 'value': skill.value}|json_encode|e('html_attr') }}">
+                    <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
+                        <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
+                    </label>
+                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                    <span class="entry-value">{{ skill.value }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div class="card-heading-row">
+            <h3>Zauber &amp; Tricks</h3>
+            <div class="add-form">
+                <select id="learn-spell-select">
+                    <option value="">Neuen Zauber lernen…</option>
+                    {% for spell in availableSpells %}
+                        <option value="{{ spell.id }}">{{ spell.name_de }}</option>
                     {% endfor %}
-                </ul>
-            </div>
-            <div class="skill-column">
-                <h3>Kampffertigkeiten</h3>
-                <ul class="skill-list">
-                    {% for skill in combatSkills %}
-                        <li><span class="skill-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span><span class="skill-value">{{ skill.value }}</span></li>
-                    {% endfor %}
-                </ul>
-                <h3>Sekundäre Fertigkeiten</h3>
-                <ul class="skill-list">
-                    {% for skill in secondarySkills %}
-                        <li><span class="skill-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span><span class="skill-value">{{ skill.value }}</span></li>
-                    {% endfor %}
-                </ul>
+                </select>
+                <button type="button" id="learn-spell-button">Lernen</button>
             </div>
         </div>
-    </section>
+        <ul class="entry-list">
+            {% for spell in spells %}
+                <li class="entry-row" data-detail="{{ {'type': 'spell', 'name': spell.name_de, 'components': spell.components_de, 'castingTime': spell.casting_time_de, 'range': spell.range_de, 'duration': spell.duration_de, 'wpNote': spell.wp_note_de, 'effect': spell.effect_de}|json_encode|e('html_attr') }}">
+                    <span class="entry-name">{{ spell.name_de }}</span>
+                    <span class="entry-value">{{ spell.wp_note_de }}</span>
+                </li>
+            {% endfor %}
+        </ul>
 
-    <section class="card talents-spells">
-        <h2>Talente &amp; Zauber</h2>
+        <h3>Talente</h3>
         <ul class="talent-list">
             {% for talent in talents %}
                 <li>
@@ -104,68 +146,145 @@
                 </li>
             {% endfor %}
         </ul>
-        <ul class="spell-list">
-            {% for spell in spells %}
-                <li>
-                    <span class="spell-name">{{ spell.name_de }} <small>({{ spell.wp_note_de }})</small></span>
-                    {% if spell.type == 'spell' %}
-                        <p class="spell-meta">
-                            Vorgabe: {{ spell.components_de }} &middot;
-                            Zauberdauer: {{ spell.casting_time_de }} &middot;
-                            Reichweite: {{ spell.range_de }} &middot;
-                            Wirkungsdauer: {{ spell.duration_de }}
-                        </p>
-                    {% endif %}
-                    <p class="spell-effect">{{ spell.effect_de }}</p>
-                </li>
-            {% endfor %}
-        </ul>
     </section>
 
-    <section class="card equipment">
-        <h2>Ausrüstung</h2>
-        <div class="equipment-columns">
-            <div>
-                <h3>Waffen</h3>
-                <table class="weapon-table">
-                    <thead>
-                        <tr><th>Name</th><th>Griff</th><th>Reichweite</th><th>Schaden</th><th>Haltbarkeit</th><th>Merkmale</th></tr>
-                    </thead>
-                    <tbody>
-                        {% for weapon in weapons %}
-                            <tr>
-                                <td>{{ weapon.name_de }}</td>
-                                <td>{{ weapon.grip_de }}</td>
-                                <td>{{ weapon.range_de }}</td>
-                                <td>{{ weapon.damage_de }}</td>
-                                <td>{{ weapon.durability }}</td>
-                                <td>{{ weapon.traits_de }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                <h3>Rüstung</h3>
-                <p>Körper: {% if armor.body %}{{ armor.body.name_de }} ({{ armor.body.armor_value }}){% else %}—{% endif %}</p>
-                <p>Helm: {% if armor.head %}{{ armor.head.name_de }} ({{ armor.head.armor_value }}){% else %}—{% endif %}</p>
-            </div>
-            <div>
-                <h3>Inventar</h3>
-                <ul class="inventory-list">
-                    {% for item in inventory %}
-                        <li>{{ item.item_name_de }}{% if item.quantity > 1 %} &times;{{ item.quantity }}{% endif %}</li>
+    <section class="card equipment-list">
+        <div class="card-heading-row">
+            <h2>Waffen</h2>
+            <div class="add-form">
+                <select id="weapon-catalog-select">
+                    <option value="">Waffe hinzufügen…</option>
+                    {% for item in weaponCatalog %}
+                        <option value="{{ item.id }}">{{ item.name_de }} ({{ item.price_copper }} Kupfer)</option>
                     {% endfor %}
-                    <li>{{ character.misc_items_de }}</li>
-                </ul>
-                <h3>Münzen</h3>
-                <p class="coins">
-                    <span>{{ character.coins_gold }} Gold</span>
-                    <span>{{ character.coins_silver }} Silber</span>
-                    <span>{{ character.coins_copper }} Kupfer</span>
-                </p>
+                </select>
+                <input type="number" id="weapon-quantity-input" value="1" min="1">
+                <button type="button" id="weapon-add-button">Hinzufügen</button>
             </div>
+        </div>
+        <table class="item-table" id="weapons-table">
+            <thead>
+                <tr><th>Name</th><th>Griff</th><th>Reichweite</th><th>Schaden</th><th>Haltbarkeit</th><th>Merkmale</th><th>Menge</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for weapon in weapons %}
+                    <tr data-row-id="{{ weapon.row_id }}">
+                        <td>{{ weapon.name_de }}</td>
+                        <td>{{ weapon.grip_de }}</td>
+                        <td>{{ weapon.range_de }}</td>
+                        <td>{{ weapon.damage_de }}</td>
+                        <td>{{ weapon.durability }}</td>
+                        <td>{{ weapon.traits_de }}</td>
+                        <td><input type="number" class="quantity-input" data-segment="weapons" data-row-id="{{ weapon.row_id }}" value="{{ weapon.quantity }}" min="0"></td>
+                        <td><button type="button" class="remove-button" data-segment="weapons" data-row-id="{{ weapon.row_id }}">✕</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card equipment-list">
+        <div class="card-heading-row">
+            <h2>Rüstung</h2>
+            <div class="add-form">
+                <select id="armor-catalog-select">
+                    <option value="">Rüstung hinzufügen…</option>
+                    {% for item in armorCatalog %}
+                        <option value="{{ item.id }}">{{ item.name_de }} ({{ item.price_copper }} Kupfer)</option>
+                    {% endfor %}
+                </select>
+                <input type="number" id="armor-quantity-input" value="1" min="1">
+                <button type="button" id="armor-add-button">Hinzufügen</button>
+            </div>
+        </div>
+        <table class="item-table" id="armor-table">
+            <thead>
+                <tr><th>Name</th><th>Slot</th><th>Rüstungswert</th><th>Nachteil bei</th><th>Menge</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for piece in armor %}
+                    <tr data-row-id="{{ piece.row_id }}">
+                        <td>{{ piece.name_de }}</td>
+                        <td>{{ piece.slot == 'body' ? 'Körper' : 'Kopf' }}</td>
+                        <td>{{ piece.armor_value }}</td>
+                        <td>{{ piece.penalty_skills_de }}</td>
+                        <td><input type="number" class="quantity-input" data-segment="armor" data-row-id="{{ piece.row_id }}" value="{{ piece.quantity }}" min="0"></td>
+                        <td><button type="button" class="remove-button" data-segment="armor" data-row-id="{{ piece.row_id }}">✕</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card equipment-list">
+        <div class="card-heading-row">
+            <h2>Inventar</h2>
+            <div class="add-form">
+                <select id="inventory-catalog-select">
+                    <option value="">Gegenstand hinzufügen…</option>
+                    {% for item in miscCatalog %}
+                        <option value="{{ item.id }}">{{ item.name_de }} ({{ item.price_copper }} Kupfer)</option>
+                    {% endfor %}
+                </select>
+                <input type="number" id="inventory-quantity-input" value="1" min="1">
+                <button type="button" id="inventory-add-button">Hinzufügen</button>
+            </div>
+        </div>
+        <table class="item-table" id="inventory-table">
+            <thead>
+                <tr><th>Name</th><th>Beschreibung</th><th>Menge</th><th></th></tr>
+            </thead>
+            <tbody>
+                {% for item in inventory %}
+                    <tr data-row-id="{{ item.row_id }}">
+                        <td>{{ item.name_de }}</td>
+                        <td>{{ item.description_de }}</td>
+                        <td><input type="number" class="quantity-input" data-segment="inventory" data-row-id="{{ item.row_id }}" value="{{ item.quantity }}" min="0"></td>
+                        <td><button type="button" class="remove-button" data-segment="inventory" data-row-id="{{ item.row_id }}">✕</button></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <p class="misc-flavor">Kleinkram: {{ character.misc_items_de }}</p>
+    </section>
+
+    <section class="card currency">
+        <h2>Münzen</h2>
+        <div class="currency-fields">
+            <label>Gold <input type="number" id="coins-gold" value="{{ character.coins_gold }}" min="0"></label>
+            <label>Silber <input type="number" id="coins-silver" value="{{ character.coins_silver }}" min="0"></label>
+            <label>Kupfer <input type="number" id="coins-copper" value="{{ character.coins_copper }}" min="0"></label>
+            <button type="button" id="currency-save-button">Speichern</button>
         </div>
     </section>
 
 </div>
+
+<div class="modal-backdrop" id="detail-modal-backdrop" hidden>
+    <div class="modal" id="detail-modal">
+        <button type="button" class="modal-close" id="detail-modal-close">✕</button>
+        <div id="detail-modal-content"></div>
+    </div>
+</div>
+
+<div class="modal-backdrop" id="downtime-modal-backdrop" hidden>
+    <div class="modal" id="downtime-modal">
+        <button type="button" class="modal-close" id="downtime-modal-close">✕</button>
+        <h2>Downtime — Markierte Fertigkeiten</h2>
+        <ul class="downtime-list" id="downtime-list">
+            {% for skill in markedSkills %}
+                <li data-skill-id="{{ skill.id }}">
+                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                    <span class="entry-value" data-current-value>{{ skill.value }}</span>
+                    <button type="button" class="advance-button" data-apply="1" data-skill-id="{{ skill.id }}">Aufleveln</button>
+                    <button type="button" class="advance-button" data-apply="0" data-skill-id="{{ skill.id }}">Verwerfen</button>
+                </li>
+            {% else %}
+                <li class="downtime-empty">Keine markierten Fertigkeiten.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
 <script src="/js/character-sheet.js"></script>
 {% endblock %}

@@ -36,11 +36,46 @@ CREATE TABLE spells (
     FOREIGN KEY (school_skill_id) REFERENCES skills(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Item catalog (for loot drops / shops, populated incrementally)
+
+CREATE TABLE items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name_de VARCHAR(150) NOT NULL,
+    description_de TEXT NOT NULL,
+    rarity ENUM('gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär') NOT NULL DEFAULT 'gewöhnlich',
+    price_copper INT NOT NULL DEFAULT 0,
+    kind ENUM('weapon', 'armor', 'misc') NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE item_weapons (
+    item_id INT PRIMARY KEY,
+    grip_de VARCHAR(50) NOT NULL,
+    range_de VARCHAR(50) NOT NULL,
+    damage_de VARCHAR(50) NOT NULL,
+    durability INT NOT NULL,
+    traits_de VARCHAR(100) NULL,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE item_armor (
+    item_id INT PRIMARY KEY,
+    slot ENUM('body', 'head') NOT NULL,
+    armor_value INT NOT NULL,
+    penalty_skills_de VARCHAR(255) NULL,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE item_misc (
+    item_id INT PRIMARY KEY,
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Characters
 
 CREATE TABLE characters (
     id INT AUTO_INCREMENT PRIMARY KEY,
     slug VARCHAR(100) NOT NULL UNIQUE,
+    is_default BOOLEAN NOT NULL DEFAULT 0,
     name_de VARCHAR(100) NOT NULL,
     kin_de VARCHAR(100) NOT NULL,
     age_de VARCHAR(50) NOT NULL,
@@ -86,6 +121,7 @@ CREATE TABLE character_skills (
     character_id INT NOT NULL,
     skill_id INT NOT NULL,
     value INT NOT NULL,
+    marked_for_advancement BOOLEAN NOT NULL DEFAULT 0,
     PRIMARY KEY (character_id, skill_id),
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
     FOREIGN KEY (skill_id) REFERENCES skills(id)
@@ -111,30 +147,27 @@ CREATE TABLE character_spells (
 CREATE TABLE character_weapons (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
-    name_de VARCHAR(100) NOT NULL,
-    grip_de VARCHAR(50) NOT NULL,
-    range_de VARCHAR(50) NOT NULL,
-    damage_de VARCHAR(50) NOT NULL,
-    durability INT NOT NULL,
-    traits_de VARCHAR(100) NULL,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    item_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE character_armor (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
-    slot ENUM('body', 'head') NOT NULL,
-    name_de VARCHAR(100) NOT NULL,
-    armor_value INT NOT NULL,
-    penalty_skills_de VARCHAR(255) NULL,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    item_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE character_inventory (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
     position INT NOT NULL,
-    item_name_de VARCHAR(150) NOT NULL,
+    item_id INT NOT NULL,
     quantity INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

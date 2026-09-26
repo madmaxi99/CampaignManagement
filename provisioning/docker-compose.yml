@@ -37,11 +37,24 @@ services:
       - mariadb_data:/var/lib/mysql
       - ../database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
       - ../database/seed_aodhan.sql:/docker-entrypoint-initdb.d/02_seed_aodhan.sql:ro
+      - ../database/seed_pregens.sql:/docker-entrypoint-initdb.d/03_seed_pregens.sql:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 5s
       retries: 10
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    ports:
+      - "8091:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_USER: "${DB_USER}"
+      PMA_PASSWORD: "${DB_PASSWORD}"
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
 volumes:
   composer:

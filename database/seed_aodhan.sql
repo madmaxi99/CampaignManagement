@@ -77,6 +77,26 @@ INSERT INTO spells (name_de, type, school_skill_id, components_de, casting_time_
         'Wort, Geste', 'Aktion', '10 m', 'Tagesabschnitt', '2 WP je Kraftstufe',
         'Hebt eine 3 m hohe Säule an; Akrobatik-Probe oder Sturz mit Sturzschaden. +3 m Höhe pro weiterer Kraftstufe.');
 
+-- Item catalog (seeded incrementally — placeholder prices where the quickstart gives none)
+
+INSERT INTO items (name_de, description_de, rarity, price_copper, kind) VALUES
+    ('Stab', 'Ein einfacher Holzstab, wie ihn Elementaristen zum Fokussieren ihrer Magie nutzen.', 'gewöhnlich', 100, 'weapon'),
+    ('Zauberbuch', 'Ein abgegriffenes Buch voller handschriftlicher Notizen zu Zaubersprüchen.', 'ungewöhnlich', 200, 'misc'),
+    ('Fackel', 'Eine Fackel, die ca. eine Stunde lang brennt.', 'gewöhnlich', 5, 'misc'),
+    ('Wein', 'Eine Flasche einfacher Rotwein.', 'gewöhnlich', 30, 'misc'),
+    ('Buch', 'Ein gebundenes Buch mit unbekanntem Inhalt.', 'gewöhnlich', 50, 'misc'),
+    ('Amulett der Klarheit', 'Ein altes Amulett, das Gedanken zu ordnen scheint. Angeblich selten und begehrt.', 'selten', 500, 'misc'),
+    ('Lederrüstung', 'Einfache, flexible Rüstung aus gegerbtem Leder.', 'gewöhnlich', 150, 'armor');
+
+INSERT INTO item_weapons (item_id, grip_de, range_de, damage_de, durability, traits_de)
+SELECT id, '2-händig', '2', 'W8', 9, 'Wucht' FROM items WHERE name_de = 'Stab';
+
+INSERT INTO item_armor (item_id, slot, armor_value, penalty_skills_de)
+SELECT id, 'body', 2, 'Heimlichkeit, Ausweichen, Akrobatik' FROM items WHERE name_de = 'Lederrüstung';
+
+INSERT INTO item_misc (item_id)
+SELECT id FROM items WHERE name_de IN ('Zauberbuch', 'Fackel', 'Wein', 'Buch', 'Amulett der Klarheit');
+
 -- Character: Erzmeister Aodhan
 
 INSERT INTO characters (
@@ -166,11 +186,12 @@ SELECT @aodhan_id, id FROM spells;
 
 -- Weapon
 
-INSERT INTO character_weapons (character_id, name_de, grip_de, range_de, damage_de, durability, traits_de) VALUES
-    (@aodhan_id, 'Stab', '2-händig', '2', 'W8', 9, 'Wucht');
+INSERT INTO character_weapons (character_id, item_id, quantity)
+SELECT @aodhan_id, id, 1 FROM items WHERE name_de = 'Stab';
 
 -- Inventory
 
-INSERT INTO character_inventory (character_id, position, item_name_de, quantity) VALUES
-    (@aodhan_id, 1, 'Zauberbuch', 1),
-    (@aodhan_id, 2, 'Fackel', 2);
+INSERT INTO character_inventory (character_id, position, item_id, quantity)
+SELECT @aodhan_id, 1, id, 1 FROM items WHERE name_de = 'Zauberbuch'
+UNION ALL
+SELECT @aodhan_id, 2, id, 2 FROM items WHERE name_de = 'Fackel';
