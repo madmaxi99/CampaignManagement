@@ -596,50 +596,6 @@ button#downtime-button:hover {
     width: 100px;
 }
 
-.modal-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.55);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    padding: 16px;
-}
-
-.modal-backdrop[hidden] {
-    display: none;
-}
-
-.modal {
-    position: relative;
-    background: var(--parchment);
-    border-radius: var(--card-radius);
-    border: 1px solid var(--parchment-dark);
-    padding: 24px;
-    max-width: 480px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-}
-
-.modal h2 {
-    margin-top: 0;
-    color: var(--green-deep);
-}
-
-.modal-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: transparent;
-    border: none;
-    font-size: 1.1rem;
-    cursor: pointer;
-    color: var(--green-mid);
-}
-
 .downtime-list {
     list-style: none;
     margin: 0;
@@ -853,6 +809,11 @@ button#downtime-button:hover {
 
 .entity-modal-body {
     clear: both;
+}
+
+.entity-modal-body h2 {
+    margin-top: 0;
+    color: var(--green-deep);
 }
 
 .location-block {

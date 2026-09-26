@@ -15,29 +15,13 @@
 {% endmacro %}
 
 {% import _self as characters_macros %}
+{% import "_entity_grid_page.twig" as grid_page %}
 
 {% block content %}
-<div class="characters-page">
-    <h1>Characters</h1>
-
-    <section class="character-section">
-        <h2>Default</h2>
-        <div class="character-grid">
-            {% for character in defaultCharacters %}
-                {{ characters_macros.character_card(character) }}
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="character-section">
-        <h2>Selbsterstellt</h2>
-        <div class="character-grid">
-            {% for character in customCharacters %}
-                {{ characters_macros.character_card(character) }}
-            {% else %}
-                <p class="character-section-empty">Noch keine selbsterstellten Charaktere.</p>
-            {% endfor %}
-        </div>
-    </section>
-</div>
+    {{ grid_page.render(
+        'Characters',
+        defaultCharacters|map(c => characters_macros.character_card(c)),
+        customCharacters|map(c => characters_macros.character_card(c)),
+        'Noch keine selbsterstellten Charaktere.'
+    ) }}
 {% endblock %}

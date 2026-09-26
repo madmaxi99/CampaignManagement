@@ -10,29 +10,13 @@
 {% endmacro %}
 
 {% import _self as campaign_macros %}
+{% import "_entity_grid_page.twig" as grid_page %}
 
 {% block content %}
-<div class="characters-page">
-    <h1>Campaigns</h1>
-
-    <section class="character-section">
-        <h2>Default</h2>
-        <div class="character-grid">
-            {% for campaign in defaultCampaigns %}
-                {{ campaign_macros.campaign_card(campaign) }}
-            {% endfor %}
-        </div>
-    </section>
-
-    <section class="character-section">
-        <h2>Selbsterstellt</h2>
-        <div class="character-grid">
-            {% for campaign in customCampaigns %}
-                {{ campaign_macros.campaign_card(campaign) }}
-            {% else %}
-                <p class="character-section-empty">Noch keine selbsterstellten Kampagnen.</p>
-            {% endfor %}
-        </div>
-    </section>
-</div>
+    {{ grid_page.render(
+        'Campaigns',
+        defaultCampaigns|map(c => campaign_macros.campaign_card(c)),
+        customCampaigns|map(c => campaign_macros.campaign_card(c)),
+        'Noch keine selbsterstellten Kampagnen.'
+    ) }}
 {% endblock %}

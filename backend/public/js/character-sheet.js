@@ -59,7 +59,7 @@
 
     // --- Detail modal (skills & spells) ---
 
-    const detailBackdrop = document.getElementById('detail-modal-backdrop');
+    const detailModal = document.getElementById('detail-modal');
     const detailContent = document.getElementById('detail-modal-content');
 
     function renderSkillDetail(detail) {
@@ -87,16 +87,14 @@
         row.addEventListener('click', () => {
             const detail = JSON.parse(row.dataset.detail);
             detailContent.innerHTML = detail.type === 'spell' ? renderSpellDetail(detail) : renderSkillDetail(detail);
-            detailBackdrop.hidden = false;
+            detailModal.showModal();
         });
     });
 
-    document.getElementById('detail-modal-close').addEventListener('click', () => {
-        detailBackdrop.hidden = true;
-    });
-    detailBackdrop.addEventListener('click', (event) => {
-        if (event.target === detailBackdrop) {
-            detailBackdrop.hidden = true;
+    document.getElementById('detail-modal-close').addEventListener('click', () => detailModal.close());
+    detailModal.addEventListener('click', (event) => {
+        if (event.target === detailModal) {
+            detailModal.close();
         }
     });
 
@@ -110,7 +108,7 @@
 
     // --- Downtime panel ---
 
-    const downtimeBackdrop = document.getElementById('downtime-modal-backdrop');
+    const downtimeModal = document.getElementById('downtime-modal');
     const downtimeList = document.getElementById('downtime-list');
 
     function renderDowntimeList(skills) {
@@ -135,16 +133,14 @@
             .then((response) => response.json())
             .then((skills) => {
                 renderDowntimeList(skills);
-                downtimeBackdrop.hidden = false;
+                downtimeModal.showModal();
             });
     });
 
-    document.getElementById('downtime-modal-close').addEventListener('click', () => {
-        downtimeBackdrop.hidden = true;
-    });
-    downtimeBackdrop.addEventListener('click', (event) => {
-        if (event.target === downtimeBackdrop) {
-            downtimeBackdrop.hidden = true;
+    document.getElementById('downtime-modal-close').addEventListener('click', () => downtimeModal.close());
+    downtimeModal.addEventListener('click', (event) => {
+        if (event.target === downtimeModal) {
+            downtimeModal.close();
         }
     });
 

@@ -2,6 +2,22 @@
 
 {% block title %}{{ character.name_de }}{% endblock %}
 
+{% macro skill_list(skills, category, listId) %}
+    <ul class="entry-list"{% if listId %} id="{{ listId }}"{% endif %}>
+        {% for skill in skills %}
+            <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': category, 'value': skill.value}|json_encode|e('html_attr') }}">
+                <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
+                    <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
+                </label>
+                <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                <span class="entry-value">{{ skill.value }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% import _self as sheet_macros %}
+
 {% block content %}
 <div class="sheet" data-slug="{{ character.slug }}">
 
@@ -78,43 +94,13 @@
         </div>
 
         <h3>Fertigkeiten</h3>
-        <ul class="entry-list" id="regular-skills-list">
-            {% for skill in regularSkills %}
-                <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': 'regular', 'value': skill.value}|json_encode|e('html_attr') }}">
-                    <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
-                        <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
-                    </label>
-                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
-                    <span class="entry-value">{{ skill.value }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        {{ sheet_macros.skill_list(regularSkills, 'regular', 'regular-skills-list') }}
 
         <h3>Kampffertigkeiten</h3>
-        <ul class="entry-list">
-            {% for skill in combatSkills %}
-                <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': 'combat', 'value': skill.value}|json_encode|e('html_attr') }}">
-                    <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
-                        <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
-                    </label>
-                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
-                    <span class="entry-value">{{ skill.value }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        {{ sheet_macros.skill_list(combatSkills, 'combat') }}
 
         <h3>Sekundäre Fertigkeiten</h3>
-        <ul class="entry-list">
-            {% for skill in secondarySkills %}
-                <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': 'secondary', 'value': skill.value}|json_encode|e('html_attr') }}">
-                    <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
-                        <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
-                    </label>
-                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
-                    <span class="entry-value">{{ skill.value }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        {{ sheet_macros.skill_list(secondarySkills, 'secondary') }}
 
         <div class="card-heading-row">
             <h3>Zauber &amp; Tricks</h3>
@@ -260,16 +246,14 @@
 
 </div>
 
-<div class="modal-backdrop" id="detail-modal-backdrop" hidden>
-    <div class="modal" id="detail-modal">
-        <button type="button" class="modal-close" id="detail-modal-close">✕</button>
-        <div id="detail-modal-content"></div>
-    </div>
-</div>
+<dialog class="entity-modal" id="detail-modal">
+    <button type="button" class="entity-modal-close" id="detail-modal-close" aria-label="Schließen">×</button>
+    <div class="entity-modal-body" id="detail-modal-content"></div>
+</dialog>
 
-<div class="modal-backdrop" id="downtime-modal-backdrop" hidden>
-    <div class="modal" id="downtime-modal">
-        <button type="button" class="modal-close" id="downtime-modal-close">✕</button>
+<dialog class="entity-modal" id="downtime-modal">
+    <button type="button" class="entity-modal-close" id="downtime-modal-close" aria-label="Schließen">×</button>
+    <div class="entity-modal-body">
         <h2>Downtime — Markierte Fertigkeiten</h2>
         <ul class="downtime-list" id="downtime-list">
             {% for skill in markedSkills %}
@@ -284,7 +268,7 @@
             {% endfor %}
         </ul>
     </div>
-</div>
+</dialog>
 
 <script src="/js/character-sheet.js"></script>
 {% endblock %}

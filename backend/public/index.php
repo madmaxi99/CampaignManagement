@@ -60,9 +60,20 @@ function jsonResponse(Response $response, array $data): Response
     return $response->withHeader('Content-Type', 'application/json');
 }
 
-function requireCharacter(CharacterRepository $repository, string $slug): ?array
+/**
+ * Wraps a route handler so it only runs once the character behind {slug}
+ * was found, passing it in as the fourth argument; otherwise responds 404.
+ */
+function withCharacter(CharacterRepository $repository, callable $handler): callable
 {
-    return $repository->findBySlug($slug);
+    return function (Request $request, Response $response, array $args) use ($repository, $handler) {
+        $character = $repository->findBySlug($args['slug']);
+        if ($character === null) {
+            return $response->withStatus(404);
+        }
+
+        return $handler($request, $response, $args, $character);
+    };
 }
 
 $app->get('/characters', function (Request $request, Response $response) use ($characterRepository) {
@@ -147,47 +158,27 @@ $app->get('/character/{slug}', function (Request $request, Response $response, a
     return $twig->render($response, 'character/sheet.twig', $sheet);
 });
 
-$app->post('/character/{slug}/hp', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/hp', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $newValue = $characterRepository->setHp((int) $character['id'], (int) $body['value']);
 
     return jsonResponse($response, ['hp_current' => $newValue]);
-});
+}));
 
-$app->post('/character/{slug}/wp', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/wp', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $newValue = $characterRepository->setWp((int) $character['id'], (int) $body['value']);
 
     return jsonResponse($response, ['wp_current' => $newValue]);
-});
+}));
 
-$app->post('/character/{slug}/conditions/{code}/toggle', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/conditions/{code}/toggle', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $active = $characterRepository->toggleCondition((int) $character['id'], $args['code']);
 
     return jsonResponse($response, ['code' => $args['code'], 'active' => $active]);
-});
+}));
 
-$app->post('/character/{slug}/currency', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/currency', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $characterRepository->setCurrency(
         (int) $character['id'],
@@ -197,91 +188,56 @@ $app->post('/character/{slug}/currency', function (Request $request, Response $r
     );
 
     return jsonResponse($response, ['gold' => max(0, (int) $body['gold']), 'silver' => max(0, (int) $body['silver']), 'copper' => max(0, (int) $body['copper'])]);
-});
+}));
 
-$app->get('/character/{slug}/skills/marked', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->get('/character/{slug}/skills/marked', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     return jsonResponse($response, $characterRepository->markedSkills((int) $character['id']));
-});
+}));
 
-$app->post('/character/{slug}/skills/{skillId}/mark', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/skills/{skillId}/mark', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $characterRepository->setSkillMark((int) $character['id'], (int) $args['skillId'], (bool) $body['marked']);
 
     return jsonResponse($response, ['skill_id' => (int) $args['skillId'], 'marked' => (bool) $body['marked']]);
-});
+}));
 
-$app->post('/character/{slug}/skills/{skillId}/advance', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/skills/{skillId}/advance', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $newValue = $characterRepository->advanceSkill((int) $character['id'], (int) $args['skillId'], (bool) $body['apply']);
 
     return jsonResponse($response, ['skill_id' => (int) $args['skillId'], 'value' => $newValue]);
-});
+}));
 
-$app->post('/character/{slug}/spells', function (Request $request, Response $response, array $args) use ($characterRepository) {
-    $character = requireCharacter($characterRepository, $args['slug']);
-    if ($character === null) {
-        return $response->withStatus(404);
-    }
-
+$app->post('/character/{slug}/spells', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $characterRepository->learnSpell((int) $character['id'], (int) $body['spell_id']);
 
     return jsonResponse($response, ['learned' => true]);
-});
+}));
 
 foreach (['weapons' => 'Weapon', 'armor' => 'Armor', 'inventory' => 'InventoryItem'] as $segment => $methodSuffix) {
-    $app->post("/character/{slug}/{$segment}", function (Request $request, Response $response, array $args) use ($characterRepository, $methodSuffix) {
-        $character = requireCharacter($characterRepository, $args['slug']);
-        if ($character === null) {
-            return $response->withStatus(404);
-        }
-
+    $app->post("/character/{slug}/{$segment}", withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository, $methodSuffix) {
         $body = json_decode((string) $request->getBody(), true);
         $addMethod = 'add' . $methodSuffix;
         $characterRepository->$addMethod((int) $character['id'], (int) $body['item_id'], (int) $body['quantity']);
 
         return jsonResponse($response, ['added' => true]);
-    });
+    }));
 
-    $app->post("/character/{slug}/{$segment}/{rowId}/quantity", function (Request $request, Response $response, array $args) use ($characterRepository, $methodSuffix) {
-        $character = requireCharacter($characterRepository, $args['slug']);
-        if ($character === null) {
-            return $response->withStatus(404);
-        }
-
+    $app->post("/character/{slug}/{$segment}/{rowId}/quantity", withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository, $methodSuffix) {
         $body = json_decode((string) $request->getBody(), true);
         $updateMethod = 'update' . $methodSuffix . 'Quantity';
         $characterRepository->$updateMethod((int) $character['id'], (int) $args['rowId'], (int) $body['quantity']);
 
         return jsonResponse($response, ['updated' => true]);
-    });
+    }));
 
-    $app->delete("/character/{slug}/{$segment}/{rowId}", function (Request $request, Response $response, array $args) use ($characterRepository, $methodSuffix) {
-        $character = requireCharacter($characterRepository, $args['slug']);
-        if ($character === null) {
-            return $response->withStatus(404);
-        }
-
+    $app->delete("/character/{slug}/{$segment}/{rowId}", withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository, $methodSuffix) {
         $removeMethod = 'remove' . $methodSuffix;
         $characterRepository->$removeMethod((int) $character['id'], (int) $args['rowId']);
 
         return jsonResponse($response, ['removed' => true]);
-    });
+    }));
 }
 
 $app->run();
