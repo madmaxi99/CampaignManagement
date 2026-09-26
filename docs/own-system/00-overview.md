@@ -49,3 +49,4 @@ Konkrete Listen/Inhalte zu den Kategorien oben — erster Entwurf, noch nicht fi
 14. [Katalog: Zauber](14-katalog-zauber.md)
 15. [Katalog: Items](15-katalog-items.md)
 16. [Katalog: Bestiarium](16-katalog-bestiarium.md)
+17. [Katalog: Sprachen](17-katalog-sprachen.md)

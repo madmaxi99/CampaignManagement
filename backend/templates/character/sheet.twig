@@ -1,0 +1,171 @@
+{% extends "layout.twig" %}
+
+{% block title %}{{ character.name_de }}{% endblock %}
+
+{% block content %}
+<div class="sheet" data-slug="{{ character.slug }}">
+
+    <header class="sheet-header">
+        <h1>{{ character.name_de }}</h1>
+        <dl class="sheet-header-facts">
+            <div><dt>Volk</dt><dd>{{ character.kin_de }}</dd></div>
+            <div><dt>Alter</dt><dd>{{ character.age_de }}</dd></div>
+            <div><dt>Beruf</dt><dd>{{ character.profession_de }}</dd></div>
+            <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
+        </dl>
+        <p class="appearance">{{ character.appearance_de }}</p>
+    </header>
+
+    <section class="card attributes">
+        <h2>Attribute</h2>
+        <div class="attribute-grid">
+            {% for attribute in attributes %}
+                <div class="attribute">
+                    <div class="attribute-code">{{ attribute.code }}</div>
+                    <div class="attribute-value">{{ attribute.value }}</div>
+                    <div class="attribute-name">{{ attribute.name_de }}</div>
+                    {% for condition in conditions %}
+                        {% if condition.attribute_code == attribute.code %}
+                            <button type="button"
+                                    class="condition-chip{% if condition.active %} active{% endif %}"
+                                    data-condition-code="{{ condition.code }}">
+                                {{ condition.name_de }}
+                            </button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="derived-stats">
+            <div><span class="label">Bewegung</span><span class="value">{{ character.movement }} m</span></div>
+            <div><span class="label">Traglast</span><span class="value">{{ character.carrying_capacity }}</span></div>
+            <div><span class="label">Schadensbonus (STA)</span><span class="value">{{ character.damage_bonus_sta_de }}</span></div>
+            <div><span class="label">Schadensbonus (GEW)</span><span class="value">{{ character.damage_bonus_gew_de }}</span></div>
+        </div>
+    </section>
+
+    <section class="card vitals">
+        <h2>Trefferpunkte &amp; Willenskraft</h2>
+        <div class="vital-tracker" data-vital="hp" data-max="{{ character.hp_max }}" data-current="{{ character.hp_current }}">
+            <span class="vital-label">TP</span>
+            <div class="pips">
+                {% for i in 1..character.hp_max %}
+                    <button type="button" class="pip{% if i <= character.hp_current %} filled{% endif %}" data-index="{{ i }}"></button>
+                {% endfor %}
+            </div>
+            <span class="vital-count">{{ character.hp_current }} / {{ character.hp_max }}</span>
+        </div>
+        <div class="vital-tracker" data-vital="wp" data-max="{{ character.wp_max }}" data-current="{{ character.wp_current }}">
+            <span class="vital-label">WP</span>
+            <div class="pips">
+                {% for i in 1..character.wp_max %}
+                    <button type="button" class="pip{% if i <= character.wp_current %} filled{% endif %}" data-index="{{ i }}"></button>
+                {% endfor %}
+            </div>
+            <span class="vital-count">{{ character.wp_current }} / {{ character.wp_max }}</span>
+        </div>
+    </section>
+
+    <section class="card skills">
+        <h2>Fertigkeiten</h2>
+        <div class="skill-columns">
+            <div class="skill-column">
+                <h3>Fertigkeiten</h3>
+                <ul class="skill-list">
+                    {% for skill in regularSkills %}
+                        <li><span class="skill-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span><span class="skill-value">{{ skill.value }}</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="skill-column">
+                <h3>Kampffertigkeiten</h3>
+                <ul class="skill-list">
+                    {% for skill in combatSkills %}
+                        <li><span class="skill-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span><span class="skill-value">{{ skill.value }}</span></li>
+                    {% endfor %}
+                </ul>
+                <h3>Sekundäre Fertigkeiten</h3>
+                <ul class="skill-list">
+                    {% for skill in secondarySkills %}
+                        <li><span class="skill-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span><span class="skill-value">{{ skill.value }}</span></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="card talents-spells">
+        <h2>Talente &amp; Zauber</h2>
+        <ul class="talent-list">
+            {% for talent in talents %}
+                <li>
+                    <span class="talent-name">{{ talent.name_de }}{% if talent.wp_note_de %} <small>({{ talent.wp_note_de }})</small>{% endif %}</span>
+                    <p class="talent-description">{{ talent.description_de }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+        <ul class="spell-list">
+            {% for spell in spells %}
+                <li>
+                    <span class="spell-name">{{ spell.name_de }} <small>({{ spell.wp_note_de }})</small></span>
+                    {% if spell.type == 'spell' %}
+                        <p class="spell-meta">
+                            Vorgabe: {{ spell.components_de }} &middot;
+                            Zauberdauer: {{ spell.casting_time_de }} &middot;
+                            Reichweite: {{ spell.range_de }} &middot;
+                            Wirkungsdauer: {{ spell.duration_de }}
+                        </p>
+                    {% endif %}
+                    <p class="spell-effect">{{ spell.effect_de }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section class="card equipment">
+        <h2>Ausrüstung</h2>
+        <div class="equipment-columns">
+            <div>
+                <h3>Waffen</h3>
+                <table class="weapon-table">
+                    <thead>
+                        <tr><th>Name</th><th>Griff</th><th>Reichweite</th><th>Schaden</th><th>Haltbarkeit</th><th>Merkmale</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for weapon in weapons %}
+                            <tr>
+                                <td>{{ weapon.name_de }}</td>
+                                <td>{{ weapon.grip_de }}</td>
+                                <td>{{ weapon.range_de }}</td>
+                                <td>{{ weapon.damage_de }}</td>
+                                <td>{{ weapon.durability }}</td>
+                                <td>{{ weapon.traits_de }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <h3>Rüstung</h3>
+                <p>Körper: {% if armor.body %}{{ armor.body.name_de }} ({{ armor.body.armor_value }}){% else %}—{% endif %}</p>
+                <p>Helm: {% if armor.head %}{{ armor.head.name_de }} ({{ armor.head.armor_value }}){% else %}—{% endif %}</p>
+            </div>
+            <div>
+                <h3>Inventar</h3>
+                <ul class="inventory-list">
+                    {% for item in inventory %}
+                        <li>{{ item.item_name_de }}{% if item.quantity > 1 %} &times;{{ item.quantity }}{% endif %}</li>
+                    {% endfor %}
+                    <li>{{ character.misc_items_de }}</li>
+                </ul>
+                <h3>Münzen</h3>
+                <p class="coins">
+                    <span>{{ character.coins_gold }} Gold</span>
+                    <span>{{ character.coins_silver }} Silber</span>
+                    <span>{{ character.coins_copper }} Kupfer</span>
+                </p>
+            </div>
+        </div>
+    </section>
+
+</div>
+<script src="/js/character-sheet.js"></script>
+{% endblock %}

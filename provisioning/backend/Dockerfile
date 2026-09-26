@@ -14,8 +14,10 @@ RUN apt-get update \
         zip \
         nano \
         libzip-dev \
+        default-mysql-client \
     && docker-php-ext-install \
         zip \
+        pdo_mysql \
     && pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && apt-get clean \

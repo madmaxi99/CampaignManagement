@@ -4,41 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Cairn-homebrew TRPG (tabletop RPG) management system: a LAN-only web app for a Dungeon Master and players. Two audiences: a player-facing chronicle page (`/`) and a DM-only toolset (`/dm`, `/dm/wiki/*`) covering a generic wiki (bestiary, items, spellbooks, relics, books) plus a hierarchical places/map system.
+Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only, no auth.
 
-## Tech stack
+**Current state: no application code exists in the working tree.** The previous PHP/Slim/Twig/MariaDB app (`backend/`, `provisioning/`) has been deleted (see `git status` — shown as pending `D` deletions, not yet committed). The repo right now holds only planning/reference docs (`docs/`), in-world narrative content (`Story/`), and a stray `.env` left over from the old Docker setup. Do not assume any file, class, route, or template from an older conversation still exists — verify with `ls`/`git status` first. The next build is planned as a Campaign Management System per `docs/superpowers/specs/2026-09-24-campaign-management-roadmap.md` and its follow-up specs; treat those specs as the design intent for what to build, not as a description of code that currently exists.
 
-- PHP 8.3, Slim 4 (`slim/slim`) microframework, Twig 3 (`slim/twig-view`) templating.
-- SQLite (`backend/var/data/app.sqlite`) via raw PDO — no ORM, no migrations. Schema is created idempotently (`CREATE TABLE IF NOT EXISTS ...`) on every app boot, in `index.php` and each repository's `ensureTable()`.
-- No JS framework — vanilla JS (`backend/public/js/pin-picker.js`) for the map pin-picker.
-- Docker Compose (nginx + php-fpm) for local dev.
+## Repository contents
 
-## Running the app
+- **`docs/own-system/`** — the custom homebrew ruleset, the authoritative source of truth for all game rules: `00-overview.md` (status/changelog) plus 10 core-mechanic files (`01-charakter.md` … `10-gm-tools.md`) and 7 catalogs (`11-katalog-kins.md` … `17-katalog-sprachen.md`, e.g. kins/professions/skills/spells/items/bestiary/languages). This system replaced an earlier plan to just use Dragonbane outright — it's a from-scratch mix of many systems' ideas, not a Dragonbane reskin.
+- **`docs/own-system/tools/*.py`** — standalone, stdlib-only Python simulators (`balance_simulator.py`, `campaign_simulator.py`, `encounter_calibration.py`, `party_gauntlet.py`, `profession_fairness_check.py`) that numerically verify combat/profession balance against the ruleset above. Run directly, e.g. `python3 docs/own-system/tools/balance_simulator.py` — no dependencies beyond the standard library (`random`, `statistics`, `collections`, `dataclasses`). Each script imports from `campaign_simulator.py`/`balance_simulator.py`, so run them from inside `docs/own-system/tools/` or keep that layout intact. These are throwaway analysis tools, not part of any application, kept only for re-verifying numbers if the ruleset changes.
+- **`docs/ruleset-comparison/`** — OOC research comparing off-the-shelf rulesets (Dragonbane, Forbidden Lands, Shadowdark, 13th Age, Daggerheart, etc.) against a fixed criteria list; historical record of why the project ended up building its own system in `docs/own-system/` instead of adopting one of these.
+- **`docs/superpowers/specs/`** and **`docs/superpowers/plans/`** — design specs/plans. The `2026-09-24-campaign-management-roadmap.md` (use-case map + sub-project breakdown) and `2026-09-25-*` specs (full DB schema, campaign-visibility design, character-system design, DM-tools design) describe the *next* build: a DM/player-visibility-split campaign manager on top of the `docs/own-system/` ruleset. The `2026-09-09-dm-wiki-design.md`/`2026-09-09-places-map-design.md` specs predate that roadmap and describe pieces of the now-deleted earlier app — historical reference only. Note the 2026-09-25 data-model spec targets a SQLite schema, whereas the deleted app used MariaDB — confirm which DB is actually intended before implementing against it.
+- **`docs/lore/`** and **`Story/`** — in-world campaign content (world doc, NPCs, locations, timeline, per-chapter narrative prose). Not rules, not application code.
+- **`docs/DB_DE_Schnellstarter_2-0_web-*.pdf`** — reference material (German quickstart PDF), supporting research.
 
-- `cd provisioning && docker compose up` — serves the app at http://localhost:8090 (nginx proxies to php-fpm 8.3; xdebug is enabled on port 9003).
-- If working outside Docker, install deps with `cd backend && composer install`.
-- No frontend build step — CSS/JS are plain files served directly from `backend/public/`.
-- No automated test suite exists. Verify changes manually: start the containers and exercise routes via browser or `curl` against `localhost:8090`.
+## Working here right now
 
-## Architecture
-
-There is no controller/service layer: **`backend/public/index.php`** is the entire application — it opens the PDO connection, ensures all tables exist, and declares every route inline as a closure. Read this file first to see the whole request-handling surface.
-
-- **`backend/src/WikiCategories.php`** — single source of truth for the 5 generic wiki categories (bestiary, items, spellbooks, relics, books): table name, label, and column definitions (`name`/`label`/`type`) per category. Adding a category means adding an entry here; `WikiRepository` and the `wiki/list.twig` / `wiki/form.twig` templates are fully generic and adapt automatically — no per-category code.
-- **`backend/src/WikiRepository.php`** — generic CRUD (`all`, `find`, `insert`, `update`, `ensureTable`) driven entirely by the column config from `WikiCategories`. Category/table names must always be resolved through `WikiCategories::find()` before use in a query — never take the `{category}` route parameter straight into SQL.
-- **`backend/src/PlacesRepository.php`** / **`PlaceImageStorage.php`** — a separate, non-generic model for hierarchical places (parent/child locations with breadcrumb navigation and map pin coordinates). It has its own schema and behavior (image upload, parent chaining) because it doesn't fit the generic wiki shape.
-- **`backend/templates/`** — Twig views split into `wiki/*` (shared across all 5 wiki categories, including the `_tabs.twig` nav partial) and `places/*` (place-specific: list, detail with map+pins, form with the pin-picker).
-- No authentication/authorization layer exists — `/dm/*` routes are unprotected. This is intentional for the current LAN-only deployment; don't add auth infrastructure unless explicitly asked.
-
-## Conventions
-
-- `declare(strict_types=1)` in every PHP file.
-- Classes are loaded via plain `require` in `index.php`, not Composer autoload/PSR-4 — a new class needs an explicit `require` before it can be used.
-- Multi-line or escape-heavy SQL is written as heredoc (`<<<SQL ... SQL;`), never with escaped quotes in a quoted string — see `index.php` and `WikiRepository.php` for existing examples.
-- UI copy and form labels are German; code identifiers and comments are English.
-- Dynamic table/column access always goes through `WikiCategories::find()` / its config — never interpolate a route parameter straight into SQL.
-
-## Non-code content
-
-- `docs/superpowers/` — specs and plans for feature work (not application code).
-- `docs/lore/` and `Story/` — in-world campaign/lore content, not part of the app.
+- There's nothing to build, lint, or test — no application exists yet. If asked to implement the next app, read the roadmap/spec docs above first and check with the user on open questions they flag (e.g. the SQLite-vs-MariaDB discrepancy) rather than assuming.
+- The Python balance tools are the one thing that actually runs: `python3 <script>.py` from `docs/own-system/tools/`.
+- UI copy and in-world content in this repo is German; when code eventually exists, code identifiers/comments should be English (this was the convention in the deleted app and is likely to continue).
