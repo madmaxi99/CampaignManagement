@@ -2,9 +2,10 @@
 
 {% block title %}{{ campaign.name_de }}{% endblock %}
 
-{% macro location_block(location, entityRegistry) %}
+{% macro location_block(location, entityRegistry, campaignSlug) %}
     <div class="location-block" id="location-{{ location.id }}">
         <h4>#{{ location.number_label }} — {{ location.name_de }}</h4>
+        <img class="location-map" src="/images/campaigns/{{ campaignSlug }}/floor-{{ location.number_label }}.jpg" alt="Kartenausschnitt {{ location.name_de }}" onerror="this.remove()">
         {% if location.read_aloud_de %}
             <p class="location-read-aloud">{{ location.read_aloud_de|linkify(entityRegistry) }}</p>
         {% endif %}
@@ -168,7 +169,7 @@
                     <img class="campaign-map" src="/images/campaigns/{{ campaign.slug }}/map.jpg" alt="Kartenplan {{ campaign.name_de }}" onerror="this.remove()">
                     <div class="location-list">
                         {% for location in locations %}
-                            {{ campaign_macros.location_block(location, entityRegistry) }}
+                            {{ campaign_macros.location_block(location, entityRegistry, campaign.slug) }}
                         {% endfor %}
                     </div>
                 </section>
@@ -182,7 +183,7 @@
                         <div class="location-list">
                             {% for location in locations %}
                                 {% if location.chapter_id == chapter.id %}
-                                    {{ campaign_macros.location_block(location, entityRegistry) }}
+                                    {{ campaign_macros.location_block(location, entityRegistry, campaign.slug) }}
                                 {% endif %}
                             {% endfor %}
                         </div>

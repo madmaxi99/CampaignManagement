@@ -808,6 +808,16 @@ button#downtime-button:hover {
     margin-bottom: 12px;
 }
 
+.location-map {
+    display: block;
+    max-width: 100%;
+    max-height: 360px;
+    margin: 0 auto 12px;
+    border-radius: 8px;
+    border: 1px solid var(--parchment-dark);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
 .entity-modal {
     border: 1px solid var(--parchment-dark);
     border-radius: var(--card-radius);
