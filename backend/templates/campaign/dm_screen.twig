@@ -1,0 +1,228 @@
+{% extends "layout.twig" %}
+
+{% block title %}{{ campaign.name_de }}{% endblock %}
+
+{% macro location_block(location, entityRegistry) %}
+    <div class="location-block" id="location-{{ location.id }}">
+        <h4>#{{ location.number_label }} — {{ location.name_de }}</h4>
+        {% if location.read_aloud_de %}
+            <p class="location-read-aloud">{{ location.read_aloud_de|linkify(entityRegistry) }}</p>
+        {% endif %}
+        {% if location.notes_de %}
+            <p class="location-notes pre-wrap">{{ location.notes_de|linkify(entityRegistry) }}</p>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro creature_block(creature, entityRegistry) %}
+    <div class="creature-card">
+        <img class="creature-portrait" src="/images/creatures/{{ creature.id }}.jpg" alt="{{ creature.name_de }}" onerror="this.remove()">
+        <h3>{{ creature.name_de }}</h3>
+        <div class="derived-stats creature-stats">
+            <div><span class="label">TP</span><span class="value">{{ creature.hp }}</span></div>
+            <div><span class="label">Grimmigkeit</span><span class="value">{{ creature.grimmigkeit_de }}</span></div>
+            <div><span class="label">Größe</span><span class="value">{{ creature.size_de }}</span></div>
+            <div><span class="label">Bewegung</span><span class="value">{{ creature.movement }}</span></div>
+            <div><span class="label">Rüstung</span><span class="value">{{ creature.armor_de }}</span></div>
+        </div>
+        {% if creature.resistances_de %}
+            <p class="pre-wrap"><strong>Resistenzen:</strong> {{ creature.resistances_de|linkify(entityRegistry) }}</p>
+        {% endif %}
+        {% if creature.immunities_de %}
+            <p class="pre-wrap"><strong>Immunität:</strong> {{ creature.immunities_de|linkify(entityRegistry) }}</p>
+        {% endif %}
+        <table class="weapon-table">
+            <thead>
+                <tr><th>Wurf</th><th>Angriff</th><th>Effekt</th></tr>
+            </thead>
+            <tbody>
+                {% for attack in creature.attacks %}
+                    <tr>
+                        <td>{{ attack.roll_de }}</td>
+                        <td>{{ attack.title_de }}</td>
+                        <td>{{ attack.effect_de|linkify(entityRegistry) }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}
+
+{% macro npc_block(npc, entityRegistry) %}
+    <div class="npc-card">
+        <h3>{{ npc.name_de }} <small>({{ npc.role_de }})</small></h3>
+        <p>{{ npc.description_de|linkify(entityRegistry) }}</p>
+        {% if npc.motivation_de %}
+            <p><strong>Motivation:</strong> {{ npc.motivation_de|linkify(entityRegistry) }}</p>
+        {% endif %}
+        {% if npc.stats_de %}
+            <p class="npc-stats pre-wrap">{{ npc.stats_de }}</p>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro event_table_block(table, entityRegistry) %}
+    <div class="event-table">
+        <div class="card-heading-row">
+            <h3>{{ table.name_de }}</h3>
+            <div class="event-roll-controls">
+                <span class="event-roll-result" data-roll-result></span>
+                <button type="button" class="advance-button" data-roll-button>Würfeln</button>
+            </div>
+        </div>
+        <ul class="event-table-list">
+            {% for entry in table.entries %}
+                <li class="event-entry"
+                    data-min="{{ entry.min_roll }}"
+                    data-max="{{ entry.max_roll ?? entry.min_roll }}"
+                    data-open-ended="{{ entry.max_roll is null ? '1' : '0' }}">
+                    <span class="event-roll">{{ entry.max_roll is null ? entry.min_roll ~ '+' : (entry.min_roll == entry.max_roll ? entry.min_roll : entry.min_roll ~ '–' ~ entry.max_roll) }}</span>
+                    <span class="event-text">{{ entry.text_de|linkify(entityRegistry) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}
+
+{% import _self as campaign_macros %}
+
+{% block content %}
+<div class="campaign-dm-screen" data-slug="{{ campaign.slug }}">
+
+    <header class="sheet-header">
+        <h1>{{ campaign.name_de }}</h1>
+        <p class="appearance">{{ campaign.teaser_de }}</p>
+    </header>
+
+    <div class="campaign-layout">
+        <nav class="campaign-sidebar">
+            <a class="sidebar-link" href="#hintergrund">Hintergrund</a>
+
+            {% if chapters is empty %}
+                <div class="sidebar-group">
+                    <span class="sidebar-group-title">Kapitel 1</span>
+                    <ul>
+                        {% for location in locations %}
+                            <li><a class="location-ref" href="#location-{{ location.id }}">#{{ location.number_label }} — {{ location.name_de }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                {% for chapter in chapters %}
+                    <div class="sidebar-group">
+                        <span class="sidebar-group-title">{{ chapter.title_de }}</span>
+                        <ul>
+                            {% for location in locations %}
+                                {% if location.chapter_id == chapter.id %}
+                                    <li><a class="location-ref" href="#location-{{ location.id }}">#{{ location.number_label }} — {{ location.name_de }}</a></li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="sidebar-group">
+                <span class="sidebar-group-title">Bestiary</span>
+                <ul>
+                    {% for creature in creatures %}
+                        <li><a class="entity-link" href="#" data-entity-type="creature" data-entity-id="{{ creature.id }}">{{ creature.name_de }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="sidebar-group">
+                <span class="sidebar-group-title">NPCs</span>
+                <ul>
+                    {% for npc in npcs %}
+                        <li><a class="entity-link" href="#" data-entity-type="npc" data-entity-id="{{ npc.id }}">{{ npc.name_de }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            {% if recurringEventTables is not empty %}
+                <div class="sidebar-group">
+                    <span class="sidebar-group-title">Zufallsereignisse</span>
+                    <ul>
+                        {% for table in recurringEventTables %}
+                            <li><a class="entity-link" href="#" data-entity-type="event-table" data-entity-id="{{ table.id }}">{{ table.name_de }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% if endingEventTable %}
+                <a class="sidebar-link" href="#zufallsereignisse">{{ endingEventTable.name_de }}</a>
+            {% endif %}
+        </nav>
+
+        <div class="campaign-content">
+            <section class="card" id="hintergrund">
+                <h2>Hintergrund</h2>
+                <p class="campaign-background pre-wrap">{{ campaign.background_de|linkify(entityRegistry) }}</p>
+            </section>
+
+            {% if chapters is empty %}
+                <section class="card">
+                    <h2>Kapitel 1</h2>
+                    <img class="campaign-map" src="/images/campaigns/{{ campaign.slug }}/map.jpg" alt="Kartenplan {{ campaign.name_de }}" onerror="this.remove()">
+                    <div class="location-list">
+                        {% for location in locations %}
+                            {{ campaign_macros.location_block(location, entityRegistry) }}
+                        {% endfor %}
+                    </div>
+                </section>
+            {% else %}
+                {% for chapter in chapters %}
+                    <section class="card">
+                        <h2>{{ chapter.title_de }}</h2>
+                        {% if chapter.notes_de %}
+                            <p class="pre-wrap">{{ chapter.notes_de|linkify(entityRegistry) }}</p>
+                        {% endif %}
+                        <div class="location-list">
+                            {% for location in locations %}
+                                {% if location.chapter_id == chapter.id %}
+                                    {{ campaign_macros.location_block(location, entityRegistry) }}
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </section>
+                {% endfor %}
+            {% endif %}
+
+            {% if endingEventTable %}
+                <section class="card" id="zufallsereignisse">
+                    <h2>Zufallsereignisse</h2>
+                    {{ campaign_macros.event_table_block(endingEventTable, entityRegistry) }}
+                </section>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="entity-templates" hidden>
+        {% for creature in creatures %}
+            <template id="tpl-creature-{{ creature.id }}">
+                {{ campaign_macros.creature_block(creature, entityRegistry) }}
+            </template>
+        {% endfor %}
+        {% for npc in npcs %}
+            <template id="tpl-npc-{{ npc.id }}">
+                {{ campaign_macros.npc_block(npc, entityRegistry) }}
+            </template>
+        {% endfor %}
+        {% for table in recurringEventTables %}
+            <template id="tpl-event-table-{{ table.id }}">
+                {{ campaign_macros.event_table_block(table, entityRegistry) }}
+            </template>
+        {% endfor %}
+    </div>
+
+    <dialog id="entity-modal" class="entity-modal">
+        <button type="button" class="entity-modal-close" data-modal-close aria-label="Schließen">×</button>
+        <div class="entity-modal-body" data-modal-body></div>
+    </dialog>
+
+</div>
+
+<script src="/js/campaign-dm-screen.js"></script>
+{% endblock %}

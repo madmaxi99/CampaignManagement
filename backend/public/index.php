@@ -11,14 +11,18 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/Database.php';
 require __DIR__ . '/../src/CharacterRepository.php';
+require __DIR__ . '/../src/CampaignRepository.php';
+require __DIR__ . '/../src/EntityLinker.php';
 
 $db = Database::connect();
 $characterRepository = new CharacterRepository($db);
+$campaignRepository = new CampaignRepository($db);
 
 $app = AppFactory::create();
 
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
 $app->add(TwigMiddleware::create($app, $twig));
+$twig->getEnvironment()->addFilter(new \Twig\TwigFilter('linkify', [EntityLinker::class, 'linkify'], ['is_safe' => ['html']]));
 
 function loadSheet(CharacterRepository $repository, string $slug): ?array
 {
@@ -71,6 +75,64 @@ $app->get('/characters', function (Request $request, Response $response) use ($c
     return $twig->render($response, 'characters/list.twig', [
         'defaultCharacters' => $defaultCharacters,
         'customCharacters' => $customCharacters,
+    ]);
+});
+
+$app->get('/campaign', function (Request $request, Response $response) use ($campaignRepository) {
+    $twig = Twig::fromRequest($request);
+
+    $campaigns = $campaignRepository->listAll();
+    $defaultCampaigns = array_values(array_filter($campaigns, fn (array $c) => (bool) $c['is_default']));
+    $customCampaigns = array_values(array_filter($campaigns, fn (array $c) => !$c['is_default']));
+
+    return $twig->render($response, 'campaign/list.twig', [
+        'defaultCampaigns' => $defaultCampaigns,
+        'customCampaigns' => $customCampaigns,
+    ]);
+});
+
+$app->get('/campaign/{slug}', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    $campaign = $campaignRepository->findBySlug($args['slug']);
+    if ($campaign === null) {
+        return $response->withStatus(404);
+    }
+
+    $campaignId = (int) $campaign['id'];
+    $twig = Twig::fromRequest($request);
+
+    $locations = $campaignRepository->locations($campaignId);
+    $creatures = $campaignRepository->creatures($campaignId);
+    $npcs = $campaignRepository->npcs($campaignId);
+
+    $entityRegistry = [];
+    foreach ($locations as $location) {
+        $entityRegistry[] = ['match' => '#' . $location['number_label'], 'type' => 'location', 'id' => (int) $location['id']];
+    }
+    foreach ($creatures as $creature) {
+        $entityRegistry[] = ['match' => $creature['name_de'], 'type' => 'creature', 'id' => (int) $creature['id']];
+    }
+    foreach ($npcs as $npc) {
+        $entityRegistry[] = ['match' => $npc['name_de'], 'type' => 'npc', 'id' => (int) $npc['id']];
+    }
+
+    $eventTables = $campaignRepository->eventTables($campaignId);
+    if (count($eventTables) <= 1) {
+        $recurringEventTables = [];
+        $endingEventTable = $eventTables[0] ?? null;
+    } else {
+        $recurringEventTables = $eventTables;
+        $endingEventTable = array_pop($recurringEventTables);
+    }
+
+    return $twig->render($response, 'campaign/dm_screen.twig', [
+        'campaign' => $campaign,
+        'chapters' => $campaignRepository->chapters($campaignId),
+        'locations' => $locations,
+        'creatures' => $creatures,
+        'npcs' => $npcs,
+        'recurringEventTables' => $recurringEventTables,
+        'endingEventTable' => $endingEventTable,
+        'entityRegistry' => $entityRegistry,
     ]);
 });
 
