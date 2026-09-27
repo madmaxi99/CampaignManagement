@@ -13,10 +13,12 @@ require __DIR__ . '/../src/Database.php';
 require __DIR__ . '/../src/CharacterRepository.php';
 require __DIR__ . '/../src/CampaignRepository.php';
 require __DIR__ . '/../src/EntityLinker.php';
+require __DIR__ . '/../src/CharacterCreationRepository.php';
 
 $db = Database::connect();
 $characterRepository = new CharacterRepository($db);
 $campaignRepository = new CampaignRepository($db);
+$characterCreationRepository = new CharacterCreationRepository($db);
 
 $app = AppFactory::create();
 
@@ -47,17 +49,14 @@ function loadSheet(CharacterRepository $repository, string $slug): ?array
         'weapons' => $repository->weapons($characterId),
         'armor' => $repository->armor($characterId),
         'inventory' => $repository->inventory($characterId),
-        'weaponCatalog' => $repository->itemsCatalogByKind('weapon'),
-        'armorCatalog' => $repository->itemsCatalogByKind('armor'),
-        'miscCatalog' => $repository->itemsCatalogByKind('misc'),
     ];
 }
 
-function jsonResponse(Response $response, array $data): Response
+function jsonResponse(Response $response, array $data, int $status = 200): Response
 {
     $response->getBody()->write(json_encode($data));
 
-    return $response->withHeader('Content-Type', 'application/json');
+    return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
 }
 
 /**
@@ -75,6 +74,24 @@ function withCharacter(CharacterRepository $repository, callable $handler): call
         return $handler($request, $response, $args, $character);
     };
 }
+
+$app->get('/api/character-creation/catalog', function (Request $request, Response $response) use ($characterCreationRepository) {
+    return jsonResponse($response, $characterCreationRepository->catalog());
+});
+
+$app->post('/characters', function (Request $request, Response $response) use ($characterCreationRepository) {
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+
+    try {
+        $slug = $characterCreationRepository->createCharacter($body);
+    } catch (InvalidArgumentException $e) {
+        $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
+    }
+
+    return jsonResponse($response, ['slug' => $slug]);
+});
 
 $app->get('/characters', function (Request $request, Response $response) use ($characterRepository) {
     $twig = Twig::fromRequest($request);
@@ -147,6 +164,12 @@ $app->get('/campaign/{slug}', function (Request $request, Response $response, ar
     ]);
 });
 
+$app->get('/character/create', function (Request $request, Response $response) {
+    $twig = Twig::fromRequest($request);
+
+    return $twig->render($response, 'character/create.twig');
+});
+
 $app->get('/character/{slug}', function (Request $request, Response $response, array $args) use ($characterRepository) {
     $sheet = loadSheet($characterRepository, $args['slug']);
     if ($sheet === null) {
@@ -215,19 +238,18 @@ $app->post('/character/{slug}/spells', withCharacter($characterRepository, funct
     return jsonResponse($response, ['learned' => true]);
 }));
 
-foreach (['weapons' => 'Weapon', 'armor' => 'Armor', 'inventory' => 'InventoryItem'] as $segment => $methodSuffix) {
+foreach (['weapons' => 'Weapon', 'inventory' => 'InventoryItem'] as $segment => $methodSuffix) {
     $app->post("/character/{slug}/{$segment}", withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository, $methodSuffix) {
-        $body = json_decode((string) $request->getBody(), true);
         $addMethod = 'add' . $methodSuffix;
-        $characterRepository->$addMethod((int) $character['id'], (int) $body['item_id'], (int) $body['quantity']);
+        $rowId = $characterRepository->$addMethod((int) $character['id']);
 
-        return jsonResponse($response, ['added' => true]);
+        return jsonResponse($response, ['added' => true, 'row_id' => $rowId]);
     }));
 
-    $app->post("/character/{slug}/{$segment}/{rowId}/quantity", withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository, $methodSuffix) {
-        $body = json_decode((string) $request->getBody(), true);
-        $updateMethod = 'update' . $methodSuffix . 'Quantity';
-        $characterRepository->$updateMethod((int) $character['id'], (int) $args['rowId'], (int) $body['quantity']);
+    $app->post("/character/{slug}/{$segment}/{rowId}", withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository, $methodSuffix) {
+        $body = json_decode((string) $request->getBody(), true) ?? [];
+        $updateMethod = 'update' . $methodSuffix;
+        $characterRepository->$updateMethod((int) $character['id'], (int) $args['rowId'], $body);
 
         return jsonResponse($response, ['updated' => true]);
     }));
@@ -239,5 +261,26 @@ foreach (['weapons' => 'Weapon', 'armor' => 'Armor', 'inventory' => 'InventoryIt
         return jsonResponse($response, ['removed' => true]);
     }));
 }
+
+$app->post('/character/{slug}/armor/{slot}', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+
+    try {
+        $characterRepository->updateArmorSlot((int) $character['id'], (string) $args['slot'], $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return jsonResponse($response, ['updated' => true]);
+}));
+
+$app->delete('/character/{slug}', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
+    if ((bool) $character['is_default']) {
+        return jsonResponse($response, ['error' => 'Default-Charaktere können nicht gelöscht werden.'], 403);
+    }
+    $characterRepository->delete((int) $character['id']);
+
+    return jsonResponse($response, ['deleted' => true]);
+}));
 
 $app->run();

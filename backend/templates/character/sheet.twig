@@ -25,12 +25,20 @@
         <div class="sheet-header-inner">
             <img class="sheet-portrait" src="/images/characters/{{ character.slug }}.jpg" alt="{{ character.name_de }}" onerror="this.remove()">
             <div class="sheet-header-text">
-                <h1>{{ character.name_de }}</h1>
+                <div class="sheet-header-title-row">
+                    <h1>{{ character.name_de }}</h1>
+                    {% if not character.is_default %}
+                        <button type="button" id="delete-character-button" class="button-danger">Charakter löschen</button>
+                    {% endif %}
+                </div>
                 <dl class="sheet-header-facts">
                     <div><dt>Volk</dt><dd>{{ character.kin_de }}</dd></div>
                     <div><dt>Alter</dt><dd>{{ character.age_de }}</dd></div>
                     <div><dt>Beruf</dt><dd>{{ character.profession_de }}</dd></div>
                     <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
+                    {% if character.memento_de %}
+                        <div><dt>Memento</dt><dd>{{ character.memento_de }}</dd></div>
+                    {% endif %}
                 </dl>
                 <p class="appearance">{{ character.appearance_de }}</p>
             </div>
@@ -137,31 +145,20 @@
     <section class="card equipment-list">
         <div class="card-heading-row">
             <h2>Waffen</h2>
-            <div class="add-form">
-                <select id="weapon-catalog-select">
-                    <option value="">Waffe hinzufügen…</option>
-                    {% for item in weaponCatalog %}
-                        <option value="{{ item.id }}">{{ item.name_de }} ({{ item.price_copper }} Kupfer)</option>
-                    {% endfor %}
-                </select>
-                <input type="number" id="weapon-quantity-input" value="1" min="1">
-                <button type="button" id="weapon-add-button">Hinzufügen</button>
-            </div>
+            <button type="button" class="add-row-button" data-segment="weapons">+ Waffe hinzufügen</button>
         </div>
         <table class="item-table" id="weapons-table">
             <thead>
-                <tr><th>Name</th><th>Griff</th><th>Reichweite</th><th>Schaden</th><th>Haltbarkeit</th><th>Merkmale</th><th>Menge</th><th></th></tr>
+                <tr><th>Name</th><th>Griff</th><th>Reichweite</th><th>Schaden</th><th>Merkmale/Beschreibung</th><th></th></tr>
             </thead>
             <tbody>
                 {% for weapon in weapons %}
                     <tr data-row-id="{{ weapon.row_id }}">
-                        <td>{{ weapon.name_de }}</td>
-                        <td>{{ weapon.grip_de }}</td>
-                        <td>{{ weapon.range_de }}</td>
-                        <td>{{ weapon.damage_de }}</td>
-                        <td>{{ weapon.durability }}</td>
-                        <td>{{ weapon.traits_de }}</td>
-                        <td><input type="number" class="quantity-input" data-segment="weapons" data-row-id="{{ weapon.row_id }}" value="{{ weapon.quantity }}" min="0"></td>
+                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="name_de" value="{{ weapon.name_de }}"></td>
+                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="grip_de" value="{{ weapon.grip_de }}"></td>
+                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="range_de" value="{{ weapon.range_de }}"></td>
+                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="damage_de" value="{{ weapon.damage_de }}"></td>
+                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="traits_de" value="{{ weapon.traits_de }}"></td>
                         <td><button type="button" class="remove-button" data-segment="weapons" data-row-id="{{ weapon.row_id }}">✕</button></td>
                     </tr>
                 {% endfor %}
@@ -172,30 +169,18 @@
     <section class="card equipment-list">
         <div class="card-heading-row">
             <h2>Rüstung</h2>
-            <div class="add-form">
-                <select id="armor-catalog-select">
-                    <option value="">Rüstung hinzufügen…</option>
-                    {% for item in armorCatalog %}
-                        <option value="{{ item.id }}">{{ item.name_de }} ({{ item.price_copper }} Kupfer)</option>
-                    {% endfor %}
-                </select>
-                <input type="number" id="armor-quantity-input" value="1" min="1">
-                <button type="button" id="armor-add-button">Hinzufügen</button>
-            </div>
         </div>
         <table class="item-table" id="armor-table">
             <thead>
-                <tr><th>Name</th><th>Slot</th><th>Rüstungswert</th><th>Nachteil bei</th><th>Menge</th><th></th></tr>
+                <tr><th>Slot</th><th>Name</th><th>Rüstungswert</th><th>Nachteil</th></tr>
             </thead>
             <tbody>
                 {% for piece in armor %}
-                    <tr data-row-id="{{ piece.row_id }}">
-                        <td>{{ piece.name_de }}</td>
+                    <tr data-slot="{{ piece.slot }}">
                         <td>{{ piece.slot == 'body' ? 'Körper' : 'Kopf' }}</td>
-                        <td>{{ piece.armor_value }}</td>
-                        <td>{{ piece.penalty_skills_de }}</td>
-                        <td><input type="number" class="quantity-input" data-segment="armor" data-row-id="{{ piece.row_id }}" value="{{ piece.quantity }}" min="0"></td>
-                        <td><button type="button" class="remove-button" data-segment="armor" data-row-id="{{ piece.row_id }}">✕</button></td>
+                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="{{ piece.slot }}" data-field="name_de" value="{{ piece.name_de }}"></td>
+                        <td><input type="number" class="free-text-field" data-segment="armor" data-slot="{{ piece.slot }}" data-field="armor_value" value="{{ piece.armor_value }}"></td>
+                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="{{ piece.slot }}" data-field="penalty_de" value="{{ piece.penalty_de }}"></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -205,16 +190,7 @@
     <section class="card equipment-list">
         <div class="card-heading-row">
             <h2>Inventar</h2>
-            <div class="add-form">
-                <select id="inventory-catalog-select">
-                    <option value="">Gegenstand hinzufügen…</option>
-                    {% for item in miscCatalog %}
-                        <option value="{{ item.id }}">{{ item.name_de }} ({{ item.price_copper }} Kupfer)</option>
-                    {% endfor %}
-                </select>
-                <input type="number" id="inventory-quantity-input" value="1" min="1">
-                <button type="button" id="inventory-add-button">Hinzufügen</button>
-            </div>
+            <button type="button" class="add-row-button" data-segment="inventory">+ Gegenstand hinzufügen</button>
         </div>
         <table class="item-table" id="inventory-table">
             <thead>
@@ -223,15 +199,14 @@
             <tbody>
                 {% for item in inventory %}
                     <tr data-row-id="{{ item.row_id }}">
-                        <td>{{ item.name_de }}</td>
-                        <td>{{ item.description_de }}</td>
-                        <td><input type="number" class="quantity-input" data-segment="inventory" data-row-id="{{ item.row_id }}" value="{{ item.quantity }}" min="0"></td>
+                        <td><input type="text" class="free-text-field" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="name_de" value="{{ item.name_de }}"></td>
+                        <td><input type="text" class="free-text-field" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="description_de" value="{{ item.description_de }}"></td>
+                        <td><input type="number" class="free-text-field" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="quantity" value="{{ item.quantity }}" min="0"></td>
                         <td><button type="button" class="remove-button" data-segment="inventory" data-row-id="{{ item.row_id }}">✕</button></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-        <p class="misc-flavor">Kleinkram: {{ character.misc_items_de }}</p>
     </section>
 
     <section class="card currency">

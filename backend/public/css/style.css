@@ -85,6 +85,19 @@ body {
     gap: 16px;
 }
 
+.character-card-wrapper {
+    position: relative;
+}
+
+.character-card-delete {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.8rem;
+    padding: 3px 8px;
+    background: var(--parchment);
+}
+
 .character-card {
     display: block;
     background: var(--parchment);
@@ -501,8 +514,7 @@ button#downtime-button:hover {
     font-size: 0.9rem;
 }
 
-.add-form select,
-.add-form input[type="number"] {
+.add-form select {
     font: inherit;
     padding: 4px 6px;
     border: 1px solid var(--parchment-dark);
@@ -510,11 +522,8 @@ button#downtime-button:hover {
     background: #fff8e8;
 }
 
-.add-form input[type="number"] {
-    width: 60px;
-}
-
 .add-form button,
+.add-row-button,
 #currency-save-button {
     font: inherit;
     padding: 4px 12px;
@@ -526,6 +535,7 @@ button#downtime-button:hover {
 }
 
 .add-form button:hover,
+.add-row-button:hover,
 #currency-save-button:hover {
     background: #93731f;
     color: #fff;
@@ -545,12 +555,23 @@ button#downtime-button:hover {
     border-bottom: 1px solid var(--parchment-dark);
 }
 
-.item-table .quantity-input {
-    width: 50px;
+.item-table input[type="text"],
+.item-table input[type="number"] {
+    width: 100%;
+    border: 1px solid transparent;
+    background: transparent;
     font: inherit;
     padding: 2px 4px;
-    border: 1px solid var(--parchment-dark);
     border-radius: 4px;
+}
+
+.item-table input[type="number"] {
+    width: 70px;
+}
+
+.item-table input:focus {
+    border-color: var(--gold);
+    background: #fff;
 }
 
 .remove-button {
@@ -567,10 +588,26 @@ button#downtime-button:hover {
     color: #fff;
 }
 
-.misc-flavor {
-    margin: 12px 0 0;
-    font-style: italic;
-    color: var(--green-mid);
+.sheet-header-title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.button-danger {
+    font: inherit;
+    padding: 4px 12px;
+    border: 1px solid var(--danger);
+    border-radius: 4px;
+    background: transparent;
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.button-danger:hover {
+    background: var(--danger);
+    color: #fff;
 }
 
 .currency-fields {
@@ -955,4 +992,339 @@ button#downtime-button:hover {
         flex: none;
         width: 100%;
     }
+}
+
+.button-primary {
+    display: inline-block;
+    margin-bottom: 1rem;
+    padding: 0.6rem 1.2rem;
+    background: #2f5233;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.button-primary:hover {
+    background: #24401f;
+}
+
+.wizard {
+    max-width: 760px;
+    margin: 0 auto;
+}
+
+.wizard-step {
+    background: var(--parchment);
+    border: 1px solid var(--parchment-dark);
+    border-radius: var(--card-radius);
+    padding: 24px 28px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    color: var(--ink);
+}
+
+.wizard-progress {
+    margin: 0 0 12px;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--green-mid);
+    font-weight: bold;
+}
+
+.wizard-step h2 {
+    margin-top: 0;
+    color: var(--green-deep);
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 6px;
+    font-size: 1.3rem;
+    letter-spacing: 0.03em;
+}
+
+.wizard-intro {
+    opacity: 0.85;
+}
+
+.wizard-note {
+    font-size: 0.85rem;
+    font-style: italic;
+    opacity: 0.75;
+    margin: 4px 0 0;
+}
+
+.wizard-static-list {
+    background: #fff8e8;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 8px;
+    padding: 10px 14px 10px 34px;
+    margin-top: 12px;
+    list-style: decimal;
+    columns: 2;
+    column-gap: 24px;
+}
+
+.wizard-static-list li {
+    break-inside: avoid;
+    padding: 2px 0;
+}
+
+.wizard-choice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.wizard-choice-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.wizard-choice {
+    display: block;
+    position: relative;
+    background: #fff8e8;
+    border: 2px solid var(--parchment-dark);
+    border-radius: 8px;
+    padding: 14px 16px 14px 40px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+}
+
+.wizard-choice > input[type="radio"],
+.wizard-choice > input[type="checkbox"] {
+    position: absolute;
+    left: 14px;
+    top: 18px;
+}
+
+.wizard-choice:hover {
+    border-color: var(--green-mid);
+}
+
+.wizard-choice--selected {
+    border-color: var(--gold);
+    background: #fdf1cf;
+}
+
+.wizard-choice--compact {
+    padding: 10px 14px 10px 40px;
+}
+
+.wizard-choice p {
+    margin: 6px 0 0;
+}
+
+.wizard-choice-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.wizard-choice-title {
+    font-weight: bold;
+    color: var(--green-deep);
+    font-size: 1.05rem;
+}
+
+.wizard-choice-meta {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.wizard-choice-detail {
+    font-size: 0.9rem;
+}
+
+.wizard-choice-inline {
+    display: block;
+    background: #fff8e8;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.wizard-choice-inline:hover {
+    border-color: var(--green-mid);
+}
+
+.wizard-ability {
+    margin-top: 8px;
+    padding: 8px 10px;
+    background: rgba(176, 141, 46, 0.12);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+}
+
+.wizard-ability p {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+}
+
+.wizard-wp-note {
+    font-size: 0.8rem;
+    opacity: 0.7;
+}
+
+.wizard-ability--muted {
+    margin-top: 16px;
+    border-left-color: var(--green-mid);
+    background: rgba(60, 98, 80, 0.1);
+    font-size: 0.85rem;
+}
+
+.wizard-count-banner {
+    font-weight: bold;
+    color: var(--green-deep);
+}
+
+.wizard-link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--green-mid);
+    text-decoration: underline;
+    cursor: pointer;
+    font: inherit;
+}
+
+.wizard-attribute-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 12px 0;
+}
+
+.wizard-attribute-card {
+    background: #fff8e8;
+    border: 2px solid var(--parchment-dark);
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.wizard-attribute-card label {
+    font-weight: bold;
+    color: var(--green-deep);
+}
+
+.wizard-attribute-card--error {
+    border-color: var(--danger);
+}
+
+.wizard-attribute-modifier {
+    margin: 6px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+.wizard-attribute-error {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    color: var(--danger);
+    font-weight: bold;
+}
+
+.wizard-field {
+    display: block;
+    margin: 12px 0;
+    font-weight: bold;
+    color: var(--green-deep);
+}
+
+.wizard-field input,
+.wizard-field textarea {
+    display: block;
+    margin-top: 4px;
+    width: 100%;
+    font: inherit;
+    font-weight: normal;
+    color: var(--ink);
+    background: #fff8e8;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.wizard-field input:focus,
+.wizard-field textarea:focus,
+.attribute-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(176, 141, 46, 0.3);
+}
+
+.attribute-input {
+    width: 100%;
+    font: inherit;
+    background: #fff8e8;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-top: 4px;
+}
+
+.wizard-swap-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 8px 0;
+}
+
+.wizard-swap-row select {
+    font: inherit;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--parchment-dark);
+    background: #fff8e8;
+}
+
+.wizard-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.wizard-nav button {
+    font: inherit;
+    font-weight: bold;
+    padding: 0.6rem 1.4rem;
+    border: none;
+    border-radius: 6px;
+    background: var(--green-mid);
+    color: var(--parchment);
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
+.wizard-nav button:hover:not(:disabled) {
+    background: var(--green-deep);
+}
+
+.wizard-nav button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#submit-character {
+    background: var(--gold);
+    color: var(--ink);
+}
+
+#submit-character:hover {
+    background: #96772a;
+}
+
+.wizard-error {
+    color: #fff;
+    background: var(--danger);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-weight: bold;
 }

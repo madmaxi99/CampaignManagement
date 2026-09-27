@@ -187,34 +187,23 @@
         });
     }
 
-    // --- Weapons / Armor / Inventory: add, quantity change, remove ---
+    // --- Weapons / Armor / Inventory: free-text rows (add, edit field, remove) ---
 
-    function wireEquipmentSegment(segment, selectId, quantityInputId, addButtonId) {
-        const addButton = document.getElementById(addButtonId);
-        if (addButton) {
-            addButton.addEventListener('click', () => {
-                const select = document.getElementById(selectId);
-                if (!select.value) {
-                    return;
-                }
-                const quantity = parseInt(document.getElementById(quantityInputId).value, 10) || 1;
+    document.querySelectorAll('.add-row-button').forEach((button) => {
+        button.addEventListener('click', () => {
+            postJson(`/character/${slug}/${button.dataset.segment}`, {}).then(() => window.location.reload());
+        });
+    });
 
-                postJson(`/character/${slug}/${segment}`, { item_id: parseInt(select.value, 10), quantity })
-                    .then(() => window.location.reload());
-            });
-        }
-    }
-
-    wireEquipmentSegment('weapons', 'weapon-catalog-select', 'weapon-quantity-input', 'weapon-add-button');
-    wireEquipmentSegment('armor', 'armor-catalog-select', 'armor-quantity-input', 'armor-add-button');
-    wireEquipmentSegment('inventory', 'inventory-catalog-select', 'inventory-quantity-input', 'inventory-add-button');
-
-    document.querySelectorAll('.quantity-input').forEach((input) => {
+    document.querySelectorAll('.free-text-field').forEach((input) => {
         input.addEventListener('change', () => {
-            const quantity = parseInt(input.value, 10) || 0;
+            const segment = input.dataset.segment;
+            const value = input.type === 'number' ? (input.value === '' ? null : parseInt(input.value, 10)) : input.value;
+            const url = segment === 'armor'
+                ? `/character/${slug}/armor/${input.dataset.slot}`
+                : `/character/${slug}/${segment}/${input.dataset.rowId}`;
 
-            postJson(`/character/${slug}/${input.dataset.segment}/${input.dataset.rowId}/quantity`, { quantity })
-                .then(() => window.location.reload());
+            postJson(url, { [input.dataset.field]: value }).then(() => window.location.reload());
         });
     });
 
@@ -224,4 +213,16 @@
                 .then(() => window.location.reload());
         });
     });
+
+    const deleteCharacterButton = document.getElementById('delete-character-button');
+    if (deleteCharacterButton) {
+        deleteCharacterButton.addEventListener('click', () => {
+            if (!confirm('Diesen Charakter wirklich unwiderruflich löschen?')) {
+                return;
+            }
+            deleteRequest(`/character/${slug}`).then(() => {
+                window.location.href = '/characters';
+            });
+        });
+    }
 })();

@@ -19,6 +19,7 @@ CREATE TABLE skills (
     name_de VARCHAR(100) NOT NULL UNIQUE,
     attribute_code CHAR(3) NOT NULL,
     category ENUM('regular', 'combat', 'secondary') NOT NULL,
+    description_de TEXT NULL,
     FOREIGN KEY (attribute_code) REFERENCES attributes(code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -83,7 +84,6 @@ CREATE TABLE characters (
     flaw_de TEXT NOT NULL,
     appearance_de TEXT NOT NULL,
     memento_de TEXT NOT NULL,
-    misc_items_de VARCHAR(255) NOT NULL,
     movement INT NOT NULL,
     damage_bonus_sta_de VARCHAR(20) NOT NULL DEFAULT '—',
     damage_bonus_gew_de VARCHAR(20) NOT NULL DEFAULT '—',
@@ -144,32 +144,44 @@ CREATE TABLE character_spells (
     FOREIGN KEY (spell_id) REFERENCES spells(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Waffen/Rüstung/Inventar sind Freitext: bei der Charaktererstellung werden
+-- Katalog-Items (items/item_weapons/item_armor) einmalig als Text übernommen,
+-- danach ist alles frei editierbar ohne weiteren Katalog-Bezug.
 CREATE TABLE character_weapons (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
-    item_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    position INT NOT NULL DEFAULT 1,
+    name_de VARCHAR(150) NOT NULL,
+    grip_de VARCHAR(50) NULL,
+    range_de VARCHAR(50) NULL,
+    damage_de VARCHAR(50) NULL,
+    traits_de VARCHAR(255) NULL,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Genau zwei feste Zeilen pro Charakter (Kopf/Körper), immer vorhanden statt
+-- add/remove -- leer, wenn der Slot unbesetzt ist.
 CREATE TABLE character_armor (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
-    item_id INT NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    slot ENUM('head', 'body') NOT NULL,
+    name_de VARCHAR(150) NULL,
+    armor_value INT NULL,
+    penalty_de VARCHAR(255) NULL,
+    UNIQUE KEY uniq_character_slot (character_id, slot),
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Keine Unterscheidung mehr zwischen normalem Kram und "Kleinkram" -- ein
+-- einziges Freitext-Inventar.
 CREATE TABLE character_inventory (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
     position INT NOT NULL,
-    item_id INT NOT NULL,
+    name_de VARCHAR(150) NOT NULL,
+    description_de VARCHAR(255) NULL,
     quantity INT NOT NULL DEFAULT 1,
-    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
-    FOREIGN KEY (item_id) REFERENCES items(id)
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Campaigns (DM screens)
@@ -270,4 +282,101 @@ CREATE TABLE campaign_event_table_entries (
     max_roll INT NULL,
     text_de TEXT NOT NULL,
     FOREIGN KEY (table_id) REFERENCES campaign_event_tables(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Character creation wizard catalog (Dragonbane rules reference data)
+-- See docs/superpowers/specs/2026-09-27-character-creation-wizard-design.md
+
+CREATE TABLE kins (
+    code VARCHAR(20) PRIMARY KEY,
+    name_de VARCHAR(50) NOT NULL,
+    d12_min INT NOT NULL,
+    d12_max INT NOT NULL,
+    movement_base INT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE kin_heroic_abilities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    kin_code VARCHAR(20) NOT NULL,
+    name_de VARCHAR(100) NOT NULL,
+    wp_note_de VARCHAR(100) NULL,
+    description_de TEXT NOT NULL,
+    FOREIGN KEY (kin_code) REFERENCES kins(code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE professions (
+    code VARCHAR(30) PRIMARY KEY,
+    name_de VARCHAR(50) NOT NULL,
+    key_attribute_code CHAR(3) NOT NULL,
+    kin_restriction VARCHAR(20) NULL,
+    -- 1 = kein Start-Talent, stattdessen Magie (nur Magier; RAW-Text bestätigt).
+    grants_magic BOOLEAN NOT NULL DEFAULT 0,
+    FOREIGN KEY (key_attribute_code) REFERENCES attributes(code),
+    FOREIGN KEY (kin_restriction) REFERENCES kins(code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE profession_key_skills (
+    profession_code VARCHAR(30) NOT NULL,
+    skill_id INT NOT NULL,
+    PRIMARY KEY (profession_code, skill_id),
+    FOREIGN KEY (profession_code) REFERENCES professions(code),
+    FOREIGN KEY (skill_id) REFERENCES skills(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE profession_heroic_abilities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    profession_code VARCHAR(30) NOT NULL,
+    -- 1 = wird bei der Charaktererstellung automatisch vergeben (RAW: genau eine
+    -- pro Beruf). 0 = zusätzliche, im Regelwerk nicht als Start-Talent gelistete
+    -- Fähigkeit, die in den Pregens auftaucht (spätere Wahl beim Aufleveln).
+    granted_at_creation BOOLEAN NOT NULL DEFAULT 1,
+    name_de VARCHAR(100) NOT NULL,
+    requirement_de VARCHAR(100) NULL,
+    wp_note_de VARCHAR(100) NULL,
+    description_de TEXT NOT NULL,
+    -- NULL = einzelnes festes Talent (Standardfall). Ein gemeinsamer Wert =
+    -- Wahl-Gruppe: der Spieler wählt genau eine Zeile aus allen Zeilen mit
+    -- demselben choice_group (bisher nur Handwerker: Meister-Schmied/
+    -- -Zimmermann/-Gerber).
+    choice_group VARCHAR(50) NULL,
+    FOREIGN KEY (profession_code) REFERENCES professions(code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Heroic abilities selectable regardless of profession (e.g. Robust, Fokussiert)
+CREATE TABLE general_heroic_abilities (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name_de VARCHAR(100) NOT NULL,
+    requirement_de VARCHAR(100) NULL,
+    wp_note_de VARCHAR(100) NULL,
+    description_de TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE profession_gear_options (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    profession_code VARCHAR(30) NOT NULL,
+    option_label VARCHAR(10) NOT NULL,
+    -- Freetext für Verbrauchsgüter dieser Option (Fackel, Tagesrationen etc.),
+    -- die keine eigenen Katalog-Items brauchen. Das Start-Silber ist NICHT mehr
+    -- Teil dieses Texts, siehe starting_silver_dice.
+    extra_de VARCHAR(255) NULL,
+    -- Würfel für das Start-Silber dieser Option, z.B. 'W6'/'W8'/'W10'/'W12'.
+    -- Der Spieler würfelt am Tisch und trägt das Ergebnis im Wizard ein.
+    starting_silver_dice VARCHAR(5) NULL,
+    FOREIGN KEY (profession_code) REFERENCES professions(code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE profession_gear_option_items (
+    gear_option_id INT NOT NULL,
+    item_id INT NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
+    FOREIGN KEY (gear_option_id) REFERENCES profession_gear_options(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id) REFERENCES items(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE flaws (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    roll_min INT NOT NULL,
+    roll_max INT NOT NULL,
+    name_de VARCHAR(50) NOT NULL,
+    description_de VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

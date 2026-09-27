@@ -2,26 +2,34 @@
 
 {% block title %}Characters{% endblock %}
 
-{% macro character_card(character) %}
-    <a class="character-card" href="/character/{{ character.slug }}">
-        <img class="character-card-portrait" src="/images/characters/{{ character.slug }}.jpg" alt="{{ character.name_de }}" onerror="this.remove()">
-        <h2>{{ character.name_de }}</h2>
-        <p class="character-card-meta">{{ character.kin_de }} &middot; {{ character.age_de }} &middot; {{ character.profession_de }}</p>
-        <div class="character-card-vitals">
-            <span>TP {{ character.hp_current }}/{{ character.hp_max }}</span>
-            <span>WP {{ character.wp_current }}/{{ character.wp_max }}</span>
-        </div>
-    </a>
+{% macro character_card(character, deletable) %}
+    <div class="character-card-wrapper">
+        <a class="character-card" href="/character/{{ character.slug }}">
+            <img class="character-card-portrait" src="/images/characters/{{ character.slug }}.jpg" alt="{{ character.name_de }}" onerror="this.remove()">
+            <h2>{{ character.name_de }}</h2>
+            <p class="character-card-meta">{{ character.kin_de }} &middot; {{ character.age_de }} &middot; {{ character.profession_de }}</p>
+            <div class="character-card-vitals">
+                <span>TP {{ character.hp_current }}/{{ character.hp_max }}</span>
+                <span>WP {{ character.wp_current }}/{{ character.wp_max }}</span>
+            </div>
+        </a>
+        {% if deletable %}
+            <button type="button" class="button-danger character-card-delete" data-slug="{{ character.slug }}">Löschen</button>
+        {% endif %}
+    </div>
 {% endmacro %}
 
 {% import _self as characters_macros %}
 {% import "_entity_grid_page.twig" as grid_page %}
 
 {% block content %}
+    <a class="button-primary" href="/character/create">Charakter erstellen</a>
     {{ grid_page.render(
         'Characters',
-        defaultCharacters|map(c => characters_macros.character_card(c)),
-        customCharacters|map(c => characters_macros.character_card(c)),
+        defaultCharacters|map(c => characters_macros.character_card(c, false)),
+        customCharacters|map(c => characters_macros.character_card(c, true)),
         'Noch keine selbsterstellten Charaktere.'
     ) }}
+
+    <script src="/js/characters-list.js"></script>
 {% endblock %}

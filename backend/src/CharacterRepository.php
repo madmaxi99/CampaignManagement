@@ -159,28 +159,29 @@ final class CharacterRepository
 
     public function weapons(int $characterId): array
     {
-        $stmt = $this->db->prepare(<<<SQL
-            SELECT cw.id AS row_id, cw.quantity, i.id AS item_id, i.name_de, i.description_de, i.rarity, i.price_copper,
-                   iw.grip_de, iw.range_de, iw.damage_de, iw.durability, iw.traits_de
-            FROM character_weapons cw
-            JOIN items i ON i.id = cw.item_id
-            JOIN item_weapons iw ON iw.item_id = i.id
-            WHERE cw.character_id = :character_id
-            ORDER BY cw.id
-            SQL);
+        $stmt = $this->db->prepare(
+            'SELECT id AS row_id, name_de, grip_de, range_de, damage_de, traits_de
+             FROM character_weapons WHERE character_id = :character_id ORDER BY position'
+        );
         $stmt->execute(['character_id' => $characterId]);
 
         return $stmt->fetchAll();
     }
 
-    public function addWeapon(int $characterId, int $itemId, int $quantity): void
+    public function addWeapon(int $characterId): int
     {
-        $this->addToCharacterItemTable('character_weapons', $characterId, $itemId, $quantity);
+        $position = $this->nextPosition('character_weapons', $characterId);
+        $stmt = $this->db->prepare(
+            'INSERT INTO character_weapons (character_id, position, name_de) VALUES (:character_id, :position, :name_de)'
+        );
+        $stmt->execute(['character_id' => $characterId, 'position' => $position, 'name_de' => 'Neue Waffe']);
+
+        return (int) $this->db->lastInsertId();
     }
 
-    public function updateWeaponQuantity(int $characterId, int $rowId, int $quantity): void
+    public function updateWeapon(int $characterId, int $rowId, array $fields): void
     {
-        $this->updateCharacterItemQuantity('character_weapons', $characterId, $rowId, $quantity);
+        $this->updateFreeTextRow('character_weapons', $characterId, $rowId, $fields, ['name_de', 'grip_de', 'range_de', 'damage_de', 'traits_de']);
     }
 
     public function removeWeapon(int $characterId, int $rowId): void
@@ -190,84 +191,57 @@ final class CharacterRepository
 
     public function armor(int $characterId): array
     {
-        $stmt = $this->db->prepare(<<<SQL
-            SELECT ca.id AS row_id, ca.quantity, i.id AS item_id, i.name_de, i.description_de, i.rarity, i.price_copper,
-                   ia.slot, ia.armor_value, ia.penalty_skills_de
-            FROM character_armor ca
-            JOIN items i ON i.id = ca.item_id
-            JOIN item_armor ia ON ia.item_id = i.id
-            WHERE ca.character_id = :character_id
-            ORDER BY ca.id
-            SQL);
+        $stmt = $this->db->prepare(
+            "SELECT slot, name_de, armor_value, penalty_de FROM character_armor
+             WHERE character_id = :character_id ORDER BY FIELD(slot, 'head', 'body')"
+        );
         $stmt->execute(['character_id' => $characterId]);
 
         return $stmt->fetchAll();
     }
 
-    public function addArmor(int $characterId, int $itemId, int $quantity): void
+    public function updateArmorSlot(int $characterId, string $slot, array $fields): void
     {
-        $this->addToCharacterItemTable('character_armor', $characterId, $itemId, $quantity);
-    }
+        if (!in_array($slot, ['head', 'body'], true)) {
+            throw new InvalidArgumentException('Ungültiger Rüstungs-Slot.');
+        }
 
-    public function updateArmorQuantity(int $characterId, int $rowId, int $quantity): void
-    {
-        $this->updateCharacterItemQuantity('character_armor', $characterId, $rowId, $quantity);
-    }
+        $allowed = ['name_de', 'armor_value', 'penalty_de'];
+        $set = array_intersect_key($fields, array_flip($allowed));
+        if ($set === []) {
+            return;
+        }
 
-    public function removeArmor(int $characterId, int $rowId): void
-    {
-        $this->removeFromCharacterItemTable('character_armor', $characterId, $rowId);
+        $assignments = implode(', ', array_map(static fn (string $field) => "{$field} = :{$field}", array_keys($set)));
+        $stmt = $this->db->prepare("UPDATE character_armor SET {$assignments} WHERE character_id = :character_id AND slot = :slot");
+        $stmt->execute($set + ['character_id' => $characterId, 'slot' => $slot]);
     }
 
     public function inventory(int $characterId): array
     {
-        $stmt = $this->db->prepare(<<<SQL
-            SELECT ci.id AS row_id, ci.quantity, i.id AS item_id, i.name_de, i.description_de, i.rarity, i.price_copper
-            FROM character_inventory ci
-            JOIN items i ON i.id = ci.item_id
-            WHERE ci.character_id = :character_id
-            ORDER BY ci.position
-            SQL);
+        $stmt = $this->db->prepare(
+            'SELECT id AS row_id, name_de, description_de, quantity
+             FROM character_inventory WHERE character_id = :character_id ORDER BY position'
+        );
         $stmt->execute(['character_id' => $characterId]);
 
         return $stmt->fetchAll();
     }
 
-    public function addInventoryItem(int $characterId, int $itemId, int $quantity): void
+    public function addInventoryItem(int $characterId): int
     {
+        $position = $this->nextPosition('character_inventory', $characterId);
         $stmt = $this->db->prepare(
-            'SELECT id, quantity FROM character_inventory WHERE character_id = :character_id AND item_id = :item_id'
+            'INSERT INTO character_inventory (character_id, position, name_de) VALUES (:character_id, :position, :name_de)'
         );
-        $stmt->execute(['character_id' => $characterId, 'item_id' => $itemId]);
-        $existing = $stmt->fetch();
+        $stmt->execute(['character_id' => $characterId, 'position' => $position, 'name_de' => 'Neuer Gegenstand']);
 
-        if ($existing !== false) {
-            $update = $this->db->prepare('UPDATE character_inventory SET quantity = :quantity WHERE id = :id');
-            $update->execute(['quantity' => (int) $existing['quantity'] + $quantity, 'id' => $existing['id']]);
-
-            return;
-        }
-
-        $positionStmt = $this->db->prepare(
-            'SELECT COALESCE(MAX(position), 0) + 1 AS next_position FROM character_inventory WHERE character_id = :character_id'
-        );
-        $positionStmt->execute(['character_id' => $characterId]);
-        $nextPosition = (int) $positionStmt->fetch()['next_position'];
-
-        $insert = $this->db->prepare(
-            'INSERT INTO character_inventory (character_id, position, item_id, quantity) VALUES (:character_id, :position, :item_id, :quantity)'
-        );
-        $insert->execute([
-            'character_id' => $characterId,
-            'position' => $nextPosition,
-            'item_id' => $itemId,
-            'quantity' => $quantity,
-        ]);
+        return (int) $this->db->lastInsertId();
     }
 
-    public function updateInventoryItemQuantity(int $characterId, int $rowId, int $quantity): void
+    public function updateInventoryItem(int $characterId, int $rowId, array $fields): void
     {
-        $this->updateCharacterItemQuantity('character_inventory', $characterId, $rowId, $quantity);
+        $this->updateFreeTextRow('character_inventory', $characterId, $rowId, $fields, ['name_de', 'description_de', 'quantity']);
     }
 
     public function removeInventoryItem(int $characterId, int $rowId): void
@@ -275,12 +249,10 @@ final class CharacterRepository
         $this->removeFromCharacterItemTable('character_inventory', $characterId, $rowId);
     }
 
-    public function itemsCatalogByKind(string $kind): array
+    public function delete(int $characterId): void
     {
-        $stmt = $this->db->prepare('SELECT id, name_de, rarity, price_copper FROM items WHERE kind = :kind ORDER BY name_de');
-        $stmt->execute(['kind' => $kind]);
-
-        return $stmt->fetchAll();
+        $stmt = $this->db->prepare('DELETE FROM characters WHERE id = :id AND is_default = 0');
+        $stmt->execute(['id' => $characterId]);
     }
 
     public function setCurrency(int $characterId, int $gold, int $silver, int $copper): void
@@ -342,37 +314,29 @@ final class CharacterRepository
         return $newActive;
     }
 
-    private function addToCharacterItemTable(string $table, int $characterId, int $itemId, int $quantity): void
+    private function nextPosition(string $table, int $characterId): int
     {
-        $stmt = $this->db->prepare(
-            "SELECT id, quantity FROM {$table} WHERE character_id = :character_id AND item_id = :item_id"
-        );
-        $stmt->execute(['character_id' => $characterId, 'item_id' => $itemId]);
-        $existing = $stmt->fetch();
+        $stmt = $this->db->prepare("SELECT COALESCE(MAX(position), 0) + 1 FROM {$table} WHERE character_id = :character_id");
+        $stmt->execute(['character_id' => $characterId]);
 
-        if ($existing !== false) {
-            $update = $this->db->prepare("UPDATE {$table} SET quantity = :quantity WHERE id = :id");
-            $update->execute(['quantity' => (int) $existing['quantity'] + $quantity, 'id' => $existing['id']]);
-
-            return;
-        }
-
-        $insert = $this->db->prepare(
-            "INSERT INTO {$table} (character_id, item_id, quantity) VALUES (:character_id, :item_id, :quantity)"
-        );
-        $insert->execute(['character_id' => $characterId, 'item_id' => $itemId, 'quantity' => $quantity]);
+        return (int) $stmt->fetchColumn();
     }
 
-    private function updateCharacterItemQuantity(string $table, int $characterId, int $rowId, int $quantity): void
+    /**
+     * Updates only the keys of $fields that are also in $allowed (a whitelist
+     * of real column names) -- prevents SQL injection via arbitrary field
+     * names from request bodies.
+     */
+    private function updateFreeTextRow(string $table, int $characterId, int $rowId, array $fields, array $allowed): void
     {
-        if ($quantity <= 0) {
-            $this->removeFromCharacterItemTable($table, $characterId, $rowId);
-
+        $set = array_intersect_key($fields, array_flip($allowed));
+        if ($set === []) {
             return;
         }
 
-        $stmt = $this->db->prepare("UPDATE {$table} SET quantity = :quantity WHERE id = :id AND character_id = :character_id");
-        $stmt->execute(['quantity' => $quantity, 'id' => $rowId, 'character_id' => $characterId]);
+        $assignments = implode(', ', array_map(static fn (string $field) => "{$field} = :{$field}", array_keys($set)));
+        $stmt = $this->db->prepare("UPDATE {$table} SET {$assignments} WHERE id = :id AND character_id = :character_id");
+        $stmt->execute($set + ['id' => $rowId, 'character_id' => $characterId]);
     }
 
     private function removeFromCharacterItemTable(string $table, int $characterId, int $rowId): void
