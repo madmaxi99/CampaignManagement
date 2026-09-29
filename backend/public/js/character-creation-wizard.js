@@ -20,26 +20,6 @@
         5: 'Magie', 6: 'Attribute', 7: 'Schwäche', 8: 'Memento', 9: 'Aussehen',
     };
 
-    const MEMENTO_EXAMPLES = [
-        'Deine treuen alten Schuhe', 'Ein schlichtes silbernes Medaillon', 'Ein Brief eines alten Freundes oder Verwandten',
-        'Ein zerfleddertes altes Tagebuch', 'Ein Armband, das in deiner Familie weitergegeben wird',
-        'Eine hölzerne Figur aus deiner Kindheit', 'Ein seltsam geformter Stein',
-        'Eine Kupfermünze aus einem Schatz, den deine Mutter oder dein Vater gesucht hat', 'Ein alter Zinnkrug',
-        'Ein Horn, das du als Trophäe von einem Monster erbeutet hast', 'Ein Fang, den du als Trophäe von einer Bestie erbeutet hast',
-        'Ein paar einfache Würfel aus Knochen', 'Ein Medaillon mit einer Haarlocke', 'Ein verzierter Schlüssel',
-        'Eine handgezeichnete Karte, die du geerbt hast', 'Ein Ring mit einer Inschrift', 'Ein Pfeifchen aus Knochen',
-        'Der zerschlissene alte Hut deiner Mutter oder deines Vaters', 'Eine Greifenfeder', 'Eine wunderschön geschnitzte Tabakspfeife',
-    ];
-
-    const APPEARANCE_EXAMPLES = [
-        'Hässliche Narbe quer über die Wange', 'Seltsame Kopfbedeckung', 'Ungewöhnlich blass und käsig',
-        'Ein ständiges Lächeln auf den Lippen', 'Eisiger, durchdringender Blick', 'Etwas Übergewicht um die Körpermitte',
-        'Dünn und drahtig', 'Ungewöhnlich viel Körperbehaarung (je nach Volk)', 'Beginnende Glatze (je nach Volk)',
-        'Auffälliges Tattoo', 'Übler Körpergeruch', 'Prächtige Frisur', 'Hinkender Gang', 'Verdreckt',
-        'Ehrliche blaue Augen', 'Silberzahn', 'Stark parfümiert', 'Verschiedenfarbige Augen', 'Zischende Stimme',
-        'Wettergegerbtes Gesicht',
-    ];
-
     let catalog = null;
 
     const state = {
@@ -53,7 +33,7 @@
         gearOptionId: null,
         rolledSilver: null,
         extraPicks: [],
-        magicSchoolSkillId: null,
+        magicSchoolId: null,
         trickPicks: [],
         spellPicks: [],
         rawAttributes: { STA: null, KON: null, GEW: null, INT: null, WIL: null, CHA: null },
@@ -210,7 +190,7 @@
         }
         const profession = selectedProfession();
         if (profession.grants_magic) {
-            return state.magicSchoolSkillId !== null;
+            return state.magicSchoolId !== null;
         }
         if (profession.heroicAbilities.length > 1) {
             return state.professionHeroicAbilityId !== null;
@@ -229,9 +209,10 @@
 
             let abilitySection;
             if (profession.heroicAbilities.length === 0 && profession.grants_magic) {
-                const schoolRows = catalog.magic.schools.map((school) => `
+                // "Allgemein" has no skill_id -- you can't train in it, so it's excluded here.
+                const schoolRows = catalog.magic.schools.filter((school) => school.skill_id !== null).map((school) => `
                     <label class="wizard-choice-inline">
-                        <input type="radio" name="magic-school" value="${school.id}" ${state.magicSchoolSkillId === school.id ? 'checked' : ''} ${selected ? '' : 'disabled'}>
+                        <input type="radio" name="magic-school" value="${school.id}" ${state.magicSchoolId === school.id ? 'checked' : ''} ${selected ? '' : 'disabled'}>
                         <strong>${school.name_de}</strong>
                         ${descriptionLine(school.description_de)}
                     </label>
@@ -328,8 +309,13 @@
             </label>
         `).join('');
 
+        // A school in catalog.magic.schools has its OWN id (matches catalog_spells.school_id),
+        // distinct from skill_id (matches catalog_skills.id / character_skills.skill_id). The
+        // pool/checkbox below is skill-based, so map the chosen school to a skill-shaped entry.
         const poolSkills = profession.grants_magic
-            ? profession.skillPool.concat(catalog.magic.schools.filter((s) => s.id === state.magicSchoolSkillId))
+            ? profession.skillPool.concat(catalog.magic.schools
+                .filter((s) => s.id === state.magicSchoolId)
+                .map((s) => ({ id: s.skill_id, name_de: s.name_de, attribute_code: s.attribute_code, description_de: s.description_de })))
             : profession.skillPool;
         const poolRows = poolSkills.map((skill) => `
             <label class="wizard-choice-inline">
@@ -410,23 +396,25 @@
     // --- Schritt 5: Magie (nur für Berufe mit grants_magic) ---
 
     function magicStepValid() {
-        return state.magicSchoolSkillId !== null
+        return state.magicSchoolId !== null
             && state.trickPicks.length === MAGIC_PICK_COUNT
             && state.spellPicks.length === MAGIC_PICK_COUNT;
     }
 
     function renderMagicStep() {
-        const school = catalog.magic.schools.find((s) => s.id === state.magicSchoolSkillId);
+        const school = catalog.magic.schools.find((s) => s.id === state.magicSchoolId);
+        const generalSchool = catalog.magic.schools.find((s) => s.skill_id === null);
+        const isGeneral = (spell) => spell.school_id === generalSchool.id;
 
         const availableTricks = catalog.magic.spells.filter((spell) => spell.type === 'trick'
-            && (spell.school_skill_id === null || spell.school_skill_id === state.magicSchoolSkillId));
+            && (isGeneral(spell) || spell.school_id === state.magicSchoolId));
         const availableSpells = catalog.magic.spells.filter((spell) => spell.type === 'spell'
-            && (spell.school_skill_id === null || spell.school_skill_id === state.magicSchoolSkillId));
+            && (isGeneral(spell) || spell.school_id === state.magicSchoolId));
 
         const trickRows = availableTricks.map((spell) => `
             <label class="wizard-choice-inline">
                 <input type="checkbox" class="trick-pick" value="${spell.id}" ${state.trickPicks.includes(spell.id) ? 'checked' : ''}>
-                <strong>${spell.name_de}</strong> ${spell.school_skill_id === null ? '<small>(Allgemein)</small>' : ''}
+                <strong>${spell.name_de}</strong> ${isGeneral(spell) ? '<small>(Allgemein)</small>' : ''}
                 <p>${spell.effect_de}</p>
             </label>
         `).join('');
@@ -434,7 +422,7 @@
         const spellRows = availableSpells.map((spell) => `
             <label class="wizard-choice-inline">
                 <input type="checkbox" class="spell-pick" value="${spell.id}" ${state.spellPicks.includes(spell.id) ? 'checked' : ''}>
-                <strong>${spell.name_de}</strong> ${spell.school_skill_id === null ? '<small>(Allgemein)</small>' : ''}
+                <strong>${spell.name_de}</strong> ${isGeneral(spell) ? '<small>(Allgemein)</small>' : ''}
                 <small>${spell.wp_note_de || ''}</small>
                 <p>${spell.effect_de}</p>
             </label>
@@ -529,7 +517,7 @@
     // --- Schritt 8: Memento ---
 
     function renderMementoStep() {
-        const examples = MEMENTO_EXAMPLES.map((entry) => `<li>${entry}</li>`).join('');
+        const examples = catalog.mementos.map((entry) => `<li>${entry.description_de}</li>`).join('');
 
         return `
             <h2>8. Memento</h2>
@@ -548,7 +536,7 @@
     // --- Schritt 9: Aussehen (letzter Schritt, direkt Absenden) ---
 
     function renderAppearanceStep() {
-        const examples = APPEARANCE_EXAMPLES.map((entry) => `<li>${entry}</li>`).join('');
+        const examples = catalog.appearances.map((entry) => `<li>${entry.description_de}</li>`).join('');
 
         return `
             <h2>9. Aussehen</h2>
@@ -577,7 +565,7 @@
             flaw_roll: state.flawRoll,
             gear_option_id: state.gearOptionId,
             rolled_silver: state.rolledSilver,
-            magic_school_skill_id: profession.grants_magic ? state.magicSchoolSkillId : null,
+            magic_school_id: profession.grants_magic ? state.magicSchoolId : null,
             known_trick_ids: profession.grants_magic ? state.trickPicks : [],
             known_spell_ids: profession.grants_magic ? state.spellPicks : [],
             memento_de: state.mementoDe,
@@ -598,7 +586,7 @@
                     setError(data.error || 'Unbekannter Fehler beim Anlegen.');
                     return;
                 }
-                window.location.href = `/character/${data.slug}`;
+                window.location.href = `/character/${data.id}`;
             });
     }
 
@@ -630,7 +618,7 @@
                 state.poolPicks = [];
                 state.gearOptionId = null;
                 state.rolledSilver = null;
-                state.magicSchoolSkillId = null;
+                state.magicSchoolId = null;
                 state.trickPicks = [];
                 state.spellPicks = [];
                 render();
@@ -712,8 +700,8 @@
 
         root.querySelectorAll('input[name="magic-school"]').forEach((input) => {
             input.addEventListener('change', () => {
-                state.magicSchoolSkillId = parseInt(input.value, 10);
-                state.poolPicks = state.poolPicks.filter((id) => !catalog.magic.schools.some((s) => s.id === id));
+                state.magicSchoolId = parseInt(input.value, 10);
+                state.poolPicks = state.poolPicks.filter((id) => !catalog.magic.schools.some((s) => s.skill_id === id));
                 state.trickPicks = [];
                 state.spellPicks = [];
                 render();

@@ -2,11 +2,11 @@
     document.querySelectorAll('.character-card-delete').forEach((button) => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
-            const slug = button.dataset.slug;
+            const id = button.dataset.id;
             if (!confirm('Diesen Charakter wirklich unwiderruflich löschen?')) {
                 return;
             }
-            fetch(`/character/${slug}`, { method: 'DELETE' }).then(() => window.location.reload());
+            fetch(`/character/${id}`, { method: 'DELETE' }).then(() => window.location.reload());
         });
     });
 })();

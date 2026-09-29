@@ -16,6 +16,8 @@ final class CharacterCreationRepository
             'professions' => $this->professions(),
             'generalHeroicAbilities' => $this->generalHeroicAbilities(),
             'flaws' => $this->flaws(),
+            'mementos' => $this->mementos(),
+            'appearances' => $this->appearances(),
             'skills' => $this->learnableSkills(),
             'magic' => $this->magicCatalog(),
         ];
@@ -23,18 +25,22 @@ final class CharacterCreationRepository
 
     private function attributes(): array
     {
-        return $this->db->query('SELECT code, name_de FROM attributes')->fetchAll();
+        return $this->db->query('SELECT code, name_de FROM catalog_attributes')->fetchAll();
     }
 
     private function kins(): array
     {
         $kins = $this->db->query(
-            'SELECT code, name_de, d12_min, d12_max, movement_base FROM kins ORDER BY d12_min'
+            'SELECT code, name_de, d12_min, d12_max, movement_base FROM catalog_kins ORDER BY d12_min'
         )->fetchAll();
 
-        $abilityStmt = $this->db->prepare(
-            'SELECT name_de, wp_note_de, description_de FROM kin_heroic_abilities WHERE kin_code = :kin_code ORDER BY id'
-        );
+        $abilityStmt = $this->db->prepare(<<<SQL
+            SELECT cha.name_de, cha.wp_note_de, cha.description_de
+            FROM catalog_kin_heroic_abilities khab
+            JOIN catalog_heroic_abilities cha ON cha.id = khab.heroic_ability_id
+            WHERE khab.kin_code = :kin_code
+            ORDER BY cha.id
+            SQL);
 
         foreach ($kins as &$kin) {
             $abilityStmt->execute(['kin_code' => $kin['code']]);
@@ -47,28 +53,30 @@ final class CharacterCreationRepository
     private function professions(): array
     {
         $professions = $this->db->query(
-            'SELECT code, name_de, key_attribute_code, kin_restriction, grants_magic FROM professions ORDER BY name_de'
+            'SELECT code, name_de, key_attribute_code, kin_restriction, grants_magic FROM catalog_professions ORDER BY name_de'
         )->fetchAll();
 
         $poolStmt = $this->db->prepare(<<<SQL
             SELECT sk.id, sk.name_de, sk.attribute_code, sk.description_de
-            FROM profession_key_skills pks
-            JOIN skills sk ON sk.id = pks.skill_id
+            FROM catalog_profession_key_skills pks
+            JOIN catalog_skills sk ON sk.id = pks.skill_id
             WHERE pks.profession_code = :profession_code
             ORDER BY sk.name_de
             SQL);
 
-        $abilityStmt = $this->db->prepare(
-            'SELECT id, name_de, requirement_de, wp_note_de, description_de, choice_group FROM profession_heroic_abilities
-             WHERE profession_code = :profession_code AND granted_at_creation = 1'
-        );
+        $abilityStmt = $this->db->prepare(<<<SQL
+            SELECT cha.id, cha.name_de, cha.requirement_de, cha.wp_note_de, cha.description_de, phab.choice_group
+            FROM catalog_profession_heroic_abilities phab
+            JOIN catalog_heroic_abilities cha ON cha.id = phab.heroic_ability_id
+            WHERE phab.profession_code = :profession_code AND phab.granted_at_creation = 1
+            SQL);
 
         $gearStmt = $this->db->prepare(<<<SQL
             SELECT pgo.id AS gear_option_id, pgo.option_label, pgo.extra_de, pgo.starting_silver_dice,
                    i.id AS item_id, i.name_de, i.kind, pgoi.quantity
-            FROM profession_gear_options pgo
-            JOIN profession_gear_option_items pgoi ON pgoi.gear_option_id = pgo.id
-            JOIN items i ON i.id = pgoi.item_id
+            FROM catalog_profession_gear_options pgo
+            JOIN catalog_profession_gear_option_items pgoi ON pgoi.gear_option_id = pgo.id
+            JOIN catalog_items i ON i.id = pgoi.item_id
             WHERE pgo.profession_code = :profession_code
             ORDER BY pgo.option_label, i.name_de
             SQL);
@@ -108,44 +116,75 @@ final class CharacterCreationRepository
 
     private function generalHeroicAbilities(): array
     {
-        return $this->db->query(
-            'SELECT name_de, requirement_de, wp_note_de, description_de FROM general_heroic_abilities ORDER BY id'
-        )->fetchAll();
+        // "General" = no row in either link table, i.e. not owned by any kin or profession.
+        return $this->db->query(<<<SQL
+            SELECT name_de, requirement_de, wp_note_de, description_de, repeatable
+            FROM catalog_heroic_abilities cha
+            WHERE NOT EXISTS (SELECT 1 FROM catalog_kin_heroic_abilities k WHERE k.heroic_ability_id = cha.id)
+              AND NOT EXISTS (SELECT 1 FROM catalog_profession_heroic_abilities p WHERE p.heroic_ability_id = cha.id)
+            ORDER BY id
+            SQL)->fetchAll();
     }
 
     private function flaws(): array
     {
         return $this->db->query(
-            'SELECT roll_min, roll_max, name_de, description_de FROM flaws ORDER BY roll_min'
+            'SELECT roll_min, roll_max, name_de, description_de FROM catalog_flaws ORDER BY roll_min'
+        )->fetchAll();
+    }
+
+    private function mementos(): array
+    {
+        return $this->db->query(
+            'SELECT roll_min, roll_max, description_de FROM catalog_mementos ORDER BY roll_min'
+        )->fetchAll();
+    }
+
+    private function appearances(): array
+    {
+        return $this->db->query(
+            'SELECT roll_min, roll_max, description_de FROM catalog_appearances ORDER BY roll_min'
         )->fetchAll();
     }
 
     private function learnableSkills(): array
     {
         return $this->db->query(
-            "SELECT id, name_de, attribute_code, category, description_de FROM skills WHERE category != 'secondary' ORDER BY name_de"
+            "SELECT id, name_de, attribute_code, category, description_de FROM catalog_skills WHERE category != 'secondary' ORDER BY name_de"
         )->fetchAll();
     }
 
     private function magicCatalog(): array
     {
         return [
-            'schools' => $this->db->query(
-                "SELECT id, name_de, attribute_code, description_de FROM skills WHERE category = 'secondary' ORDER BY name_de"
-            )->fetchAll(),
+            'schools' => $this->db->query(<<<SQL
+                SELECT sc.id, sc.name_de, sk.id AS skill_id, sk.attribute_code, sk.description_de
+                FROM catalog_schools sc
+                LEFT JOIN catalog_skills sk ON sk.id = sc.skill_id
+                ORDER BY sc.display_order, sc.name_de
+                SQL)->fetchAll(),
             'spells' => $this->db->query(<<<SQL
-                SELECT id, name_de, type, school_skill_id, components_de, casting_time_de,
-                       range_de, duration_de, wp_note_de, effect_de
-                FROM spells
-                ORDER BY school_skill_id IS NULL DESC, type DESC, name_de
+                SELECT sp.id, sp.name_de, sp.type, sp.school_id, sp.components_de,
+                       ct.name_de AS casting_time_de, sp.range_de, sd.name_de AS duration_de,
+                       sp.wp_note_de, sp.effect_de
+                FROM catalog_spells sp
+                JOIN catalog_schools sc ON sc.id = sp.school_id
+                LEFT JOIN catalog_casting_times ct ON ct.code = sp.casting_time_code
+                LEFT JOIN catalog_spell_durations sd ON sd.code = sp.duration_code
+                WHERE sp.type = 'trick' OR sp.rank = 1 OR sp.rank IS NULL
+                ORDER BY sc.skill_id IS NULL DESC, sp.type DESC, sp.name_de
                 SQL)->fetchAll(),
         ];
     }
 
+    // 'id' matches the fixed catalog_age.id rows (schema.sql: 1=Jung,
+    // 2=Erwachsen, 3=Alt) -- the attribute modifiers/skill totals used during
+    // character creation stay here rather than in the DB, since catalog_age
+    // is a display-only reference catalog (see its schema.sql comment).
     private const AGE_TABLE = [
-        'jung' => ['label' => 'Jung', 'total' => 8, 'modifiers' => ['GEW' => 1, 'KON' => 1]],
-        'erwachsen' => ['label' => 'Erwachsen', 'total' => 10, 'modifiers' => []],
-        'alt' => ['label' => 'Alt', 'total' => 12, 'modifiers' => ['STA' => -2, 'GEW' => -2, 'KON' => -2, 'INT' => 1, 'WIL' => 1]],
+        'jung' => ['id' => 1, 'label' => 'Jung', 'total' => 8, 'modifiers' => ['GEW' => 1, 'KON' => 1]],
+        'erwachsen' => ['id' => 2, 'label' => 'Erwachsen', 'total' => 10, 'modifiers' => []],
+        'alt' => ['id' => 3, 'label' => 'Alt', 'total' => 12, 'modifiers' => ['STA' => -2, 'GEW' => -2, 'KON' => -2, 'INT' => 1, 'WIL' => 1]],
     ];
 
     /**
@@ -154,10 +193,10 @@ final class CharacterCreationRepository
      *     raw_attributes: array<string,int>, learned_skill_ids: int[],
      *     heroic_ability_choice: string, profession_heroic_ability_id?: int, flaw_roll: int, gear_option_id: int,
      *     rolled_silver?: int, memento_de: string, appearance_de: string,
-     *     magic_school_skill_id?: int, known_trick_ids?: int[], known_spell_ids?: int[]
+     *     magic_school_id?: int, known_trick_ids?: int[], known_spell_ids?: int[]
      * } $input
      */
-    public function createCharacter(array $input): string
+    public function createCharacter(array $input): int
     {
         $ageCode = $input['age_code'] ?? '';
         if (!isset(self::AGE_TABLE[$ageCode])) {
@@ -170,12 +209,12 @@ final class CharacterCreationRepository
             throw new InvalidArgumentException('Name darf nicht leer sein.');
         }
 
-        $kin = $this->fetchOne('SELECT * FROM kins WHERE code = :code', ['code' => $input['kin_code'] ?? '']);
+        $kin = $this->fetchOne('SELECT * FROM catalog_kins WHERE code = :code', ['code' => $input['kin_code'] ?? '']);
         if ($kin === null) {
             throw new InvalidArgumentException('Unbekanntes Volk.');
         }
 
-        $profession = $this->fetchOne('SELECT * FROM professions WHERE code = :code', ['code' => $input['profession_code'] ?? '']);
+        $profession = $this->fetchOne('SELECT * FROM catalog_professions WHERE code = :code', ['code' => $input['profession_code'] ?? '']);
         if ($profession === null) {
             throw new InvalidArgumentException('Unbekannter Beruf.');
         }
@@ -206,17 +245,21 @@ final class CharacterCreationRepository
         // zählt die gewählte Schule als validierter zusätzlicher Pool-Eintrag,
         // obwohl sie serverseitig nicht in profession_key_skills steht (sie wird
         // im Wizard clientseitig an den Pool angehängt, siehe character-creation-wizard.js).
+        // `magic_school_id` ist catalog_schools.id (die Schule als eigenständige
+        // Entität); für Skill-Pool/Fertigkeitswert brauchen wir zusätzlich die
+        // zugrunde liegende catalog_skills.id, aufgelöst über school['skill_id'].
         $magicSchoolSkillId = null;
         $knownSpellIds = [];
         if ((bool) $profession['grants_magic']) {
-            $magicSchoolSkillId = (int) ($input['magic_school_skill_id'] ?? 0);
+            $magicSchoolId = (int) ($input['magic_school_id'] ?? 0);
             $school = $this->fetchOne(
-                "SELECT id FROM skills WHERE id = :id AND category = 'secondary'",
-                ['id' => $magicSchoolSkillId]
+                'SELECT id, skill_id FROM catalog_schools WHERE id = :id',
+                ['id' => $magicSchoolId]
             );
             if ($school === null) {
                 throw new InvalidArgumentException('Ungültige Zauberschule.');
             }
+            $magicSchoolSkillId = (int) $school['skill_id'];
 
             $trickIds = array_values(array_unique(array_map('intval', $input['known_trick_ids'] ?? [])));
             $spellIds = array_values(array_unique(array_map('intval', $input['known_spell_ids'] ?? [])));
@@ -226,13 +269,13 @@ final class CharacterCreationRepository
             if (count($spellIds) !== 3) {
                 throw new InvalidArgumentException('Es müssen genau 3 Rang-1-Zauber gewählt werden.');
             }
-            $this->assertSpellSelectionValid($trickIds, 'trick', $magicSchoolSkillId);
-            $this->assertSpellSelectionValid($spellIds, 'spell', $magicSchoolSkillId);
+            $this->assertSpellSelectionValid($trickIds, 'trick', $magicSchoolId);
+            $this->assertSpellSelectionValid($spellIds, 'spell', $magicSchoolId);
 
             $knownSpellIds = array_merge($trickIds, $spellIds);
         }
 
-        $poolStmt = $this->db->prepare('SELECT skill_id FROM profession_key_skills WHERE profession_code = :code');
+        $poolStmt = $this->db->prepare('SELECT skill_id FROM catalog_profession_key_skills WHERE profession_code = :code');
         $poolStmt->execute(['code' => $profession['code']]);
         $poolSkillIds = array_map('intval', array_column($poolStmt->fetchAll(), 'skill_id'));
         if ($magicSchoolSkillId !== null) {
@@ -251,7 +294,7 @@ final class CharacterCreationRepository
         }
         if ($heroicChoice === 'robust' || $heroicChoice === 'fokussiert') {
             $general = $this->fetchOne(
-                'SELECT name_de, wp_note_de, description_de FROM general_heroic_abilities WHERE name_de = :name',
+                'SELECT name_de, wp_note_de, description_de FROM catalog_heroic_abilities WHERE name_de = :name',
                 ['name' => $heroicChoice === 'robust' ? 'Robust' : 'Fokussiert']
             );
             if ($general === null) {
@@ -259,10 +302,12 @@ final class CharacterCreationRepository
             }
             $talents[] = $general;
         } elseif ($heroicChoice === 'profession') {
-            $abilityStmt = $this->db->prepare(
-                'SELECT id, name_de, wp_note_de, description_de FROM profession_heroic_abilities
-                 WHERE profession_code = :code AND granted_at_creation = 1'
-            );
+            $abilityStmt = $this->db->prepare(<<<SQL
+                SELECT cha.id, cha.name_de, cha.wp_note_de, cha.description_de
+                FROM catalog_profession_heroic_abilities phab
+                JOIN catalog_heroic_abilities cha ON cha.id = phab.heroic_ability_id
+                WHERE phab.profession_code = :code AND phab.granted_at_creation = 1
+                SQL);
             $abilityStmt->execute(['code' => $profession['code']]);
             $professionAbilities = $abilityStmt->fetchAll();
 
@@ -296,7 +341,7 @@ final class CharacterCreationRepository
         }
 
         $flaw = $this->fetchOne(
-            'SELECT name_de, description_de FROM flaws WHERE roll_min <= :roll AND roll_max >= :roll',
+            'SELECT id, name_de, description_de FROM catalog_flaws WHERE roll_min <= :roll AND roll_max >= :roll',
             ['roll' => (int) ($input['flaw_roll'] ?? 0)]
         );
         if ($flaw === null) {
@@ -305,7 +350,7 @@ final class CharacterCreationRepository
 
         $gearOptionId = (int) ($input['gear_option_id'] ?? 0);
         $gearOption = $this->fetchOne(
-            'SELECT extra_de, starting_silver_dice FROM profession_gear_options WHERE id = :id AND profession_code = :code',
+            'SELECT extra_de, starting_silver_dice FROM catalog_profession_gear_options WHERE id = :id AND profession_code = :code',
             ['id' => $gearOptionId, 'code' => $profession['code']]
         );
         if ($gearOption === null) {
@@ -324,15 +369,15 @@ final class CharacterCreationRepository
 
         $gearItems = $this->db->prepare(<<<SQL
             SELECT i.id AS item_id, i.name_de, i.kind
-            FROM profession_gear_option_items pgoi
-            JOIN items i ON i.id = pgoi.item_id
+            FROM catalog_profession_gear_option_items pgoi
+            JOIN catalog_items i ON i.id = pgoi.item_id
             WHERE pgoi.gear_option_id = :gear_option_id
             SQL);
         $gearItems->execute(['gear_option_id' => $gearOptionId]);
         $gearRows = $gearItems->fetchAll();
 
         return $this->insertCharacter(
-            $name, $kin, $profession, $age['label'], $finalAttributes,
+            $name, $kin, $profession, $age['id'], $finalAttributes,
             $learnedSkillIds, $talents, $flaw, $gearRows, (string) $gearOption['extra_de'], $rolledSilver,
             (string) ($input['memento_de'] ?? ''), (string) ($input['appearance_de'] ?? ''),
             $heroicChoice, $magicSchoolSkillId, $knownSpellIds
@@ -348,15 +393,23 @@ final class CharacterCreationRepository
         return $row === false ? null : $row;
     }
 
-    /** @param int[] $ids */
-    private function assertSpellSelectionValid(array $ids, string $type, int $schoolSkillId): void
+    /**
+     * A spell counts as available if it belongs to the chosen school OR to
+     * "Allgemein" (general magic, usable regardless of your trained school).
+     *
+     * @param int[] $ids
+     */
+    private function assertSpellSelectionValid(array $ids, string $type, int $schoolId): void
     {
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $stmt = $this->db->prepare(<<<SQL
-            SELECT id FROM spells
-            WHERE type = ? AND (school_skill_id IS NULL OR school_skill_id = ?) AND id IN ({$placeholders})
+            SELECT id FROM catalog_spells
+            WHERE type = ?
+              AND school_id IN (?, (SELECT id FROM catalog_schools WHERE skill_id IS NULL))
+              AND (rank = 1 OR rank IS NULL)
+              AND id IN ({$placeholders})
             SQL);
-        $stmt->execute([$type, $schoolSkillId, ...$ids]);
+        $stmt->execute([$type, $schoolId, ...$ids]);
         $found = array_map('intval', array_column($stmt->fetchAll(), 'id'));
 
         if (count(array_unique($found)) !== count($ids)) {
@@ -367,40 +420,16 @@ final class CharacterCreationRepository
 
     private function kinAbilitiesFor(string $kinCode): array
     {
-        $stmt = $this->db->prepare(
-            'SELECT name_de, wp_note_de, description_de FROM kin_heroic_abilities WHERE kin_code = :code ORDER BY id'
-        );
+        $stmt = $this->db->prepare(<<<SQL
+            SELECT cha.name_de, cha.wp_note_de, cha.description_de
+            FROM catalog_kin_heroic_abilities khab
+            JOIN catalog_heroic_abilities cha ON cha.id = khab.heroic_ability_id
+            WHERE khab.kin_code = :code
+            ORDER BY cha.id
+            SQL);
         $stmt->execute(['code' => $kinCode]);
 
         return $stmt->fetchAll();
-    }
-
-    private function movement(string $kinCode, int $gew): int
-    {
-        $base = match ($kinCode) {
-            'mensch', 'elf' => 10,
-            'wolfsmensch' => 12,
-            default => 8, // halbling, zwerg, ente
-        };
-
-        $modifier = match (true) {
-            $gew <= 6 => -4,
-            $gew <= 9 => -2,
-            $gew <= 12 => 0,
-            $gew <= 15 => 2,
-            default => 4,
-        };
-
-        return $base + $modifier;
-    }
-
-    private function damageBonus(int $value): string
-    {
-        return match (true) {
-            $value <= 12 => '—',
-            $value <= 16 => 'W4',
-            default => 'W6',
-        };
     }
 
     private function baseChance(int $value): int
@@ -437,48 +466,38 @@ final class CharacterCreationRepository
      * @param int[] $knownSpellIds
      */
     private function insertCharacter(
-        string $name, array $kin, array $profession, string $ageLabel, array $finalAttributes,
+        string $name, array $kin, array $profession, int $ageId, array $finalAttributes,
         array $learnedSkillIds, array $talents, array $flaw, array $gearRows, string $gearExtraDe, int $rolledSilver,
         string $memento, string $appearance, string $heroicChoice,
         ?int $magicSchoolSkillId, array $knownSpellIds
-    ): string {
+    ): int {
         $slug = $this->slugify($name);
-        $movement = $this->movement($kin['code'], $finalAttributes['GEW']);
-        // Traglast = ceil(STA/2); nicht im Schnellstarter explizit, aber gegen alle 7 Pregens verifiziert.
-        $carryingCapacity = (int) ceil($finalAttributes['STA'] / 2);
         $hpBonus = $heroicChoice === 'robust' ? 2 : 0;
         $wpBonus = $heroicChoice === 'fokussiert' ? 2 : 0;
         $hpMax = $finalAttributes['KON'] + $hpBonus;
         $wpMax = $finalAttributes['WIL'] + $wpBonus;
-        $flawText = $flaw['name_de'] . '. ' . $flaw['description_de'];
 
         $this->db->beginTransaction();
 
         try {
             $insert = $this->db->prepare(<<<SQL
                 INSERT INTO characters (
-                    slug, name_de, kin_de, age_de, profession_de, flaw_de, appearance_de, memento_de,
-                    movement, damage_bonus_sta_de, damage_bonus_gew_de, carrying_capacity,
+                    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de,
                     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
                 ) VALUES (
-                    :slug, :name_de, :kin_de, :age_de, :profession_de, :flaw_de, :appearance_de, :memento_de,
-                    :movement, :damage_bonus_sta_de, :damage_bonus_gew_de, :carrying_capacity,
+                    :slug, :name_de, :kin_code, :age_id, :profession_code, :flaw_id, :appearance_de, :memento_de,
                     :hp_max, :hp_max, :wp_max, :wp_max, 0, :coins_silver, 0
                 )
                 SQL);
             $insert->execute([
                 'slug' => $slug,
                 'name_de' => $name,
-                'kin_de' => $kin['name_de'],
-                'age_de' => $ageLabel,
-                'profession_de' => $profession['name_de'],
-                'flaw_de' => $flawText,
+                'kin_code' => $kin['code'],
+                'age_id' => $ageId,
+                'profession_code' => $profession['code'],
+                'flaw_id' => $flaw['id'],
                 'appearance_de' => $appearance,
                 'memento_de' => $memento,
-                'movement' => $movement,
-                'damage_bonus_sta_de' => $this->damageBonus($finalAttributes['STA']),
-                'damage_bonus_gew_de' => $this->damageBonus($finalAttributes['GEW']),
-                'carrying_capacity' => $carryingCapacity,
                 'hp_max' => $hpMax,
                 'wp_max' => $wpMax,
                 'coins_silver' => $rolledSilver,
@@ -492,7 +511,7 @@ final class CharacterCreationRepository
                 $attributeInsert->execute(['character_id' => $characterId, 'code' => $code, 'value' => $value]);
             }
 
-            $this->db->prepare('INSERT INTO character_conditions (character_id, condition_code, active) SELECT :character_id, code, 0 FROM conditions')
+            $this->db->prepare('INSERT INTO character_conditions (character_id, condition_code, active) SELECT :character_id, code, 0 FROM catalog_conditions')
                 ->execute(['character_id' => $characterId]);
 
             // Rüstung hat immer genau die 2 festen Slot-Zeilen (Kopf/Körper),
@@ -502,7 +521,7 @@ final class CharacterCreationRepository
                 $armorSlotInsert->execute(['character_id' => $characterId, 'slot' => $slot]);
             }
 
-            $allSkills = $this->db->query('SELECT id, attribute_code, category FROM skills')->fetchAll();
+            $allSkills = $this->db->query('SELECT id, attribute_code, category FROM catalog_skills')->fetchAll();
             $skillInsert = $this->db->prepare(
                 'INSERT INTO character_skills (character_id, skill_id, value) VALUES (:character_id, :skill_id, :value)'
             );
@@ -557,7 +576,7 @@ final class CharacterCreationRepository
             foreach ($gearRows as $gearItem) {
                 if ($gearItem['kind'] === 'weapon') {
                     $stats = $this->fetchOne(
-                        'SELECT grip_de, range_de, damage_de, traits_de FROM item_weapons WHERE item_id = :id',
+                        'SELECT grip_de, range_de, damage_de, traits_de FROM catalog_item_weapons WHERE item_id = :id',
                         ['id' => $gearItem['item_id']]
                     );
                     $weaponInsert->execute([
@@ -568,7 +587,7 @@ final class CharacterCreationRepository
                     ]);
                 } elseif ($gearItem['kind'] === 'armor') {
                     $stats = $this->fetchOne(
-                        'SELECT slot, armor_value, penalty_skills_de FROM item_armor WHERE item_id = :id',
+                        'SELECT slot, armor_value, penalty_skills_de FROM catalog_item_armor WHERE item_id = :id',
                         ['id' => $gearItem['item_id']]
                     );
                     $armorSlots[$stats['slot']] = [
@@ -610,6 +629,6 @@ final class CharacterCreationRepository
             throw $e;
         }
 
-        return $slug;
+        return $characterId;
     }
 }

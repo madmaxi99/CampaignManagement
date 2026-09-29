@@ -169,6 +169,32 @@ body {
     flex-shrink: 0;
 }
 
+.sheet-portrait-upload {
+    width: 140px;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 8px;
+    border: 1px dashed var(--parchment-dark);
+    background: #fff8e8;
+    flex-shrink: 0;
+    padding: 8px;
+    text-align: center;
+}
+
+.sheet-portrait-upload label {
+    font-size: 0.8rem;
+    color: var(--green-mid);
+}
+
+.sheet-portrait-upload input[type="file"] {
+    max-width: 100%;
+    font-size: 0.7rem;
+}
+
 .sheet-header-text {
     flex: 1;
     min-width: 0;
@@ -512,6 +538,22 @@ button#downtime-button:hover {
     gap: 6px;
     flex-wrap: wrap;
     font-size: 0.9rem;
+}
+
+.spell-add-menu {
+    margin-top: 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 8px;
+    background: #fff8e8;
+}
+
+.spell-add-menu label {
+    display: block;
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: var(--green-deep);
+    margin-bottom: 6px;
 }
 
 .add-form select {

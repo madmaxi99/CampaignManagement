@@ -2,7 +2,7 @@ SET NAMES utf8mb4;
 
 -- Attributes
 
-INSERT INTO attributes (code, name_de) VALUES
+INSERT INTO catalog_attributes (code, name_de) VALUES
     ('STA', 'Stärke'),
     ('KON', 'Konstitution'),
     ('GEW', 'Gewandtheit'),
@@ -12,7 +12,7 @@ INSERT INTO attributes (code, name_de) VALUES
 
 -- Conditions
 
-INSERT INTO conditions (code, name_de, attribute_code) VALUES
+INSERT INTO catalog_conditions (code, name_de, attribute_code) VALUES
     ('exhausted', 'Erschöpft', 'STA'),
     ('sickly', 'Kränkelnd', 'KON'),
     ('dazed', 'Benommen', 'GEW'),
@@ -22,7 +22,7 @@ INSERT INTO conditions (code, name_de, attribute_code) VALUES
 
 -- Skills (20 regular + 10 combat + 1 secondary)
 
-INSERT INTO skills (name_de, attribute_code, category) VALUES
+INSERT INTO catalog_skills (name_de, attribute_code, category) VALUES
     ('Akrobatik', 'GEW', 'regular'),
     ('Ausweichen', 'GEW', 'regular'),
     ('Bestienkunde', 'INT', 'regular'),
@@ -55,143 +55,77 @@ INSERT INTO skills (name_de, attribute_code, category) VALUES
     ('Stäbe', 'GEW', 'combat'),
     ('Elementarismus', 'INT', 'secondary');
 
+INSERT INTO catalog_schools (name_de, skill_id, display_order)
+SELECT 'Elementarismus', id, 1 FROM catalog_skills WHERE name_de = 'Elementarismus';
+
+-- Time units + spell duration/casting-time lookups (needed before any
+-- catalog_spells row, since those reference them by FK).
+
+INSERT INTO catalog_time_units (code, name_de, duration_de, usage_de) VALUES
+    ('runde', 'Runde', '10 Sek.', 'eine Aktion im Kampf, Verschnaufen'),
+    ('viertel', 'Viertel', '15 Minuten', 'einen Raum erkunden, eine kurze Rast'),
+    ('tagesabschnitt', 'Tagesabschnitt', '6 Stunden', 'ein Marsch von 15 km, eine lange Rast');
+
+INSERT INTO catalog_spell_durations (code, name_de, time_unit_code, description_de) VALUES
+    ('sofort', 'Sofort', NULL, 'Der Effekt tritt sofort ein und hält nicht an.'),
+    ('runde', 'Runde', 'runde', 'Der Effekt hält an, bis du in der nächsten Runde am Zug bist.'),
+    ('viertel', 'Viertel', 'viertel', 'Der Effekt hält für ein Viertel an.'),
+    ('tagesabschnitt', 'Tagesabschnitt', 'tagesabschnitt', 'Der Effekt hält bis zum Ende des aktuellen Tagesabschnitts an.'),
+    ('konzentration', 'Konzentration', NULL, 'Der Effekt endet, wenn du eine andere Handlung durchführst, Schaden erleidest oder eine WIL-Probe gegen eine plötzliche Störung (z. B. ein Geräusch) nicht schaffst, um die Konzentration aufrechtzuerhalten (keine Aktion).');
+
+INSERT INTO catalog_casting_times (code, name_de, time_unit_code, description_de) VALUES
+    ('aktion', 'Aktion', NULL, 'Das Wirken des Zaubers zählt im Kampf als Aktion, sofern nicht anders angegeben.'),
+    ('reaktion', 'Reaktion', NULL, 'Der Zauber wird außerhalb deines eigenen Zuges gewirkt, wie beim Parieren oder Ausweichen.'),
+    ('viertel', 'Viertel', 'viertel', 'Das Wirken erfordert ein Viertel Vorbereitung (Ritual).'),
+    ('tagesabschnitt', 'Tagesabschnitt', 'tagesabschnitt', 'Das Wirken erfordert einen ganzen Tagesabschnitt Vorbereitung (Ritual).');
+
 -- Spells (3 Zaubertricks + 3 Zauber, all Elementarismus)
 
-INSERT INTO spells (name_de, type, school_skill_id, components_de, casting_time_de, range_de, duration_de, wp_note_de, effect_de) VALUES
-    ('Aufwärmen/Abkühlen', 'trick', NULL, NULL, NULL, NULL, NULL, '1 WP',
+INSERT INTO catalog_spells (name_de, type, school_id, components_de, casting_time_code, range_de, duration_code, wp_note_de, effect_de) VALUES
+    ('Aufwärmen/Abkühlen', 'trick',
+        (SELECT id FROM catalog_schools WHERE skill_id = (SELECT id FROM catalog_skills WHERE name_de = 'Elementarismus')),
+        NULL, NULL, NULL, NULL, '1 WP',
         'Wärmt oder kühlt einen Radius von 10 m und schützt einmal gegen die Auswirkungen einer Kälteschicht.'),
-    ('Entzünden', 'trick', NULL, NULL, NULL, NULL, NULL, '1 WP',
+    ('Entzünden', 'trick',
+        (SELECT id FROM catalog_schools WHERE skill_id = (SELECT id FROM catalog_skills WHERE name_de = 'Elementarismus')),
+        NULL, NULL, NULL, NULL, '1 WP',
         'Entzündet oder löscht eine Kerze, Fackel oder Laterne im Umkreis von 10 m.'),
-    ('Rauchwolke', 'trick', NULL, NULL, NULL, NULL, NULL, '1 WP',
+    ('Rauchwolke', 'trick',
+        (SELECT id FROM catalog_schools WHERE skill_id = (SELECT id FROM catalog_skills WHERE name_de = 'Elementarismus')),
+        NULL, NULL, NULL, NULL, '1 WP',
         'Erzeugt eine beeindruckende Rauchwolke, die einen situativen Vorteil auf Heimlichkeit geben kann.'),
     ('Feuerball', 'spell',
-        (SELECT id FROM skills WHERE name_de = 'Elementarismus'),
-        'Wort, Geste', 'Aktion', '20 m', 'Sofort', '2 WP je Kraftstufe',
+        (SELECT id FROM catalog_schools WHERE skill_id = (SELECT id FROM catalog_skills WHERE name_de = 'Elementarismus')),
+        'Wort, Geste', 'aktion', '20 m', 'sofort', '2 WP je Kraftstufe',
         '2W6 Schaden, entzündet brennbare Objekte. +1W6 Schaden oder ein zusätzliches Ziel pro weiterer Kraftstufe.'),
     ('Windstoß', 'spell',
-        (SELECT id FROM skills WHERE name_de = 'Elementarismus'),
-        'Wort, Geste', 'Aktion', '10 m Kegel', 'Sofort', '2 WP je Kraftstufe',
+        (SELECT id FROM catalog_schools WHERE skill_id = (SELECT id FROM catalog_skills WHERE name_de = 'Elementarismus')),
+        'Wort, Geste', 'aktion', '10 m Kegel', 'sofort', '2 WP je Kraftstufe',
         'Schleudert Kreaturen/Objekte 2W4 m zurück, gleich hoher Wuchtschaden. +1 Würfel pro weiterer Kraftstufe.'),
     ('Pfeiler', 'spell',
-        (SELECT id FROM skills WHERE name_de = 'Elementarismus'),
-        'Wort, Geste', 'Aktion', '10 m', 'Tagesabschnitt', '2 WP je Kraftstufe',
+        (SELECT id FROM catalog_schools WHERE skill_id = (SELECT id FROM catalog_skills WHERE name_de = 'Elementarismus')),
+        'Wort, Geste', 'aktion', '10 m', 'tagesabschnitt', '2 WP je Kraftstufe',
         'Hebt eine 3 m hohe Säule an; Akrobatik-Probe oder Sturz mit Sturzschaden. +3 m Höhe pro weiterer Kraftstufe.');
 
 -- Item catalog (seeded incrementally — placeholder prices where the quickstart gives none)
 
-INSERT INTO items (name_de, description_de, rarity, price_copper, kind) VALUES
-    ('Stab', 'Ein einfacher Holzstab, wie ihn Elementaristen zum Fokussieren ihrer Magie nutzen.', 'gewöhnlich', 100, 'weapon'),
-    ('Zauberbuch', 'Ein abgegriffenes Buch voller handschriftlicher Notizen zu Zaubersprüchen.', 'ungewöhnlich', 200, 'misc'),
-    ('Fackel', 'Eine Fackel, die ca. eine Stunde lang brennt.', 'gewöhnlich', 5, 'misc'),
-    ('Wein', 'Eine Flasche einfacher Rotwein.', 'gewöhnlich', 30, 'misc'),
-    ('Buch', 'Ein gebundenes Buch mit unbekanntem Inhalt.', 'gewöhnlich', 50, 'misc'),
-    ('Amulett der Klarheit', 'Ein altes Amulett, das Gedanken zu ordnen scheint. Angeblich selten und begehrt.', 'selten', 500, 'misc'),
-    ('Lederrüstung', 'Einfache, flexible Rüstung aus gegerbtem Leder.', 'gewöhnlich', 150, 'armor');
+INSERT INTO catalog_items (name_de, description_de, rarity, price_gold, price_silver, price_copper, kind) VALUES
+    ('Stab', 'Ein einfacher Holzstab, wie ihn Elementaristen zum Fokussieren ihrer Magie nutzen.', 'gewöhnlich', 1, 0, 0, 'weapon'),
+    ('Zauberbuch', 'Ein abgegriffenes Buch voller handschriftlicher Notizen zu Zaubersprüchen.', 'ungewöhnlich', 2, 0, 0, 'misc'),
+    ('Fackel', 'Eine Fackel, die ca. eine Stunde lang brennt.', 'gewöhnlich', 0, 0, 5, 'misc'),
+    ('Wein', 'Eine Flasche einfacher Rotwein.', 'gewöhnlich', 0, 3, 0, 'misc'),
+    ('Buch', 'Ein gebundenes Buch mit unbekanntem Inhalt.', 'gewöhnlich', 0, 5, 0, 'misc'),
+    ('Amulett der Klarheit', 'Ein altes Amulett, das Gedanken zu ordnen scheint. Angeblich selten und begehrt.', 'selten', 5, 0, 0, 'misc'),
+    ('Lederrüstung', 'Einfache, flexible Rüstung aus gegerbtem Leder.', 'gewöhnlich', 1, 5, 0, 'armor');
 
-INSERT INTO item_weapons (item_id, grip_de, range_de, damage_de, durability, traits_de)
-SELECT id, '2-händig', '2', 'W8', 9, 'Wucht' FROM items WHERE name_de = 'Stab';
+INSERT INTO catalog_item_weapons (item_id, grip_de, range_de, damage_de, durability, traits_de)
+SELECT id, '2-händig', '2', 'W8', 9, 'Wucht' FROM catalog_items WHERE name_de = 'Stab';
 
-INSERT INTO item_armor (item_id, slot, armor_value, penalty_skills_de)
-SELECT id, 'body', 2, 'Heimlichkeit, Ausweichen, Akrobatik' FROM items WHERE name_de = 'Lederrüstung';
+INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_skills_de)
+SELECT id, 'body', 2, 'Heimlichkeit, Ausweichen, Akrobatik' FROM catalog_items WHERE name_de = 'Lederrüstung';
 
-INSERT INTO item_misc (item_id)
-SELECT id FROM items WHERE name_de IN ('Zauberbuch', 'Fackel', 'Wein', 'Buch', 'Amulett der Klarheit');
-
--- Character: Erzmeister Aodhan
-
-INSERT INTO characters (
-    slug, name_de, kin_de, age_de, profession_de, flaw_de, appearance_de, memento_de, misc_items_de,
-    movement, damage_bonus_sta_de, damage_bonus_gew_de, carrying_capacity,
-    hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
-) VALUES (
-    'erzmeister_aodhan', 'Erzmeister Aodhan', 'Mensch', 'Alt', 'Magier – Elementarist',
-    'Feige. Du hältst dich stets im Rücken der Anderen.',
-    'Groß und drahtig. Langer weißer Bart und buschige Augenbrauen. Wissbegieriger Blick.',
-    'Abgegriffenes Tagebuch mit deinen Erfahrungen und Erkenntnissen.',
-    'Feuerstein & Zunder',
-    8, '—', '—', 4,
-    11, 11, 18, 18, 0, 7, 0
-);
-
-SET @aodhan_id = (SELECT id FROM characters WHERE slug = 'erzmeister_aodhan');
-
--- Attribute values
-
-INSERT INTO character_attributes (character_id, attribute_code, value)
-SELECT @aodhan_id, code, value FROM (
-    SELECT 'STA' AS code, 8 AS value
-    UNION ALL SELECT 'KON', 11
-    UNION ALL SELECT 'GEW', 9
-    UNION ALL SELECT 'INT', 16
-    UNION ALL SELECT 'WIL', 18
-    UNION ALL SELECT 'CHA', 14
-) v;
-
--- Conditions (all inactive on the printed sheet)
-
-INSERT INTO character_conditions (character_id, condition_code, active)
-SELECT @aodhan_id, code, 0 FROM conditions;
-
--- Skill values
-
-INSERT INTO character_skills (character_id, skill_id, value)
-SELECT @aodhan_id, s.id, v.value
-FROM skills s
-JOIN (
-    SELECT 'Akrobatik' AS name_de, 5 AS value
-    UNION ALL SELECT 'Ausweichen', 10
-    UNION ALL SELECT 'Bestienkunde', 14
-    UNION ALL SELECT 'Darbietung', 6
-    UNION ALL SELECT 'Entdecken', 14
-    UNION ALL SELECT 'Feilschen', 6
-    UNION ALL SELECT 'Fingerfertigkeit', 5
-    UNION ALL SELECT 'Fremdsprachen', 14
-    UNION ALL SELECT 'Handwerk', 4
-    UNION ALL SELECT 'Heilkunde', 14
-    UNION ALL SELECT 'Heimlichkeit', 10
-    UNION ALL SELECT 'Jagen & Fischen', 5
-    UNION ALL SELECT 'Mythen & Legenden', 14
-    UNION ALL SELECT 'Reiten', 5
-    UNION ALL SELECT 'Schwimmen', 7
-    UNION ALL SELECT 'Seefahrt', 7
-    UNION ALL SELECT 'Täuschen', 6
-    UNION ALL SELECT 'Überzeugen', 12
-    UNION ALL SELECT 'Wahrnehmung', 14
-    UNION ALL SELECT 'Wildnisleben', 14
-    UNION ALL SELECT 'Armbrüste', 5
-    UNION ALL SELECT 'Äxte', 4
-    UNION ALL SELECT 'Bögen', 5
-    UNION ALL SELECT 'Hämmer', 5
-    UNION ALL SELECT 'Messer', 5
-    UNION ALL SELECT 'Prügelei', 4
-    UNION ALL SELECT 'Schleudern', 5
-    UNION ALL SELECT 'Schwerter', 4
-    UNION ALL SELECT 'Speere', 4
-    UNION ALL SELECT 'Stäbe', 10
-    UNION ALL SELECT 'Elementarismus', 14
-) v ON v.name_de = s.name_de;
-
--- Talents
-
-INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
-    (@aodhan_id, 'Anpassungsfähig', NULL,
-        'Bei einer Fertigkeitsprobe kannst du dich entscheiden, für den Wurf eine andere Fertigkeit deiner Wahl zu benutzen.'),
-    (@aodhan_id, 'Magie', 'unterschiedlich',
-        'Als Zauberer kannst du Magie benutzen.');
-
--- Known spells/tricks
-
-INSERT INTO character_spells (character_id, spell_id)
-SELECT @aodhan_id, id FROM spells;
-
--- Weapon
-
-INSERT INTO character_weapons (character_id, item_id, quantity)
-SELECT @aodhan_id, id, 1 FROM items WHERE name_de = 'Stab';
-
--- Inventory
-
-INSERT INTO character_inventory (character_id, position, item_id, quantity)
-SELECT @aodhan_id, 1, id, 1 FROM items WHERE name_de = 'Zauberbuch'
-UNION ALL
-SELECT @aodhan_id, 2, id, 2 FROM items WHERE name_de = 'Fackel';
+-- The "Character: Erzmeister Aodhan" section used to live here, but it needs
+-- catalog_kins/catalog_professions/catalog_flaws (seed_character_creation_catalog.sql,
+-- seed_wizard_expansion.sql) and catalog_items rows from seed_items_completion.sql
+-- (e.g. 'Feuerstein & Zunder'), all of which load after this file -- see
+-- seed_aodhan_character.sql, mounted later in provisioning/docker-compose.yml.

@@ -4,8 +4,10 @@
 
 {% macro character_card(character, deletable) %}
     <div class="character-card-wrapper">
-        <a class="character-card" href="/character/{{ character.slug }}">
-            <img class="character-card-portrait" src="/images/characters/{{ character.slug }}.jpg" alt="{{ character.name_de }}" onerror="this.remove()">
+        <a class="character-card" href="/character/{{ character.id }}">
+            {% if character.portrait_path %}
+                <img class="character-card-portrait" src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">
+            {% endif %}
             <h2>{{ character.name_de }}</h2>
             <p class="character-card-meta">{{ character.kin_de }} &middot; {{ character.age_de }} &middot; {{ character.profession_de }}</p>
             <div class="character-card-vitals">
@@ -14,7 +16,7 @@
             </div>
         </a>
         {% if deletable %}
-            <button type="button" class="button-danger character-card-delete" data-slug="{{ character.slug }}">Löschen</button>
+            <button type="button" class="button-danger character-card-delete" data-id="{{ character.id }}">Löschen</button>
         {% endif %}
     </div>
 {% endmacro %}

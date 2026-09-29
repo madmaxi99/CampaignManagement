@@ -4,7 +4,7 @@
         return;
     }
 
-    const slug = sheet.dataset.slug;
+    const id = sheet.dataset.id;
 
     function postJson(path, body) {
         return fetch(path, {
@@ -38,7 +38,7 @@
                 const current = parseInt(tracker.dataset.current, 10);
                 const newValue = clickedIndex === current ? clickedIndex - 1 : clickedIndex;
 
-                postJson(`/character/${slug}/${vital}`, { value: newValue }).then((data) => {
+                postJson(`/character/${id}/${vital}`, { value: newValue }).then((data) => {
                     renderPips(tracker, data[`${vital}_current`]);
                 });
             });
@@ -51,7 +51,7 @@
         chip.addEventListener('click', () => {
             const code = chip.dataset.conditionCode;
 
-            postJson(`/character/${slug}/conditions/${code}/toggle`).then((data) => {
+            postJson(`/character/${id}/conditions/${code}/toggle`).then((data) => {
                 chip.classList.toggle('active', data.active);
             });
         });
@@ -102,7 +102,7 @@
 
     document.querySelectorAll('.skill-mark').forEach((checkbox) => {
         checkbox.addEventListener('change', () => {
-            postJson(`/character/${slug}/skills/${checkbox.dataset.skillId}/mark`, { marked: checkbox.checked });
+            postJson(`/character/${id}/skills/${checkbox.dataset.skillId}/mark`, { marked: checkbox.checked });
         });
     });
 
@@ -129,7 +129,7 @@
     }
 
     document.getElementById('downtime-button').addEventListener('click', () => {
-        fetch(`/character/${slug}/skills/marked`)
+        fetch(`/character/${id}/skills/marked`)
             .then((response) => response.json())
             .then((skills) => {
                 renderDowntimeList(skills);
@@ -150,7 +150,7 @@
             return;
         }
 
-        postJson(`/character/${slug}/skills/${button.dataset.skillId}/advance`, { apply: button.dataset.apply === '1' })
+        postJson(`/character/${id}/skills/${button.dataset.skillId}/advance`, { apply: button.dataset.apply === '1' })
             .then(() => window.location.reload());
     });
 
@@ -165,7 +165,7 @@
                 copper: parseInt(document.getElementById('coins-copper').value, 10) || 0,
             };
 
-            postJson(`/character/${slug}/currency`, body).then(() => {
+            postJson(`/character/${id}/currency`, body).then(() => {
                 currencySaveButton.textContent = 'Gespeichert!';
                 setTimeout(() => { currencySaveButton.textContent = 'Speichern'; }, 1500);
             });
@@ -182,7 +182,7 @@
                 return;
             }
 
-            postJson(`/character/${slug}/spells`, { spell_id: parseInt(select.value, 10) })
+            postJson(`/character/${id}/spells`, { spell_id: parseInt(select.value, 10) })
                 .then(() => window.location.reload());
         });
     }
@@ -191,7 +191,7 @@
 
     document.querySelectorAll('.add-row-button').forEach((button) => {
         button.addEventListener('click', () => {
-            postJson(`/character/${slug}/${button.dataset.segment}`, {}).then(() => window.location.reload());
+            postJson(`/character/${id}/${button.dataset.segment}`, {}).then(() => window.location.reload());
         });
     });
 
@@ -200,8 +200,8 @@
             const segment = input.dataset.segment;
             const value = input.type === 'number' ? (input.value === '' ? null : parseInt(input.value, 10)) : input.value;
             const url = segment === 'armor'
-                ? `/character/${slug}/armor/${input.dataset.slot}`
-                : `/character/${slug}/${segment}/${input.dataset.rowId}`;
+                ? `/character/${id}/armor/${input.dataset.slot}`
+                : `/character/${id}/${segment}/${input.dataset.rowId}`;
 
             postJson(url, { [input.dataset.field]: value }).then(() => window.location.reload());
         });
@@ -209,7 +209,7 @@
 
     document.querySelectorAll('.remove-button').forEach((button) => {
         button.addEventListener('click', () => {
-            deleteRequest(`/character/${slug}/${button.dataset.segment}/${button.dataset.rowId}`)
+            deleteRequest(`/character/${id}/${button.dataset.segment}/${button.dataset.rowId}`)
                 .then(() => window.location.reload());
         });
     });
@@ -220,9 +220,37 @@
             if (!confirm('Diesen Charakter wirklich unwiderruflich löschen?')) {
                 return;
             }
-            deleteRequest(`/character/${slug}`).then(() => {
+            deleteRequest(`/character/${id}`).then(() => {
                 window.location.href = '/characters';
             });
+        });
+    }
+
+    // --- Portrait upload (only shown once, while there is no portrait yet) ---
+
+    const portraitUploadForm = document.getElementById('portrait-upload-form');
+    if (portraitUploadForm) {
+        portraitUploadForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const input = document.getElementById('portrait-upload-input');
+            if (!input.files[0]) {
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('portrait', input.files[0]);
+
+            fetch(`/character/${id}/portrait`, { method: 'POST', body: formData })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.error) {
+                        alert(data.error);
+
+                        return;
+                    }
+                    window.location.reload();
+                });
         });
     }
 })();

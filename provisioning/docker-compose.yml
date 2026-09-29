@@ -37,9 +37,17 @@ services:
       - mariadb_data:/var/lib/mysql
       - ../database/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
       - ../database/seed_aodhan.sql:/docker-entrypoint-initdb.d/02_seed_aodhan.sql:ro
-      - ../database/seed_pregens.sql:/docker-entrypoint-initdb.d/03_seed_pregens.sql:ro
-      - ../database/seed_ridderhohe.sql:/docker-entrypoint-initdb.d/04_seed_ridderhohe.sql:ro
-      - ../database/seed_versinkender_turm.sql:/docker-entrypoint-initdb.d/05_seed_versinkender_turm.sql:ro
+      - ../database/seed_character_creation_catalog.sql:/docker-entrypoint-initdb.d/03_seed_character_creation_catalog.sql:ro
+      - ../database/seed_wizard_expansion.sql:/docker-entrypoint-initdb.d/04_seed_wizard_expansion.sql:ro
+      - ../database/seed_elementals.sql:/docker-entrypoint-initdb.d/05_seed_elementals.sql:ro
+      - ../database/seed_items_completion.sql:/docker-entrypoint-initdb.d/06_seed_items_completion.sql:ro
+      - ../database/seed_rules_reference.sql:/docker-entrypoint-initdb.d/07_seed_rules_reference.sql:ro
+      - ../database/seed_aodhan_character.sql:/docker-entrypoint-initdb.d/08_seed_aodhan_character.sql:ro
+      - ../database/seed_pregens.sql:/docker-entrypoint-initdb.d/09_seed_pregens.sql:ro
+      - ../database/seed_weapon_armor_corrections.sql:/docker-entrypoint-initdb.d/10_seed_weapon_armor_corrections.sql:ro
+      - ../database/seed_item_stats_corrections_2.sql:/docker-entrypoint-initdb.d/11_seed_item_stats_corrections_2.sql:ro
+      - ../database/seed_ridderhohe.sql:/docker-entrypoint-initdb.d/12_seed_ridderhohe.sql:ro
+      - ../database/seed_versinkender_turm.sql:/docker-entrypoint-initdb.d/13_seed_versinkender_turm.sql:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s

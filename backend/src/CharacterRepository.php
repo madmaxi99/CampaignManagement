@@ -10,20 +10,102 @@ final class CharacterRepository
 
     public function listAll(): array
     {
-        $stmt = $this->db->query(
-            'SELECT slug, name_de, kin_de, age_de, profession_de, hp_current, hp_max, wp_current, wp_max, is_default FROM characters ORDER BY name_de'
-        );
+        $stmt = $this->db->query(<<<SQL
+            SELECT c.id, c.slug, c.name_de, c.portrait_path,
+                   k.name_de AS kin_de, ag.name_de AS age_de, p.name_de AS profession_de,
+                   c.hp_current, c.hp_max, c.wp_current, c.wp_max, c.is_default
+            FROM characters c
+            JOIN catalog_kins k ON k.code = c.kin_code
+            JOIN catalog_age ag ON ag.id = c.age_id
+            JOIN catalog_professions p ON p.code = c.profession_code
+            ORDER BY c.name_de
+            SQL);
 
         return $stmt->fetchAll();
     }
 
-    public function findBySlug(string $slug): ?array
+    /**
+     * Joins in kin/age/profession/flaw display text under the same field
+     * names (kin_de/age_de/profession_de/flaw_de) the freetext columns used
+     * to have, so templates built against those names don't need to change.
+     */
+    public function findById(int $id): ?array
     {
-        $stmt = $this->db->prepare('SELECT * FROM characters WHERE slug = :slug');
-        $stmt->execute(['slug' => $slug]);
+        $stmt = $this->db->prepare(<<<SQL
+            SELECT c.*,
+                   k.name_de AS kin_de, k.movement_base,
+                   ag.name_de AS age_de,
+                   p.name_de AS profession_de,
+                   CONCAT(fl.name_de, '. ', fl.description_de) AS flaw_de
+            FROM characters c
+            JOIN catalog_kins k ON k.code = c.kin_code
+            JOIN catalog_age ag ON ag.id = c.age_id
+            JOIN catalog_professions p ON p.code = c.profession_code
+            JOIN catalog_flaws fl ON fl.id = c.flaw_id
+            WHERE c.id = :id
+            SQL);
+        $stmt->execute(['id' => $id]);
         $character = $stmt->fetch();
 
         return $character === false ? null : $character;
+    }
+
+    /**
+     * Movement/carrying capacity/damage bonus aren't stored -- they're always
+     * derivable from the kin (movement_base, joined in by findById above) and
+     * the STA/GEW attribute values. Returns them under the same field names
+     * (movement/carrying_capacity/damage_bonus_sta_de/damage_bonus_gew_de)
+     * the stored columns used to have.
+     *
+     * @param array<int,array{code:string,value:int}> $attributes
+     */
+    public function derivedStats(array $character, array $attributes): array
+    {
+        $attributeValues = [];
+        foreach ($attributes as $attribute) {
+            $attributeValues[$attribute['code']] = (int) $attribute['value'];
+        }
+        $gew = $attributeValues['GEW'] ?? 0;
+        $sta = $attributeValues['STA'] ?? 0;
+
+        $movementModifier = match (true) {
+            $gew <= 6 => -4,
+            $gew <= 9 => -2,
+            $gew <= 12 => 0,
+            $gew <= 15 => 2,
+            default => 4,
+        };
+
+        return [
+            'movement' => (int) $character['movement_base'] + $movementModifier,
+            'carrying_capacity' => (int) ceil($sta / 2),
+            'damage_bonus_sta_de' => $this->damageBonus($sta),
+            'damage_bonus_gew_de' => $this->damageBonus($gew),
+        ];
+    }
+
+    private function damageBonus(int $value): string
+    {
+        return match (true) {
+            $value <= 12 => '—',
+            $value <= 16 => 'W4',
+            default => 'W6',
+        };
+    }
+
+    /**
+     * Sets the portrait once. Returns false without changing anything if the
+     * character already has one -- portraits are permanent, see the
+     * schema.sql comment on characters.portrait_path.
+     */
+    public function setPortraitPath(int $characterId, string $path): bool
+    {
+        $stmt = $this->db->prepare(
+            'UPDATE characters SET portrait_path = :path WHERE id = :id AND portrait_path IS NULL'
+        );
+        $stmt->execute(['path' => $path, 'id' => $characterId]);
+
+        return $stmt->rowCount() === 1;
     }
 
     public function attributes(int $characterId): array
@@ -31,7 +113,7 @@ final class CharacterRepository
         $stmt = $this->db->prepare(<<<SQL
             SELECT a.code, a.name_de, ca.value
             FROM character_attributes ca
-            JOIN attributes a ON a.code = ca.attribute_code
+            JOIN catalog_attributes a ON a.code = ca.attribute_code
             WHERE ca.character_id = :character_id
             ORDER BY FIELD(a.code, 'STA', 'KON', 'GEW', 'INT', 'WIL', 'CHA')
             SQL);
@@ -45,7 +127,7 @@ final class CharacterRepository
         $stmt = $this->db->prepare(<<<SQL
             SELECT c.code, c.name_de, c.attribute_code, cc.active
             FROM character_conditions cc
-            JOIN conditions c ON c.code = cc.condition_code
+            JOIN catalog_conditions c ON c.code = cc.condition_code
             WHERE cc.character_id = :character_id
             ORDER BY FIELD(c.attribute_code, 'STA', 'KON', 'GEW', 'INT', 'WIL', 'CHA')
             SQL);
@@ -59,7 +141,7 @@ final class CharacterRepository
         $stmt = $this->db->prepare(<<<SQL
             SELECT sk.id, sk.name_de, sk.attribute_code, sk.category, cs.value, cs.marked_for_advancement
             FROM character_skills cs
-            JOIN skills sk ON sk.id = cs.skill_id
+            JOIN catalog_skills sk ON sk.id = cs.skill_id
             WHERE cs.character_id = :character_id AND sk.category = :category
             ORDER BY sk.name_de
             SQL);
@@ -73,7 +155,7 @@ final class CharacterRepository
         $stmt = $this->db->prepare(<<<SQL
             SELECT sk.id, sk.name_de, sk.attribute_code, cs.value
             FROM character_skills cs
-            JOIN skills sk ON sk.id = cs.skill_id
+            JOIN catalog_skills sk ON sk.id = cs.skill_id
             WHERE cs.character_id = :character_id AND cs.marked_for_advancement = 1
             ORDER BY sk.name_de
             SQL);
@@ -126,10 +208,13 @@ final class CharacterRepository
     public function spells(int $characterId): array
     {
         $stmt = $this->db->prepare(<<<SQL
-            SELECT s.id, s.name_de, s.type, s.components_de, s.casting_time_de, s.range_de,
-                   s.duration_de, s.wp_note_de, s.effect_de
+            SELECT s.id, s.name_de, s.type, s.components_de,
+                   ct.name_de AS casting_time_de, s.range_de, sd.name_de AS duration_de,
+                   s.wp_note_de, s.effect_de
             FROM character_spells cs
-            JOIN spells s ON s.id = cs.spell_id
+            JOIN catalog_spells s ON s.id = cs.spell_id
+            LEFT JOIN catalog_casting_times ct ON ct.code = s.casting_time_code
+            LEFT JOIN catalog_spell_durations sd ON sd.code = s.duration_code
             WHERE cs.character_id = :character_id
             ORDER BY s.type DESC, s.name_de
             SQL);
@@ -138,15 +223,24 @@ final class CharacterRepository
         return $stmt->fetchAll();
     }
 
-    public function availableSpells(int $characterId): array
+    public function availableSpells(int $characterId, ?int $schoolSkillId): array
     {
+        if ($schoolSkillId === null) {
+            return [];
+        }
+
         $stmt = $this->db->prepare(<<<SQL
             SELECT id, name_de
-            FROM spells
-            WHERE id NOT IN (SELECT spell_id FROM character_spells WHERE character_id = :character_id)
+            FROM catalog_spells
+            WHERE school_id IN (
+                    (SELECT id FROM catalog_schools WHERE skill_id = :school_skill_id),
+                    (SELECT id FROM catalog_schools WHERE skill_id IS NULL)
+                )
+              AND (rank = 1 OR rank IS NULL)
+              AND id NOT IN (SELECT spell_id FROM character_spells WHERE character_id = :character_id)
             ORDER BY name_de
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute(['character_id' => $characterId, 'school_skill_id' => $schoolSkillId]);
 
         return $stmt->fetchAll();
     }

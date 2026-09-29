@@ -19,11 +19,19 @@
 {% import _self as sheet_macros %}
 
 {% block content %}
-<div class="sheet" data-slug="{{ character.slug }}">
+<div class="sheet" data-id="{{ character.id }}">
 
     <header class="sheet-header">
         <div class="sheet-header-inner">
-            <img class="sheet-portrait" src="/images/characters/{{ character.slug }}.jpg" alt="{{ character.name_de }}" onerror="this.remove()">
+            {% if character.portrait_path %}
+                <img class="sheet-portrait" src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">
+            {% else %}
+                <form id="portrait-upload-form" class="sheet-portrait-upload" enctype="multipart/form-data">
+                    <label for="portrait-upload-input">Kein Bild</label>
+                    <input type="file" id="portrait-upload-input" name="portrait" accept="image/jpeg,image/png,image/webp" required>
+                    <button type="submit">Hochladen</button>
+                </form>
+            {% endif %}
             <div class="sheet-header-text">
                 <div class="sheet-header-title-row">
                     <h1>{{ character.name_de }}</h1>
@@ -110,18 +118,7 @@
         <h3>Sekundäre Fertigkeiten</h3>
         {{ sheet_macros.skill_list(secondarySkills, 'secondary') }}
 
-        <div class="card-heading-row">
-            <h3>Zauber &amp; Tricks</h3>
-            <div class="add-form">
-                <select id="learn-spell-select">
-                    <option value="">Neuen Zauber lernen…</option>
-                    {% for spell in availableSpells %}
-                        <option value="{{ spell.id }}">{{ spell.name_de }}</option>
-                    {% endfor %}
-                </select>
-                <button type="button" id="learn-spell-button">Lernen</button>
-            </div>
-        </div>
+        <h3>Zauber &amp; Tricks</h3>
         <ul class="entry-list">
             {% for spell in spells %}
                 <li class="entry-row" data-detail="{{ {'type': 'spell', 'name': spell.name_de, 'components': spell.components_de, 'castingTime': spell.casting_time_de, 'range': spell.range_de, 'duration': spell.duration_de, 'wpNote': spell.wp_note_de, 'effect': spell.effect_de}|json_encode|e('html_attr') }}">
@@ -130,6 +127,20 @@
                 </li>
             {% endfor %}
         </ul>
+        {% if isCaster %}
+            <div class="spell-add-menu">
+                <label for="learn-spell-select">Neuen Zauber/Trick lernen</label>
+                <div class="add-form">
+                    <select id="learn-spell-select">
+                        <option value="">Auswählen…</option>
+                        {% for spell in availableSpells %}
+                            <option value="{{ spell.id }}">{{ spell.name_de }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="button" id="learn-spell-button">Lernen</button>
+                </div>
+            </div>
+        {% endif %}
 
         <h3>Talente</h3>
         <ul class="talent-list">
