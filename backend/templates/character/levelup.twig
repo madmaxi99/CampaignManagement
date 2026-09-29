@@ -1,0 +1,95 @@
+{% extends "layout.twig" %}
+
+{% block title %}Level Up — {{ character.name_de }}{% endblock %}
+
+{% block content %}
+<div class="levelup" data-id="{{ character.id }}">
+
+    <header class="levelup-header">
+        <h1>Level Up — {{ character.name_de }}</h1>
+        <a href="/character/{{ character.id }}">&larr; Zurück zum Sheet</a>
+    </header>
+
+    <section class="card">
+        <h2>Fertigkeiten</h2>
+        {% if markedSkills is empty %}
+            <p class="levelup-empty">Keine markierten Fertigkeiten.</p>
+        {% else %}
+            <ul class="levelup-list" id="levelup-skills-list">
+                {% for skill in markedSkills %}
+                    <li data-skill-id="{{ skill.id }}">
+                        <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                        <span class="entry-value">{{ skill.value }}</span>
+                        <button type="button" class="levelup-skill-decision" data-decision="apply" data-skill-id="{{ skill.id }}">Aufleveln</button>
+                        <button type="button" class="levelup-skill-decision" data-decision="discard" data-skill-id="{{ skill.id }}">Verwerfen</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>Heldenfähigkeiten</h2>
+        {% if learnableHeroicAbilities is empty %}
+            <p class="levelup-empty">Keine wählbaren Heldenfähigkeiten.</p>
+        {% else %}
+            <ul class="levelup-list" id="levelup-abilities-list">
+                {% for ability in learnableHeroicAbilities %}
+                    <li data-ability-id="{{ ability.id }}">
+                        <div class="entry-name">
+                            {{ ability.name_de }}
+                            {% if ability.wp_note_de %}<small>(WP {{ ability.wp_note_de }})</small>{% endif %}
+                            {% if ability.repeatable and ability.times_owned > 0 %}<small>(bereits {{ ability.times_owned }}&times; gewählt)</small>{% endif %}
+                        </div>
+                        {% if ability.requirement_de %}<p class="levelup-requirement">Voraussetzung: {{ ability.requirement_de }}</p>{% endif %}
+                        <p class="levelup-description">{{ ability.description_de }}</p>
+                        {% if ability.name_de == 'Magisches Talent' %}
+                            <label>Neue Zauberschule:
+                                <select class="levelup-school-select" {% if untrainedSchoolSkills is empty %}disabled{% endif %}>
+                                    {% if untrainedSchoolSkills is empty %}
+                                        <option value="">Alle Schulen bereits erlernt</option>
+                                    {% else %}
+                                        {% for skill in untrainedSchoolSkills %}
+                                            <option value="{{ skill.id }}">{{ skill.name_de }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>
+                            </label>
+                        {% endif %}
+                        <button type="button" class="levelup-learn-ability" data-ability-id="{{ ability.id }}">Lernen</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>Zauber &amp; Tricks</h2>
+        {% if availableSpells is empty %}
+            <p class="levelup-empty">Keine lernbaren Zauber/Tricks.</p>
+        {% else %}
+            <ul class="levelup-list" id="levelup-spells-list">
+                {% for spell in availableSpells %}
+                    <li data-spell-id="{{ spell.id }}">
+                        <div class="entry-name">{{ spell.name_de }} <small>({{ spell.wp_note_de }})</small></div>
+                        {% if spell.components_de %}<p>Vorgabe: {{ spell.components_de }}</p>{% endif %}
+                        {% if spell.casting_time_de %}<p>Zauberdauer: {{ spell.casting_time_de }}</p>{% endif %}
+                        {% if spell.range_de %}<p>Reichweite: {{ spell.range_de }}</p>{% endif %}
+                        {% if spell.duration_de %}<p>Wirkungsdauer: {{ spell.duration_de }}</p>{% endif %}
+                        <p>{{ spell.effect_de }}</p>
+                        <button type="button" class="levelup-learn-spell" data-spell-id="{{ spell.id }}">Lernen</button>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </section>
+
+    <div class="levelup-action-bar">
+        <button type="button" id="levelup-save" class="button-primary">Speichern</button>
+        <a id="levelup-cancel" class="button-danger" href="/character/{{ character.id }}">Abbrechen</a>
+    </div>
+
+</div>
+
+<script src="/js/character-levelup.js"></script>
+{% endblock %}

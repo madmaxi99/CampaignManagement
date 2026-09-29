@@ -159,17 +159,17 @@ UPDATE catalog_items i JOIN catalog_item_weapons w ON w.item_id = i.id SET
 
 UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
     a.armor_value = 1, i.price_gold = 2, i.price_silver = 0, i.price_copper = 0,
-    a.penalty_skills_de = NULL
+    a.penalty_stealth = 0, a.penalty_evasion = 0, a.penalty_acrobatics = 0
     WHERE i.name_de = 'Lederrüstung';
 
 UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
     i.price_gold = 10, i.price_silver = 0, i.price_copper = 0,
-    a.penalty_skills_de = 'Heimlichkeit'
+    a.penalty_stealth = 1, a.penalty_evasion = 0, a.penalty_acrobatics = 0
     WHERE i.name_de = 'Beschlagenes Leder';
 
 UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
     i.price_gold = 50, i.price_silver = 0, i.price_copper = 0,
-    a.penalty_skills_de = 'Ausweichen, Heimlichkeit'
+    a.penalty_stealth = 1, a.penalty_evasion = 1, a.penalty_acrobatics = 0
     WHERE i.name_de = 'Kettenpanzer';
 
 UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
@@ -178,10 +178,10 @@ UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
 
 UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
     i.price_gold = 12, i.price_silver = 0, i.price_copper = 0,
-    a.penalty_skills_de = 'Wahrnehmung'
+    a.penalty_perception = 1, a.penalty_ranged = 0
     WHERE i.name_de = 'Offener Helm';
 
 UPDATE catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id SET
     i.price_gold = 100, i.price_silver = 0, i.price_copper = 0,
-    a.penalty_skills_de = 'Wahrnehmung, alle Fernkampfangriffe'
+    a.penalty_perception = 1, a.penalty_ranged = 1
     WHERE i.name_de = 'Großhelm';

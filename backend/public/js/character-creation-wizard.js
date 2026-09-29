@@ -742,9 +742,34 @@
 
         root.querySelectorAll('.attribute-input').forEach((input) => {
             input.addEventListener('input', () => {
+                const code = input.dataset.code;
                 const value = parseInt(input.value, 10);
-                state.rawAttributes[input.dataset.code] = Number.isInteger(value) ? value : null;
-                render();
+                state.rawAttributes[code] = Number.isInteger(value) ? value : null;
+
+                const card = input.closest('.wizard-attribute-card');
+                const modifier = ageModifier(code);
+                const raw = state.rawAttributes[code];
+                const final = Number.isInteger(raw) ? raw + modifier : null;
+                const tooHigh = final !== null && final > 18;
+
+                card.classList.toggle('wizard-attribute-card--error', tooHigh);
+                card.querySelector('.wizard-attribute-modifier').textContent =
+                    `Alters-Bonus: ${modifier >= 0 ? '+' : ''}${modifier} → Endwert: ${final ?? '—'}`;
+
+                let errorP = card.querySelector('.wizard-attribute-error');
+                if (tooHigh && !errorP) {
+                    errorP = document.createElement('p');
+                    errorP.className = 'wizard-attribute-error';
+                    errorP.textContent = 'Über 18! Bitte einen niedrigeren Rohwert eintragen.';
+                    card.appendChild(errorP);
+                } else if (!tooHigh && errorP) {
+                    errorP.remove();
+                }
+
+                const nextButton = document.getElementById('next-step');
+                if (nextButton) {
+                    nextButton.disabled = !ATTRIBUTE_ORDER.every((c) => Number.isInteger(state.rawAttributes[c]));
+                }
             });
         });
 

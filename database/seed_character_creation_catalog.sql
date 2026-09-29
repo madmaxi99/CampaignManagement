@@ -44,9 +44,9 @@ INSERT INTO catalog_item_weapons (item_id, grip_de, range_de, damage_de, durabil
     ((SELECT id FROM catalog_items WHERE name_de = 'Leichte Armbrust'), '2-händig', '40', 'W10', 6, 'Stich'),
     ((SELECT id FROM catalog_items WHERE name_de = 'Dreizack'), '1-händig', '4', '2W6', 9, 'Stich, Lang');
 
-INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_skills_de) VALUES
-    ((SELECT id FROM catalog_items WHERE name_de = 'Offener Helm'), 'head', 1, NULL),
-    ((SELECT id FROM catalog_items WHERE name_de = 'Großhelm'), 'head', 2, 'Wahrnehmung');
+INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_perception, penalty_ranged) VALUES
+    ((SELECT id FROM catalog_items WHERE name_de = 'Offener Helm'), 'head', 1, 0, 0),
+    ((SELECT id FROM catalog_items WHERE name_de = 'Großhelm'), 'head', 2, 1, 0);
 
 -- ============================================================
 -- Kins
@@ -88,7 +88,6 @@ UNION ALL SELECT 'wolfsmensch', id FROM catalog_heroic_abilities WHERE name_de =
 
 INSERT INTO catalog_professions (code, name_de, key_attribute_code, kin_restriction) VALUES
     ('kaempfer', 'Kämpfer', 'STA', NULL),
-    ('zwergenkaempfer', 'Zwergenkämpfer', 'STA', 'zwerg'),
     ('jaeger', 'Jäger', 'GEW', NULL),
     ('ritter', 'Ritter', 'STA', NULL),
     ('seefahrerin', 'Seefahrerin', 'GEW', NULL),
@@ -96,12 +95,9 @@ INSERT INTO catalog_professions (code, name_de, key_attribute_code, kin_restrict
     ('dieb', 'Dieb', 'GEW', NULL);
 
 -- Skill pools: 8 options per profession, the player picks exactly 6.
--- Zwergenkämpfer shares the Kämpfer pool (see spec: not a distinct RAW profession).
 
 INSERT INTO catalog_profession_key_skills (profession_code, skill_id)
 SELECT 'kaempfer', id FROM catalog_skills WHERE name_de IN ('Äxte', 'Bögen', 'Prügelei', 'Armbrüste', 'Ausweichen', 'Hämmer', 'Speere', 'Schwerter')
-UNION ALL
-SELECT 'zwergenkaempfer', id FROM catalog_skills WHERE name_de IN ('Äxte', 'Bögen', 'Prügelei', 'Armbrüste', 'Ausweichen', 'Hämmer', 'Speere', 'Schwerter')
 UNION ALL
 SELECT 'jaeger', id FROM catalog_skills WHERE name_de IN ('Akrobatik', 'Wahrnehmung', 'Bögen', 'Wildnisleben', 'Jagen & Fischen', 'Messer', 'Schleudern', 'Heimlichkeit')
 UNION ALL
@@ -114,8 +110,6 @@ UNION ALL
 SELECT 'dieb', id FROM catalog_skills WHERE name_de IN ('Akrobatik', 'Wahrnehmung', 'Täuschen', 'Ausweichen', 'Messer', 'Fingerfertigkeit', 'Heimlichkeit', 'Entdecken');
 
 -- Each profession grants exactly one fixed heroic ability at creation (RAW).
--- "Veteran" and "Furchtlos" are shared by kaempfer/zwergenkaempfer, so each
--- is stored once in catalog_heroic_abilities and linked to both professions.
 
 INSERT INTO catalog_heroic_abilities (name_de, requirement_de, wp_note_de, description_de) VALUES
     ('Veteran', 'Beliebige Waffenfertigkeit 12', '1', 'Wenn du dieses Talent zu Beginn einer Kampfrunde aktivierst, kannst du deine Initiativekarte aus der letzten Runde behalten, anstatt eine neue zu ziehen. Das zählt nicht als Aktion.'),
@@ -133,15 +127,13 @@ INSERT INTO catalog_heroic_abilities (name_de, requirement_de, wp_note_de, descr
 
 INSERT INTO catalog_profession_heroic_abilities (profession_code, heroic_ability_id, granted_at_creation, choice_group)
 SELECT 'kaempfer', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Veteran'
-UNION ALL SELECT 'zwergenkaempfer', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Veteran'
 UNION ALL SELECT 'jaeger', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Gefährte'
 UNION ALL SELECT 'ritter', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Beschützer'
 UNION ALL SELECT 'seefahrerin', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Seebeine'
 UNION ALL SELECT 'haendler', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Goldnase'
 UNION ALL SELECT 'dieb', id, 1, NULL FROM catalog_heroic_abilities WHERE name_de = 'Hinterhältig'
 UNION ALL SELECT 'jaeger', id, 0, NULL FROM catalog_heroic_abilities WHERE name_de = 'Doppelschuss'
-UNION ALL SELECT 'kaempfer', id, 0, NULL FROM catalog_heroic_abilities WHERE name_de = 'Furchtlos'
-UNION ALL SELECT 'zwergenkaempfer', id, 0, NULL FROM catalog_heroic_abilities WHERE name_de = 'Furchtlos';
+UNION ALL SELECT 'kaempfer', id, 0, NULL FROM catalog_heroic_abilities WHERE name_de = 'Furchtlos';
 
 -- Starting gear: all 3 official W6 equipment options (A=1-2, B=3-4, C=5-6) per
 -- profession, screenshot-verified against the full rulebook's equipment
@@ -158,11 +150,8 @@ UNION ALL SELECT 'zwergenkaempfer', id, 0, NULL FROM catalog_heroic_abilities WH
 -- CharacterCreationRepository::createCharacter()).
 INSERT INTO catalog_profession_gear_options (profession_code, option_label, extra_de, starting_silver_dice) VALUES
     ('kaempfer', 'A', 'Fackel, Feuerstein & Zunder, W6 Tagesrationen', 'W6'),
-    ('zwergenkaempfer', 'A', 'Fackel, Feuerstein & Zunder, W6 Tagesrationen', 'W6'),
     ('kaempfer', 'B', 'Fackel, Feuerstein & Zunder, W6 Tagesrationen', 'W6'),
-    ('zwergenkaempfer', 'B', 'Fackel, Feuerstein & Zunder, W6 Tagesrationen', 'W6'),
     ('kaempfer', 'C', 'Fackel, Feuerstein & Zunder, W6 Tagesrationen', 'W6'),
-    ('zwergenkaempfer', 'C', 'Fackel, Feuerstein & Zunder, W6 Tagesrationen', 'W6'),
     ('jaeger', 'A', 'Schlafpelz, Fackel, Feuerstein & Zunder, Falle/Schlinge, W8 Tagesrationen', 'W6'),
     ('jaeger', 'B', 'Schlafpelz, Seil (Hanf), Angel, W6 Tagesrationen', NULL),
     ('jaeger', 'C', 'Schlafpelz, Falle/Schlinge, Fackel, Feuerstein & Zunder, W8 Tagesrationen', 'W6'),
@@ -186,23 +175,13 @@ JOIN (
     SELECT 'kaempfer' AS profession_code, 'A' AS option_label, 'Streitaxt' AS name_de, 1 AS qty UNION ALL
     SELECT 'kaempfer', 'A', 'Schild, klein', 1 UNION ALL
     SELECT 'kaempfer', 'A', 'Kettenpanzer', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'A', 'Streitaxt', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'A', 'Schild, klein', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'A', 'Kettenpanzer', 1 UNION ALL
     SELECT 'kaempfer', 'B', 'Kurzschwert', 1 UNION ALL
     SELECT 'kaempfer', 'B', 'Leichte Armbrust', 1 UNION ALL
     SELECT 'kaempfer', 'B', 'Köcher', 1 UNION ALL
     SELECT 'kaempfer', 'B', 'Lederrüstung', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'B', 'Kurzschwert', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'B', 'Leichte Armbrust', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'B', 'Köcher', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'B', 'Lederrüstung', 1 UNION ALL
     SELECT 'kaempfer', 'C', 'Langspeer', 1 UNION ALL
     SELECT 'kaempfer', 'C', 'Beschlagenes Leder', 1 UNION ALL
     SELECT 'kaempfer', 'C', 'Offener Helm', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'C', 'Langspeer', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'C', 'Beschlagenes Leder', 1 UNION ALL
-    SELECT 'zwergenkaempfer', 'C', 'Offener Helm', 1 UNION ALL
     SELECT 'jaeger', 'A', 'Dolch', 1 UNION ALL
     SELECT 'jaeger', 'A', 'Kurzbogen', 1 UNION ALL
     SELECT 'jaeger', 'A', 'Köcher', 1 UNION ALL

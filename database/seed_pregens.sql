@@ -43,10 +43,10 @@ INSERT INTO catalog_item_weapons (item_id, grip_de, range_de, damage_de, durabil
     ((SELECT id FROM catalog_items WHERE name_de = 'Beil'), '1-händig', '2', '2W6', 9, 'Hieb, Niederwerfend'),
     ((SELECT id FROM catalog_items WHERE name_de = 'Zweihandaxt'), '2-händig', '2', '2W10', 9, 'Hieb, Niederwerfend');
 
-INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_skills_de) VALUES
-    ((SELECT id FROM catalog_items WHERE name_de = 'Plattenpanzer'), 'body', 6, 'Heimlichkeit, Ausweichen, Akrobatik'),
-    ((SELECT id FROM catalog_items WHERE name_de = 'Beschlagenes Leder'), 'body', 2, 'Heimlichkeit, Ausweichen, Akrobatik'),
-    ((SELECT id FROM catalog_items WHERE name_de = 'Kettenpanzer'), 'body', 4, 'Heimlichkeit, Ausweichen, Akrobatik');
+INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics) VALUES
+    ((SELECT id FROM catalog_items WHERE name_de = 'Plattenpanzer'), 'body', 6, 1, 1, 1),
+    ((SELECT id FROM catalog_items WHERE name_de = 'Beschlagenes Leder'), 'body', 2, 1, 1, 1),
+    ((SELECT id FROM catalog_items WHERE name_de = 'Kettenpanzer'), 'body', 4, 1, 1, 1);
 
 -- ============================================================
 -- Character: Orla Mondsilber (Elf, Erwachsen, Jäger)
@@ -96,6 +96,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Speere', 7 UNION ALL SELECT 'Stäbe', 7
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
+
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Innerer Frieden', NULL, 'Als Elf kannst du während einer kurzen Rast meditieren. Du heilst einen zusätzlichen W6 TP sowie einen weiteren W6 WP, außerdem kannst du dich von einem zusätzlichen Zustand erholen.'),
     (@char_id, 'Doppelschuss', '3', 'Wenn du bei einem Angriff mit dem Bogen dieses Talent aktivierst, kannst du zwei Pfeile gleichzeitig abschießen.');
@@ -107,10 +118,12 @@ WHERE i.name_de IN ('Langbogen', 'Messer');
 
 INSERT INTO character_armor (character_id, slot) VALUES (@char_id, 'head');
 
-INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_de)
-SELECT @char_id, 'body', i.name_de, a.armor_value, a.penalty_skills_de
-FROM catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id
-WHERE i.name_de = 'Lederrüstung';
+-- Hardcoded (not INSERT...SELECT from catalog_item_armor): this seed file
+-- runs before seed_weapon_armor_corrections.sql, which is what actually
+-- fixes this item's armor_value/penalties -- copying live here would freeze
+-- in the pre-correction (wrong) numbers. These are the post-correction ones.
+INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+VALUES (@char_id, 'body', 'Lederrüstung', 1, 0, 0, 0);
 
 INSERT INTO character_inventory (character_id, position, name_de, description_de, quantity)
 SELECT @char_id, ROW_NUMBER() OVER (ORDER BY name_de), name_de, description_de, 1
@@ -164,6 +177,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Speere', 14 UNION ALL SELECT 'Stäbe', 5
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
+
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Übellaunig', '3', 'Enten haben ein eher cholerisches Gemüt. Du kannst dieses Talent aktivieren, wenn du eine Fertigkeitsprobe ablegst, und bekommst dadurch einen Vorteil auf deinen Wurf. Zusätzlich erhältst du den Zustand Wütend, falls du es nicht bereits bist.'),
     (@char_id, 'Schwimmhäute', NULL, 'Als Ente erhältst du einen Vorteil auf alle Schwimmen-Proben. Du bewegst dich im oder unter Wasser stets mit deiner vollen Geschwindigkeit.'),
@@ -176,10 +200,8 @@ WHERE i.name_de IN ('Streitaxt', 'Kurzschwert', 'Schild, klein');
 
 INSERT INTO character_armor (character_id, slot) VALUES (@char_id, 'head');
 
-INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_de)
-SELECT @char_id, 'body', i.name_de, a.armor_value, a.penalty_skills_de
-FROM catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id
-WHERE i.name_de = 'Plattenpanzer';
+INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+VALUES (@char_id, 'body', 'Plattenpanzer', 6, 1, 1, 1);
 
 INSERT INTO character_inventory (character_id, position, name_de, description_de, quantity)
 SELECT @char_id, ROW_NUMBER() OVER (ORDER BY name_de), name_de, description_de, 1
@@ -233,6 +255,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Speere', 4 UNION ALL SELECT 'Stäbe', 7
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
+
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Schwer zu fassen', '3', 'Du kannst dieses Talent aktivieren, wenn du einem Angriff ausweichst, um einen Vorteil auf deine Ausweichen-Probe zu erhalten.'),
     (@char_id, 'Hinterhältig', '3', 'Du kannst dieses Talent bei einem Nahkampfangriff aktivieren, wenn sich dein Gegner innerhalb von 2 Metern zu einem anderen Spielercharakter befindet. Dein Angriff zählt dann als Schleichangriff. Dieses Talent kann nur mit unauffälligen Waffen eingesetzt werden.');
@@ -249,10 +282,12 @@ FROM catalog_items i JOIN catalog_item_weapons w ON w.item_id = i.id WHERE i.nam
 
 INSERT INTO character_armor (character_id, slot) VALUES (@char_id, 'head');
 
-INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_de)
-SELECT @char_id, 'body', i.name_de, a.armor_value, a.penalty_skills_de
-FROM catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id
-WHERE i.name_de = 'Lederrüstung';
+-- Hardcoded (not INSERT...SELECT from catalog_item_armor): this seed file
+-- runs before seed_weapon_armor_corrections.sql, which is what actually
+-- fixes this item's armor_value/penalties -- copying live here would freeze
+-- in the pre-correction (wrong) numbers. These are the post-correction ones.
+INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+VALUES (@char_id, 'body', 'Lederrüstung', 1, 0, 0, 0);
 
 INSERT INTO character_inventory (character_id, position, name_de, description_de, quantity)
 SELECT @char_id, 1, name_de, description_de, 1 FROM catalog_items WHERE name_de = 'Dietriche'
@@ -311,6 +346,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Speere', 14 UNION ALL SELECT 'Stäbe', 6
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
+
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Jagdinstinkt', '3', 'Du kannst dieses Talent aktivieren, um eine Kreatur in Sichtweite oder deren Geruch du wahrnehmen kannst, als deine Beute zu markieren. Dies zählt im Kampf als eine Aktion.'),
     (@char_id, 'Veteran', '1', 'Wenn du dieses Talent zu Beginn einer Kampfrunde aktivierst, kannst du deine Initiativekarte aus der letzten Runde behalten anstatt eine neue zu ziehen.');
@@ -322,10 +368,11 @@ WHERE i.name_de IN ('Langspeer', 'Kurzspeer');
 
 INSERT INTO character_armor (character_id, slot) VALUES (@char_id, 'head');
 
-INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_de)
-SELECT @char_id, 'body', i.name_de, a.armor_value, a.penalty_skills_de
-FROM catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id
-WHERE i.name_de = 'Beschlagenes Leder';
+-- Hardcoded (post-correction values, same reasoning as the Lederrüstung
+-- blocks above): seed_weapon_armor_corrections.sql narrows this item's
+-- penalties after this file runs, so INSERT...SELECT would be stale here.
+INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+VALUES (@char_id, 'body', 'Beschlagenes Leder', 2, 1, 0, 0);
 
 INSERT INTO character_inventory (character_id, position, name_de, description_de, quantity)
 SELECT @char_id, ROW_NUMBER() OVER (ORDER BY name_de), name_de, description_de, 1
@@ -378,6 +425,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Schleudern', 6 UNION ALL SELECT 'Schwerter', 5
     UNION ALL SELECT 'Speere', 5 UNION ALL SELECT 'Stäbe', 6
 ) v ON v.name_de = s.name_de;
+
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
 
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Nachtragend', '3', 'Du kannst dieses Talent aktivieren, wenn du jemanden angreifst, der dich in der Vergangenheit verletzt hat, um einen Vorteil auf den Wurf zu erhalten.'),
@@ -442,6 +500,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Speere', 6 UNION ALL SELECT 'Stäbe', 6
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
+
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Anpassungsfähig', '3', 'Bei einer Fertigkeitsprobe kannst du dich entscheiden, für den Wurf eine andere Fertigkeit deiner Wahl zu benutzen. Du musst allerdings erklären können, wie die gewählte Fertigkeit die ursprüngliche ersetzen kann.'),
     (@char_id, 'Seebeine', '1', 'Du kannst dieses Talent aktivieren (keine Aktion), wenn du eine Aktion im Wasser ausführst, selbst wenn es nur hüfttief ist. Daraufhin bist du eine Runde lang gegen alle negativen Effekte geschützt, die üblicherweise im Wasser auftreten, einschließlich der Gefahr, zu ertrinken.');
@@ -460,7 +529,9 @@ UNION ALL
 SELECT @char_id, 3, name_de, description_de, 1 FROM catalog_items WHERE name_de = 'Fernrohr';
 
 -- ============================================================
--- Character: Urd Bitterkinn (Zwerg, Alt, Zwergenkämpfer)
+-- Character: Urd Bitterkinn (Zwerg, Alt, Kämpfer -- "Zwergenkämpfer" ist nur
+-- ein RP-Beiname, kein eigener Beruf; siehe Korrektur oben bei den
+-- Professionen -- vgl. 2026-09-27-character-creation-wizard-design.md)
 -- ============================================================
 
 INSERT INTO characters (
@@ -469,7 +540,7 @@ INSERT INTO characters (
 ) VALUES (
     'urd_bitterkinn', 'Urd Bitterkinn', 'zwerg',
     (SELECT id FROM catalog_age WHERE name_de = 'Alt'),
-    'zwergenkaempfer',
+    'kaempfer',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Pessimistisch'),
     'Eisiger, durchdringender Blick. Wettergegerbte Haut. Du hast schon viel gesehen und es benötigt eine Menge, um dich aus der Ruhe zu bringen.',
     'Deine verlässlichen alten Stiefel aus Lindwurmleder, die du mit Hingabe pflegst.',
@@ -507,6 +578,17 @@ SELECT @char_id, s.id, v.value FROM catalog_skills s JOIN (
     UNION ALL SELECT 'Speere', 7 UNION ALL SELECT 'Stäbe', 6
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row: every
+-- character_skills row is expected to exist for every catalog skill (see
+-- CharacterCreationRepository::insertCharacter's loop over ALL catalog_skills
+-- for new characters). Without this, "Magisches Talent" on the levelup page
+-- would have no untrained school to offer this pregen.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @char_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @char_id);
+
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
     (@char_id, 'Nachtragend', '3', 'Du kannst dieses Talent aktivieren, wenn du jemanden angreifst, der dich in der Vergangenheit verletzt hat, um einen Vorteil auf den Wurf zu erhalten.'),
     (@char_id, 'Furchtlos', '2', 'Du widerstehst von vornherein Furchtangriffen, ohne eine WIL-Probe ablegen zu müssen.');
@@ -518,10 +600,9 @@ WHERE i.name_de IN ('Dolch', 'Beil', 'Zweihandaxt');
 
 INSERT INTO character_armor (character_id, slot) VALUES (@char_id, 'head');
 
-INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_de)
-SELECT @char_id, 'body', i.name_de, a.armor_value, a.penalty_skills_de
-FROM catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id
-WHERE i.name_de = 'Kettenpanzer';
+-- Hardcoded (post-correction values): same reasoning as above.
+INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+VALUES (@char_id, 'body', 'Kettenpanzer', 4, 1, 1, 0);
 
 INSERT INTO character_inventory (character_id, position, name_de, description_de, quantity)
 SELECT @char_id, ROW_NUMBER() OVER (ORDER BY name_de), name_de, description_de, 1

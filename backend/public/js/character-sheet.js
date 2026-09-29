@@ -106,54 +106,6 @@
         });
     });
 
-    // --- Downtime panel ---
-
-    const downtimeModal = document.getElementById('downtime-modal');
-    const downtimeList = document.getElementById('downtime-list');
-
-    function renderDowntimeList(skills) {
-        if (skills.length === 0) {
-            downtimeList.innerHTML = '<li class="downtime-empty">Keine markierten Fertigkeiten.</li>';
-
-            return;
-        }
-
-        downtimeList.innerHTML = skills.map((skill) => `
-            <li data-skill-id="${skill.id}">
-                <span class="entry-name">${skill.name_de} <small>(${skill.attribute_code})</small></span>
-                <span class="entry-value">${skill.value}</span>
-                <button type="button" class="advance-button" data-apply="1" data-skill-id="${skill.id}">Aufleveln</button>
-                <button type="button" class="advance-button" data-apply="0" data-skill-id="${skill.id}">Verwerfen</button>
-            </li>
-        `).join('');
-    }
-
-    document.getElementById('downtime-button').addEventListener('click', () => {
-        fetch(`/character/${id}/skills/marked`)
-            .then((response) => response.json())
-            .then((skills) => {
-                renderDowntimeList(skills);
-                downtimeModal.showModal();
-            });
-    });
-
-    document.getElementById('downtime-modal-close').addEventListener('click', () => downtimeModal.close());
-    downtimeModal.addEventListener('click', (event) => {
-        if (event.target === downtimeModal) {
-            downtimeModal.close();
-        }
-    });
-
-    downtimeList.addEventListener('click', (event) => {
-        const button = event.target.closest('.advance-button');
-        if (!button) {
-            return;
-        }
-
-        postJson(`/character/${id}/skills/${button.dataset.skillId}/advance`, { apply: button.dataset.apply === '1' })
-            .then(() => window.location.reload());
-    });
-
     // --- Currency ---
 
     const currencySaveButton = document.getElementById('currency-save-button');
@@ -169,21 +121,6 @@
                 currencySaveButton.textContent = 'Gespeichert!';
                 setTimeout(() => { currencySaveButton.textContent = 'Speichern'; }, 1500);
             });
-        });
-    }
-
-    // --- Learn spell ---
-
-    const learnSpellButton = document.getElementById('learn-spell-button');
-    if (learnSpellButton) {
-        learnSpellButton.addEventListener('click', () => {
-            const select = document.getElementById('learn-spell-select');
-            if (!select.value) {
-                return;
-            }
-
-            postJson(`/character/${id}/spells`, { spell_id: parseInt(select.value, 10) })
-                .then(() => window.location.reload());
         });
     }
 
@@ -204,6 +141,13 @@
                 : `/character/${id}/${segment}/${input.dataset.rowId}`;
 
             postJson(url, { [input.dataset.field]: value }).then(() => window.location.reload());
+        });
+    });
+
+    document.querySelectorAll('.armor-penalty-checkbox').forEach((checkbox) => {
+        checkbox.addEventListener('change', () => {
+            postJson(`/character/${id}/armor/${checkbox.dataset.slot}`, { [checkbox.dataset.field]: checkbox.checked })
+                .then(() => window.location.reload());
         });
     });
 

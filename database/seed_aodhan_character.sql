@@ -86,6 +86,16 @@ JOIN (
     UNION ALL SELECT 'Elementarismus', 14
 ) v ON v.name_de = s.name_de;
 
+-- Untrained magic-school (secondary) skills still need a value-0 row (see
+-- matching comment in seed_pregens.sql) -- Aodhan is trained in Elementarismus
+-- but has no row at all for Animismus/Mentalismus otherwise, which would
+-- leave "Magisches Talent" with no untrained school to offer him.
+INSERT INTO character_skills (character_id, skill_id, value)
+SELECT @aodhan_id, sk.id, 0
+FROM catalog_skills sk
+WHERE sk.category = 'secondary'
+  AND sk.id NOT IN (SELECT skill_id FROM character_skills WHERE character_id = @aodhan_id);
+
 -- Talents
 
 INSERT INTO character_talents (character_id, name_de, wp_note_de, description_de) VALUES
@@ -111,10 +121,12 @@ WHERE i.name_de = 'Stab';
 
 INSERT INTO character_armor (character_id, slot) VALUES (@aodhan_id, 'head');
 
-INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_de)
-SELECT @aodhan_id, 'body', i.name_de, a.armor_value, a.penalty_skills_de
-FROM catalog_items i JOIN catalog_item_armor a ON a.item_id = i.id
-WHERE i.name_de = 'Lederrüstung';
+-- Hardcoded (not INSERT...SELECT from catalog_item_armor): this seed file
+-- runs before seed_weapon_armor_corrections.sql, which is what actually
+-- fixes this item's armor_value/penalties -- copying live here would freeze
+-- in the pre-correction (wrong) numbers. These are the post-correction ones.
+INSERT INTO character_armor (character_id, slot, name_de, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+VALUES (@aodhan_id, 'body', 'Lederrüstung', 1, 0, 0, 0);
 
 -- Inventory (freetext; 'Feuerstein & Zunder' was the old misc_items_de text)
 

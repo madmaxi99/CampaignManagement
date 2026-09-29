@@ -121,8 +121,8 @@ INSERT INTO catalog_items (name_de, description_de, rarity, price_gold, price_si
 INSERT INTO catalog_item_weapons (item_id, grip_de, range_de, damage_de, durability, traits_de)
 SELECT id, '2-händig', '2', 'W8', 9, 'Wucht' FROM catalog_items WHERE name_de = 'Stab';
 
-INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_skills_de)
-SELECT id, 'body', 2, 'Heimlichkeit, Ausweichen, Akrobatik' FROM catalog_items WHERE name_de = 'Lederrüstung';
+INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics)
+SELECT id, 'body', 2, 1, 1, 1 FROM catalog_items WHERE name_de = 'Lederrüstung';
 
 -- The "Character: Erzmeister Aodhan" section used to live here, but it needs
 -- catalog_kins/catalog_professions/catalog_flaws (seed_character_creation_catalog.sql,

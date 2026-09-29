@@ -122,11 +122,19 @@ CREATE TABLE catalog_item_weapons (
     FOREIGN KEY (item_id) REFERENCES catalog_items(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- penalty_* are fixed narrative flags matching the physical Dragonbane sheet
+-- (body: Heimlichkeit/Ausweichen/Akrobatik; head: Wahrnehmung/Fernkampf --
+-- "Fernkampf" has no single matching catalog_skills row, it's a fixed flag).
+-- A row only ever uses the 3 (body) or 2 (head) flags that apply to its slot.
 CREATE TABLE catalog_item_armor (
     item_id INT PRIMARY KEY,
     slot ENUM('body', 'head') NOT NULL,
     armor_value INT NOT NULL,
-    penalty_skills_de VARCHAR(255) NULL,
+    penalty_stealth BOOLEAN NOT NULL DEFAULT 0,
+    penalty_evasion BOOLEAN NOT NULL DEFAULT 0,
+    penalty_acrobatics BOOLEAN NOT NULL DEFAULT 0,
+    penalty_perception BOOLEAN NOT NULL DEFAULT 0,
+    penalty_ranged BOOLEAN NOT NULL DEFAULT 0,
     FOREIGN KEY (item_id) REFERENCES catalog_items(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -229,13 +237,23 @@ CREATE TABLE character_weapons (
 
 -- Genau zwei feste Zeilen pro Charakter (Kopf/Körper), immer vorhanden statt
 -- add/remove -- leer, wenn der Slot unbesetzt ist.
+-- Freetext, hand-typed copy (no FK to catalog_items -- a player can wear any
+-- gear, not just catalog items). penalty_* mirror catalog_item_armor's flags
+-- but are independently editable here, same "no ongoing catalog link" rule
+-- as name_de/armor_value.
 CREATE TABLE character_armor (
     id INT AUTO_INCREMENT PRIMARY KEY,
     character_id INT NOT NULL,
     slot ENUM('head', 'body') NOT NULL,
     name_de VARCHAR(150) NULL,
     armor_value INT NULL,
-    penalty_de VARCHAR(255) NULL,
+    -- body-slot penalties (Rüstung)
+    penalty_stealth BOOLEAN NOT NULL DEFAULT 0,
+    penalty_evasion BOOLEAN NOT NULL DEFAULT 0,
+    penalty_acrobatics BOOLEAN NOT NULL DEFAULT 0,
+    -- head-slot penalties (Helm)
+    penalty_perception BOOLEAN NOT NULL DEFAULT 0,
+    penalty_ranged BOOLEAN NOT NULL DEFAULT 0,
     UNIQUE KEY uniq_character_slot (character_id, slot),
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

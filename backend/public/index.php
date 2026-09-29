@@ -36,8 +36,6 @@ function loadSheet(CharacterRepository $repository, int $id): ?array
     $characterId = (int) $character['id'];
     $attributes = $repository->attributes($characterId);
     $character = $character + $repository->derivedStats($character, $attributes);
-    $secondarySkills = $repository->skillsByCategory($characterId, 'secondary');
-    $schoolSkillId = isset($secondarySkills[0]) ? (int) $secondarySkills[0]['id'] : null;
 
     return [
         'character' => $character,
@@ -45,12 +43,9 @@ function loadSheet(CharacterRepository $repository, int $id): ?array
         'conditions' => $repository->conditions($characterId),
         'regularSkills' => $repository->skillsByCategory($characterId, 'regular'),
         'combatSkills' => $repository->skillsByCategory($characterId, 'combat'),
-        'secondarySkills' => $secondarySkills,
-        'markedSkills' => $repository->markedSkills($characterId),
+        'secondarySkills' => $repository->skillsByCategory($characterId, 'secondary'),
         'talents' => $repository->talents($characterId),
         'spells' => $repository->spells($characterId),
-        'availableSpells' => $repository->availableSpells($characterId, $schoolSkillId),
-        'isCaster' => $schoolSkillId !== null,
         'weapons' => $repository->weapons($characterId),
         'armor' => $repository->armor($characterId),
         'inventory' => $repository->inventory($characterId),
@@ -218,10 +213,6 @@ $app->post('/character/{id:[0-9]+}/currency', withCharacter($characterRepository
     return jsonResponse($response, ['gold' => max(0, (int) $body['gold']), 'silver' => max(0, (int) $body['silver']), 'copper' => max(0, (int) $body['copper'])]);
 }));
 
-$app->get('/character/{id:[0-9]+}/skills/marked', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
-    return jsonResponse($response, $characterRepository->markedSkills((int) $character['id']));
-}));
-
 $app->post('/character/{id:[0-9]+}/skills/{skillId}/mark', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $characterRepository->setSkillMark((int) $character['id'], (int) $args['skillId'], (bool) $body['marked']);
@@ -239,6 +230,38 @@ $app->post('/character/{id:[0-9]+}/skills/{skillId}/advance', withCharacter($cha
 $app->post('/character/{id:[0-9]+}/spells', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
     $body = json_decode((string) $request->getBody(), true);
     $characterRepository->learnSpell((int) $character['id'], (int) $body['spell_id']);
+
+    return jsonResponse($response, ['learned' => true]);
+}));
+
+$app->get('/character/{id:[0-9]+}/levelup', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
+    $characterId = (int) $character['id'];
+    $secondarySkills = $characterRepository->skillsByCategory($characterId, 'secondary');
+    $untrainedSchoolSkills = array_values(array_filter($secondarySkills, static fn (array $s) => (int) $s['value'] === 0));
+
+    $twig = Twig::fromRequest($request);
+
+    return $twig->render($response, 'character/levelup.twig', [
+        'character' => $character,
+        'markedSkills' => $characterRepository->markedSkills($characterId),
+        'learnableHeroicAbilities' => $characterRepository->learnableHeroicAbilities($characterId, $character['profession_code']),
+        'untrainedSchoolSkills' => $untrainedSchoolSkills,
+        'availableSpells' => $characterRepository->availableSpells($characterId, $characterRepository->trainedSchoolSkillIds($characterId)),
+    ]);
+}));
+
+$app->post('/character/{id:[0-9]+}/heroic-abilities', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    $ability = $characterRepository->heroicAbilityById((int) ($body['heroic_ability_id'] ?? 0));
+    if ($ability === null) {
+        return jsonResponse($response, ['error' => 'Unbekanntes Talent.'], 422);
+    }
+
+    $characterRepository->learnHeroicAbility((int) $character['id'], $ability);
+
+    if ($ability['name_de'] === 'Magisches Talent' && isset($body['school_skill_id'])) {
+        $characterRepository->trainSkill((int) $character['id'], (int) $body['school_skill_id']);
+    }
 
     return jsonResponse($response, ['learned' => true]);
 }));
@@ -283,6 +306,14 @@ $app->delete('/character/{id:[0-9]+}', withCharacter($characterRepository, funct
     if ((bool) $character['is_default']) {
         return jsonResponse($response, ['error' => 'Default-Charaktere können nicht gelöscht werden.'], 403);
     }
+
+    if ($character['portrait_path'] !== null && str_starts_with($character['portrait_path'], 'images/characters/uploads/')) {
+        $path = __DIR__ . '/' . $character['portrait_path'];
+        if (is_file($path)) {
+            unlink($path);
+        }
+    }
+
     $characterRepository->delete((int) $character['id']);
 
     return jsonResponse($response, ['deleted' => true]);

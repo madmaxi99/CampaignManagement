@@ -106,7 +106,7 @@
     <section class="card skills-spells">
         <div class="card-heading-row">
             <h2>Fertigkeiten &amp; Zauber</h2>
-            <button type="button" id="downtime-button">Downtime</button>
+            <a class="button-primary" href="/character/{{ character.id }}/levelup">Level Up</a>
         </div>
 
         <h3>Fertigkeiten</h3>
@@ -127,20 +127,6 @@
                 </li>
             {% endfor %}
         </ul>
-        {% if isCaster %}
-            <div class="spell-add-menu">
-                <label for="learn-spell-select">Neuen Zauber/Trick lernen</label>
-                <div class="add-form">
-                    <select id="learn-spell-select">
-                        <option value="">Auswählen…</option>
-                        {% for spell in availableSpells %}
-                            <option value="{{ spell.id }}">{{ spell.name_de }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="button" id="learn-spell-button">Lernen</button>
-                </div>
-            </div>
-        {% endif %}
 
         <h3>Talente</h3>
         <ul class="talent-list">
@@ -181,19 +167,41 @@
         <div class="card-heading-row">
             <h2>Rüstung</h2>
         </div>
-        <table class="item-table" id="armor-table">
+        <table class="item-table" id="body-armor-table">
             <thead>
-                <tr><th>Slot</th><th>Name</th><th>Rüstungswert</th><th>Nachteil</th></tr>
+                <tr><th>Name</th><th>Rüstungswert</th><th>Heimlichkeit</th><th>Ausweichen</th><th>Akrobatik</th></tr>
             </thead>
             <tbody>
-                {% for piece in armor %}
-                    <tr data-slot="{{ piece.slot }}">
-                        <td>{{ piece.slot == 'body' ? 'Körper' : 'Kopf' }}</td>
-                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="{{ piece.slot }}" data-field="name_de" value="{{ piece.name_de }}"></td>
-                        <td><input type="number" class="free-text-field" data-segment="armor" data-slot="{{ piece.slot }}" data-field="armor_value" value="{{ piece.armor_value }}"></td>
-                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="{{ piece.slot }}" data-field="penalty_de" value="{{ piece.penalty_de }}"></td>
+                {% for piece in armor %}{% if piece.slot == 'body' %}
+                    <tr>
+                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="body" data-field="name_de" value="{{ piece.name_de }}"></td>
+                        <td><input type="number" class="free-text-field" data-segment="armor" data-slot="body" data-field="armor_value" value="{{ piece.armor_value }}"></td>
+                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="body" data-field="penalty_stealth" {{ piece.penalty_stealth ? 'checked' }}></td>
+                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="body" data-field="penalty_evasion" {{ piece.penalty_evasion ? 'checked' }}></td>
+                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="body" data-field="penalty_acrobatics" {{ piece.penalty_acrobatics ? 'checked' }}></td>
                     </tr>
-                {% endfor %}
+                {% endif %}{% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="card equipment-list">
+        <div class="card-heading-row">
+            <h2>Helm</h2>
+        </div>
+        <table class="item-table" id="head-armor-table">
+            <thead>
+                <tr><th>Name</th><th>Rüstungswert</th><th>Wahrnehmung</th><th>Fernkampf</th></tr>
+            </thead>
+            <tbody>
+                {% for piece in armor %}{% if piece.slot == 'head' %}
+                    <tr>
+                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="head" data-field="name_de" value="{{ piece.name_de }}"></td>
+                        <td><input type="number" class="free-text-field" data-segment="armor" data-slot="head" data-field="armor_value" value="{{ piece.armor_value }}"></td>
+                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="head" data-field="penalty_perception" {{ piece.penalty_perception ? 'checked' }}></td>
+                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="head" data-field="penalty_ranged" {{ piece.penalty_ranged ? 'checked' }}></td>
+                    </tr>
+                {% endif %}{% endfor %}
             </tbody>
         </table>
     </section>
@@ -235,25 +243,6 @@
 <dialog class="entity-modal" id="detail-modal">
     <button type="button" class="entity-modal-close" id="detail-modal-close" aria-label="Schließen">×</button>
     <div class="entity-modal-body" id="detail-modal-content"></div>
-</dialog>
-
-<dialog class="entity-modal" id="downtime-modal">
-    <button type="button" class="entity-modal-close" id="downtime-modal-close" aria-label="Schließen">×</button>
-    <div class="entity-modal-body">
-        <h2>Downtime — Markierte Fertigkeiten</h2>
-        <ul class="downtime-list" id="downtime-list">
-            {% for skill in markedSkills %}
-                <li data-skill-id="{{ skill.id }}">
-                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
-                    <span class="entry-value" data-current-value>{{ skill.value }}</span>
-                    <button type="button" class="advance-button" data-apply="1" data-skill-id="{{ skill.id }}">Aufleveln</button>
-                    <button type="button" class="advance-button" data-apply="0" data-skill-id="{{ skill.id }}">Verwerfen</button>
-                </li>
-            {% else %}
-                <li class="downtime-empty">Keine markierten Fertigkeiten.</li>
-            {% endfor %}
-        </ul>
-    </div>
 </dialog>
 
 <script src="/js/character-sheet.js"></script>

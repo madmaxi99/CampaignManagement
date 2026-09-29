@@ -587,30 +587,34 @@ final class CharacterCreationRepository
                     ]);
                 } elseif ($gearItem['kind'] === 'armor') {
                     $stats = $this->fetchOne(
-                        'SELECT slot, armor_value, penalty_skills_de FROM catalog_item_armor WHERE item_id = :id',
+                        'SELECT slot, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics, penalty_perception, penalty_ranged
+                         FROM catalog_item_armor WHERE item_id = :id',
                         ['id' => $gearItem['item_id']]
                     );
-                    $armorSlots[$stats['slot']] = [
-                        'name_de' => $gearItem['name_de'],
-                        'armor_value' => $stats['armor_value'],
-                        'penalty_de' => $stats['penalty_skills_de'],
-                    ];
+                    $armorSlots[$stats['slot']] = ['name_de' => $gearItem['name_de']] + $stats;
                 } else {
                     $inventoryInsert->execute(['character_id' => $characterId, 'position' => $position++, 'name_de' => $gearItem['name_de']]);
                 }
             }
 
-            $armorUpdate = $this->db->prepare(
-                'UPDATE character_armor SET name_de = :name_de, armor_value = :armor_value, penalty_de = :penalty_de
-                 WHERE character_id = :character_id AND slot = :slot'
-            );
+            $armorUpdate = $this->db->prepare(<<<SQL
+                UPDATE character_armor
+                SET name_de = :name_de, armor_value = :armor_value,
+                    penalty_stealth = :penalty_stealth, penalty_evasion = :penalty_evasion, penalty_acrobatics = :penalty_acrobatics,
+                    penalty_perception = :penalty_perception, penalty_ranged = :penalty_ranged
+                WHERE character_id = :character_id AND slot = :slot
+                SQL);
             foreach (['head', 'body'] as $slot) {
                 $data = $armorSlots[$slot];
                 $armorUpdate->execute([
                     'character_id' => $characterId, 'slot' => $slot,
                     'name_de' => $data['name_de'] ?? null,
                     'armor_value' => $data['armor_value'] ?? null,
-                    'penalty_de' => $data['penalty_de'] ?? null,
+                    'penalty_stealth' => $data['penalty_stealth'] ?? 0,
+                    'penalty_evasion' => $data['penalty_evasion'] ?? 0,
+                    'penalty_acrobatics' => $data['penalty_acrobatics'] ?? 0,
+                    'penalty_perception' => $data['penalty_perception'] ?? 0,
+                    'penalty_ranged' => $data['penalty_ranged'] ?? 0,
                 ]);
             }
 
