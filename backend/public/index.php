@@ -12,12 +12,16 @@ require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/Database.php';
 require __DIR__ . '/../src/CharacterRepository.php';
 require __DIR__ . '/../src/CampaignRepository.php';
+require __DIR__ . '/../src/CampaignStandRepository.php';
+require __DIR__ . '/../src/WorldRepository.php';
 require __DIR__ . '/../src/EntityLinker.php';
 require __DIR__ . '/../src/CharacterCreationRepository.php';
 
 $db = Database::connect();
 $characterRepository = new CharacterRepository($db);
 $campaignRepository = new CampaignRepository($db);
+$standRepository = new CampaignStandRepository($db);
+$worldRepository = new WorldRepository($db);
 $characterCreationRepository = new CharacterCreationRepository($db);
 
 $app = AppFactory::create();
@@ -57,6 +61,50 @@ function jsonResponse(Response $response, array $data, int $status = 200): Respo
     $response->getBody()->write(json_encode($data));
 
     return $response->withHeader('Content-Type', 'application/json')->withStatus($status);
+}
+
+/**
+ * Stores an uploaded JPG/PNG/WebP as public/<dir>/<id>.<ext>, replacing a
+ * previous file of the same id with another extension.
+ *
+ * @return array{path: string}|array{error: string}
+ */
+function storeUploadedImage(?\Psr\Http\Message\UploadedFileInterface $file, string $dir, int $id): array
+{
+    if ($file === null || $file->getError() !== UPLOAD_ERR_OK) {
+        return ['error' => 'Keine gültige Bilddatei übermittelt.'];
+    }
+    if ($file->getSize() > 5 * 1024 * 1024) {
+        return ['error' => 'Datei ist zu groß (max. 5 MB).'];
+    }
+
+    $extensions = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    $extension = $extensions[$file->getClientMediaType()] ?? null;
+    if ($extension === null) {
+        return ['error' => 'Nur JPG, PNG oder WebP erlaubt.'];
+    }
+
+    $targetDir = __DIR__ . '/' . $dir;
+    if (!is_dir($targetDir)) {
+        mkdir($targetDir, 0755, true);
+    }
+    $targetPath = $targetDir . '/' . $id . '.' . $extension;
+    $file->moveTo($targetPath);
+
+    if (getimagesize($targetPath) === false) {
+        unlink($targetPath);
+
+        return ['error' => 'Datei ist kein gültiges Bild.'];
+    }
+
+    foreach (array_diff($extensions, [$extension]) as $otherExtension) {
+        $old = $targetDir . '/' . $id . '.' . $otherExtension;
+        if (is_file($old)) {
+            unlink($old);
+        }
+    }
+
+    return ['path' => $dir . '/' . $id . '.' . $extension];
 }
 
 /**
@@ -106,6 +154,13 @@ $app->get('/characters', function (Request $request, Response $response) use ($c
     ]);
 });
 
+$app->get('/world', function (Request $request, Response $response) use ($worldRepository) {
+    return Twig::fromRequest($request)->render($response, 'world.twig', [
+        'bestiary' => $worldRepository->bestiary(),
+        'encounterTables' => $worldRepository->encounterTables(),
+    ]);
+});
+
 $app->get('/campaign', function (Request $request, Response $response) use ($campaignRepository) {
     $twig = Twig::fromRequest($request);
 
@@ -119,8 +174,8 @@ $app->get('/campaign', function (Request $request, Response $response) use ($cam
     ]);
 });
 
-$app->get('/campaign/{slug}', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    $campaign = $campaignRepository->findBySlug($args['slug']);
+$app->get('/campaign/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($campaignRepository, $standRepository) {
+    $campaign = $campaignRepository->find((int) $args['id']);
     if ($campaign === null) {
         return $response->withStatus(404);
     }
@@ -129,39 +184,187 @@ $app->get('/campaign/{slug}', function (Request $request, Response $response, ar
     $twig = Twig::fromRequest($request);
 
     $locations = $campaignRepository->locations($campaignId);
-    $creatures = $campaignRepository->creatures($campaignId);
+    $bestiary = $campaignRepository->bestiary($campaignId);
     $npcs = $campaignRepository->npcs($campaignId);
+    $places = $campaignRepository->places($campaignId);
 
     $entityRegistry = [];
     foreach ($locations as $location) {
         $entityRegistry[] = ['match' => '#' . $location['number_label'], 'type' => 'location', 'id' => (int) $location['id']];
     }
-    foreach ($creatures as $creature) {
-        $entityRegistry[] = ['match' => $creature['name_de'], 'type' => 'creature', 'id' => (int) $creature['id']];
+    foreach ($bestiary as $creature) {
+        $entityRegistry[] = ['match' => $creature['name_de'], 'type' => 'bestiary', 'id' => (int) $creature['id']];
     }
     foreach ($npcs as $npc) {
         $entityRegistry[] = ['match' => $npc['name_de'], 'type' => 'npc', 'id' => (int) $npc['id']];
-    }
-
-    $eventTables = $campaignRepository->eventTables($campaignId);
-    if (count($eventTables) <= 1) {
-        $recurringEventTables = [];
-        $endingEventTable = $eventTables[0] ?? null;
-    } else {
-        $recurringEventTables = $eventTables;
-        $endingEventTable = array_pop($recurringEventTables);
     }
 
     return $twig->render($response, 'campaign/dm_screen.twig', [
         'campaign' => $campaign,
         'chapters' => $campaignRepository->chapters($campaignId),
         'locations' => $locations,
-        'creatures' => $creatures,
+        'bestiary' => $bestiary,
         'npcs' => $npcs,
-        'recurringEventTables' => $recurringEventTables,
-        'endingEventTable' => $endingEventTable,
+        'npcFormData' => [
+            'bestiary' => $campaignRepository->bestiaryOptions(),
+            'npcs' => array_column(array_map(fn (array $n) => [
+                'id' => (int) $n['id'],
+                'values' => [
+                    'name_de' => $n['name_de'], 'description_de' => $n['description_de'], 'dm_text_de' => $n['dm_text_de'],
+                    'notes_de' => $n['notes_de'], 'found_hint_de' => $n['found_hint_de'], 'bestiary_id' => $n['bestiary_id'],
+                ],
+            ], $npcs), 'values', 'id'),
+        ],
+        'places' => $places,
+        'items' => $campaignRepository->items($campaignId),
+        'encounterTableOptions' => $campaignRepository->encounterTableOptions(),
+        'placeFormData' => array_column(array_map(fn (array $p) => [
+            'id' => (int) $p['id'],
+            'values' => [
+                'name_de' => $p['name_de'], 'parent_id' => $p['parent_id'],
+                'description_de' => $p['description_de'], 'dm_text_de' => $p['dm_text_de'],
+                'encounter_table_id' => $p['encounter_table_id'],
+            ],
+        ], $places), 'values', 'id'),
+        'chronicle' => $standRepository->chronicle($campaignId),
+        'encounterTables' => $campaignRepository->encounterTables($campaignId),
         'entityRegistry' => $entityRegistry,
     ]);
+});
+
+$app->post('/campaign/{id:[0-9]+}/npcs', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    if ($campaignRepository->find((int) $args['id']) === null) {
+        return $response->withStatus(404);
+    }
+
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    try {
+        $npcId = $campaignRepository->createNpc((int) $args['id'], $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return jsonResponse($response, ['id' => $npcId], 201);
+});
+
+$app->post('/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    $campaignId = (int) $args['id'];
+    $npcId = (int) $args['npcId'];
+    if (!$campaignRepository->npcInCampaign($campaignId, $npcId)) {
+        return $response->withStatus(404);
+    }
+
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    try {
+        $campaignRepository->updateNpc($campaignId, $npcId, $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return jsonResponse($response, ['updated' => true]);
+});
+
+$app->post('/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}/portrait', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    $campaignId = (int) $args['id'];
+    $npcId = (int) $args['npcId'];
+    if (!$campaignRepository->npcInCampaign($campaignId, $npcId)) {
+        return $response->withStatus(404);
+    }
+
+    $stored = storeUploadedImage($request->getUploadedFiles()['portrait'] ?? null, 'images/npcs', $npcId);
+    if (isset($stored['error'])) {
+        return jsonResponse($response, ['error' => $stored['error']], 422);
+    }
+    $campaignRepository->setNpcPortrait($npcId, $stored['path']);
+
+    return jsonResponse($response, ['portrait_path' => $stored['path']]);
+});
+
+$app->post('/campaign/{id:[0-9]+}/restart', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    if ($campaignRepository->find((int) $args['id']) === null) {
+        return $response->withStatus(404);
+    }
+    $campaignRepository->restart((int) $args['id']);
+
+    return jsonResponse($response, ['restarted' => true]);
+});
+
+$app->post('/campaign/{id:[0-9]+}/places', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    if ($campaignRepository->find((int) $args['id']) === null) {
+        return $response->withStatus(404);
+    }
+
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    try {
+        $placeId = $campaignRepository->createPlace((int) $args['id'], $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return jsonResponse($response, ['id' => $placeId], 201);
+});
+
+$app->post('/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    $campaignId = (int) $args['id'];
+    $placeId = (int) $args['placeId'];
+    if (!$campaignRepository->placeInCampaign($campaignId, $placeId)) {
+        return $response->withStatus(404);
+    }
+
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    try {
+        $campaignRepository->updatePlace($campaignId, $placeId, $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return jsonResponse($response, ['updated' => true]);
+});
+
+$app->post('/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}/image', function (Request $request, Response $response, array $args) use ($campaignRepository) {
+    $placeId = (int) $args['placeId'];
+    if (!$campaignRepository->placeInCampaign((int) $args['id'], $placeId)) {
+        return $response->withStatus(404);
+    }
+
+    $stored = storeUploadedImage($request->getUploadedFiles()['image'] ?? null, 'images/places', $placeId);
+    if (isset($stored['error'])) {
+        return jsonResponse($response, ['error' => $stored['error']], 422);
+    }
+    $campaignRepository->setPlaceImage($placeId, $stored['path']);
+
+    return jsonResponse($response, ['image_path' => $stored['path']]);
+});
+
+$app->post('/campaign/{id:[0-9]+}/chronicle', function (Request $request, Response $response, array $args) use ($campaignRepository, $standRepository) {
+    if ($campaignRepository->find((int) $args['id']) === null) {
+        return $response->withStatus(404);
+    }
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    try {
+        $entryId = $standRepository->addChronicleEntry((int) $args['id'], $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return jsonResponse($response, ['id' => $entryId], 201);
+});
+
+$app->post('/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', function (Request $request, Response $response, array $args) use ($standRepository) {
+    $body = json_decode((string) $request->getBody(), true) ?? [];
+    try {
+        $found = $standRepository->updateChronicleEntry((int) $args['id'], (int) $args['entryId'], $body);
+    } catch (InvalidArgumentException $e) {
+        return jsonResponse($response, ['error' => $e->getMessage()], 422);
+    }
+
+    return $found ? jsonResponse($response, ['updated' => true]) : $response->withStatus(404);
+});
+
+$app->delete('/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', function (Request $request, Response $response, array $args) use ($standRepository) {
+    return $standRepository->deleteChronicleEntry((int) $args['id'], (int) $args['entryId'])
+        ? jsonResponse($response, ['deleted' => true])
+        : $response->withStatus(404);
 });
 
 $app->get('/character/create', function (Request $request, Response $response) {

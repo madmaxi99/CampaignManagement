@@ -1422,3 +1422,161 @@ button#downtime-button:hover {
     padding: 8px 12px;
     font-weight: bold;
 }
+
+.npc-add-button {
+    margin: 4px 0 8px;
+}
+
+.npc-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: var(--green-deep);
+}
+
+.npc-form input[type="text"],
+.npc-form select,
+.npc-form textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 3px;
+    font: inherit;
+    font-weight: normal;
+    padding: 4px 6px;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 4px;
+    background: #fff8e8;
+}
+
+.npc-form .npc-form-check {
+    font-weight: normal;
+}
+
+.npc-form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.npc-form-error {
+    background: #f3d6d0;
+    border: 1px solid #b5503f;
+    border-radius: 4px;
+    padding: 6px 10px;
+    color: #6b1f12;
+}
+
+.npc-card-actions {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.event-log {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.event-log-entry {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--parchment-dark);
+}
+
+.event-log-entry:last-child {
+    border-bottom: none;
+}
+
+.event-change {
+    color: var(--green-mid);
+    font-style: italic;
+}
+
+.event-adopted {
+    font-size: 0.8rem;
+    color: var(--green-mid);
+    white-space: nowrap;
+}
+
+.event-log-state {
+    flex-shrink: 0;
+}
+
+.campaign-stand {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 12px 32px;
+}
+
+.stand-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.stand-list > li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--parchment-dark);
+}
+
+.stand-list > li:last-child {
+    border-bottom: none;
+}
+
+.stand-list p {
+    margin: 4px 0 0;
+}
+
+.stand-person {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.stand-portrait {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--parchment-dark);
+}
+
+.stand-resolved,
+.stand-resolved > li {
+    text-decoration: line-through;
+    color: var(--green-mid);
+}
+
+.stand-form {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.stand-form input,
+.stand-form textarea {
+    font: inherit;
+    padding: 4px 6px;
+    border: 1px solid var(--parchment-dark);
+    border-radius: 4px;
+    background: #fff8e8;
+}
+
+.stand-form button {
+    align-self: flex-start;
+}
+
+.stand-entry-text p {
+    margin: 2px 0 0;
+}
+
+.advance-button.is-active {
+    background: var(--green-mid);
+    color: #fff;
+}

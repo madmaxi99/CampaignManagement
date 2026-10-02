@@ -443,24 +443,6 @@ final class CharacterCreationRepository
         };
     }
 
-    private function slugify(string $name): string
-    {
-        $transliterated = strtr($name, [
-            'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue', 'Ä' => 'ae', 'Ö' => 'oe', 'Ü' => 'ue', 'ß' => 'ss',
-        ]);
-        $slug = (string) preg_replace('/[^a-z0-9]+/', '_', strtolower($transliterated));
-        $slug = trim($slug, '_');
-
-        $candidate = $slug;
-        $suffix = 2;
-        while ($this->fetchOne('SELECT id FROM characters WHERE slug = :slug', ['slug' => $candidate]) !== null) {
-            $candidate = $slug . '_' . $suffix;
-            $suffix++;
-        }
-
-        return $candidate;
-    }
-
     /**
      * @param int[] $learnedSkillIds
      * @param int[] $knownSpellIds
@@ -471,7 +453,6 @@ final class CharacterCreationRepository
         string $memento, string $appearance, string $heroicChoice,
         ?int $magicSchoolSkillId, array $knownSpellIds
     ): int {
-        $slug = $this->slugify($name);
         $hpBonus = $heroicChoice === 'robust' ? 2 : 0;
         $wpBonus = $heroicChoice === 'fokussiert' ? 2 : 0;
         $hpMax = $finalAttributes['KON'] + $hpBonus;
@@ -482,15 +463,14 @@ final class CharacterCreationRepository
         try {
             $insert = $this->db->prepare(<<<SQL
                 INSERT INTO characters (
-                    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de,
+                    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de,
                     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
                 ) VALUES (
-                    :slug, :name_de, :kin_code, :age_id, :profession_code, :flaw_id, :appearance_de, :memento_de,
+                    :name_de, :kin_code, :age_id, :profession_code, :flaw_id, :appearance_de, :memento_de,
                     :hp_max, :hp_max, :wp_max, :wp_max, 0, :coins_silver, 0
                 )
                 SQL);
             $insert->execute([
-                'slug' => $slug,
                 'name_de' => $name,
                 'kin_code' => $kin['code'],
                 'age_id' => $ageId,

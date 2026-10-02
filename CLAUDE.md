@@ -22,3 +22,6 @@ Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and pl
 - There's nothing to build, lint, or test — no application exists yet. If asked to implement the next app, read the roadmap/spec docs above first and check with the user on open questions they flag (e.g. the SQLite-vs-MariaDB discrepancy) rather than assuming.
 - The Python balance tools are the one thing that actually runs: `python3 <script>.py` from `docs/own-system/tools/`.
 - UI copy and in-world content in this repo is German; when code eventually exists, code identifiers/comments should be English (this was the convention in the deleted app and is likely to continue).
+
+
+## Remember me to checkout Obsidian for Atlas

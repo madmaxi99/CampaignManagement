@@ -3,7 +3,7 @@
 {% block title %}Campaigns{% endblock %}
 
 {% macro campaign_card(campaign) %}
-    <a class="character-card" href="/campaign/{{ campaign.slug }}">
+    <a class="character-card" href="/campaign/{{ campaign.id }}">
         <h2>{{ campaign.name_de }}</h2>
         <p class="character-card-meta">{{ campaign.teaser_de }}</p>
     </a>

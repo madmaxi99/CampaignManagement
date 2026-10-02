@@ -11,7 +11,7 @@ final class CharacterRepository
     public function listAll(): array
     {
         $stmt = $this->db->query(<<<SQL
-            SELECT c.id, c.slug, c.name_de, c.portrait_path,
+            SELECT c.id, c.name_de, c.portrait_path,
                    k.name_de AS kin_de, ag.name_de AS age_de, p.name_de AS profession_de,
                    c.hp_current, c.hp_max, c.wp_current, c.wp_max, c.is_default
             FROM characters c

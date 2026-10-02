@@ -150,7 +150,6 @@ CREATE TABLE catalog_item_armor (
 -- is created, since MySQL needs the referenced table to exist first.
 CREATE TABLE characters (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    slug VARCHAR(100) NOT NULL UNIQUE,
     is_default BOOLEAN NOT NULL DEFAULT 0,
     name_de VARCHAR(100) NOT NULL,
     kin_code VARCHAR(20) NOT NULL,
@@ -270,106 +269,180 @@ CREATE TABLE character_inventory (
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Campaigns (DM screens)
+-- The catalog holds only the ruleset (items, skills, bestiary, encounter
+-- tables, ...) and is static; campaigns own their places, items and NPCs
+-- (see docs/CONCEPT.md and docs/SCHEMA.md). catalog_* rows exist exactly once.
 
-CREATE TABLE campaigns (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    slug VARCHAR(100) NOT NULL UNIQUE,
-    is_default BOOLEAN NOT NULL DEFAULT 0,
-    name_de VARCHAR(150) NOT NULL,
-    teaser_de VARCHAR(255) NOT NULL,
-    background_de TEXT NOT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE campaign_chapters (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    campaign_id INT NOT NULL,
-    position INT NOT NULL,
-    title_de VARCHAR(150) NOT NULL,
-    notes_de TEXT NULL,
-    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE campaign_locations (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    campaign_id INT NOT NULL,
-    chapter_id INT NULL,
-    position INT NOT NULL,
-    number_label VARCHAR(10) NOT NULL,
-    name_de VARCHAR(150) NOT NULL,
-    read_aloud_de TEXT NULL,
-    notes_de TEXT NULL,
-    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
-    FOREIGN KEY (chapter_id) REFERENCES campaign_chapters(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Bestiary & NPC catalogs are campaign content here (all existing rows are
--- campaign-unique creatures/NPCs, not generic Dragonbane rulebook monsters),
--- so they intentionally stay without the catalog_ prefix, like `npcs`.
-
-CREATE TABLE creatures (
+-- Bestiary = stat blocks, never individual creatures ("Wolf", "Goblin", or the
+-- stat block of one unique being like Krakul). Named beings are
+-- campaign_npcs pointing at their stat block here.
+-- is_unique: one-off boss stat block that only exists for a single story.
+-- traits_de: special rules that are neither resistance nor immunity.
+-- kit_de: profile of variants without their own attack table (skills,
+-- typical armor/weapon, damage bonus, abilities, spells).
+CREATE TABLE catalog_bestiary (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name_de VARCHAR(150) NOT NULL,
+    category_de VARCHAR(50) NULL,
+    is_unique BOOLEAN NOT NULL DEFAULT 0,
     hp INT NOT NULL,
     grimmigkeit_de VARCHAR(20) NOT NULL,
     size_de VARCHAR(50) NOT NULL,
     movement INT NOT NULL,
-    armor_de VARCHAR(20) NOT NULL DEFAULT '—',
+    armor_de VARCHAR(50) NOT NULL DEFAULT '—',
     resistances_de TEXT NULL,
-    immunities_de TEXT NULL
+    immunities_de TEXT NULL,
+    traits_de TEXT NULL,
+    kit_de TEXT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE creature_attacks (
+CREATE TABLE catalog_bestiary_attacks (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    creature_id INT NOT NULL,
+    bestiary_id INT NOT NULL,
     roll_de VARCHAR(10) NOT NULL,
     title_de VARCHAR(100) NOT NULL,
     effect_de TEXT NOT NULL,
-    FOREIGN KEY (creature_id) REFERENCES creatures(id) ON DELETE CASCADE
+    FOREIGN KEY (bestiary_id) REFERENCES catalog_bestiary(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE campaign_creature_links (
-    campaign_id INT NOT NULL,
-    creature_id INT NOT NULL,
-    PRIMARY KEY (campaign_id, creature_id),
-    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
-    FOREIGN KEY (creature_id) REFERENCES creatures(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE npcs (
+-- Random encounter tables by environment ("Wald", "Straße", "Ruine"). Campaign
+-- places pick one; the entries point at bestiary stat blocks with a count.
+CREATE TABLE catalog_encounter_tables (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name_de VARCHAR(150) NOT NULL,
-    role_de VARCHAR(150) NOT NULL,
-    description_de TEXT NOT NULL,
-    motivation_de TEXT NULL,
-    stats_de TEXT NULL
+    name_de VARCHAR(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE campaign_npc_links (
-    campaign_id INT NOT NULL,
-    npc_id INT NOT NULL,
-    PRIMARY KEY (campaign_id, npc_id),
-    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
-    FOREIGN KEY (npc_id) REFERENCES npcs(id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE campaign_event_tables (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    campaign_id INT NOT NULL,
-    position INT NOT NULL,
-    name_de VARCHAR(150) NOT NULL,
-    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE campaign_event_table_entries (
+-- max_roll NULL = open ended from min_roll upwards. bestiary_id NULL = nothing
+-- happens / no creature (description in text_de).
+CREATE TABLE catalog_encounter_table_entries (
     id INT AUTO_INCREMENT PRIMARY KEY,
     table_id INT NOT NULL,
     min_roll INT NOT NULL,
     max_roll INT NULL,
+    bestiary_id INT NULL,
+    quantity_de VARCHAR(20) NULL,
+    text_de VARCHAR(255) NULL,
+    FOREIGN KEY (table_id) REFERENCES catalog_encounter_tables(id) ON DELETE CASCADE,
+    FOREIGN KEY (bestiary_id) REFERENCES catalog_bestiary(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Campaigns (DM screens). Addressed as /campaign/:id; images live in
+-- public/images/campaigns/<campaign id>/.
+
+CREATE TABLE campaigns (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name_de VARCHAR(150) NOT NULL,
+    teaser_de VARCHAR(255) NOT NULL,
+    background_de TEXT NOT NULL,
+    is_default BOOLEAN NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- label is what is displayed ("1", "1.5"), position only sorts, in steps of
+-- 10 so a chapter 1.5 can be inserted at 15 without renumbering.
+CREATE TABLE campaign_chapters (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    campaign_id INT NOT NULL,
+    label VARCHAR(10) NOT NULL,
+    position INT NOT NULL,
+    title_de VARCHAR(150) NOT NULL,
+    notes_de TEXT NULL,
+    UNIQUE KEY uq_chapter_position (campaign_id, position),
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Places belong to their campaign and nest (land > village > tavern, tower >
+-- floor). description_de can be read aloud, dm_text_de is the short DM-only
+-- description. number_label/position order and number rooms on a map ("#5").
+-- encounter_table_id: random encounter table of the catalog used here.
+CREATE TABLE campaign_places (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    campaign_id INT NOT NULL,
+    parent_id INT NULL,
+    chapter_id INT NULL,
+    position INT NOT NULL DEFAULT 0,
+    number_label VARCHAR(10) NULL,
+    name_de VARCHAR(150) NOT NULL,
+    description_de TEXT NULL,
+    dm_text_de TEXT NULL,
+    -- Web-relative path from the public/ root, no leading slash.
+    image_path VARCHAR(255) NULL,
+    encounter_table_id INT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+    FOREIGN KEY (parent_id) REFERENCES campaign_places(id) ON DELETE SET NULL,
+    FOREIGN KEY (chapter_id) REFERENCES campaign_chapters(id) ON DELETE SET NULL,
+    FOREIGN KEY (encounter_table_id) REFERENCES catalog_encounter_tables(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Story items of one campaign: books, letters, quest items, the odd bottle of
+-- wine. Rule items (swords, potions) stay in catalog_items. text_de is the
+-- text of a book/letter. Found at place_id and/or found_hint_de.
+CREATE TABLE campaign_items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    campaign_id INT NOT NULL,
+    chapter_id INT NULL,
+    place_id INT NULL,
+    found_hint_de VARCHAR(255) NULL,
+    name_de VARCHAR(150) NOT NULL,
+    description_de TEXT NULL,
+    dm_text_de TEXT NULL,
+    text_de TEXT NULL,
+    -- Web-relative path from the public/ root, no leading slash.
+    image_path VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+    FOREIGN KEY (chapter_id) REFERENCES campaign_chapters(id) ON DELETE SET NULL,
+    FOREIGN KEY (place_id) REFERENCES campaign_places(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- NPCs belong to their campaign; deleting the campaign deletes them.
+-- Players see name and portrait only; description_de can be read aloud,
+-- dm_text_de is DM only. notes_de = play notes ("alive", "liked Aodhan"),
+-- cleared by the restart. place_id/found_hint_de: where a quest NPC is found.
+CREATE TABLE campaign_npcs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    campaign_id INT NOT NULL,
+    chapter_id INT NULL,
+    place_id INT NULL,
+    found_hint_de VARCHAR(255) NULL,
+    name_de VARCHAR(150) NOT NULL,
+    description_de TEXT NULL,
+    dm_text_de TEXT NULL,
+    notes_de TEXT NULL,
+    bestiary_id INT NULL,
+    -- Web-relative path from the public/ root, no leading slash.
+    portrait_path VARCHAR(255) NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+    FOREIGN KEY (chapter_id) REFERENCES campaign_chapters(id) ON DELETE SET NULL,
+    FOREIGN KEY (place_id) REFERENCES campaign_places(id) ON DELETE SET NULL,
+    FOREIGN KEY (bestiary_id) REFERENCES catalog_bestiary(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE campaign_bestiary (
+    campaign_id INT NOT NULL,
+    bestiary_id INT NOT NULL,
+    chapter_id INT NULL,
+    notes_de TEXT NULL,
+    PRIMARY KEY (campaign_id, bestiary_id),
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE,
+    FOREIGN KEY (bestiary_id) REFERENCES catalog_bestiary(id),
+    FOREIGN KEY (chapter_id) REFERENCES campaign_chapters(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Chronicle of one campaign: everything that happens. Cleared by the restart.
+CREATE TABLE campaign_chronicle (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    campaign_id INT NOT NULL,
+    title_de VARCHAR(100) NULL,
     text_de TEXT NOT NULL,
-    FOREIGN KEY (table_id) REFERENCES campaign_event_tables(id) ON DELETE CASCADE
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (campaign_id) REFERENCES campaigns(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Character creation wizard catalog (Dragonbane rules reference data)
@@ -571,6 +644,3 @@ CREATE TABLE catalog_hazards (
     name_de VARCHAR(50) NOT NULL,
     description_de TEXT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- "Die Zeit messen": the three units of time the game measures duration in.
-

@@ -49,6 +49,10 @@ services:
       - ../database/seed_ridderhohe.sql:/docker-entrypoint-initdb.d/12_seed_ridderhohe.sql:ro
       - ../database/seed_versinkender_turm.sql:/docker-entrypoint-initdb.d/13_seed_versinkender_turm.sql:ro
       - ../database/seed_heroic_abilities_missing.sql:/docker-entrypoint-initdb.d/14_seed_heroic_abilities_missing.sql:ro
+      - ../database/seed_bestiary.sql:/docker-entrypoint-initdb.d/15_seed_bestiary.sql:ro
+      - ../database/seed_bestiary_alltagsvolk.sql:/docker-entrypoint-initdb.d/16_seed_bestiary_alltagsvolk.sql:ro
+      - ../database/seed_encounter_tables.sql:/docker-entrypoint-initdb.d/17_seed_encounter_tables.sql:ro
+      - ../database/seed_catalog_content.sql:/docker-entrypoint-initdb.d/18_seed_catalog_content.sql:ro
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s

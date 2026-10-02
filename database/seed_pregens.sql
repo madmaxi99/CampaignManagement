@@ -53,10 +53,10 @@ INSERT INTO catalog_item_armor (item_id, slot, armor_value, penalty_stealth, pen
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'orla_mondsilber', 'Orla Mondsilber', 'elf',
+    'Orla Mondsilber', 'elf',
     (SELECT id FROM catalog_age WHERE name_de = 'Erwachsen'),
     'jaeger',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Voreingenommen'),
@@ -66,7 +66,7 @@ INSERT INTO characters (
     15, 15, 10, 10, 0, 4, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'orla_mondsilber');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (
@@ -134,10 +134,10 @@ FROM catalog_items WHERE name_de IN ('Köcher', 'Fackel', 'Seil (Hanf), 10m', 'F
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'makander_von_sichelbucht', 'Makander von Sichelbucht', 'ente',
+    'Makander von Sichelbucht', 'ente',
     (SELECT id FROM catalog_age WHERE name_de = 'Erwachsen'),
     'ritter',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Tollkühn'),
@@ -147,7 +147,7 @@ INSERT INTO characters (
     16, 16, 14, 14, 0, 10, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'makander_von_sichelbucht');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (
@@ -212,10 +212,10 @@ FROM catalog_items WHERE name_de IN ('Fackel', 'Feuerstein & Zunder');
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'krisanna_die_kuehne', 'Krisanna die Kühne', 'halbling',
+    'Krisanna die Kühne', 'halbling',
     (SELECT id FROM catalog_age WHERE name_de = 'Jung'),
     'dieb',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Unbesonnen'),
@@ -225,7 +225,7 @@ INSERT INTO characters (
     13, 13, 15, 15, 0, 2, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'krisanna_die_kuehne');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (
@@ -303,10 +303,10 @@ SELECT @char_id, 4, name_de, description_de, 1 FROM catalog_items WHERE name_de 
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'bastonn_blutschlund', 'Bastonn Blutschlund', 'wolfsmensch',
+    'Bastonn Blutschlund', 'wolfsmensch',
     (SELECT id FROM catalog_age WHERE name_de = 'Jung'),
     'kaempfer',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Verfressen'),
@@ -316,7 +316,7 @@ INSERT INTO characters (
     17, 17, 13, 13, 0, 2, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'bastonn_blutschlund');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (
@@ -383,10 +383,10 @@ FROM catalog_items WHERE name_de IN ('Fackel', 'Feuerstein & Zunder');
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'alberich_glanzherz', 'Alberich Glanzherz', 'zwerg',
+    'Alberich Glanzherz', 'zwerg',
     (SELECT id FROM catalog_age WHERE name_de = 'Jung'),
     'haendler',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Eitel'),
@@ -396,7 +396,7 @@ INSERT INTO characters (
     14, 14, 11, 11, 0, 10, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'alberich_glanzherz');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (
@@ -457,10 +457,10 @@ SELECT @char_id, 4, name_de, description_de, 1 FROM catalog_items WHERE name_de 
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'kapitaenin_beatrix_weitsegel', 'Kapitänin Beatrix Weitsegel', 'mensch',
+    'Kapitänin Beatrix Weitsegel', 'mensch',
     (SELECT id FROM catalog_age WHERE name_de = 'Erwachsen'),
     'seefahrerin',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Anmaßend'),
@@ -470,7 +470,7 @@ INSERT INTO characters (
     12, 12, 16, 16, 0, 10, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'kapitaenin_beatrix_weitsegel');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (
@@ -535,10 +535,10 @@ SELECT @char_id, 3, name_de, description_de, 1 FROM catalog_items WHERE name_de 
 -- ============================================================
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'urd_bitterkinn', 'Urd Bitterkinn', 'zwerg',
+    'Urd Bitterkinn', 'zwerg',
     (SELECT id FROM catalog_age WHERE name_de = 'Alt'),
     'kaempfer',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Pessimistisch'),
@@ -548,7 +548,7 @@ INSERT INTO characters (
     14, 14, 13, 13, 0, 3, 0
 );
 
-SET @char_id = (SELECT id FROM characters WHERE slug = 'urd_bitterkinn');
+SET @char_id = LAST_INSERT_ID();
 
 INSERT INTO character_attributes (character_id, attribute_code, value)
 SELECT @char_id, code, value FROM (

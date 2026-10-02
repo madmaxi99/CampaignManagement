@@ -15,10 +15,10 @@ SET NAMES utf8mb4;
 -- in meaning, so that's what flaw_id now points at.
 
 INSERT INTO characters (
-    slug, name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
+    name_de, kin_code, age_id, profession_code, flaw_id, appearance_de, memento_de, portrait_path,
     hp_max, hp_current, wp_max, wp_current, coins_gold, coins_silver, coins_copper
 ) VALUES (
-    'erzmeister_aodhan', 'Erzmeister Aodhan', 'mensch',
+    'Erzmeister Aodhan', 'mensch',
     (SELECT id FROM catalog_age WHERE name_de = 'Alt'),
     'magier',
     (SELECT id FROM catalog_flaws WHERE name_de = 'Ängstlich'),
@@ -28,7 +28,7 @@ INSERT INTO characters (
     11, 11, 18, 18, 0, 7, 0
 );
 
-SET @aodhan_id = (SELECT id FROM characters WHERE slug = 'erzmeister_aodhan');
+SET @aodhan_id = LAST_INSERT_ID();
 
 -- Attribute values
 
