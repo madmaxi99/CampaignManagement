@@ -13,6 +13,16 @@
     </details>
 {% endmacro %}
 
+{% macro quick(title, badge, body) %}
+    {% import _self as s %}
+    {{ s.entry(title, title ~ ' ' ~ body|striptags, '<span class="ui-badge">' ~ badge ~ '</span>', body) }}
+{% endmacro %}
+
+{% macro dm(title, badge, body) %}
+    {% import _self as s %}
+    {{ s.entry(title, title ~ ' spielleitung sl ' ~ body|striptags, '<span class="ui-badge ui-badge--berry">SL</span><span class="ui-badge">' ~ badge ~ '</span>', body) }}
+{% endmacro %}
+
 {% import _self as r %}
 
 {% macro roll(min, max) %}{{ min == max ? min : min ~ '–' ~ max }}{% endmacro %}
@@ -89,23 +99,178 @@
         {% set sta_skills = skills.combat|filter(s => s.attribute_code == 'STA') %}
         {% set gew_skills = skills.combat|filter(s => s.attribute_code == 'GEW') %}
 
+        <h2>Ablauf &amp; Initiative</h2>
+        {{ r.quick('Runden & Initiative ziehen', 'Runde', '<p>Ein Kampf läuft in <strong>Runden</strong> ab, jede dauert etwa zehn Sekunden. Zu Beginn jeder Runde wird die Initiative gezogen: Jeder Beteiligte zieht eine zufällige Karte von 1 bis 10. Die Zahl bestimmt, wann du in der Runde dran bist (1 zuerst, dann 2 usw.). Diese Position heißt dein <strong>Zug</strong>. Haben alle gehandelt, beginnt die Runde neu mit frischer Initiative.</p>') }}
+        {{ r.dm('NSC-Initiative', 'Initiative', '<p>Um große Kämpfe zu vereinfachen, kann die Spielleitung eine einzige Karte für eine ganze NSC-Gruppe ziehen. Alle handeln dann im selben Zug, die Reihenfolge untereinander legt die Spielleitung fest. Monster haben oft mehrere Züge pro Runde und ziehen entsprechend mehrere Karten. Bei Überraschung wählt die Spielleitung, ob ein Angriff als überraschend gilt.</p>') }}
+        {{ r.quick('Überraschung', 'Runde 1', '<p>Führst du einen überraschenden Angriff aus, darfst du dir in der ersten Kampfrunde eine beliebige Initiativkarte aussuchen. Greifen mehrere Charaktere überraschend an, dürfen alle wählen. Die übrigen Kämpfenden ziehen aus den verbleibenden Karten. Ab der zweiten Runde wird wie üblich gezogen.</p>') }}
+        {{ r.quick('Warten', 'Initiative', '<p>In deinem Zug kannst du <strong>warten</strong>: Du tauschst deine Initiativkarte mit einem anderen Wesen, das nach dir an der Reihe wäre. Das Gegenüber darf den Tausch nicht ablehnen. Du kannst nicht mit jemandem tauschen, der schon dran war oder selbst gewartet hat. Monster warten nie.</p>') }}
+        {{ r.quick('Initiativkarte umdrehen', 'Reaktion', '<p>Hattest du deinen Zug, drehst du deine Karte um. So ist für alle klar, dass du in dieser Runde keine Reaktion (etwa Parieren oder Ausweichen) mehr ausführen kannst.</p>') }}
+
+        <h2>Aktionen &amp; Bewegung</h2>
+        {{ r.quick('Zug: Bewegung und Aktion', 'Zug', '<p>In deinem Zug kannst du dich <strong>bewegen</strong> und <strong>eine Aktion</strong> ausführen. Du schilderst, wie du dich bewegst und was du tun willst; falls nötig wird gewürfelt. Du darfst dich vor oder nach der Aktion bewegen oder die Bewegung aufteilen. Beides muss in deinem Zug geschehen und kann nicht aufgespart werden (außer durch Warten).</p>') }}
+        {{ r.quick('Mögliche Aktionen', 'Aktion', '<ul>
+            <li><strong>Sprinten:</strong> verdoppelt deine Bewegungsrate in dieser Runde.</li>
+            <li><strong>Nahkampfangriff:</strong> gegen Feinde innerhalb von 2 Metern (4 Meter bei langen Waffen).</li>
+            <li><strong>Fernkampfangriff:</strong> gegen Ziele innerhalb der Waffenreichweite.</li>
+            <li><strong>Parieren / Ausweichen:</strong> Reaktionen im Zug des Gegners, die deinen eigenen Zug ersetzen.</li>
+            <li><strong>Gegenstand aufheben:</strong> vom Boden innerhalb von 2 Metern oder aus dem Inventar.</li>
+            <li><strong>Rüstung / Helm an- oder ablegen:</strong> Rüstungen schützen, schränken aber die Bewegung ein.</li>
+            <li><strong>Erste Hilfe:</strong> eine Heilkunde-Probe rettet jemanden, dessen TP auf null gesunken sind.</li>
+            <li><strong>Aufrappeln:</strong> einen Mitstreiter mit null TP per Überzeugen zum Weiterkämpfen bewegen.</li>
+            <li><strong>Tür aufbrechen:</strong> Türen halten eine bestimmte Menge Schaden aus.</li>
+            <li><strong>Schloss knacken:</strong> Fingerfertigkeit; ohne Dietriche mit Nachteil.</li>
+            <li><strong>Gegenstand benutzen:</strong> etwa einen Trank oder anderen Gegenstand in 2 Metern Reichweite.</li>
+            <li><strong>Fähigkeit aktivieren:</strong> angeborene oder Heldenfähigkeit.</li>
+            <li><strong>Zauber wirken:</strong> meist eine Aktion. Manche Zauber sind Reaktionen, andere dauern länger.</li>
+            <li><strong>Helfen:</strong> gibt einem anderen in derselben Runde einen Vorteil auf dessen Wurf.</li>
+            <li><strong>Verschnaufen:</strong> W6 WP zurückholen, nur einmal pro Tagesabschnitt.</li>
+        </ul>') }}
+        {{ r.quick('Freie Aktionen', 'gratis', '<p>Kleinigkeiten kosten keine Aktion, aber nur in deinem eigenen Zug und nur <strong>eine pro Art</strong> und Runde (du kannst dich also hinwerfen <em>oder</em> aufstehen, nicht beides):</p><ul>
+            <li><strong>Waffe ziehen:</strong> ziehen, tauschen oder wegstecken (eine Waffe in Griffweite).</li>
+            <li><strong>Position wechseln:</strong> zu Boden werfen oder aufstehen.</li>
+            <li><strong>Gegenstand fallen lassen.</strong></li>
+            <li><strong>Rufen:</strong> ein paar Worte sagen.</li>
+        </ul>') }}
+        {{ r.quick('Reaktionen', 'Reaktion', '<p>Manche Handlungen geschehen nicht im eigenen, sondern im Zug des Gegners, etwa <strong>Parieren</strong> oder <strong>Ausweichen</strong>. Eine Reaktion verbraucht deinen eigenen Zug der Runde: Du kannst sie nicht ausführen, wenn du schon dran warst. Drehe die Initiativkarte nach der Reaktion sofort um. Mit einer Reaktion verlierst du auch deine Bewegung der Runde. Parieren und Ausweichen geben dir dafür eine kleine Bewegung zurück.</p>') }}
+        {{ r.quick('Bewegung: Sonderfälle', 'Bewegung', '<p>Normalerweise bewegst du dich so viele Meter wie deine Bewegungsrate. Besonderheiten:</p><ul>
+            <li><strong>Sprinten:</strong> doppelte Strecke.</li>
+            <li><strong>Hinwerfen / Aufstehen:</strong> freie Aktionen, die deine Bewegung nicht verändern.</li>
+            <li><strong>Springen:</strong> waagerecht bis zur halben Bewegungsrate mit gelungener Akrobatik-Probe. Bis zu einem Viertel brauchst du keinen Wurf.</li>
+            <li><strong>Tür:</strong> eine geschlossene, aber nicht verschlossene Tür zu passieren kostet die halbe Bewegung. Verschlossene Türen müssen geknackt oder aufgebrochen werden.</li>
+            <li><strong>Feinde:</strong> an einem stehenden Feind, der dich aufhalten will, kommst du nicht vorbei. Ein menschengroßes Wesen blockiert etwa 2×2 Meter, Monster mehr. Du musst ihn zu Boden bringen oder seine TP auf null senken. Freunde darfst du passieren.</li>
+        </ul>') }}
+        {{ r.quick('Freier Angriff', 'Ausweichen', '<p>Stehst du innerhalb von 2 Metern eines Feindes und bewegst dich freiwillig von ihm weg, musst du eine <strong>Ausweichen</strong>-Probe ablegen. Sie zählt nicht als Aktion. Scheitert sie, erhält der Feind sofort einen zusätzlichen Nahkampfangriff gegen dich, den <strong>Freien Angriff</strong>. Er kostet ihn keine Aktion und kann weder pariert noch ausgewichen werden. Ein Monster führt dabei einen Monsterangriff aus, der auch andere treffen kann.</p><p>Der Freie Angriff entsteht auch, wenn du aus der Distanz startest, aber an einem Feind vorbeiläufst. Wer sich <em>um</em> einen Feind herum bewegt und innerhalb von 2 Metern bleibt, löst ihn nicht aus. Unfreiwillige Bewegung löst nie einen Freien Angriff aus.</p>') }}
+
+        <h2>Heimlicher Angriff &amp; Hinterhalt</h2>
+        {{ r.quick('Heimlicher Angriff', 'Heimlichkeit', '<p>Schleichst du dich an jemand Ahnungslosen heran und greifst an, ist das ein <strong>heimlicher Angriff</strong>. Er geht mit Nah- und Fernkampfwaffen, aber nie im offenen Kampf (außer mit der Heldenfähigkeit Meuchler).</p><p>Zuerst legst du eine <strong>Heimlichkeit</strong>-Probe ab. Nah genug für den Nahkampf heranzukommen (bei den meisten Waffen innerhalb von 2 Metern) gibt einen Nachteil. Scheitert die Probe, bemerkt dich der Feind und die Initiative wird gezogen. Gelingt sie, gilt dein Angriff als überraschend: Du wählst deine Initiativkarte, erhältst einen <strong>Vorteil</strong> auf den Angriff, und das Ziel kann weder ausweichen noch parieren. Eine <em>unauffällige</em> Waffe verursacht eine Würfelstufe mehr Schaden (z. B. 2W8 statt 2W6). Heimliche Angriffe führt immer ein einzelner Angreifer gegen ein Ziel aus.</p>') }}
+        {{ r.quick('Hinterhalt', 'Wahrnehmung', '<p>Ein <strong>Hinterhalt</strong> ist ein heimlicher Angriff aus dem Verborgenen auf einen Feind, der vorbeikommt. Jedes Opfer legt eine <strong>Wahrnehmung</strong>-Probe ab, um ihn zu bemerken (mit Nachteil, wenn die Angreifer gut vorbereitet sind). Wer scheitert, bekommt die untersten Karten (ab 10 aufwärts), zufällig gezogen.</p>') }}
+
+        <h2>Gelände &amp; Karten</h2>
+        {{ r.quick('Kampfkarten', 'Raster', '<p>Mit einem Raster behaltet ihr den Überblick: Jedes Feld ist etwa 2×2 Meter groß. Türen, Wände und Aufstiege werden eingezeichnet. In der Regel steht nur ein Wesen pro Feld, aber du darfst ein Feld mit einem verbündeten Kämpfer durchqueren. Diagonale Bewegung und Angriffe sind erlaubt, nicht aber, wenn beide Felder, zwischen denen du dich bewegst, von Feinden blockiert oder besetzt sind. Wer 5×5-Fuß-Felder gewohnt ist, nutzt sie einfach als 2×2 Meter.</p>') }}
+        {{ r.quick('Gelände', 'Gelände', '<ul>
+            <li><strong>Beengt:</strong> wenig Platz oder niedrige Decke. Alle Nahkampfwaffen außer Stichwaffen und <em>unauffälligen</em> Waffen erhalten einen Nachteil auf alle Würfe.</li>
+            <li><strong>Unwegsam:</strong> schwer begehbar. Bei jeder Bewegung musst du eine Akrobatik-Probe ablegen (keine Aktion). Bei Misserfolg fällst du hin und verlierst den Rest deiner Bewegung.</li>
+            <li><strong>Schwach beleuchtet:</strong> Nachteil auf alle Fernkampfangriffe.</li>
+        </ul>') }}
+
+        <h2>Nahkampf</h2>
+        {{ r.quick('Nahkampfangriff', 'Nahkampf', '<p>Für einen Nahkampfangriff musst du in der Regel innerhalb von 2 Metern des Ziels stehen (auf dem Raster auf einem angrenzenden Feld, auch diagonal). Du würfelst auf die Fertigkeit, die zu deiner Waffe gehört. Bei einem Treffer bestimmt die Waffe den Schadenswürfel. Der Schaden wird durch Schadensbonus und Drachenwurf erhöht und durch Rüstung gesenkt.</p>') }}
         {% set badges %}<span class="ui-badge ui-badge--berry">STÄ / GEW</span>{% endset %}
         {% set body %}
-            <p>Dein Schadensbonus hängt an dem Attribut, auf dem die <strong>Waffenfertigkeit</strong> basiert. Es gibt zwei Boni, einen für STÄ und einen für GEW (siehe Überblick am Charakterbogen).</p>
+            <p>Dein Schadensbonus hängt an dem Attribut, auf dem die <strong>Waffenfertigkeit</strong> basiert. Es gibt zwei Boni, einen für STÄ und einen für GEW; beide stehen auf deinem Charakterbogen.</p>
             <p><strong>STÄ-Waffen:</strong> {{ sta_skills|map(s => s.name_de)|join(', ') }}.</p>
             <p><strong>GEW-Waffen:</strong> {{ gew_skills|map(s => s.name_de)|join(', ') }}.</p>
-            <p>Fernkampfwaffen bekommen den gleichen Bonus wie im Nahkampf. Wurfwaffen wie Messer oder Speere nutzen die Fertigkeit der Nahkampfwaffe und damit deren Bonus.</p>
-        {% endset %}{{ r.entry('Schadensbonus: welcher gilt?', 'Schadensbonus STÄ GEW Waffenfertigkeit Fernkampf Wurfwaffen', badges, body) }}
+            <p>Fernkampfwaffen bekommen den gleichen Bonus wie im Nahkampf, Armbrüste ausgenommen: Sie geben keinen Schadensbonus. Wurfwaffen wie Messer oder Speere nutzen die Fertigkeit der Nahkampfwaffe und damit deren Bonus.</p>
+        {% endset %}{{ r.entry('Schadensbonus: welcher gilt?', 'Schadensbonus STÄ GEW Waffenfertigkeit Fernkampf Wurfwaffen Armbrust', badges, body) }}
 
         {% set badges %}<span class="ui-badge">STA</span>{% endset %}
         {% set body %}
-            <p>Die Spalte „STA“ in der Waffenliste ist die <strong>Voraussetzung</strong>, kein Bonus. Ist deine Stärke niedriger, greifst und parierst du mit Nachteil. Liegt sie unter der Hälfte der Voraussetzung, kannst du die Waffe gar nicht einsetzen.</p>
+            <p>Die Spalte „STA“ in der Waffenliste ist die <strong>Voraussetzung</strong>, kein Bonus. Ist deine Stärke niedriger, greifst und parierst du mit Nachteil. Liegt sie unter der Hälfte der Voraussetzung, kannst du die Waffe gar nicht einsetzen. Führst du eine Einhandwaffe mit beiden Händen, sinkt die Voraussetzung um 3.</p>
         {% endset %}{{ r.entry('Voraussetzung Stärke', 'Voraussetzung Stärke STA Nachteil Waffe', badges, body) }}
+
+        {{ r.quick('Waffen & Griff', 'Waffen', '<p>Du kannst bis zu <strong>drei Waffen in Griffweite</strong> haben (auf dem Charakterbogen eintragen). Zum Angreifen muss die Waffe gezogen sein. Ziehen oder Tauschen einer Waffe in Griffweite ist eine freie Aktion, eine Waffe vom Boden oder aus dem Inventar aufzunehmen kostet eine Aktion.</p><p>Waffen brauchen eine oder zwei Hände. Gleichzeitig gezogen sein dürfen nur eine Zweihandwaffe oder zwei Einhandwaffen (ein Schild zählt mit).</p>') }}
+        {{ r.quick('Lange Waffen', 'Reichweite', '<p>Ein Angriff mit einer Waffe mit dem Merkmal <em>lang</em> (z. B. langer Speer oder Lanze) trifft Feinde bis 4 Meter entfernt (zwei Felder). Damit kannst du auch an einem verbündeten Kämpfer vorbei einen Feind dahinter treffen.</p>') }}
+        {{ r.quick('Liegende Ziele', 'Vorteil', '<p>Stehst du und dein Feind liegt am Boden, erhält dein Angriff einen Vorteil und verursacht zusätzlich W6 Schaden.</p>') }}
 
         {% set badges %}<span class="ui-badge ui-badge--gold">Drache</span>{% endset %}
         {% set body %}
-            <p>Bei einem kritischen Treffer verdoppelst du die Würfel der Waffe, den Schadensbonus aber nicht. Beispiel: Ein Breitschwert (2W6) mit Schadensbonus W4 richtet 4W6 + W4 an.</p>
-        {% endset %}{{ r.entry('Kritischer Treffer', 'Kritischer Treffer Drache Schaden verdoppeln Schadensbonus', badges, body) }}
+            <p>Würfelst du beim Angriff einen Drachen, ist es ein <strong>kritischer Treffer</strong>: Gegen ihn hilft Parieren oder Ausweichen nur mit einem eigenen Drachenwurf. Du wählst eine der Wirkungen:</p>
+            <ul>
+                <li><strong>Doppelte Würfel:</strong> Du verdoppelst die Würfel der Waffe, den Schadensbonus aber nicht. Beispiel: Ein Breitschwert (2W6) mit Schadensbonus W4 richtet 4W6 + W4 an.</li>
+                <li><strong>Zweiter Angriff:</strong> Du führst sofort einen weiteren Angriff gegen einen anderen Feind aus, als freie Aktion.</li>
+                <li><strong>Rüstung ignoriert:</strong> Die Rüstung schützt nicht, du findest eine Lücke. Nur wählbar, wenn der Angriff Stichschaden verursacht (optionale Regel).</li>
+            </ul>
+        {% endset %}{{ r.entry('Kritischer Treffer (Nahkampf)', 'Kritischer Treffer Drache Schaden verdoppeln Schadensbonus Rüstung ignorieren zweiter Angriff', badges, body) }}
+
+        {{ r.quick('Schadensarten', 'Optional', '<p>Es gibt drei Schadensarten: <strong>Hieb</strong>, <strong>Stich</strong> und <strong>Wucht</strong>. Die Art steht in der Waffenliste. Manche Waffen (etwa Schwerter) können Hieb- und Stichschaden verursachen. Sag vor dem Wurf an, ob du stichst oder schlägst. Die Schadensart beeinflusst die Wirkung von Rüstung, und Monster können gegen bestimmte Arten resistent sein.</p>') }}
+        {{ r.quick('Wegstoßen', 'STÄ', '<p>Triffst du mit einem Nahkampfangriff und ist dein STÄ-Schadensbonus mindestens so hoch wie der des Gegners, darfst du ihn zusätzlich zum Schaden bis zu 2 Meter in beliebige Richtung stoßen (auf ein angrenzendes Feld). Die Bewegung zählt nicht zu seiner Gesamtbewegung der Runde und löst keine Freien Angriffe aus. Monster können weder wegstoßen noch weggestoßen werden.</p>') }}
+        {{ r.quick('Dämon beim Angriff', 'Dämon', '<p>Würfelst du bei einem Angriff einen Dämon, triffst du nicht und kannst den Wurf nicht strapazieren. Zusätzlich kann dir ein Missgeschick passieren (W6):</p><p><strong>Nahkampf</strong></p><ul>
+            <li><strong>1:</strong> Du lässt die Waffe fallen. Aufheben kostet eine Aktion.</li>
+            <li><strong>2:</strong> Du gibst dir eine Blöße. Der Gegner erhält einen Freien Angriff, der weder ausgewichen noch pariert werden kann.</li>
+            <li><strong>3:</strong> Die Waffe bleibt stecken. Befreien kostet eine Aktion und gelingt mit einer STÄ-Probe.</li>
+            <li><strong>4:</strong> Du schleuderst die Waffe W3+3 Meter weit weg. Du musst dich bewegen und dann eine Aktion zum Aufheben aufwenden.</li>
+            <li><strong>5:</strong> Die Waffe wird beschädigt. Jeder Einsatz geht mit Nachteil, bis ein Handwerker sie repariert.</li>
+            <li><strong>6:</strong> Du triffst dich selbst. Schaden wie üblich, aber ohne Schadensbonus.</li>
+        </ul><p><strong>Fernkampf</strong></p><ul>
+            <li><strong>1:</strong> Du lässt die Waffe fallen. Aufheben kostet eine Aktion.</li>
+            <li><strong>2:</strong> Dir gehen die Pfeile aus, du musst neue besorgen. Bei Schleudern und Wurfwaffen würfelst du stattdessen neu.</li>
+            <li><strong>3:</strong> Du triffst einen wertvollen oder wichtigen Gegenstand in der Nähe.</li>
+            <li><strong>4:</strong> Die Waffe zerbricht. Jeder Einsatz geht mit Nachteil, bis ein Handwerker sie repariert.</li>
+            <li><strong>5:</strong> Du triffst einen Mitstreiter in der Nähe. Schaden wie üblich, mit Schadensbonus.</li>
+            <li><strong>6:</strong> Du triffst dich selbst. Schaden wie üblich, aber ohne Schadensbonus.</li>
+        </ul>') }}
+        {{ r.quick('Unbelebte Objekte', 'Schaden', '<p>Triffst du einen leblosen Gegenstand wie eine Tür oder ein Schloss, gelingt der Treffer automatisch. Du würfelst nur den Schaden. Leblose Objekte besitzen oft einen Rüstungswert.</p>') }}
+
+        <h2>Parieren &amp; Ausweichen</h2>
+        {{ r.quick('Parieren', 'Reaktion', '<p>Wirst du im Nahkampf getroffen, kannst du mit einer <strong>gezogenen</strong> Waffe oder einem Schild parieren. Eine Waffe zum Parieren zu ziehen geht nicht, denn freie Aktionen sind nur im eigenen Zug möglich. Du musst das Parieren ansagen, <em>bevor</em> der Angreifer den Schaden würfelt. Du kannst nicht unbewaffnet parieren und nicht denselben Angriff parieren <em>und</em> ausweichen. Parieren ist auch im Liegen möglich. Du würfelst auf deinen Fertigkeitswert der Waffe.</p>
+            <ul>
+                <li><strong>Reaktion:</strong> Parieren ersetzt deinen Zug, die Initiativkarte wird sofort umgedreht. Wer schon dran war, kann nicht parieren (außer mit der Heldenfähigkeit Defensiv).</li>
+                <li><strong>Haltbarkeit:</strong> Gelingt die Parade, trifft der Angriff deine Waffe oder dein Schild, und du erleidest keinen Schaden. Übersteigt der Schaden die Haltbarkeit, ist die Waffe beschädigt und unbrauchbar, bis sie mit einer Handwerk-Probe repariert wird.</li>
+                <li><strong>Schild:</strong> Dafür gibt es keine eigene Fertigkeit. Du nutzt jede STÄ-basierte Nahkampffertigkeit außer Messer und Stäbe.</li>
+                <li><strong>Stichschaden:</strong> Stichangriffe können nie eine parierende Waffe oder ein Schild beschädigen.</li>
+                <li><strong>Monster:</strong> Monsterangriffe können in der Regel nicht pariert werden, sofern nicht anders angegeben.</li>
+            </ul>') }}
+        {{ r.quick('Drache beim Parieren', 'Drache', '<p>Würfelst du beim Parieren einen Drachen, führst du sofort einen <strong>Gegenangriff</strong> gegen den Angreifer aus, einen automatischen Treffer mit deiner Waffe, der weder ausgewichen noch pariert werden kann. Das gilt nicht, wenn auch der Angreifer einen Drachen gewürfelt hat. Dann brauchst du den Drachen allein fürs Parieren und erhältst keinen Gegenangriff.</p>') }}
+        {{ r.quick('Paradebewegung', 'Bewegung', '<p>Nach einer gelungenen Parade kannst du dich selbst und den Angreifer um 2 Meter (ein Feld) in beliebige Richtung bewegen. Die Bewegung zählt nicht zur Gesamtbewegung und löst keine Freien Angriffe aus.</p>') }}
+        {{ r.quick('Ausweichen', 'Reaktion', '<p>Alternativ zum Parieren kannst du einem Angriff ausweichen. Du kannst nicht denselben Angriff parieren und ausweichen. Ausweichen ist auch im Liegen möglich. Sag es an, bevor der Gegner den Schaden würfelt, und würfle auf <strong>Ausweichen</strong>. Gelingt der Wurf, weichst du aus und erleidest keinen Schaden, sonst wirst du getroffen.</p><ul>
+            <li><strong>Reaktion:</strong> wie beim Parieren ersetzt Ausweichen deinen Zug, die Initiativkarte wird umgedreht.</li>
+            <li><strong>Bewegung:</strong> Bei Erfolg darfst du dich bis zu 2 Meter in beliebige Richtung bewegen, ohne Freie Angriffe auszulösen.</li>
+            <li><strong>Monster:</strong> Monsterangriffe können in der Regel ausgewichen werden, sofern nicht anders angegeben.</li>
+        </ul>') }}
+
+        <h2>Besondere Nahkampfangriffe</h2>
+        <p class="ui-muted">Sag vor dem Wurf an, dass du einen besonderen Angriff verwendest. Viele davon sind vergleichende Proben.</p>
+        {{ r.dm('NSC bei besonderen Angriffen', 'Vergleichend', '<p>Würfelt die Spielleitung für einen NSC, der die betreffende Fertigkeit nicht hat, würfelt sie gegen den Standardwert 5.</p>') }}
+        {{ r.quick('Schwachstelle finden', 'Stich', '<p>Mit einer Stichwaffe suchst du eine Lücke in Rüstung oder natürlicher Panzerung. Du erhältst einen Nachteil auf den Angriff, aber bei einem Treffer gilt der Feind als ungerüstet.</p>') }}
+        {{ r.quick('Zu Boden werfen', 'Vergleichend', '<p>Statt Schaden zu verursachen, versuchst du, den Feind umzuwerfen. Das ist eine vergleichende Probe zwischen deiner Waffenfertigkeit und seinem <strong>Ausweichen</strong>. Hat die Waffe das Merkmal <em>Umwerfen</em>, erhältst du einen Vorteil. Der Angriff zählt für dich als Aktion, nicht für den Gegner, und kann nicht pariert oder ausgewichen werden. Nutzvoll im Team: Ein Freund greift den liegenden Feind an, bevor er aufsteht.</p>') }}
+        {{ r.quick('Entwaffnen', 'Vergleichend', '<p>Du versuchst, dem Gegner die Waffe zu entreißen. Vergleichende Probe zwischen deiner und seiner Waffenfertigkeit. Der Angriff zählt als Aktion für dich, nicht für ihn, und kann nicht pariert oder ausgewichen werden. Hält er die Waffe mit beiden Händen, erhältst du einen Nachteil. Gelingt es, landet die Waffe W6 Meter entfernt in einer Richtung deiner Wahl. Das Aufheben ist eine Aktion. Gegen Schilde und natürliche Waffen wirkt Entwaffnen nicht.</p>') }}
+        {{ r.quick('Umklammern', 'Prügelei', '<p>Du versuchst, einen humanoiden Gegner zu umklammern. Vergleichende Probe zwischen deiner <strong>Prügelei</strong> und seiner. Der Angriff zählt für dich als Aktion, nicht für ihn, und kann nicht pariert oder ausgewichen werden. Scheitert er, fällst du zu Boden. Gelingt er, fallt ihr beide, und der Feind steckt in deinem Griff.</p><p>Solange du ihn hältst, kann er sich weder bewegen noch Aktionen ausführen, die Körperbewegung erfordern, außer es zu versuchen, sich zu befreien: eine vergleichende Prügelei-Probe, die für ihn eine freie Aktion ist (für dich nicht). Während du hältst, kannst du dich selbst weder bewegen noch Aktionen mit Körperbewegung ausführen, außer <em>brechen</em>: ein unbewaffneter Angriff mit Vorteil, der weder ausgewichen noch pariert werden kann. Den Gegner loszulassen ist eine freie Aktion.</p>') }}
+        {{ r.quick('Taktik im Nahkampf', 'Tipp', '<p>Deine wertvollste Ressource sind deine Aktionen: Du hast nur eine pro Runde, Reaktionen eingeschlossen. Greift die Gruppe gemeinsam an, lohnt es sich, einen Gegner zu fokussieren, da er nur einmal parieren oder ausweichen kann. Gegen einen gleich starken Feind kann es klug sein zu warten: Verfehlt sein Angriff, musst du nicht parieren und kannst selbst angreifen, während er sich nicht schützen kann. Dafür gibst du ihm die Initiative. Die Heldenfähigkeiten Defensiv und Blitzschnell helfen hier.</p>') }}
+
+        <h2>Fernkampf</h2>
+        {{ r.quick('Fernkampfangriff', 'Fernkampf', '<p>Die Waffe muss gezogen sein (freie Aktion). Du solltest mehr als 2 Meter vom Ziel entfernt stehen, also <em>nicht</em> auf einem angrenzenden Feld. Bei 2 Metern oder weniger erhältst du einen Nachteil. Du würfelst auf die Fertigkeit der Waffe. Wurfwaffen nutzen dieselbe Fertigkeit wie im Nahkampf (z. B. Messer oder Speere). Bei einem Treffer bestimmt die Waffe den Schaden, erhöht durch Schadensbonus und Drachenwurf, gesenkt durch Rüstung.</p><p><strong>Reichweite:</strong> Jede Waffe hat eine Reichweite in Metern, in der sie effektiv ist. Bis zur doppelten Reichweite darfst du schießen, dann aber mit Nachteil.</p>') }}
+        {{ r.quick('Kritischer Treffer (Fernkampf)', 'Drache', '<p>Ein Drache beim Fernkampfangriff ist ein kritischer Treffer: Er kann nur ausgewichen (oder mit Schild pariert) werden, wenn der Gegner ebenfalls einen Drachen würfelt. Du wählst:</p><ul>
+            <li><strong>Doppelter Schaden:</strong> Würfle die Waffenwürfel doppelt (ohne Schadensbonus und andere Boni). Ein kritischer Treffer mit einem Langbogen verursacht 2W12.</li>
+            <li><strong>Rüstung ignoriert:</strong> Rüstung und natürliche Panzerung schützen nicht. Nur bei Stichschaden wählbar (optionale Regel).</li>
+        </ul>') }}
+        {{ r.quick('Parieren & Ausweichen (Fernkampf)', 'Schild', '<p>Einen Fernkampfangriff zu parieren erfordert einen <strong>Schild</strong>. Es funktioniert wie im Nahkampf, nur gibt ein Drache keinen Gegenangriff. Ausweichen geht wie im Nahkampf.</p>') }}
+        {{ r.quick('Verdeckte Ziele', 'Nachteil', '<p>Ist deine Sicht auf das Ziel teilweise durch ein Hindernis oder eine Person (auch Freund) verdeckt, erhältst du einen Nachteil. Auf dem Raster kannst du an einer Person zwischen dir und dem Ziel vorbei schießen, ebenfalls mit Nachteil. Ist das Ziel völlig außer Sicht (etwa hinter einer Wand), kannst du es nicht beschießen.</p>') }}
+
+        <h2>Schaden, Rüstung &amp; Tod</h2>
+        {{ r.quick('Rüstung & Helme', 'Rüstungswert', '<p>Lederrüstung, Kettenhemd oder Plattenpanzer schützen vor Schaden. Rüstung an- oder abzulegen kostet eine Aktion. Du kannst nur eine Rüstung gleichzeitig tragen, sie zählt nicht zur Traglast. Manche Rüstungen geben Nachteile auf bestimmte Fertigkeiten oder schränken die Bewegung ein.</p><p><strong>Rüstungswert:</strong> Bei körperlichem Schaden ziehst du den Rüstungswert vom Schaden ab. Wird der Schaden eines Nahkampfangriffs komplett aufgehoben, nimmt stattdessen die angreifende Waffe den Schaden und kann dabei beschädigt werden.</p><p><strong>Helme:</strong> Sie lassen sich mit der Rüstung kombinieren und erhöhen den Rüstungswert. Auf- und Absetzen kostet eine Aktion. Helme können Nachteile auf bestimmte Fertigkeiten geben.</p>') }}
+        {{ r.quick('Schadensarten & Rüstung', 'Optional', '<p>Gilt, wenn die optionale Regel für Schadensarten verwendet wird: Leder und Nietenleder geben +2 Rüstungswert gegen Wucht. Kettenhemd gibt +2 gegen Hieb. Ist die Schadensart nicht angegeben, wirkt die Rüstung normal.</p>') }}
+        {{ r.quick('Sterben & Todeswürfe', 'KON', '<p>Sinken deine TP auf null, fällst du zu Boden und riskierst zu sterben. Du kannst dich nicht bewegen und nur versuchen, dich aufzurappeln.</p><p><strong>Todeswurf:</strong> In jeder folgenden Runde musst du in deinem Zug eine Probe auf <strong>KON</strong> ablegen. Sie kann nicht strapaziert werden, auch nicht mit der optionalen Regel. Trage die Ergebnisse auf dem Charakterbogen ein. Nach drei gelungenen Würfen erhältst du W6 TP zurück und musst nicht mehr würfeln. Nach drei Fehlschlägen stirbt dein Charakter. Ein Drache zählt als zwei Erfolge, ein Dämon als zwei Fehlschläge. Nach dem Kampf zählst du weiter die Runden, bis alle Todeswürfe gemacht sind. Gescheiterte Todeswürfe werden zurückgesetzt, wenn du überlebst.</p><p><strong>Weiterer Schaden:</strong> Erleidest du bei null TP zusätzlichen Schaden, zählt das automatisch als gescheiterter Todeswurf.</p>') }}
+        {{ r.quick('Aufrappeln', 'Überzeugen', '<p>Ein anderer Spielercharakter in bis zu 10 Metern Entfernung und in Hörweite kann dich per <strong>Überzeugen</strong> aufrappeln, damit du trotz null TP weiterkämpfst. Das zählt als Aktion. Gelingt es, kannst du normal handeln, musst aber weiter Todeswürfe machen. Du kannst auch versuchen, dich selbst aufzurappeln, mit einer WIL-Probe mit Nachteil (statt Überzeugen).</p>') }}
+        {{ r.quick('Leben retten', 'Heilkunde', '<p>Hast du null TP, kann dich eine andere Person neben dir mit einer gelungenen <strong>Heilkunde</strong>-Probe retten (Aktion). Ohne Verbände erhält sie einen Nachteil. Mehrere Versuche sind erlaubt. Gelingt der Wurf, musst du keine Todeswürfe mehr machen und erhältst W6 TP zurück. Du kannst dein eigenes Leben so nicht retten, auch wenn du dich aufgerappelt hast. Weitere Heilkunde-Würfe haben keine Wirkung, sobald du nicht mehr auf null TP bist, außer beim Rasten. Auch Magie kann Leben retten.</p>') }}
+        {{ r.quick('Sofortiger Tod', 'Tod', '<p>Negative TP werden nicht notiert. Senkt aber ein einziger Angriff deine TP auf einen negativen Wert in Höhe deiner vollen TP, stirbt dein Charakter sofort.</p>') }}
+        {{ r.dm('NSC bei null TP', 'Tod', '<p>Erreicht ein NSC null TP, gibt es keine Todeswürfe. Die Spielleitung entscheidet, ob er lebt oder stirbt. Ein sofort tötender Angriff tötet einen NSC jedoch ebenso wie einen Spielercharakter.</p>') }}
+        {{ r.quick('Schwere Verletzungen', 'KON', '<p>Wurdest du auf null TP gebracht und hast überlebt, riskierst du schwere Verletzungen, die lange heilen und dauerhafte Folgen haben können. Lege eine Probe auf <strong>KON</strong> ab. Scheitert sie, erleidest du eine Verletzung: etwa Nachteile auf bestimmte Attribute und Fertigkeiten, halbierte Bewegung oder dauerhaft gesenkte Fertigkeitswerte. Die Heilzeit halbiert sich, wenn du mindestens einen Tagesabschnitt pro Tag rastest und von jemandem versorgt wirst, der eine Heilkunde-Probe schafft. Dauerhaft gesenkte Fertigkeitswerte kannst du neu erlernen.</p>') }}
+
+        <h2>Zustände</h2>
+        {{ r.quick('Die sechs Zustände', 'Zustand', '<p>Jeder Zustand gibt dir einen <strong>Nachteil</strong> auf alle Proben auf ein bestimmtes Attribut und auf Fertigkeiten, die darauf basieren:</p><ul>
+            <li><strong>Erschöpft</strong> – STÄ</li>
+            <li><strong>Kränkelnd</strong> – KON</li>
+            <li><strong>Benommen</strong> – GEW</li>
+            <li><strong>Wütend</strong> – INT</li>
+            <li><strong>Verängstigt</strong> – WIL</li>
+            <li><strong>Verzagt</strong> – CHA</li>
+        </ul>') }}
+        {{ r.quick('Zustand erleiden', 'Zustand', '<p>Am häufigsten erleidest du einen Zustand, wenn du einen Wurf strapazierst (optionale Regel). Dann wählst du einen Zustand und beschreibst, wie du ihn bekommst. Auch Monsterangriffe oder Zauber können Zustände verursachen.</p><p><strong>Mehrere Zustände:</strong> Hast du den Zustand schon, musst du einen anderen wählen. Hast du alle sechs, verlierst du stattdessen W6 WP. Bist du bei null WP, verlierst du W6 TP.</p><p><strong>Heilung:</strong> Bei einer Kurzen Rast (Viertel) heilst du einen Zustand deiner Wahl, bei einer Langen Rast (Tagesabschnitt) alle.</p>') }}
+
+        <h2>Hunger, Schlaf &amp; Krankheit</h2>
+        {{ r.quick('Hunger', 'Gefahr', '<p>Du musst mindestens eine Ration Essen pro Tag zu dir nehmen. Nach einem Tag ohne Essen bist du ausgehungert und kannst dich nur noch durch Magie von TP, WP oder Zuständen erholen. Du erleidest außerdem einen Schadenspunkt pro Tag. Erreichst du ausgehungert null TP, stirbst du nach einem Tag. Hast du eine Ration gegessen, bist du nicht mehr ausgehungert und heilst normal.</p>') }}
+        {{ r.quick('Schlafentzug', 'Gefahr', '<p>Du brauchst jeden Tag mindestens eine Schicht ungestörten Schlaf. In Rüstung kannst du nicht schlafen. Nach drei Schichten ohne Schlaf kannst du WP und Zustände nicht mehr heilen (TP normal). Außerdem verlierst du W6 WP pro Schicht, die du wach bleibst. Erreichst du bei Schlafentzug null WP, brichst du zusammen und schläfst mindestens eine Schicht, ohne zu erwachen. Nach einer Schicht Schlaf heilst du WP und Zustände wieder normal.</p>') }}
+        {{ r.quick('Krankheit', 'Gefahr', '<p>Setzt du dich einer gefährlichen Krankheit aus, wird eine offene vergleichende Probe zwischen der <strong>Virulenz</strong> der Krankheit und deiner KON gewürfelt. Gewinnst du, widerstehst du. Sonst wirst du nach einem Tag krank: Du erhältst den Zustand Kränkelnd und verlierst W6 TP. Solange du krank bist, kannst du TP, WP oder Zustände nicht heilen. Jeden Tag wird neu gewürfelt, und jeder Fehlschlag verursacht W6 Schaden. Erreichst du krank null TP, stirbst du einen Tag später. Sobald du die vergleichende Probe gewinnst, bist du geheilt.</p><p><strong>Pflege:</strong> Wer dich mit Heilkunde pflegt, kann den Wurf gegen die Virulenz an deiner Stelle ablegen. Ein Kräutersud gibt einen Vorteil.</p>') }}
+
+        <h2>Reittiere &amp; Improvisierte Waffen</h2>
+        {{ r.quick('Reiten im Kampf', 'Reiten', '<p>Ein treues Pferd oder ein anderes Reittier ist ein großer Vorteil. Alle Spielercharaktere können aufsteigen und langsam reiten. Anspruchsvollere Manöver erfordern eine <strong>Reiten</strong>-Probe.</p><ul>
+            <li><strong>Satteltaschen:</strong> Die Ausrüstungslisten nennen, wie viel das Tier tragen kann.</li>
+            <li><strong>Bewegung:</strong> Beritten reist du doppelt so schnell wie zu Fuß, etwa 30 Kilometer pro Schicht.</li>
+            <li><strong>Kampf:</strong> Das Reittier muss kampfgeschult sein. Du nutzt seine Bewegungsrate statt deiner. Alle Angriffe und Paraden verwenden den <em>niedrigeren</em> Wert aus Reiten und Waffenfertigkeit. Reiten ersetzt Ausweichen. Ohne Sattel erhalten alle Würfe einen Nachteil. Feinde müssen wählen, ob sie dich oder dein Reittier angreifen. Nahkampfangriffe vom Boden aus gegen dich haben einen Nachteil.</li>
+            <li><strong>Schaden:</strong> Reittiere heilen TP wie Spielercharaktere. Bei null TP macht ein Reittier keine Todeswürfe, es stirbt.</li>
+        </ul>') }}
+        {{ r.quick('Improvisierte Waffen', 'Umgebung', '<p>Die Umgebung lässt sich im Kampf nutzen: als Waffe, Deckung oder zur Fortbewegung. Improvisierte Waffen sind normalerweise nur <strong>einmal</strong> verwendbar und danach verbraucht. Ihr Einsatz ist eine Aktion und lässt sich mit Bewegung kombinieren.</p><p>Pro Kampf stehen meist nur wenige solcher Gegenstände zur Verfügung. Was in der Umgebung herumliegt, siehst du an der Szene.</p>') }}
+        {{ r.dm('Improvisierte Waffen bereitstellen', 'Umgebung', '<p>Zu Kampfbeginn kann die Spielleitung W3 improvisierte Waffen auswürfeln oder festlegen, ihre Position auf der Karte markieren oder sagen, dass sie überall in der Gegend verfügbar sind. Abenteuer können eigene improvisierte Waffen für einen Ort mitbringen.</p>') }}
     </div>
 
     {# ---------- Zauber ---------- #}
