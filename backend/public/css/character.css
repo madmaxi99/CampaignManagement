@@ -891,3 +891,35 @@
     padding-left: 1.4rem;
     color: var(--ink-soft);
 }
+
+/* Compact gear: collapsed rows, details open on tap */
+.gear-list {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.gear-entry {
+    box-shadow: none;
+    background: var(--paper);
+}
+
+.gear-entry > summary {
+    padding: var(--space-1) var(--space-3);
+}
+
+.gear-entry .ui-details__title {
+    font-size: var(--fs-body);
+}
+
+.gear-entry .ui-details__body {
+    padding: 0 var(--space-3) var(--space-3);
+}
+
+.bonus-hint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-small);
+}

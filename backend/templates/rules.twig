@@ -30,6 +30,7 @@
     <div class="ui-tabs rules-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash style="margin-top: var(--space-3)">
         <button class="ui-tab" role="tab" id="tab-items" aria-controls="panel-items" aria-selected="true">Items</button>
         <button class="ui-tab" role="tab" id="tab-skills" aria-controls="panel-skills" aria-selected="false">Fertigkeiten</button>
+        <button class="ui-tab" role="tab" id="tab-combat" aria-controls="panel-combat" aria-selected="false">Kampf</button>
         <button class="ui-tab" role="tab" id="tab-spells" aria-controls="panel-spells" aria-selected="false">Zauber</button>
         <button class="ui-tab" role="tab" id="tab-professions" aria-controls="panel-professions" aria-selected="false">Berufe</button>
         <button class="ui-tab" role="tab" id="tab-kins" aria-controls="panel-kins" aria-selected="false">Völker</button>
@@ -81,6 +82,30 @@
                 {% endset %}{{ r.entry(s.name_de, s.name_de ~ ' ' ~ s.description_de, badges, body) }}
             {% endfor %}
         {% endfor %}
+    </div>
+
+    {# ---------- Kampf ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-combat" role="tabpanel" aria-labelledby="tab-combat" hidden>
+        {% set sta_skills = skills.combat|filter(s => s.attribute_code == 'STA') %}
+        {% set gew_skills = skills.combat|filter(s => s.attribute_code == 'GEW') %}
+
+        {% set badges %}<span class="ui-badge ui-badge--berry">STÄ / GEW</span>{% endset %}
+        {% set body %}
+            <p>Dein Schadensbonus hängt an dem Attribut, auf dem die <strong>Waffenfertigkeit</strong> basiert. Es gibt zwei Boni, einen für STÄ und einen für GEW (siehe Überblick am Charakterbogen).</p>
+            <p><strong>STÄ-Waffen:</strong> {{ sta_skills|map(s => s.name_de)|join(', ') }}.</p>
+            <p><strong>GEW-Waffen:</strong> {{ gew_skills|map(s => s.name_de)|join(', ') }}.</p>
+            <p>Fernkampfwaffen bekommen den gleichen Bonus wie im Nahkampf. Wurfwaffen wie Messer oder Speere nutzen die Fertigkeit der Nahkampfwaffe und damit deren Bonus.</p>
+        {% endset %}{{ r.entry('Schadensbonus: welcher gilt?', 'Schadensbonus STÄ GEW Waffenfertigkeit Fernkampf Wurfwaffen', badges, body) }}
+
+        {% set badges %}<span class="ui-badge">STA</span>{% endset %}
+        {% set body %}
+            <p>Die Spalte „STA“ in der Waffenliste ist die <strong>Voraussetzung</strong>, kein Bonus. Ist deine Stärke niedriger, greifst und parierst du mit Nachteil. Liegt sie unter der Hälfte der Voraussetzung, kannst du die Waffe gar nicht einsetzen.</p>
+        {% endset %}{{ r.entry('Voraussetzung Stärke', 'Voraussetzung Stärke STA Nachteil Waffe', badges, body) }}
+
+        {% set badges %}<span class="ui-badge ui-badge--gold">Drache</span>{% endset %}
+        {% set body %}
+            <p>Bei einem kritischen Treffer verdoppelst du die Würfel der Waffe, den Schadensbonus aber nicht. Beispiel: Ein Breitschwert (2W6) mit Schadensbonus W4 richtet 4W6 + W4 an.</p>
+        {% endset %}{{ r.entry('Kritischer Treffer', 'Kritischer Treffer Drache Schaden verdoppeln Schadensbonus', badges, body) }}
     </div>
 
     {# ---------- Zauber ---------- #}

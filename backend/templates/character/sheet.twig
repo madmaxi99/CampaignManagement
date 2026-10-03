@@ -159,59 +159,98 @@
             <h2 class="ui-card__title">{{ ui.icon('swords') }} Waffen
                 <button type="button" class="ui-btn ui-btn--small ui-btn--gold sheet-add" data-add="weapons">{{ ui.icon('plus') }} Neu</button>
             </h2>
-            {% for weapon in weapons %}
-                <div class="gear-card" data-row-id="{{ weapon.row_id }}">
-                    <div class="gear-card__fields">
-                        <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="name_de" value="{{ weapon.name_de }}"></div>
-                        <div class="ui-field"><label>Griff</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="grip_de" value="{{ weapon.grip_de }}"></div>
-                        <div class="ui-field"><label>Reichweite</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="range_de" value="{{ weapon.range_de }}"></div>
-                        <div class="ui-field"><label>Schaden</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="damage_de" value="{{ weapon.damage_de }}"></div>
-                        <div class="ui-field gear-wide"><label>Merkmale</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="traits_de" value="{{ weapon.traits_de }}"></div>
-                    </div>
-                    <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-remove="weapons" data-row-id="{{ weapon.row_id }}">{{ ui.icon('trash-2') }} Entfernen</button>
-                </div>
-            {% else %}
-                <p class="ui-muted">Keine Waffen.</p>
-            {% endfor %}
+            <p class="bonus-hint">
+                <strong>Schadensbonus</strong>
+                <span class="ui-badge ui-badge--berry">STÄ {{ character.damage_bonus_sta_de }}</span>
+                <span class="ui-badge ui-badge--berry">GEW {{ character.damage_bonus_gew_de }}</span>
+                <a href="/rules#combat">Welcher gilt?</a>
+            </p>
+            <div class="gear-list">
+                {% for weapon in weapons %}
+                    <details class="ui-details gear-entry" data-row-id="{{ weapon.row_id }}"{% if loop.last and weapon.name_de == 'Neue Waffe' %} open{% endif %}>
+                        <summary>
+                            <span class="ui-details__title">{{ weapon.name_de }}</span>
+                            <span class="ui-details__badges">
+                                {% if weapon.damage_de %}<span class="ui-badge ui-badge--berry">{{ weapon.damage_de }}</span>{% endif %}
+                                {% if weapon.range_de %}<span class="ui-badge">{{ weapon.range_de }} m</span>{% endif %}
+                            </span>
+                        </summary>
+                        <div class="ui-details__body">
+                            <div class="gear-card__fields">
+                                <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="name_de" value="{{ weapon.name_de }}"></div>
+                                <div class="ui-field"><label>Griff</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="grip_de" value="{{ weapon.grip_de }}"></div>
+                                <div class="ui-field"><label>Reichweite</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="range_de" value="{{ weapon.range_de }}"></div>
+                                <div class="ui-field"><label>Schaden</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="damage_de" value="{{ weapon.damage_de }}"></div>
+                                <div class="ui-field gear-wide"><label>Merkmale</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="traits_de" value="{{ weapon.traits_de }}"></div>
+                            </div>
+                            <p class="ui-field__hint">Dazu kommt dein Schadensbonus: STÄ {{ character.damage_bonus_sta_de }} · GEW {{ character.damage_bonus_gew_de }}, je nach Waffenfertigkeit.</p>
+                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-remove="weapons" data-row-id="{{ weapon.row_id }}">{{ ui.icon('trash-2') }} Entfernen</button>
+                        </div>
+                    </details>
+                {% else %}
+                    <p class="ui-muted">Keine Waffen.</p>
+                {% endfor %}
+            </div>
         </section>
 
-        {% for slot in [{'key': 'body', 'title': 'Rüstung', 'penalties': {'penalty_stealth': 'Heimlichkeit', 'penalty_evasion': 'Ausweichen', 'penalty_acrobatics': 'Akrobatik'}}, {'key': 'head', 'title': 'Helm', 'penalties': {'penalty_perception': 'Wahrnehmung', 'penalty_ranged': 'Fernkampf'}}] %}
-            <section class="ui-card">
-                <h2 class="ui-card__title">{{ ui.icon('shield') }} {{ slot.title }}</h2>
-                {% for piece in armor %}{% if piece.slot == slot.key %}
-                    <div class="gear-card__fields">
-                        <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="armor" data-slot="{{ slot.key }}" data-field="name_de" value="{{ piece.name_de }}"></div>
-                        <div class="ui-field"><label>Rüstungswert</label><input class="ui-input" type="number" data-segment="armor" data-slot="{{ slot.key }}" data-field="armor_value" value="{{ piece.armor_value }}"></div>
-                    </div>
-                    <p class="ui-label">Abzüge</p>
-                    <div class="ui-row">
-                        {% for field, label in slot.penalties %}
-                            <label class="check-chip">
-                                <input type="checkbox" data-segment="armor" data-slot="{{ slot.key }}" data-field="{{ field }}" {{ piece[field] ? 'checked' }}>
-                                <span>{{ label }}</span>
-                            </label>
-                        {% endfor %}
-                    </div>
-                {% endif %}{% endfor %}
-            </section>
-        {% endfor %}
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('shield') }} Rüstung</h2>
+            <div class="gear-list">
+                {% for slot in [{'key': 'body', 'title': 'Körper', 'penalties': {'penalty_stealth': 'Heimlichkeit', 'penalty_evasion': 'Ausweichen', 'penalty_acrobatics': 'Akrobatik'}}, {'key': 'head', 'title': 'Kopf', 'penalties': {'penalty_perception': 'Wahrnehmung', 'penalty_ranged': 'Fernkampf'}}] %}
+                    {% for piece in armor %}{% if piece.slot == slot.key %}
+                        <details class="ui-details gear-entry">
+                            <summary>
+                                <span class="ui-details__title">{{ slot.title }}: {{ piece.name_de ?: '–' }}</span>
+                                <span class="ui-details__badges">
+                                    {% if piece.armor_value is not null %}<span class="ui-badge ui-badge--sky">RS {{ piece.armor_value }}</span>{% endif %}
+                                    {% for field, label in slot.penalties %}{% if piece[field] %}<span class="ui-badge ui-badge--gold">{{ label }}</span>{% endif %}{% endfor %}
+                                </span>
+                            </summary>
+                            <div class="ui-details__body">
+                                <div class="gear-card__fields">
+                                    <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="armor" data-slot="{{ slot.key }}" data-field="name_de" value="{{ piece.name_de }}"></div>
+                                    <div class="ui-field"><label>Rüstungswert</label><input class="ui-input" type="number" data-segment="armor" data-slot="{{ slot.key }}" data-field="armor_value" value="{{ piece.armor_value }}"></div>
+                                </div>
+                                <p class="ui-label">Abzüge</p>
+                                <div class="ui-row">
+                                    {% for field, label in slot.penalties %}
+                                        <label class="check-chip">
+                                            <input type="checkbox" data-segment="armor" data-slot="{{ slot.key }}" data-field="{{ field }}" {{ piece[field] ? 'checked' }}>
+                                            <span>{{ label }}</span>
+                                        </label>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </details>
+                    {% endif %}{% endfor %}
+                {% endfor %}
+            </div>
+        </section>
 
         <section class="ui-card">
             <h2 class="ui-card__title">{{ ui.icon('backpack') }} Inventar
                 <button type="button" class="ui-btn ui-btn--small ui-btn--gold sheet-add" data-add="inventory">{{ ui.icon('plus') }} Neu</button>
             </h2>
-            {% for item in inventory %}
-                <div class="gear-card" data-row-id="{{ item.row_id }}">
-                    <div class="gear-card__fields">
-                        <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="name_de" value="{{ item.name_de }}"></div>
-                        <div class="ui-field gear-wide"><label>Beschreibung</label><input class="ui-input" type="text" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="description_de" value="{{ item.description_de }}"></div>
-                        <div class="ui-field"><label>Menge</label><input class="ui-input" type="number" min="0" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="quantity" value="{{ item.quantity }}"></div>
-                    </div>
-                    <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-remove="inventory" data-row-id="{{ item.row_id }}">{{ ui.icon('trash-2') }} Entfernen</button>
-                </div>
-            {% else %}
-                <p class="ui-muted">Das Inventar ist leer.</p>
-            {% endfor %}
+            <div class="gear-list">
+                {% for item in inventory %}
+                    <details class="ui-details gear-entry" data-row-id="{{ item.row_id }}"{% if loop.last and item.name_de == 'Neuer Gegenstand' %} open{% endif %}>
+                        <summary>
+                            <span class="ui-details__title">{{ item.name_de }}</span>
+                            <span class="ui-details__badges">{% if item.quantity != 1 %}<span class="ui-badge">× {{ item.quantity }}</span>{% endif %}</span>
+                        </summary>
+                        <div class="ui-details__body">
+                            <div class="gear-card__fields">
+                                <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="name_de" value="{{ item.name_de }}"></div>
+                                <div class="ui-field gear-wide"><label>Beschreibung</label><input class="ui-input" type="text" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="description_de" value="{{ item.description_de }}"></div>
+                                <div class="ui-field"><label>Menge</label><input class="ui-input" type="number" min="0" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="quantity" value="{{ item.quantity }}"></div>
+                            </div>
+                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-remove="inventory" data-row-id="{{ item.row_id }}">{{ ui.icon('trash-2') }} Entfernen</button>
+                        </div>
+                    </details>
+                {% else %}
+                    <p class="ui-muted">Das Inventar ist leer.</p>
+                {% endfor %}
+            </div>
         </section>
 
         <section class="ui-card">

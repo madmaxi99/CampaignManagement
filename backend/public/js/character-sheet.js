@@ -148,6 +148,12 @@
             const body = {};
             body[input.dataset.field] = value;
             request('POST', url, body).then(saved).catch(failed);
+
+            // Keep the collapsed row's title in step with the name field.
+            const entry = input.closest('.gear-entry');
+            if (entry && input.dataset.field === 'name_de' && input.dataset.segment !== 'armor') {
+                entry.querySelector('.ui-details__title').textContent = value;
+            }
         });
     });
 
