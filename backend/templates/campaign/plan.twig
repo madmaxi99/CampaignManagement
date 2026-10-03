@@ -1,0 +1,74 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+{% import "campaign/_mode.twig" as mode %}
+
+{% block title %}{{ campaign.name_de }} planen{% endblock %}
+
+{% macro outline_link(href, active, text, num, depth) %}
+    <a class="outline__item{{ active ? ' is-active' : '' }}" href="{{ href }}" style="--depth: {{ depth|default(0) }}"{% if active %} aria-current="page"{% endif %}>
+        {% if num is not null and num != '' %}<span class="outline__num">{{ num }}</span>{% endif %}
+        <span class="outline__text">{{ text }}</span>
+    </a>
+{% endmacro %}
+
+{% import _self as o %}
+
+{% block content %}
+    {% set base = '/dm/campaign/' ~ campaign.id %}
+    {{ mode.header(campaign, 'plan') }}
+
+    <div class="plan-workspace" data-campaign-id="{{ campaign.id }}">
+        <nav class="outline ui-card" aria-label="Gliederung">
+            {{ o.outline_link(base, editorType == 'overview', 'Übersicht', null) }}
+
+            <div class="outline__head">
+                <span>Kapitel</span>
+                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="{{ base }}?e=chapter-new" aria-label="Neues Kapitel">{{ ui.icon('plus') }}</a>
+            </div>
+            {% for chapter in chapters %}
+                {{ o.outline_link(base ~ '?e=chapter-' ~ chapter.id, editorType == 'chapter' and entity and entity.id == chapter.id, chapter.title_de, chapter.label) }}
+            {% else %}
+                <p class="outline__empty">Noch keine Kapitel.</p>
+            {% endfor %}
+
+            <div class="outline__head">
+                <span>Orte</span>
+                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="{{ base }}?e=place-new" aria-label="Neuer Ort">{{ ui.icon('plus') }}</a>
+            </div>
+            {% for p in placeTree %}
+                {{ o.outline_link(base ~ '?e=place-' ~ p.id, editorType == 'place' and entity and entity.id == p.id, p.name_de, p.number_label ? '#' ~ p.number_label : null, p.depth) }}
+            {% else %}
+                <p class="outline__empty">Noch keine Orte.</p>
+            {% endfor %}
+
+            <div class="outline__head">
+                <span>NPCs</span>
+                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="{{ base }}?e=npc-new" aria-label="Neuer NPC">{{ ui.icon('plus') }}</a>
+            </div>
+            {% for n in npcs %}
+                {{ o.outline_link(base ~ '?e=npc-' ~ n.id, editorType == 'npc' and entity and entity.id == n.id, n.name_de, null) }}
+            {% else %}
+                <p class="outline__empty">Noch keine NPCs.</p>
+            {% endfor %}
+
+            <div class="outline__head">
+                <span>Items &amp; Bücher</span>
+                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="{{ base }}?e=item-new" aria-label="Neues Item">{{ ui.icon('plus') }}</a>
+            </div>
+            {% for i in items %}
+                {{ o.outline_link(base ~ '?e=item-' ~ i.id, editorType == 'item' and entity and entity.id == i.id, i.name_de, null) }}
+            {% else %}
+                <p class="outline__empty">Noch keine Items.</p>
+            {% endfor %}
+
+            <div class="outline__head"><span>Monster</span></div>
+            {{ o.outline_link(base ~ '?e=monsters', editorType == 'monsters', monsters|length ~ ' Vorlagen', null) }}
+        </nav>
+
+        <section class="plan-editor">
+            {% include 'campaign/edit/' ~ editorType ~ '.twig' %}
+        </section>
+    </div>
+
+    <script src="{{ asset('js/dm-forms.js') }}"></script>
+{% endblock %}

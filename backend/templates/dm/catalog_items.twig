@@ -1,0 +1,115 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}Katalog: Items{% endblock %}
+
+{% block content %}
+    {% include 'dm/_catalog_tabs.twig' with {section: 'items'} %}
+
+    {% set kindLabels = {weapon: 'Waffen', armor: 'Rüstungen', misc: 'Sonstiges'} %}
+    <div class="plan-workspace">
+        <nav class="outline ui-card" aria-label="Items">
+            <div class="outline__head">
+                <span>{{ items|length }} Items</span>
+                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="/dm/catalog/items?e=new" aria-label="Neues Item">{{ ui.icon('plus') }}</a>
+            </div>
+            {% for kind, label in kindLabels %}
+                <div class="outline__head"><span>{{ label }}</span></div>
+                {% for i in items|filter(x => x.kind == kind) %}
+                    <a class="outline__item{{ entity and entity.id == i.id ? ' is-active' : '' }}" href="/dm/catalog/items?e={{ i.id }}"{% if entity and entity.id == i.id %} aria-current="page"{% endif %}>
+                        <span class="outline__text">{{ i.name_de }}</span>
+                    </a>
+                {% endfor %}
+            {% endfor %}
+        </nav>
+
+        <section class="plan-editor">
+            {% if entity or creating %}
+                <form class="ui-card ui-stack" data-dm-form
+                      data-action="{{ entity ? '/dm/catalog/items/' ~ entity.id : '/dm/catalog/items' }}"
+                      data-after="{{ entity ? 'reload' : 'goto:/dm/catalog/items?e={id}' }}">
+                    <h2 class="ui-card__title">{{ ui.icon('swords') }} {{ entity ? entity.name_de : 'Neues Item' }}</h2>
+                    <p class="ui-muted">Regel-Gegenstände, die Spieler im Regelwerk sehen und kaufen können. Quest-Items und Bücher gehören in die Kampagne.</p>
+
+                    <div class="ui-field"><label for="c-name">Name</label><input class="ui-input" id="c-name" name="name_de" maxlength="150" required value="{{ entity.name_de|default('') }}"></div>
+                    <div class="field-pair">
+                        <div class="ui-field">
+                            <label for="c-kind">Art</label>
+                            <select class="ui-select" id="c-kind" name="kind" data-switch>
+                                {% for kind, label in {weapon: 'Waffe', armor: 'Rüstung', misc: 'Sonstiges'} %}<option value="{{ kind }}" {{ (entity.kind|default('misc')) == kind ? 'selected' }}>{{ label }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="ui-field">
+                            <label for="c-rarity">Seltenheit</label>
+                            <select class="ui-select" id="c-rarity" name="rarity">
+                                {% for r in ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig'] %}<option value="{{ r }}" {{ (entity.rarity|default('gewöhnlich')) == r ? 'selected' }}>{{ r }}</option>{% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ui-field"><label for="c-desc">Beschreibung</label><textarea class="ui-textarea" id="c-desc" name="description_de" rows="3">{{ entity.description_de|default('') }}</textarea></div>
+
+                    <fieldset class="ui-stack" style="border: 0; padding: 0; margin: 0">
+                        <legend class="ui-field__hint">Preis</legend>
+                        <div class="field-pair">
+                            <div class="ui-field"><label for="c-pg">Gold</label><input class="ui-input" id="c-pg" type="number" min="0" name="price_gold" value="{{ entity.price_gold|default(0) }}"></div>
+                            <div class="ui-field"><label for="c-ps">Silber</label><input class="ui-input" id="c-ps" type="number" min="0" name="price_silver" value="{{ entity.price_silver|default(0) }}"></div>
+                            <div class="ui-field"><label for="c-pc">Kupfer</label><input class="ui-input" id="c-pc" type="number" min="0" name="price_copper" value="{{ entity.price_copper|default(0) }}"></div>
+                        </div>
+                    </fieldset>
+
+                    <div class="ui-stack" data-kind="weapon" {{ (entity.kind|default('misc')) != 'weapon' ? 'hidden' }}>
+                        <h3>Waffenwerte</h3>
+                        <div class="field-pair">
+                            <div class="ui-field"><label for="c-grip">Griff</label><input class="ui-input" id="c-grip" name="grip_de" maxlength="50" placeholder="1H" value="{{ entity.grip_de|default('') }}"></div>
+                            <div class="ui-field"><label for="c-dmg">Schaden</label><input class="ui-input" id="c-dmg" name="damage_de" maxlength="50" placeholder="W8" value="{{ entity.damage_de|default('') }}"></div>
+                            <div class="ui-field"><label for="c-range">Reichweite</label><input class="ui-input" id="c-range" name="range_de" maxlength="50" placeholder="1" value="{{ entity.range_de|default('') }}"></div>
+                        </div>
+                        <div class="field-pair">
+                            <div class="ui-field"><label for="c-str">STA-Anforderung</label><input class="ui-input" id="c-str" type="number" min="0" name="str_requirement" value="{{ entity.str_requirement|default('') }}"></div>
+                            <div class="ui-field"><label for="c-dur">Haltbarkeit</label><input class="ui-input" id="c-dur" type="number" min="0" name="durability" value="{{ entity.durability|default('') }}"></div>
+                        </div>
+                        <div class="ui-field"><label for="c-traits">Eigenschaften</label><input class="ui-input" id="c-traits" name="traits_de" maxlength="150" value="{{ entity.traits_de|default('') }}" placeholder="Wuchtig, Durchbohrend"></div>
+                    </div>
+
+                    <div class="ui-stack" data-kind="armor" {{ (entity.kind|default('misc')) != 'armor' ? 'hidden' }}>
+                        <h3>Rüstungswerte</h3>
+                        <div class="field-pair">
+                            <div class="ui-field">
+                                <label for="c-slot">Platz</label>
+                                <select class="ui-select" id="c-slot" name="armor_slot">
+                                    <option value="body" {{ (entity.armor_slot|default('body')) == 'body' ? 'selected' }}>Körper</option>
+                                    <option value="head" {{ entity.armor_slot|default('') == 'head' ? 'selected' }}>Kopf</option>
+                                </select>
+                            </div>
+                            <div class="ui-field"><label for="c-av">Rüstungswert</label><input class="ui-input" id="c-av" type="number" min="0" name="armor_value" value="{{ entity.armor_value|default(1) }}"></div>
+                        </div>
+                        <div class="ui-field">
+                            <span class="ui-field__hint">Erschwert (Malus auf):</span>
+                            <div class="ui-row">
+                                {% for key, label in {penalty_stealth: 'Heimlichkeit', penalty_evasion: 'Ausweichen', penalty_acrobatics: 'Akrobatik', penalty_perception: 'Wahrnehmung', penalty_ranged: 'Fernkampf'} %}
+                                    <label class="ui-check"><input type="checkbox" name="{{ key }}" {{ entity[key]|default(0) ? 'checked' }}> {{ label }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ui-row">
+                        <button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+                        {% if entity %}
+                            <button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="/dm/catalog/items/{{ entity.id }}" data-confirm="Item „{{ entity.name_de }}“ aus dem Katalog löschen?" data-after="goto:/dm/catalog/items">{{ ui.icon('trash-2') }} Löschen</button>
+                        {% endif %}
+                    </div>
+                </form>
+            {% else %}
+                <div class="ui-empty">
+                    {{ ui.icon('swords') }}
+                    <strong>Item wählen oder anlegen</strong>
+                    <span>Links ein Item öffnen oder mit dem Plus ein neues anlegen.</span>
+                    <a class="ui-btn ui-btn--gold" href="/dm/catalog/items?e=new">{{ ui.icon('plus') }} Neues Item</a>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <script src="{{ asset('js/dm-forms.js') }}"></script>
+{% endblock %}

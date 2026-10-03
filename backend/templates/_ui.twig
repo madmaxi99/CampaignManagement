@@ -1,0 +1,2 @@
+{# Small UI helpers shared by all layouts and pages. #}
+{% macro icon(name, class) %}<svg class="ui-icon{{ class ? ' ' ~ class : '' }}" aria-hidden="true" focusable="false"><use href="/icons/sprite.svg#{{ name }}"></use></svg>{% endmacro %}

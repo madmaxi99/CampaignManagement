@@ -1,0 +1,110 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}Katalog: Bestiary{% endblock %}
+
+{% macro attack_row(a) %}
+    {% import "_ui.twig" as ui %}
+    <div class="attack-row ui-card" data-row>
+        <div class="field-pair">
+            <div class="ui-field"><label>Wurf</label><input class="ui-input" name="attack_roll[]" maxlength="10" placeholder="1–2" value="{{ a.roll_de|default('') }}"></div>
+            <div class="ui-field"><label>Titel</label><input class="ui-input" name="attack_title[]" maxlength="100" placeholder="Biss" value="{{ a.title_de|default('') }}"></div>
+        </div>
+        <div class="ui-field"><label>Wirkung</label><textarea class="ui-textarea" name="attack_effect[]" rows="2">{{ a.effect_de|default('') }}</textarea></div>
+        <div><button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-row-remove>{{ ui.icon('trash-2') }} Angriff entfernen</button></div>
+    </div>
+{% endmacro %}
+
+{% import _self as b %}
+
+{% block content %}
+    {% include 'dm/_catalog_tabs.twig' with {section: 'bestiary'} %}
+
+    <div class="plan-workspace">
+        <nav class="outline ui-card" aria-label="Bestiary">
+            <div class="outline__head">
+                <span>{{ creatures|length }} Vorlagen</span>
+                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="/dm/catalog/bestiary?e=new" aria-label="Neue Vorlage">{{ ui.icon('plus') }}</a>
+            </div>
+            {% set groups = {} %}
+            {% for c in creatures %}
+                {% if loop.first or c.category_de != creatures[loop.index0 - 1].category_de %}
+                    <div class="outline__head"><span>{{ c.category_de ?? 'Ohne Kategorie' }}</span></div>
+                {% endif %}
+                <a class="outline__item{{ entity and entity.id == c.id ? ' is-active' : '' }}" href="/dm/catalog/bestiary?e={{ c.id }}"{% if entity and entity.id == c.id %} aria-current="page"{% endif %}>
+                    <span class="outline__text">{{ c.name_de }}{% if c.is_unique %} ★{% endif %}</span>
+                </a>
+            {% endfor %}
+        </nav>
+
+        <section class="plan-editor">
+            {% if entity or creating %}
+                <form class="ui-card ui-stack" data-dm-form
+                      data-action="{{ entity ? '/dm/catalog/bestiary/' ~ entity.id : '/dm/catalog/bestiary' }}"
+                      data-after="{{ entity ? 'reload' : 'goto:/dm/catalog/bestiary?e={id}' }}"
+                      {% if entity %}data-id="{{ entity.id }}"{% endif %}
+                      data-upload-url="/dm/catalog/bestiary/{id}/image">
+                    <h2 class="ui-card__title">{{ ui.icon('skull') }} {{ entity ? entity.name_de : 'Neue Vorlage' }}</h2>
+                    <p class="ui-muted">Kampfwerte einer Kreatur. Spieler sehen das nie.</p>
+
+                    <div class="ui-field"><label for="b-name">Name</label><input class="ui-input" id="b-name" name="name_de" maxlength="150" required value="{{ entity.name_de|default('') }}"></div>
+                    <div class="field-pair">
+                        <div class="ui-field">
+                            <label for="b-cat">Kategorie</label>
+                            <input class="ui-input" id="b-cat" name="category_de" maxlength="50" list="b-cats" value="{{ entity.category_de|default('') }}">
+                            <datalist id="b-cats">{% for c in categories %}<option value="{{ c }}">{% endfor %}</datalist>
+                        </div>
+                        <div class="ui-field">
+                            <span class="ui-field__hint">Einzigartig</span>
+                            <label class="ui-check"><input type="checkbox" name="is_unique" {{ entity.is_unique|default(0) ? 'checked' }}> Endgegner, gibt es nur einmal</label>
+                        </div>
+                    </div>
+
+                    <div class="field-pair">
+                        <div class="ui-field"><label for="b-hp">TP</label><input class="ui-input" id="b-hp" type="number" min="1" name="hp" required value="{{ entity.hp|default('') }}"></div>
+                        <div class="ui-field"><label for="b-grim">Grimmigkeit</label><input class="ui-input" id="b-grim" name="grimmigkeit_de" maxlength="20" required value="{{ entity.grimmigkeit_de|default('') }}"></div>
+                        <div class="ui-field"><label for="b-size">Größe</label><input class="ui-input" id="b-size" name="size_de" maxlength="50" required value="{{ entity.size_de|default('') }}"></div>
+                    </div>
+                    <div class="field-pair">
+                        <div class="ui-field"><label for="b-move">Bewegung</label><input class="ui-input" id="b-move" type="number" min="0" name="movement" required value="{{ entity.movement|default('') }}"></div>
+                        <div class="ui-field"><label for="b-armor">Rüstung</label><input class="ui-input" id="b-armor" name="armor_de" maxlength="50" placeholder="—" value="{{ entity.armor_de|default('') }}"></div>
+                    </div>
+
+                    <div class="ui-field"><label for="b-res">Resistenzen</label><textarea class="ui-textarea" id="b-res" name="resistances_de" rows="2">{{ entity.resistances_de|default('') }}</textarea></div>
+                    <div class="ui-field"><label for="b-imm">Immunitäten</label><textarea class="ui-textarea" id="b-imm" name="immunities_de" rows="2">{{ entity.immunities_de|default('') }}</textarea></div>
+                    <div class="ui-field"><label for="b-traits">Besonderheiten</label><textarea class="ui-textarea" id="b-traits" name="traits_de" rows="3">{{ entity.traits_de|default('') }}</textarea></div>
+                    <div class="ui-field"><label for="b-kit">Profil (Varianten ohne eigene Angriffstabelle)</label><textarea class="ui-textarea" id="b-kit" name="kit_de" rows="3">{{ entity.kit_de|default('') }}</textarea></div>
+
+                    <h3>Angriffe</h3>
+                    <div class="ui-stack" id="attack-rows">
+                        {% for a in entity.attacks|default([]) %}{{ b.attack_row(a) }}{% endfor %}
+                    </div>
+                    <template id="attack-template">{{ b.attack_row({}) }}</template>
+                    <div><button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-row-add data-template="#attack-template" data-target="#attack-rows">{{ ui.icon('plus') }} Angriff hinzufügen</button></div>
+
+                    <div class="ui-field">
+                        <label for="b-image">Bild</label>
+                        {% if entity and entity.image_path %}<img class="place-image" src="/{{ entity.image_path }}" alt="{{ entity.name_de }}">{% endif %}
+                        <input class="ui-input" id="b-image" type="file" name="image" accept="image/jpeg,image/png,image/webp">
+                    </div>
+
+                    <div class="ui-row">
+                        <button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+                        {% if entity %}
+                            <button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="/dm/catalog/bestiary/{{ entity.id }}" data-confirm="„{{ entity.name_de }}“ aus dem Bestiary löschen?" data-after="goto:/dm/catalog/bestiary">{{ ui.icon('trash-2') }} Löschen</button>
+                        {% endif %}
+                    </div>
+                </form>
+            {% else %}
+                <div class="ui-empty">
+                    {{ ui.icon('skull') }}
+                    <strong>Vorlage wählen oder anlegen</strong>
+                    <span>Links eine Kreatur öffnen oder mit dem Plus eine neue anlegen. ★ markiert Endgegner.</span>
+                    <a class="ui-btn ui-btn--gold" href="/dm/catalog/bestiary?e=new">{{ ui.icon('plus') }} Neue Vorlage</a>
+                </div>
+            {% endif %}
+        </section>
+    </div>
+
+    <script src="{{ asset('js/dm-forms.js') }}"></script>
+{% endblock %}

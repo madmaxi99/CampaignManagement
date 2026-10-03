@@ -1,0 +1,28 @@
+{% import "_ui.twig" as ui %}
+<div class="ui-stack">
+    <form class="ui-card ui-stack" data-dm-form data-action="/dm/campaign/{{ campaign.id }}" data-after="reload">
+        <h2 class="ui-card__title">{{ ui.icon('castle') }} Kampagne</h2>
+        <div class="ui-field"><label for="c-name">Name</label><input class="ui-input" id="c-name" name="name_de" maxlength="150" required value="{{ campaign.name_de }}"></div>
+        <div class="ui-field"><label for="c-teaser">Teaser (eine Zeile für die Liste)</label><input class="ui-input" id="c-teaser" name="teaser_de" maxlength="255" value="{{ campaign.teaser_de }}"></div>
+        <div class="ui-field"><label for="c-bg">Hintergrund</label><textarea class="ui-textarea" id="c-bg" name="background_de" rows="10">{{ campaign.background_de }}</textarea></div>
+        <div><button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button></div>
+    </form>
+
+    <div class="ui-card ui-stack">
+        <h2 class="ui-card__title">{{ ui.icon('star') }} Was als Nächstes?</h2>
+        <p class="ui-muted">Plane Kapitel, Orte, NPCs und Items in der Gliederung links. Zum Spielen wechselst du oben auf "Spielen". Dort liegen Chronik, Würfeln und Schnellzugriff.</p>
+        <div class="ui-row">
+            <a class="ui-btn ui-btn--gold" href="/dm/campaign/{{ campaign.id }}/play">{{ ui.icon('dices') }} Zum Spielen</a>
+        </div>
+    </div>
+
+    <div class="ui-card ui-stack">
+        <h2 class="ui-card__title">{{ ui.icon('triangle-alert') }} Gefahrenzone</h2>
+        {% if campaign.is_default %}
+            <p class="ui-muted">Standard-Abenteuer lassen sich nicht löschen. Zum Neustarten (Chronik und NPC-Notizen leeren) wechsle in den Spielen-Modus.</p>
+        {% else %}
+            <p class="ui-muted">Löscht die Kampagne mit allen Kapiteln, Orten, NPCs, Items und der Chronik. Der Katalog bleibt.</p>
+            <div><button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="/dm/campaign/{{ campaign.id }}" data-confirm="„{{ campaign.name_de }}“ endgültig löschen?" data-after="goto:/dm">{{ ui.icon('trash-2') }} Kampagne löschen</button></div>
+        {% endif %}
+    </div>
+</div>

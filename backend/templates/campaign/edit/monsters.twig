@@ -1,0 +1,38 @@
+{% import "_ui.twig" as ui %}
+{% set base = '/dm/campaign/' ~ campaign.id %}
+<div class="ui-stack">
+    <div class="ui-card ui-stack">
+        <h2 class="ui-card__title">{{ ui.icon('skull') }} Monster dieser Kampagne</h2>
+        <p class="ui-muted">Kampfwerte-Vorlagen aus dem Bestiary, die du hier brauchst. Im Spielen-Modus hast du sie per Schnellzugriff. Einzelne Tiere gibt es nicht als Einträge: Schreib bei den Notizen z. B. "4 Wölfe".</p>
+
+        {% if monsterOptions is not empty %}
+            <div class="ui-row">
+                <div class="ui-field" style="margin: 0; flex: 1 1 14rem">
+                    <label class="visually-hidden" for="m-add">Vorlage hinzufügen</label>
+                    <select class="ui-select" id="m-add">
+                        <option value="">Vorlage hinzufügen …</option>
+                        {% for b in monsterOptions %}<option value="{{ b.id }}">{{ b.name_de }}{% if b.category_de %} ({{ b.category_de }}){% endif %}</option>{% endfor %}
+                    </select>
+                </div>
+                <button type="button" class="ui-btn ui-btn--gold" data-monster-add data-url="{{ base }}/monsters" data-select="#m-add">{{ ui.icon('plus') }} Hinzufügen</button>
+            </div>
+        {% endif %}
+    </div>
+
+    {% for m in monsters %}
+        <div class="ui-card ui-stack">
+            <div class="ui-row" style="justify-content: space-between">
+                <h3 style="margin: 0">{{ m.name_de }} {% if m.category_de %}<span class="ui-badge">{{ m.category_de }}</span>{% endif %}</h3>
+                <span class="ui-badge ui-badge--berry">TP {{ m.hp }}</span>
+            </div>
+            <div class="ui-field">
+                <label for="m-notes-{{ m.id }}">Notizen dazu</label>
+                <textarea class="ui-textarea" id="m-notes-{{ m.id }}" rows="2" data-notes-url="{{ base }}/monsters/{{ m.id }}/notes" placeholder="z. B. 4 Wölfe im Wald">{{ m.campaign_notes_de }}</textarea>
+                <span class="ui-field__hint" data-notes-status aria-live="polite">Wird automatisch gespeichert.</span>
+            </div>
+            <div><button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-delete data-url="{{ base }}/monsters/{{ m.id }}" data-confirm="„{{ m.name_de }}“ aus der Kampagne entfernen? Der Katalog bleibt." data-after="reload">{{ ui.icon('trash-2') }} Entfernen</button></div>
+        </div>
+    {% else %}
+        <div class="ui-empty">{{ ui.icon('skull') }}<strong>Noch keine Monster</strong><span>Füge oben Vorlagen aus dem Bestiary hinzu.</span></div>
+    {% endfor %}
+</div>

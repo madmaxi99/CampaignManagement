@@ -1,0 +1,56 @@
+{% import "_ui.twig" as ui %}
+{% set base = '/dm/campaign/' ~ campaign.id %}
+{% set chapterValue = entity ? entity.chapter_id : preset.chapter_id %}
+{% set placeValue = entity ? entity.place_id : preset.place_id %}
+<form class="ui-card ui-stack" data-dm-form
+      data-action="{{ entity ? base ~ '/npcs/' ~ entity.id : base ~ '/npcs' }}"
+      data-after="{{ entity ? 'reload' : 'goto:' ~ base ~ '?e=npc-{id}' }}"
+      {% if entity %}data-id="{{ entity.id }}"{% endif %}
+      data-upload-url="{{ base }}/npcs/{id}/portrait" data-upload-field="portrait">
+    <h2 class="ui-card__title">{{ ui.icon('user') }} {{ entity ? entity.name_de : 'Neuer NPC' }}</h2>
+
+    <div class="ui-field"><label for="n-name">Name</label><input class="ui-input" id="n-name" name="name_de" maxlength="150" required value="{{ entity.name_de|default('') }}"><span class="ui-field__hint">Mehr braucht ein NPC nicht.</span></div>
+    <div class="ui-field"><label for="n-desc">Beschreibung (zum Vorlesen)</label><textarea class="ui-textarea" id="n-desc" name="description_de" rows="4">{{ entity.description_de|default('') }}</textarea></div>
+    <div class="ui-field dm-field"><label for="n-dm">Nur für den DM (Theater, Geheimnisse)</label><textarea class="ui-textarea" id="n-dm" name="dm_text_de" rows="5">{{ entity.dm_text_de|default('') }}</textarea></div>
+    <div class="ui-field dm-field"><label for="n-notes">Notizen in dieser Kampagne</label><textarea class="ui-textarea" id="n-notes" name="notes_de" rows="3" placeholder="lebt, mochte Aodhan, geflohen …">{{ entity.notes_de|default('') }}</textarea><span class="ui-field__hint">Spielstand. Wird beim Neustart der Kampagne geleert.</span></div>
+
+    <div class="field-pair">
+        <div class="ui-field">
+            <label for="n-place">Zu finden in</label>
+            <select class="ui-select" id="n-place" name="place_id">
+                <option value="">– kein Ort –</option>
+                {% for p in placeTree %}<option value="{{ p.id }}" {{ placeValue is not null and p.id == placeValue ? 'selected' }}>{{ '– '|repeat(p.depth) }}{{ p.name_de }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="ui-field">
+            <label for="n-chapter">Kapitel</label>
+            <select class="ui-select" id="n-chapter" name="chapter_id">
+                <option value="">– keins –</option>
+                {% for c in chapters %}<option value="{{ c.id }}" {{ chapterValue is not null and c.id == chapterValue ? 'selected' }}>{{ c.label }}: {{ c.title_de }}</option>{% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="ui-field"><label for="n-hint">Fundort-Hinweis (Quest-NPC)</label><input class="ui-input" id="n-hint" name="found_hint_de" maxlength="255" value="{{ entity.found_hint_de|default('') }}" placeholder="bei den Hundekämpfen"></div>
+
+    <div class="ui-field">
+        <label for="n-stat">Kampfvorlage</label>
+        <select class="ui-select" id="n-stat" name="bestiary_id">
+            <option value="">– keine –</option>
+            {% for b in bestiaryOptions %}<option value="{{ b.id }}" {{ entity and entity.bestiary_id == b.id ? 'selected' }}>{{ b.name_de }}{% if b.category_de %} ({{ b.category_de }}){% endif %}</option>{% endfor %}
+        </select>
+        <span class="ui-field__hint">Kampfwerte aus dem Bestiary, optional.</span>
+    </div>
+
+    <div class="ui-field">
+        <label for="n-portrait">Icon / Portrait</label>
+        {% if entity and entity.portrait_path %}<span class="ui-avatar ui-avatar--large"><img src="/{{ entity.portrait_path }}" alt=""></span>{% endif %}
+        <input class="ui-input" id="n-portrait" type="file" name="portrait" accept="image/jpeg,image/png,image/webp">
+    </div>
+
+    <div class="ui-row">
+        <button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+        {% if entity %}
+            <button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="{{ base }}/npcs/{{ entity.id }}" data-confirm="NPC „{{ entity.name_de }}“ löschen?" data-after="goto:{{ base }}">{{ ui.icon('trash-2') }} Löschen</button>
+        {% endif %}
+    </div>
+</form>

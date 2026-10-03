@@ -1,0 +1,170 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}Styleguide{% endblock %}
+
+{% block content %}
+    <div class="dm-page-title">
+        <h1>Styleguide</h1>
+        <span class="ui-badge ui-badge--sky">Alle Bausteine des Designs</span>
+    </div>
+
+    <div class="ui-stack">
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Farben</h2>
+            <div class="ui-row">
+                {% for c in [['paper', 'Papier'], ['card', 'Karte'], ['paper-deep', 'Papier dunkel'], ['forest', 'Waldgrün'], ['forest-light', 'Grün hell'], ['honey', 'Honig'], ['honey-light', 'Honig hell'], ['berry', 'Beere'], ['berry-light', 'Beere hell'], ['sky', 'Himmel'], ['sky-light', 'Himmel hell'], ['ink', 'Tinte'], ['ink-soft', 'Tinte weich']] %}
+                    <div style="width: 96px; text-align: center; font-size: var(--fs-small)">
+                        <div style="height: 48px; border: var(--border); border-radius: var(--radius-s); background: var(--{{ c[0] }})"></div>
+                        {{ c[1] }}
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Schrift</h2>
+            <h1>Überschrift 1 – Der Versinkende Turm</h1>
+            <h2>Überschrift 2 – Ridderhöhe</h2>
+            <h3>Überschrift 3 – Alberta, die Bäckerin</h3>
+            <p>Fließtext in Alegreya: Ein kleines Dorf am Fluss. Fachwerkhäuser, ein Brunnen auf dem Platz und überall der Geruch von frischem Brot. <em>Kursiv für Vorlesetexte.</em> <strong>Fett für Wichtiges.</strong></p>
+            <p class="ui-muted">Gedämpfter Text für Nebensächliches und Hinweise. Äöüß „Anführungszeichen“ – Gedankenstrich.</p>
+            <hr>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Knöpfe</h2>
+            <div class="ui-row">
+                <button class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+                <button class="ui-btn ui-btn--gold">{{ ui.icon('star') }} Hervorgehoben</button>
+                <button class="ui-btn ui-btn--ghost">Abbrechen</button>
+                <button class="ui-btn ui-btn--danger">{{ ui.icon('trash-2') }} Löschen</button>
+                <button class="ui-btn ui-btn--small">Klein</button>
+                <button class="ui-btn ui-btn--icon" aria-label="Hinzufügen">{{ ui.icon('plus') }}</button>
+                <button class="ui-btn" disabled>Gesperrt</button>
+            </div>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Formulare</h2>
+            <div class="ui-grid">
+                <div class="ui-field">
+                    <label for="sg-name">Name</label>
+                    <input class="ui-input" id="sg-name" value="Alberta">
+                    <span class="ui-field__hint">Ein NPC braucht nur einen Namen.</span>
+                </div>
+                <div class="ui-field ui-field--error">
+                    <label for="sg-err">Mit Fehler</label>
+                    <input class="ui-input" id="sg-err" value="">
+                    <span class="ui-field__error">Bitte einen Namen eingeben.</span>
+                </div>
+                <div class="ui-field">
+                    <label for="sg-sel">Auswahl</label>
+                    <select class="ui-select" id="sg-sel"><option>Wald</option><option>Straße</option><option>Ruine</option></select>
+                </div>
+                <div class="ui-field">
+                    <label for="sg-text">Textfeld</label>
+                    <textarea class="ui-textarea" id="sg-text">Theater: raue Stimme, unterbricht gern.</textarea>
+                </div>
+                <div class="ui-field">
+                    <label for="sg-search">Suche</label>
+                    <div class="ui-search">{{ ui.icon('search') }}<input class="ui-input" id="sg-search" type="search" placeholder="Charakter suchen …"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Karten, Abzeichen, Balken, Avatar</h2>
+            <div class="ui-grid">
+                <a class="ui-card ui-card--link" href="#">
+                    <div class="ui-row">
+                        <span class="ui-avatar">{{ ui.icon('user') }}</span>
+                        <div>
+                            <h3 style="margin: 0">Aodhan</h3>
+                            <span class="ui-muted">Elf · Erwachsen · Magier</span>
+                        </div>
+                    </div>
+                    <div class="ui-stack" style="margin-top: var(--space-3); gap: var(--space-2)">
+                        <div class="ui-bar ui-bar--hp" role="meter" aria-label="Trefferpunkte" aria-valuemin="0" aria-valuemax="12" aria-valuenow="9"><div class="ui-bar__fill" style="width: 75%"></div><span class="ui-bar__label">TP 9/12</span></div>
+                        <div class="ui-bar ui-bar--wp" role="meter" aria-label="Willenskraft" aria-valuemin="0" aria-valuemax="14" aria-valuenow="14"><div class="ui-bar__fill" style="width: 100%"></div><span class="ui-bar__label">WP 14/14</span></div>
+                    </div>
+                </a>
+                <div class="ui-card ui-card--dm">
+                    <h3 class="ui-card__title">{{ ui.icon('lock') }} Karte nur für den DM</h3>
+                    <p>Honig-Rahmen: kennzeichnet Inhalt, den Spieler nie sehen.</p>
+                    <div class="ui-row">
+                        <span class="ui-badge">Grün</span>
+                        <span class="ui-badge ui-badge--gold">{{ ui.icon('coins') }} Gold</span>
+                        <span class="ui-badge ui-badge--berry">{{ ui.icon('skull') }} Gefahr</span>
+                        <span class="ui-badge ui-badge--sky">Info</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Schritte (Wizard)</h2>
+            <ol class="ui-stepper">
+                <li class="ui-step ui-step--done">{{ ui.icon('check') }}</li>
+                <li class="ui-step ui-step--done">{{ ui.icon('check') }}</li>
+                <li class="ui-step ui-step--current">3</li>
+                <li class="ui-step">4</li>
+                <li class="ui-step">5</li>
+            </ol>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Tabs</h2>
+            <div class="ui-tabs" role="tablist" data-ui-tabs>
+                <button class="ui-tab" role="tab" aria-selected="true" aria-controls="sg-tab-1">Fertigkeiten</button>
+                <button class="ui-tab" role="tab" aria-selected="false" aria-controls="sg-tab-2">Zauber</button>
+                <button class="ui-tab" role="tab" aria-selected="false" aria-controls="sg-tab-3">Inventar</button>
+            </div>
+            <div class="ui-tabpanel" id="sg-tab-1" role="tabpanel">Hier stehen die Fertigkeiten.</div>
+            <div class="ui-tabpanel" id="sg-tab-2" role="tabpanel" hidden>Hier stehen die Zauber.</div>
+            <div class="ui-tabpanel" id="sg-tab-3" role="tabpanel" hidden>Hier steht das Inventar.</div>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Tabelle (auf dem Handy als Karten)</h2>
+            <table class="ui-table ui-table--cards">
+                <thead><tr><th>Waffe</th><th>Schaden</th><th>Reichweite</th></tr></thead>
+                <tbody>
+                    <tr><td data-label="Waffe">Kurzschwert</td><td data-label="Schaden">W10</td><td data-label="Reichweite">Nah</td></tr>
+                    <tr><td data-label="Waffe">Kurzbogen</td><td data-label="Schaden">W10</td><td data-label="Reichweite">30 m</td></tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Hinweise, Dialog, Toast</h2>
+            <div class="ui-banner ui-banner--info" style="margin-bottom: var(--space-4)">{{ ui.icon('info') }} Info-Band</div>
+            <div class="ui-empty" style="margin-bottom: var(--space-4)">{{ ui.icon('scroll-text') }}<strong>Noch nichts hier</strong><span>Leere Zustände erklären, was als Nächstes zu tun ist.</span></div>
+            <div class="ui-row">
+                <button class="ui-btn" data-ui-open="#sg-sheet">Dialog öffnen</button>
+                <button class="ui-btn ui-btn--gold" onclick="ui.toast('Gespeichert!')">Toast zeigen</button>
+                <button class="ui-btn ui-btn--danger" onclick="ui.toast('Das hat nicht geklappt.', 'error')">Fehler-Toast</button>
+            </div>
+        </section>
+
+        <section class="ui-card">
+            <h2 class="ui-ribbon">Icons</h2>
+            <div class="ui-row" style="gap: var(--space-4)">
+                {% for name in ['user', 'users', 'scroll-text', 'book-open', 'swords', 'shield', 'heart', 'wand-sparkles', 'coins', 'backpack', 'map', 'map-pin', 'castle', 'lock', 'log-in', 'log-out', 'plus', 'pencil', 'trash-2', 'search', 'x', 'check', 'chevron-right', 'chevron-down', 'dices', 'skull', 'crown', 'flame', 'package', 'arrow-left', 'star', 'menu', 'notebook-pen', 'paw-print', 'house', 'triangle-alert', 'info', 'bookmark', 'feather'] %}
+                    <span style="display: grid; justify-items: center; gap: 4px; width: 84px; font-size: 0.75rem; color: var(--ink-soft)"><style>.sg-icon{width:1.8rem;height:1.8rem}</style>{{ ui.icon(name, 'sg-icon') }}{{ name }}</span>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <dialog class="ui-sheet" id="sg-sheet">
+        <button class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <h2>Ein Dialog</h2>
+        <p>Auf dem Desktop schwebt er in der Mitte, auf dem Handy gleitet er als Blatt von unten herein.</p>
+        <div class="ui-row">
+            <button class="ui-btn" data-ui-close>{{ ui.icon('check') }} Verstanden</button>
+            <button class="ui-btn ui-btn--ghost" data-ui-close>Abbrechen</button>
+        </div>
+    </dialog>
+{% endblock %}

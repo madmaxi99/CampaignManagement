@@ -467,6 +467,17 @@ final class CharacterRepository
         $stmt->execute(['id' => $characterId]);
     }
 
+    /** The player's private "Gedächtnis" text. Empty text clears it. */
+    public function setMemory(int $characterId, string $text): void
+    {
+        $text = trim($text);
+        $stmt = $this->db->prepare('UPDATE characters SET memory_de = :text WHERE id = :character_id');
+        $stmt->execute([
+            'text' => $text === '' ? null : mb_substr($text, 0, 20000),
+            'character_id' => $characterId,
+        ]);
+    }
+
     public function setCurrency(int $characterId, int $gold, int $silver, int $copper): void
     {
         $stmt = $this->db->prepare(

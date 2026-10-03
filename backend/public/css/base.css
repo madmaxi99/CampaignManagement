@@ -1,0 +1,137 @@
+/* Fonts (self-hosted, OFL; see /fonts/LICENSE-*.txt) */
+@font-face {
+    font-family: "Almendra";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("/fonts/almendra-latin-400-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Almendra";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("/fonts/almendra-latin-700-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Alegreya";
+    font-style: normal;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url("/fonts/alegreya-latin-wght-normal.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Alegreya";
+    font-style: italic;
+    font-weight: 400 900;
+    font-display: swap;
+    src: url("/fonts/alegreya-latin-wght-italic.woff2") format("woff2");
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+    /* Fixed bars (tab bar, wizard navigation, sticky vitals) must not cover a
+       field the browser scrolls into view. */
+    scroll-padding: 180px 0 200px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    font-size: var(--fs-body);
+    line-height: 1.5;
+    color: var(--ink);
+    font-variant-numeric: lining-nums;
+    background-color: var(--paper);
+    /* Paper: soft sky wash at the top, fine dots, warm vignette. */
+    background-image:
+        radial-gradient(rgba(154, 98, 8, 0.07) 1px, transparent 1.6px),
+        linear-gradient(180deg, #eef5f2 0, var(--paper) 280px);
+    background-size: 22px 22px, 100% 100%;
+    background-repeat: repeat, no-repeat;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--forest-dark);
+    margin: 0 0 var(--space-3);
+}
+
+h1 { font-size: var(--fs-h1); }
+h2 { font-size: var(--fs-h2); }
+h3 { font-size: var(--fs-h3); }
+h4 { font-size: var(--fs-lead); }
+
+p {
+    margin: 0 0 var(--space-3);
+}
+
+a {
+    color: var(--forest-dark);
+    text-underline-offset: 3px;
+}
+
+a:hover {
+    color: var(--forest);
+}
+
+:focus-visible {
+    outline: 3px solid var(--honey);
+    outline-offset: 2px;
+    border-radius: var(--radius-s);
+}
+
+img {
+    max-width: 100%;
+}
+
+hr {
+    border: 0;
+    height: 12px;
+    margin: var(--space-5) 0;
+    background: center / contain no-repeat url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12'%3E%3Cpath d='M0 6h96M144 6h96' stroke='%23e6d4a6' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M120 1l4 5-4 5-4-5z' fill='%23e6a93a'/%3E%3C/svg%3E");
+}
+
+/* Components set display: grid/flex, which would beat the hidden attribute. */
+[hidden] {
+    display: none !important;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,0 +1,32 @@
+{% extends "_base.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block body_class %}player{% endblock %}
+
+{% block shell %}
+    {% set path = current_url() %}
+    <div class="player-shell">
+        <header class="player-header">
+            <a class="player-brand" href="/characters">{{ ui.icon('book-open') }} {{ app_name }}</a>
+        </header>
+
+        <main class="player-main">
+            {% block content %}{% endblock %}
+        </main>
+
+        <nav class="player-tabbar" aria-label="Hauptnavigation">
+            <a class="player-tab" href="/characters"{% if path == '/characters' or (path starts with '/character/' and path != '/character/create') %} aria-current="page"{% endif %}>
+                {{ ui.icon('users') }}<span>Charaktere</span>
+            </a>
+            <a class="player-tab" href="/character/create"{% if path == '/character/create' %} aria-current="page"{% endif %}>
+                {{ ui.icon('plus') }}<span>Neu</span>
+            </a>
+            <a class="player-tab" href="/rules"{% if path == '/rules' %} aria-current="page"{% endif %}>
+                {{ ui.icon('book-open') }}<span>Regeln</span>
+            </a>
+            <a class="player-tab" href="{{ is_dm ? '/dm' : '/dm/login' }}">
+                {{ ui.icon('lock') }}<span>DM</span>
+            </a>
+        </nav>
+    </div>
+{% endblock %}

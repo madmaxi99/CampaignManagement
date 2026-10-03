@@ -1,0 +1,100 @@
+{# Read-only cards of campaign things, shown in dialogs of the play mode. #}
+
+{% macro creature(creature, entityRegistry) %}
+    <div class="card-block">
+        <h3>{{ creature.name_de }}</h3>
+        {% if creature.image_path %}<img class="place-image" src="/{{ creature.image_path }}" alt="{{ creature.name_de }}" onerror="this.remove()">{% endif %}
+        <div class="stat-row">
+            <span class="ui-badge ui-badge--berry">TP {{ creature.hp }}</span>
+            <span class="ui-badge">Grimmigkeit {{ creature.grimmigkeit_de }}</span>
+            <span class="ui-badge ui-badge--sky">Größe {{ creature.size_de }}</span>
+            <span class="ui-badge ui-badge--gold">Bewegung {{ creature.movement }}</span>
+            <span class="ui-badge">Rüstung {{ creature.armor_de }}</span>
+        </div>
+        {% if creature.resistances_de %}<p class="pre-wrap"><strong>Resistenzen:</strong> {{ creature.resistances_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if creature.immunities_de %}<p class="pre-wrap"><strong>Immunität:</strong> {{ creature.immunities_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if creature.traits_de %}<p class="pre-wrap"><strong>Besonderheiten:</strong> {{ creature.traits_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if creature.kit_de %}<p class="pre-wrap"><strong>Profil:</strong> {{ creature.kit_de }}</p>{% endif %}
+        {% if creature.campaign_notes_de %}<p class="pre-wrap"><strong>In dieser Kampagne:</strong> {{ creature.campaign_notes_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if creature.attacks is not empty %}
+            <table class="ui-table ui-table--cards">
+                <thead><tr><th>Wurf</th><th>Angriff</th><th>Effekt</th></tr></thead>
+                <tbody>
+                    {% for attack in creature.attacks %}
+                        <tr>
+                            <td data-label="Wurf">{{ attack.roll_de }}</td>
+                            <td data-label="Angriff"><strong>{{ attack.title_de }}</strong></td>
+                            <td data-label="Effekt" class="pre-wrap">{{ attack.effect_de|linkify(entityRegistry) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro npc(npc, campaignId, entityRegistry) %}
+    {% import _self as cards %}
+    <div class="card-block">
+        <div class="ui-row">
+            <span class="ui-avatar ui-avatar--large">
+                {% if npc.portrait_path %}<img src="/{{ npc.portrait_path }}" alt="">{% else %}<svg class="ui-icon" aria-hidden="true"><use href="/icons/sprite.svg#user"></use></svg>{% endif %}
+            </span>
+            <h3 style="margin: 0">{{ npc.name_de }}</h3>
+        </div>
+        {% if npc.description_de %}<p class="read-aloud pre-wrap">{{ npc.description_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if npc.dm_text_de %}<p class="dm-text pre-wrap"><strong>Für den DM:</strong> {{ npc.dm_text_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if npc.found_hint_de or npc.place_de %}
+            <p class="pre-wrap"><strong>Zu finden:</strong> {{ [npc.place_de, npc.found_hint_de]|filter(v => v)|join(' – ') }}</p>
+        {% endif %}
+        <div class="ui-field">
+            <label for="npc-notes-{{ npc.id }}">Notizen in dieser Kampagne</label>
+            <textarea class="ui-textarea" id="npc-notes-{{ npc.id }}" rows="3" data-notes-url="/dm/campaign/{{ campaignId }}/npcs/{{ npc.id }}/notes" placeholder="lebt, mochte Aodhan, geflohen …">{{ npc.notes_de }}</textarea>
+            <span class="ui-field__hint" data-notes-status aria-live="polite">Wird automatisch gespeichert.</span>
+        </div>
+        {% if npc.creature %}{{ cards.creature(npc.creature, entityRegistry) }}{% endif %}
+    </div>
+{% endmacro %}
+
+{% macro place(place, entityRegistry) %}
+    <div class="card-block">
+        <h3>{% if place.number_label %}#{{ place.number_label }} – {% endif %}{{ place.name_de }}{% if place.parent_de %} <small class="ui-muted">(in {{ place.parent_de }})</small>{% endif %}</h3>
+        {% if place.image_path %}<img class="place-image" src="/{{ place.image_path }}" alt="{{ place.name_de }}" onerror="this.remove()">{% endif %}
+        {% if place.description_de %}<p class="read-aloud pre-wrap">{{ place.description_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if place.dm_text_de %}<p class="dm-text pre-wrap"><strong>Für den DM:</strong> {{ place.dm_text_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if place.encounter_table_de %}<p><strong>Zufallsbegegnungen:</strong> {{ place.encounter_table_de }}</p>{% endif %}
+    </div>
+{% endmacro %}
+
+{% macro item(item, entityRegistry) %}
+    <div class="card-block">
+        <h3>{{ item.name_de }}</h3>
+        {% if item.image_path %}<img class="place-image" src="/{{ item.image_path }}" alt="{{ item.name_de }}" onerror="this.remove()">{% endif %}
+        {% if item.description_de %}<p class="read-aloud pre-wrap">{{ item.description_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if item.dm_text_de %}<p class="dm-text pre-wrap"><strong>Für den DM:</strong> {{ item.dm_text_de|linkify(entityRegistry) }}</p>{% endif %}
+        {% if item.found_hint_de or item.place_de %}
+            <p class="pre-wrap"><strong>Zu finden:</strong> {{ [item.place_de, item.found_hint_de]|filter(v => v)|join(' – ') }}</p>
+        {% endif %}
+        {% if item.text_de %}<div class="book-text pre-wrap">{{ item.text_de }}</div>{% endif %}
+    </div>
+{% endmacro %}
+
+{% macro encounter_table(table, entityRegistry) %}
+    <div class="event-table" data-event-table>
+        <div class="ui-row" style="justify-content: space-between">
+            <h3 style="margin: 0">{{ table.name_de }}</h3>
+            <span class="ui-row">
+                <strong data-roll-result></strong>
+                <button type="button" class="ui-btn ui-btn--gold ui-btn--small" data-roll-button>Würfeln</button>
+            </span>
+        </div>
+        <ul class="event-table-list">
+            {% for entry in table.entries %}
+                <li class="event-entry" data-min="{{ entry.min_roll }}" data-max="{{ entry.max_roll ?? entry.min_roll }}" data-open-ended="{{ entry.max_roll is null ? '1' : '0' }}">
+                    <span class="event-roll">{{ entry.max_roll is null ? entry.min_roll ~ '+' : (entry.min_roll == entry.max_roll ? entry.min_roll : entry.min_roll ~ '–' ~ entry.max_roll) }}</span>
+                    <span class="event-text">{{ entry.text_de|linkify(entityRegistry) }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endmacro %}

@@ -1,0 +1,41 @@
+{% import "_ui.twig" as ui %}
+{% set base = '/dm/campaign/' ~ campaign.id %}
+<form class="ui-card ui-stack" data-dm-form
+      data-action="{{ entity ? base ~ '/chapters/' ~ entity.id : base ~ '/chapters' }}"
+      data-after="{{ entity ? 'reload' : 'goto:' ~ base ~ '?e=chapter-{id}' }}">
+    <h2 class="ui-card__title">{{ ui.icon('scroll-text') }} {{ entity ? 'Kapitel ' ~ entity.label : 'Neues Kapitel' }}</h2>
+    <div class="ui-field"><label for="ch-title">Titel</label><input class="ui-input" id="ch-title" name="title_de" maxlength="150" required value="{{ entity.title_de|default('') }}"></div>
+    <div class="ui-field">
+        <label for="ch-notes">Notizen zum Kapitel</label>
+        <textarea class="ui-textarea" id="ch-notes" name="notes_de" rows="8">{{ entity.notes_de|default('') }}</textarea>
+        <span class="ui-field__hint">Ein sinnvoller Abschnitt, den du an einer oder mehreren Sessions spielen willst.</span>
+    </div>
+    <div class="ui-row">
+        <button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+        {% if entity %}
+            <button type="button" class="ui-btn ui-btn--ghost" data-dm-post data-url="{{ base }}/chapters/{{ entity.id }}/move" data-body='{"direction":"up"}' data-after="reload" aria-label="Kapitel nach oben">↑ Früher</button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-dm-post data-url="{{ base }}/chapters/{{ entity.id }}/move" data-body='{"direction":"down"}' data-after="reload" aria-label="Kapitel nach unten">↓ Später</button>
+            <button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="{{ base }}/chapters/{{ entity.id }}" data-confirm="Kapitel „{{ entity.title_de }}“ löschen? Orte, NPCs und Items bleiben, verlieren aber das Kapitel." data-after="goto:{{ base }}">{{ ui.icon('trash-2') }} Löschen</button>
+        {% endif %}
+    </div>
+</form>
+
+{% if entity %}
+    <div class="ui-card ui-stack" style="margin-top: var(--space-4)">
+        <h3 class="ui-card__title">In diesem Kapitel</h3>
+        {% set inChapterPlaces = places|filter(x => x.chapter_id == entity.id) %}
+        {% set inChapterNpcs = npcs|filter(x => x.chapter_id == entity.id) %}
+        {% set inChapterItems = items|filter(x => x.chapter_id == entity.id) %}
+        <ul class="plain-list">
+            {% for p in inChapterPlaces %}<li><a href="{{ base }}?e=place-{{ p.id }}">{{ ui.icon('map-pin') }} {{ p.number_label ? '#' ~ p.number_label ~ ' ' : '' }}{{ p.name_de }}</a></li>{% endfor %}
+            {% for n in inChapterNpcs %}<li><a href="{{ base }}?e=npc-{{ n.id }}">{{ ui.icon('user') }} {{ n.name_de }}</a></li>{% endfor %}
+            {% for i in inChapterItems %}<li><a href="{{ base }}?e=item-{{ i.id }}">{{ ui.icon('package') }} {{ i.name_de }}</a></li>{% endfor %}
+        </ul>
+        {% if inChapterPlaces is empty and inChapterNpcs is empty and inChapterItems is empty %}<p class="ui-muted">Noch nichts zugeordnet. Wähle das Kapitel bei einem Ort, NPC oder Item.</p>{% endif %}
+        <div class="ui-row">
+            <a class="ui-btn ui-btn--ghost ui-btn--small" href="{{ base }}?e=place-new&chapter={{ entity.id }}">{{ ui.icon('plus') }} Ort</a>
+            <a class="ui-btn ui-btn--ghost ui-btn--small" href="{{ base }}?e=npc-new&chapter={{ entity.id }}">{{ ui.icon('plus') }} NPC</a>
+            <a class="ui-btn ui-btn--ghost ui-btn--small" href="{{ base }}?e=item-new&chapter={{ entity.id }}">{{ ui.icon('plus') }} Item</a>
+        </div>
+    </div>
+{% endif %}

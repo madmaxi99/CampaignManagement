@@ -1,0 +1,65 @@
+/*
+ * Design tokens: "Märchenbuch" theme (light, warm, friendly).
+ * Every colour, size and shadow of the UI comes from here.
+ * Contrast notes (WCAG AA, body text >= 4.5:1): --ink, --ink-soft and --hint
+ * on --paper/--card; white on --forest, --berry, --sky-dark; --ink on --honey.
+ */
+:root {
+    /* Paper and ink */
+    --paper: #fbf4e2;
+    --paper-deep: #f3e6c4;
+    --card: #fffbf0;
+    --card-edge: #e6d4a6;
+    --ink: #3a2c1d;
+    --ink-soft: #6a5a45;
+    --hint: #75654d;
+
+    /* Accents */
+    --forest: #3a7349;
+    --forest-dark: #2b5937;
+    --forest-light: #dcebd9;
+    --honey: #e6a93a;
+    --honey-dark: #9a6208;
+    --honey-light: #fbe9bf;
+    --berry: #b84a42;
+    --berry-dark: #8f352f;
+    --berry-light: #f6d9d5;
+    --sky: #3f7fa3;
+    --sky-light: #d9eaf3;
+
+    /* Shadows (warm, soft) */
+    --shadow-1: 0 1px 2px rgba(86, 60, 20, 0.12), 0 2px 8px rgba(86, 60, 20, 0.08);
+    --shadow-2: 0 4px 10px rgba(86, 60, 20, 0.14), 0 12px 28px rgba(86, 60, 20, 0.12);
+
+    /* Shape */
+    --radius-s: 8px;
+    --radius-m: 14px;
+    --radius-l: 20px;
+    --border: 2px solid var(--card-edge);
+
+    /* Spacing scale */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+
+    /* Type */
+    --font-display: "Almendra", "Georgia", serif;
+    --font-body: "Alegreya", "Georgia", serif;
+    --fs-small: 0.9rem;
+    --fs-body: 1rem;
+    --fs-lead: 1.15rem;
+    --fs-h3: 1.3rem;
+    --fs-h2: 1.65rem;
+    --fs-h1: 2.1rem;
+
+    /* Touch target */
+    --touch: 44px;
+
+    /* Layout */
+    --sidebar-width: 248px;
+    --tabbar-height: 64px;
+}

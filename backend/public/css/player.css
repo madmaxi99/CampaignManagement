@@ -1,0 +1,127 @@
+/* Player shell: phone first. Header on top, tab bar at the thumb. */
+
+.player-shell {
+    min-height: 100vh;
+    padding-bottom: calc(var(--tabbar-height) + var(--space-5) + env(safe-area-inset-bottom));
+}
+
+.player-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+}
+
+.player-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--forest-dark);
+    text-decoration: none;
+}
+
+.player-brand .ui-icon {
+    color: var(--honey);
+}
+
+.player-main {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+    padding: var(--space-2) var(--space-4) var(--space-5);
+}
+
+.player-tabbar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 50;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    height: calc(var(--tabbar-height) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    background: var(--card);
+    border-top: 2px solid var(--card-edge);
+    box-shadow: 0 -4px 14px rgba(86, 60, 20, 0.08);
+}
+
+.player-tab {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 2px;
+    min-height: var(--touch);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--ink-soft);
+    text-decoration: none;
+}
+
+.player-tab .ui-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+}
+
+.player-tab[aria-current="page"] {
+    color: var(--forest-dark);
+}
+
+.player-tab[aria-current="page"] .ui-icon {
+    padding: 2px;
+    color: var(--ink);
+    background: var(--honey-light);
+    border-radius: 8px;
+    box-sizing: content-box;
+}
+
+/* Wider screens: the tab bar becomes a slim bar below the header. */
+@media (min-width: 900px) {
+    .player-shell {
+        display: flex;
+        flex-direction: column;
+        padding-bottom: var(--space-6);
+    }
+
+    .player-header { order: 1; }
+    .player-tabbar { order: 2; }
+    .player-main { order: 3; }
+
+    .player-tabbar {
+        position: static;
+        inset: auto;
+        display: flex;
+        height: auto;
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 var(--space-4);
+        gap: var(--space-2);
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+
+    .player-tab {
+        display: inline-flex;
+        grid-auto-flow: column;
+        gap: var(--space-2);
+        padding: 0 var(--space-4);
+        font-size: var(--fs-body);
+        border-radius: 999px;
+    }
+
+    .player-tab[aria-current="page"] {
+        background: var(--forest-light);
+    }
+
+    .player-tab[aria-current="page"] .ui-icon {
+        padding: 0;
+        background: none;
+    }
+
+    .ui-toasts {
+        bottom: var(--space-4);
+    }
+}

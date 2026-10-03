@@ -3,6 +3,7 @@
 {% block title %}Charakter erstellen{% endblock %}
 
 {% block content %}
+<h1>Charakter erstellen</h1>
 <div class="wizard" data-catalog-url="/api/character-creation/catalog"></div>
-<script src="/js/character-creation-wizard.js"></script>
+<script src="{{ asset('js/character-creation-wizard.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,161 @@
+/* DM shell: desktop first. Sidebar on the left, "DM only" banner on top. */
+
+.dm-shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    min-height: 100vh;
+}
+
+.dm-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    height: 100vh;
+    padding: var(--space-5) var(--space-4);
+    background: var(--card);
+    border-right: 2px solid var(--card-edge);
+}
+
+.dm-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: var(--forest-dark);
+    text-decoration: none;
+}
+
+.dm-brand .ui-icon {
+    color: var(--honey);
+}
+
+.dm-nav {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.dm-nav__label {
+    margin: var(--space-4) 0 var(--space-1);
+    padding: 0 var(--space-3);
+    font-size: var(--fs-small);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hint);
+}
+
+.dm-nav a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: var(--touch);
+    padding: 0 var(--space-3);
+    font-weight: 700;
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: var(--radius-s);
+}
+
+.dm-nav a:hover {
+    background: var(--forest-light);
+}
+
+.dm-nav a[aria-current="page"] {
+    color: var(--forest-dark);
+    background: var(--honey-light);
+    box-shadow: inset 4px 0 0 var(--honey);
+}
+
+.dm-sidebar__foot {
+    margin-top: auto;
+}
+
+.dm-main {
+    min-width: 0;
+}
+
+.dm-content {
+    width: 100%;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: var(--space-5);
+}
+
+.dm-page-title {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.dm-page-title h1 {
+    margin: 0;
+}
+
+/* Three-column workspace: tree | content | details (campaign editor, SP3). */
+.dm-workspace {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 280px minmax(0, 1fr) 320px;
+    align-items: start;
+}
+
+/* Tablet and narrow desktop: the sidebar becomes a horizontal strip. */
+@media (max-width: 1100px) {
+    .dm-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .dm-shell {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .dm-sidebar {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        height: auto;
+        padding: var(--space-3) var(--space-4);
+        border-right: 0;
+        border-bottom: 2px solid var(--card-edge);
+    }
+
+    .dm-nav {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .dm-nav__label {
+        display: none;
+    }
+
+    .dm-sidebar__foot {
+        margin: 0 0 0 auto;
+    }
+
+    .dm-content {
+        padding: var(--space-4);
+    }
+}
+
+/* Login */
+.dm-login {
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    padding: var(--space-4);
+}
+
+.dm-login__card {
+    width: min(420px, 100%);
+}

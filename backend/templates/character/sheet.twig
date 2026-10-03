@@ -1,16 +1,21 @@
 {% extends "layout.twig" %}
+{% import "_ui.twig" as ui %}
 
 {% block title %}{{ character.name_de }}{% endblock %}
 
-{% macro skill_list(skills, category, listId) %}
-    <ul class="entry-list"{% if listId %} id="{{ listId }}"{% endif %}>
+{% macro skill_list(skills, category) %}
+    <ul class="entry-list">
         {% for skill in skills %}
-            <li class="entry-row" data-detail="{{ {'type': 'skill', 'id': skill.id, 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': category, 'value': skill.value}|json_encode|e('html_attr') }}">
-                <label class="mark-checkbox" title="Markiere ihn, wenn du nicht bestanden hast." onclick="event.stopPropagation()">
-                    <input type="checkbox" class="skill-mark" data-skill-id="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
+            <li class="entry-row">
+                <label class="mark-toggle" title="Markieren, wenn die Probe nicht bestanden wurde (Steigerung beim Level-up)">
+                    <input type="checkbox" data-skill-mark="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
+                    <span class="mark-toggle__box" aria-hidden="true"></span>
+                    <span class="visually-hidden">{{ skill.name_de }} für Steigerung markieren</span>
                 </label>
-                <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
-                <span class="entry-value">{{ skill.value }}</span>
+                <button type="button" class="entry-main" data-detail="{{ {'type': 'skill', 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': category, 'value': skill.value}|json_encode|e('html_attr') }}">
+                    <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
+                    <span class="ui-badge entry-value">{{ skill.value }}</span>
+                </button>
             </li>
         {% endfor %}
     </ul>
@@ -21,229 +26,234 @@
 {% block content %}
 <div class="sheet" data-id="{{ character.id }}">
 
-    <header class="sheet-header">
-        <div class="sheet-header-inner">
-            {% if character.portrait_path %}
-                <img class="sheet-portrait" src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">
-            {% else %}
-                <form id="portrait-upload-form" class="sheet-portrait-upload" enctype="multipart/form-data">
-                    <label for="portrait-upload-input">Kein Bild</label>
-                    <input type="file" id="portrait-upload-input" name="portrait" accept="image/jpeg,image/png,image/webp" required>
-                    <button type="submit">Hochladen</button>
-                </form>
-            {% endif %}
-            <div class="sheet-header-text">
-                <div class="sheet-header-title-row">
-                    <h1>{{ character.name_de }}</h1>
-                    {% if not character.is_default %}
-                        <button type="button" id="delete-character-button" class="button-danger">Charakter löschen</button>
-                    {% endif %}
-                </div>
-                <dl class="sheet-header-facts">
-                    <div><dt>Volk</dt><dd>{{ character.kin_de }}</dd></div>
-                    <div><dt>Alter</dt><dd>{{ character.age_de }}</dd></div>
-                    <div><dt>Beruf</dt><dd>{{ character.profession_de }}</dd></div>
-                    <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
-                    {% if character.memento_de %}
-                        <div><dt>Memento</dt><dd>{{ character.memento_de }}</dd></div>
-                    {% endif %}
-                </dl>
-                <p class="appearance">{{ character.appearance_de }}</p>
-            </div>
+    <header class="sheet-hero ui-card ui-card--raised">
+        {% if character.portrait_path %}
+            <span class="ui-avatar ui-avatar--large"><img src="/{{ character.portrait_path }}" alt="{{ character.name_de }}"></span>
+        {% else %}
+            <form class="sheet-portrait-upload" data-portrait-form>
+                <label class="ui-avatar ui-avatar--large" for="portrait-input" title="Bild hinzufügen">{{ ui.icon('user') }}<span class="visually-hidden">Bild hinzufügen</span></label>
+                <input class="visually-hidden" type="file" id="portrait-input" name="portrait" accept="image/jpeg,image/png,image/webp">
+            </form>
+        {% endif %}
+        <div class="sheet-hero__text">
+            <h1>{{ character.name_de }}</h1>
+            <p class="ui-muted">{{ character.kin_de }} · {{ character.age_de }} · {{ character.profession_de }}</p>
         </div>
+        <a class="ui-btn ui-btn--gold ui-btn--small sheet-hero__levelup" href="/character/{{ character.id }}/levelup">{{ ui.icon('star') }} Level-up</a>
     </header>
 
-    <section class="card attributes">
-        <h2>Attribute</h2>
-        <div class="attribute-grid">
-            {% for attribute in attributes %}
-                <div class="attribute">
-                    <div class="attribute-code">{{ attribute.code }}</div>
-                    <div class="attribute-value">{{ attribute.value }}</div>
-                    <div class="attribute-name">{{ attribute.name_de }}</div>
-                    {% for condition in conditions %}
-                        {% if condition.attribute_code == attribute.code %}
-                            <button type="button"
-                                    class="condition-chip{% if condition.active %} active{% endif %}"
-                                    data-condition-code="{{ condition.code }}">
-                                {{ condition.name_de }}
-                            </button>
-                        {% endif %}
-                    {% endfor %}
+    <div class="sheet-sticky">
+    <section class="sheet-vitals ui-card" aria-label="Trefferpunkte und Willenskraft">
+        {% for v in [{'key': 'hp', 'label': 'TP', 'name': 'Trefferpunkte', 'current': character.hp_current, 'max': character.hp_max}, {'key': 'wp', 'label': 'WP', 'name': 'Willenskraft', 'current': character.wp_current, 'max': character.wp_max}] %}
+            <div class="vital" data-vital="{{ v.key }}" data-current="{{ v.current }}" data-max="{{ v.max }}">
+                <span class="vital__label">{{ v.label }}</span>
+                <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon" data-vital-step="-1" aria-label="{{ v.name }} verringern">−</button>
+                <div class="ui-bar ui-bar--{{ v.key }}" role="meter" aria-label="{{ v.name }}" aria-valuemin="0" aria-valuemax="{{ v.max }}" aria-valuenow="{{ v.current }}">
+                    <div class="ui-bar__fill" style="width: {{ v.max > 0 ? (v.current / v.max * 100)|round : 0 }}%"></div>
+                    <span class="ui-bar__label">{{ v.current }} / {{ v.max }}</span>
                 </div>
-            {% endfor %}
-        </div>
-        <div class="derived-stats">
-            <div><span class="label">Bewegung</span><span class="value">{{ character.movement }} m</span></div>
-            <div><span class="label">Traglast</span><span class="value">{{ character.carrying_capacity }}</span></div>
-            <div><span class="label">Schadensbonus (STA)</span><span class="value">{{ character.damage_bonus_sta_de }}</span></div>
-            <div><span class="label">Schadensbonus (GEW)</span><span class="value">{{ character.damage_bonus_gew_de }}</span></div>
-        </div>
+                <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon" data-vital-step="1" aria-label="{{ v.name }} erhöhen">+</button>
+            </div>
+        {% endfor %}
     </section>
 
-    <section class="card vitals">
-        <h2>Trefferpunkte &amp; Willenskraft</h2>
-        <div class="vital-tracker" data-vital="hp" data-max="{{ character.hp_max }}" data-current="{{ character.hp_current }}">
-            <span class="vital-label">TP</span>
-            <div class="pips">
-                {% for i in 1..character.hp_max %}
-                    <button type="button" class="pip{% if i <= character.hp_current %} filled{% endif %}" data-index="{{ i }}"></button>
+    <div class="ui-tabs sheet-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash>
+        <button class="ui-tab" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true">Überblick</button>
+        <button class="ui-tab" role="tab" id="tab-skills" aria-controls="panel-skills" aria-selected="false">Fertigkeiten</button>
+        <button class="ui-tab" role="tab" id="tab-gear" aria-controls="panel-gear" aria-selected="false">Ausrüstung</button>
+        <button class="ui-tab" role="tab" id="tab-memory" aria-controls="panel-memory" aria-selected="false">Gedächtnis</button>
+    </div>
+    </div>
+
+    {# ---------- Überblick ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('shield') }} Attribute</h2>
+            <div class="attribute-grid">
+                {% for attribute in attributes %}
+                    <div class="attribute">
+                        <span class="attribute__value">{{ attribute.value }}</span>
+                        <span class="attribute__code">{{ attribute.code }}</span>
+                        <span class="attribute__name ui-muted">{{ attribute.name_de }}</span>
+                        {% for condition in conditions %}
+                            {% if condition.attribute_code == attribute.code %}
+                                <button type="button" class="condition-chip" aria-pressed="{{ condition.active ? 'true' : 'false' }}" data-condition="{{ condition.code }}">{{ condition.name_de }}</button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 {% endfor %}
             </div>
-            <span class="vital-count">{{ character.hp_current }} / {{ character.hp_max }}</span>
-        </div>
-        <div class="vital-tracker" data-vital="wp" data-max="{{ character.wp_max }}" data-current="{{ character.wp_current }}">
-            <span class="vital-label">WP</span>
-            <div class="pips">
-                {% for i in 1..character.wp_max %}
-                    <button type="button" class="pip{% if i <= character.wp_current %} filled{% endif %}" data-index="{{ i }}"></button>
-                {% endfor %}
-            </div>
-            <span class="vital-count">{{ character.wp_current }} / {{ character.wp_max }}</span>
-        </div>
-    </section>
+            <p class="ui-field__hint" style="margin-top: var(--space-3)">Zustände antippen, um sie ein- oder auszuschalten.</p>
+        </section>
 
-    <section class="card skills-spells">
-        <div class="card-heading-row">
-            <h2>Fertigkeiten &amp; Zauber</h2>
-            <a class="button-primary" href="/character/{{ character.id }}/levelup">Level Up</a>
-        </div>
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('feather') }} Werte</h2>
+            <dl class="facts">
+                <div><dt>Bewegung</dt><dd>{{ character.movement }} m</dd></div>
+                <div><dt>Traglast</dt><dd>{{ character.carrying_capacity }}</dd></div>
+                <div><dt>Schadensbonus STA</dt><dd>{{ character.damage_bonus_sta_de }}</dd></div>
+                <div><dt>Schadensbonus GEW</dt><dd>{{ character.damage_bonus_gew_de }}</dd></div>
+            </dl>
+        </section>
 
-        <h3>Fertigkeiten</h3>
-        {{ sheet_macros.skill_list(regularSkills, 'regular', 'regular-skills-list') }}
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('scroll-text') }} Über {{ character.name_de }}</h2>
+            <dl class="facts">
+                <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
+                {% if character.memento_de %}<div><dt>Memento</dt><dd>{{ character.memento_de }}</dd></div>{% endif %}
+                {% if character.appearance_de %}<div><dt>Aussehen</dt><dd>{{ character.appearance_de }}</dd></div>{% endif %}
+            </dl>
+        </section>
 
-        <h3>Kampffertigkeiten</h3>
-        {{ sheet_macros.skill_list(combatSkills, 'combat') }}
+        {% if not character.is_default %}
+            <section class="ui-card sheet-danger">
+                <button type="button" class="ui-btn ui-btn--danger ui-btn--block" data-ui-open="#delete-sheet">{{ ui.icon('trash-2') }} Charakter löschen</button>
+            </section>
+        {% endif %}
+    </div>
 
-        <h3>Sekundäre Fertigkeiten</h3>
-        {{ sheet_macros.skill_list(secondarySkills, 'secondary') }}
+    {# ---------- Fertigkeiten ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('swords') }} Fertigkeiten</h2>
+            <p class="ui-field__hint">Das Kästchen markiert eine nicht bestandene Probe. Beim Level-up darfst du markierte Fertigkeiten steigern.</p>
+            {{ sheet_macros.skill_list(regularSkills, 'regular') }}
+            <h3>Kampf</h3>
+            {{ sheet_macros.skill_list(combatSkills, 'combat') }}
+            <h3>Sekundär</h3>
+            {{ sheet_macros.skill_list(secondarySkills, 'secondary') }}
+        </section>
 
-        <h3>Zauber &amp; Tricks</h3>
-        <ul class="entry-list">
-            {% for spell in spells %}
-                <li class="entry-row" data-detail="{{ {'type': 'spell', 'name': spell.name_de, 'components': spell.components_de, 'castingTime': spell.casting_time_de, 'range': spell.range_de, 'duration': spell.duration_de, 'wpNote': spell.wp_note_de, 'effect': spell.effect_de}|json_encode|e('html_attr') }}">
-                    <span class="entry-name">{{ spell.name_de }}</span>
-                    <span class="entry-value">{{ spell.wp_note_de }}</span>
-                </li>
-            {% endfor %}
-        </ul>
+        {% if spells is not empty %}
+            <section class="ui-card">
+                <h2 class="ui-card__title">{{ ui.icon('wand-sparkles') }} Zauber &amp; Tricks</h2>
+                <ul class="entry-list">
+                    {% for spell in spells %}
+                        <li class="entry-row">
+                            <button type="button" class="entry-main" data-detail="{{ {'type': 'spell', 'name': spell.name_de, 'components': spell.components_de, 'castingTime': spell.casting_time_de, 'range': spell.range_de, 'duration': spell.duration_de, 'wpNote': spell.wp_note_de, 'effect': spell.effect_de}|json_encode|e('html_attr') }}">
+                                <span class="entry-name">{{ spell.name_de }}</span>
+                                <span class="ui-badge ui-badge--sky entry-value">{{ spell.wp_note_de }}</span>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
 
-        <h3>Talente</h3>
-        <ul class="talent-list">
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('crown') }} Talente</h2>
             {% for talent in talents %}
-                <li>
-                    <span class="talent-name">{{ talent.name_de }}{% if talent.wp_note_de %} <small>({{ talent.wp_note_de }})</small>{% endif %}</span>
-                    <p class="talent-description">{{ talent.description_de }}</p>
-                </li>
+                <div class="talent">
+                    <strong>{{ talent.name_de }}</strong>{% if talent.wp_note_de %} <span class="ui-badge ui-badge--sky">{{ talent.wp_note_de }}</span>{% endif %}
+                    <p class="ui-muted">{{ talent.description_de }}</p>
+                </div>
+            {% else %}
+                <p class="ui-muted">Noch keine Talente.</p>
             {% endfor %}
-        </ul>
-    </section>
+        </section>
+    </div>
 
-    <section class="card equipment-list">
-        <div class="card-heading-row">
-            <h2>Waffen</h2>
-            <button type="button" class="add-row-button" data-segment="weapons">+ Waffe hinzufügen</button>
-        </div>
-        <table class="item-table" id="weapons-table">
-            <thead>
-                <tr><th>Name</th><th>Griff</th><th>Reichweite</th><th>Schaden</th><th>Merkmale/Beschreibung</th><th></th></tr>
-            </thead>
-            <tbody>
-                {% for weapon in weapons %}
-                    <tr data-row-id="{{ weapon.row_id }}">
-                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="name_de" value="{{ weapon.name_de }}"></td>
-                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="grip_de" value="{{ weapon.grip_de }}"></td>
-                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="range_de" value="{{ weapon.range_de }}"></td>
-                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="damage_de" value="{{ weapon.damage_de }}"></td>
-                        <td><input type="text" class="free-text-field" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="traits_de" value="{{ weapon.traits_de }}"></td>
-                        <td><button type="button" class="remove-button" data-segment="weapons" data-row-id="{{ weapon.row_id }}">✕</button></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
+    {# ---------- Ausrüstung ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-gear" role="tabpanel" aria-labelledby="tab-gear" hidden>
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('swords') }} Waffen
+                <button type="button" class="ui-btn ui-btn--small ui-btn--gold sheet-add" data-add="weapons">{{ ui.icon('plus') }} Neu</button>
+            </h2>
+            {% for weapon in weapons %}
+                <div class="gear-card" data-row-id="{{ weapon.row_id }}">
+                    <div class="gear-card__fields">
+                        <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="name_de" value="{{ weapon.name_de }}"></div>
+                        <div class="ui-field"><label>Griff</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="grip_de" value="{{ weapon.grip_de }}"></div>
+                        <div class="ui-field"><label>Reichweite</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="range_de" value="{{ weapon.range_de }}"></div>
+                        <div class="ui-field"><label>Schaden</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="damage_de" value="{{ weapon.damage_de }}"></div>
+                        <div class="ui-field gear-wide"><label>Merkmale</label><input class="ui-input" type="text" data-segment="weapons" data-row-id="{{ weapon.row_id }}" data-field="traits_de" value="{{ weapon.traits_de }}"></div>
+                    </div>
+                    <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-remove="weapons" data-row-id="{{ weapon.row_id }}">{{ ui.icon('trash-2') }} Entfernen</button>
+                </div>
+            {% else %}
+                <p class="ui-muted">Keine Waffen.</p>
+            {% endfor %}
+        </section>
 
-    <section class="card equipment-list">
-        <div class="card-heading-row">
-            <h2>Rüstung</h2>
-        </div>
-        <table class="item-table" id="body-armor-table">
-            <thead>
-                <tr><th>Name</th><th>Rüstungswert</th><th>Heimlichkeit</th><th>Ausweichen</th><th>Akrobatik</th></tr>
-            </thead>
-            <tbody>
-                {% for piece in armor %}{% if piece.slot == 'body' %}
-                    <tr>
-                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="body" data-field="name_de" value="{{ piece.name_de }}"></td>
-                        <td><input type="number" class="free-text-field" data-segment="armor" data-slot="body" data-field="armor_value" value="{{ piece.armor_value }}"></td>
-                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="body" data-field="penalty_stealth" {{ piece.penalty_stealth ? 'checked' }}></td>
-                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="body" data-field="penalty_evasion" {{ piece.penalty_evasion ? 'checked' }}></td>
-                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="body" data-field="penalty_acrobatics" {{ piece.penalty_acrobatics ? 'checked' }}></td>
-                    </tr>
+        {% for slot in [{'key': 'body', 'title': 'Rüstung', 'penalties': {'penalty_stealth': 'Heimlichkeit', 'penalty_evasion': 'Ausweichen', 'penalty_acrobatics': 'Akrobatik'}}, {'key': 'head', 'title': 'Helm', 'penalties': {'penalty_perception': 'Wahrnehmung', 'penalty_ranged': 'Fernkampf'}}] %}
+            <section class="ui-card">
+                <h2 class="ui-card__title">{{ ui.icon('shield') }} {{ slot.title }}</h2>
+                {% for piece in armor %}{% if piece.slot == slot.key %}
+                    <div class="gear-card__fields">
+                        <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="armor" data-slot="{{ slot.key }}" data-field="name_de" value="{{ piece.name_de }}"></div>
+                        <div class="ui-field"><label>Rüstungswert</label><input class="ui-input" type="number" data-segment="armor" data-slot="{{ slot.key }}" data-field="armor_value" value="{{ piece.armor_value }}"></div>
+                    </div>
+                    <p class="ui-label">Abzüge</p>
+                    <div class="ui-row">
+                        {% for field, label in slot.penalties %}
+                            <label class="check-chip">
+                                <input type="checkbox" data-segment="armor" data-slot="{{ slot.key }}" data-field="{{ field }}" {{ piece[field] ? 'checked' }}>
+                                <span>{{ label }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
                 {% endif %}{% endfor %}
-            </tbody>
-        </table>
-    </section>
+            </section>
+        {% endfor %}
 
-    <section class="card equipment-list">
-        <div class="card-heading-row">
-            <h2>Helm</h2>
-        </div>
-        <table class="item-table" id="head-armor-table">
-            <thead>
-                <tr><th>Name</th><th>Rüstungswert</th><th>Wahrnehmung</th><th>Fernkampf</th></tr>
-            </thead>
-            <tbody>
-                {% for piece in armor %}{% if piece.slot == 'head' %}
-                    <tr>
-                        <td><input type="text" class="free-text-field" data-segment="armor" data-slot="head" data-field="name_de" value="{{ piece.name_de }}"></td>
-                        <td><input type="number" class="free-text-field" data-segment="armor" data-slot="head" data-field="armor_value" value="{{ piece.armor_value }}"></td>
-                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="head" data-field="penalty_perception" {{ piece.penalty_perception ? 'checked' }}></td>
-                        <td><input type="checkbox" class="armor-penalty-checkbox" data-segment="armor" data-slot="head" data-field="penalty_ranged" {{ piece.penalty_ranged ? 'checked' }}></td>
-                    </tr>
-                {% endif %}{% endfor %}
-            </tbody>
-        </table>
-    </section>
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('backpack') }} Inventar
+                <button type="button" class="ui-btn ui-btn--small ui-btn--gold sheet-add" data-add="inventory">{{ ui.icon('plus') }} Neu</button>
+            </h2>
+            {% for item in inventory %}
+                <div class="gear-card" data-row-id="{{ item.row_id }}">
+                    <div class="gear-card__fields">
+                        <div class="ui-field gear-wide"><label>Name</label><input class="ui-input" type="text" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="name_de" value="{{ item.name_de }}"></div>
+                        <div class="ui-field gear-wide"><label>Beschreibung</label><input class="ui-input" type="text" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="description_de" value="{{ item.description_de }}"></div>
+                        <div class="ui-field"><label>Menge</label><input class="ui-input" type="number" min="0" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="quantity" value="{{ item.quantity }}"></div>
+                    </div>
+                    <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-remove="inventory" data-row-id="{{ item.row_id }}">{{ ui.icon('trash-2') }} Entfernen</button>
+                </div>
+            {% else %}
+                <p class="ui-muted">Das Inventar ist leer.</p>
+            {% endfor %}
+        </section>
 
-    <section class="card equipment-list">
-        <div class="card-heading-row">
-            <h2>Inventar</h2>
-            <button type="button" class="add-row-button" data-segment="inventory">+ Gegenstand hinzufügen</button>
-        </div>
-        <table class="item-table" id="inventory-table">
-            <thead>
-                <tr><th>Name</th><th>Beschreibung</th><th>Menge</th><th></th></tr>
-            </thead>
-            <tbody>
-                {% for item in inventory %}
-                    <tr data-row-id="{{ item.row_id }}">
-                        <td><input type="text" class="free-text-field" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="name_de" value="{{ item.name_de }}"></td>
-                        <td><input type="text" class="free-text-field" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="description_de" value="{{ item.description_de }}"></td>
-                        <td><input type="number" class="free-text-field" data-segment="inventory" data-row-id="{{ item.row_id }}" data-field="quantity" value="{{ item.quantity }}" min="0"></td>
-                        <td><button type="button" class="remove-button" data-segment="inventory" data-row-id="{{ item.row_id }}">✕</button></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('coins') }} Münzen</h2>
+            <div class="currency-fields">
+                <div class="ui-field"><label for="coins-gold">Gold</label><input class="ui-input" type="number" min="0" id="coins-gold" data-coin value="{{ character.coins_gold }}"></div>
+                <div class="ui-field"><label for="coins-silver">Silber</label><input class="ui-input" type="number" min="0" id="coins-silver" data-coin value="{{ character.coins_silver }}"></div>
+                <div class="ui-field"><label for="coins-copper">Kupfer</label><input class="ui-input" type="number" min="0" id="coins-copper" data-coin value="{{ character.coins_copper }}"></div>
+            </div>
+        </section>
+    </div>
 
-    <section class="card currency">
-        <h2>Münzen</h2>
-        <div class="currency-fields">
-            <label>Gold <input type="number" id="coins-gold" value="{{ character.coins_gold }}" min="0"></label>
-            <label>Silber <input type="number" id="coins-silver" value="{{ character.coins_silver }}" min="0"></label>
-            <label>Kupfer <input type="number" id="coins-copper" value="{{ character.coins_copper }}" min="0"></label>
-            <button type="button" id="currency-save-button">Speichern</button>
-        </div>
-    </section>
-
+    {# ---------- Gedächtnis ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-memory" role="tabpanel" aria-labelledby="tab-memory" hidden>
+        <section class="ui-card">
+            <h2 class="ui-card__title">{{ ui.icon('notebook-pen') }} Gedächtnis</h2>
+            <p class="ui-field__hint">Schreib auf, was du dir merken willst: Namen, Hinweise, offene Fragen. Das gehört nur zu {{ character.name_de }} und wird automatisch gespeichert.</p>
+            <div class="ui-field">
+                <label class="visually-hidden" for="memory-text">Gedächtnis</label>
+                <textarea class="ui-textarea memory-text" id="memory-text" rows="14" maxlength="20000" placeholder="Was war noch mal …?">{{ character.memory_de }}</textarea>
+                <span class="ui-field__hint" data-memory-status aria-live="polite">Alles gespeichert.</span>
+            </div>
+        </section>
+    </div>
 </div>
 
-<dialog class="entity-modal" id="detail-modal">
-    <button type="button" class="entity-modal-close" id="detail-modal-close" aria-label="Schließen">×</button>
-    <div class="entity-modal-body" id="detail-modal-content"></div>
+<dialog class="ui-sheet" id="detail-sheet">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <div id="detail-sheet-body"></div>
 </dialog>
 
-<script src="/js/character-sheet.js"></script>
+{% if not character.is_default %}
+    <dialog class="ui-sheet" id="delete-sheet">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <h2>{{ character.name_de }} löschen?</h2>
+        <p>Der Charakter und alles, was dazugehört, wird unwiderruflich gelöscht.</p>
+        <div class="ui-row">
+            <button type="button" class="ui-btn ui-btn--danger" data-delete-confirm>{{ ui.icon('trash-2') }} Ja, löschen</button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-ui-close>Abbrechen</button>
+        </div>
+    </dialog>
+{% endif %}
+
+<script src="{{ asset('js/character-sheet.js') }}"></script>
 {% endblock %}

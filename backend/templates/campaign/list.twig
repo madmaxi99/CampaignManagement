@@ -1,22 +1,60 @@
-{% extends "layout.twig" %}
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
 
-{% block title %}Campaigns{% endblock %}
+{% block title %}Kampagnen{% endblock %}
 
 {% macro campaign_card(campaign) %}
-    <a class="character-card" href="/campaign/{{ campaign.id }}">
-        <h2>{{ campaign.name_de }}</h2>
-        <p class="character-card-meta">{{ campaign.teaser_de }}</p>
-    </a>
+    {% import "_ui.twig" as ui %}
+    <article class="ui-card campaign-card">
+        <a class="campaign-card__main" href="/dm/campaign/{{ campaign.id }}">
+            <h3>{{ ui.icon('castle') }} {{ campaign.name_de }}</h3>
+            <p class="ui-muted">{{ campaign.teaser_de ?: 'Noch kein Teaser.' }}</p>
+            <div class="ui-row">
+                <span class="ui-badge">{{ campaign.chapter_count }} Kapitel</span>
+                <span class="ui-badge ui-badge--gold">{{ campaign.place_count }} Orte</span>
+                <span class="ui-badge ui-badge--sky">{{ campaign.npc_count }} NPCs</span>
+                {% if campaign.chronicle_count > 0 %}<span class="ui-badge ui-badge--berry">{{ campaign.chronicle_count }} Chronik-Einträge</span>{% endif %}
+            </div>
+        </a>
+        <div class="ui-row">
+            <a class="ui-btn ui-btn--ghost ui-btn--small" href="/dm/campaign/{{ campaign.id }}">{{ ui.icon('pencil') }} Planen</a>
+            <a class="ui-btn ui-btn--small" href="/dm/campaign/{{ campaign.id }}/play">{{ ui.icon('dices') }} Spielen</a>
+        </div>
+    </article>
 {% endmacro %}
 
 {% import _self as campaign_macros %}
-{% import "_entity_grid_page.twig" as grid_page %}
 
 {% block content %}
-    {{ grid_page.render(
-        'Campaigns',
-        defaultCampaigns|map(c => campaign_macros.campaign_card(c)),
-        customCampaigns|map(c => campaign_macros.campaign_card(c)),
-        'Noch keine selbsterstellten Kampagnen.'
-    ) }}
+    <div class="dm-page-title">
+        <h1>Kampagnen</h1>
+        <button type="button" class="ui-btn ui-btn--gold" data-ui-open="#new-campaign">{{ ui.icon('plus') }} Neue Kampagne</button>
+    </div>
+
+    <h2>Eigene Kampagnen</h2>
+    {% if customCampaigns is empty %}
+        <div class="ui-empty">
+            {{ ui.icon('scroll-text') }}
+            <strong>Noch keine eigenen Kampagnen</strong>
+            <span>Lege eine an und baue sie aus Kapiteln, Orten und NPCs zusammen.</span>
+            <button type="button" class="ui-btn ui-btn--gold" data-ui-open="#new-campaign">{{ ui.icon('plus') }} Neue Kampagne</button>
+        </div>
+    {% else %}
+        <div class="ui-grid">{% for c in customCampaigns %}{{ campaign_macros.campaign_card(c) }}{% endfor %}</div>
+    {% endif %}
+
+    <h2 style="margin-top: var(--space-6)">Standard-Abenteuer</h2>
+    <div class="ui-grid">{% for c in defaultCampaigns %}{{ campaign_macros.campaign_card(c) }}{% endfor %}</div>
+
+    <dialog class="ui-sheet" id="new-campaign">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <form class="ui-stack" data-dm-form data-action="/dm/campaigns" data-after="goto:/dm/campaign/{id}">
+            <h2>Neue Kampagne</h2>
+            <div class="ui-field"><label for="nc-name">Name</label><input class="ui-input" id="nc-name" name="name_de" maxlength="150" required autocomplete="off"></div>
+            <div class="ui-field"><label for="nc-teaser">Teaser</label><input class="ui-input" id="nc-teaser" name="teaser_de" maxlength="255" placeholder="Ein Satz für die Liste"></div>
+            <div class="ui-row"><button type="submit" class="ui-btn">{{ ui.icon('check') }} Anlegen</button><button type="button" class="ui-btn ui-btn--ghost" data-ui-close>Abbrechen</button></div>
+        </form>
+    </dialog>
+
+    <script src="{{ asset('js/dm-forms.js') }}"></script>
 {% endblock %}

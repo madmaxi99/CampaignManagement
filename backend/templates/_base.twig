@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#fbf4e2">
+    {% if csrf_token %}<meta name="csrf-token" content="{{ csrf_token }}">{% endif %}
+    <title>{% block title %}{{ app_name }}{% endblock %} · {{ app_name }}</title>
+    <link rel="icon" href="/icons/favicon.svg" type="image/svg+xml">
+    <link rel="preload" href="/fonts/almendra-latin-700-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/fonts/alegreya-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="{{ asset('css/tokens.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/base.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/components.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/player.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/character.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dm-campaign.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dm.css') }}">
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    {% block shell %}{% endblock %}
+    <div class="ui-toasts" aria-live="polite" data-ui-toasts></div>
+    <script src="{{ asset('js/ui.js') }}"></script>
+</body>
+</html>

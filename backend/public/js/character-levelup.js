@@ -1,88 +1,100 @@
+/*
+ * Level-up: every decision is only staged here and sent together on "Speichern".
+ */
 (function () {
+    'use strict';
+
     const root = document.querySelector('.levelup');
     if (!root) {
         return;
     }
 
     const id = root.dataset.id;
+    const saveButton = document.getElementById('levelup-save');
+    const counter = document.querySelector('[data-pending-count]');
 
     function postJson(path, body) {
         return fetch(path, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body || {}),
-        }).then((response) => response.json());
+        }).then(function (response) {
+            if (!response.ok) {
+                throw new Error('Speichern fehlgeschlagen.');
+            }
+
+            return response.json();
+        });
     }
 
-    // --- Skills: stage apply/discard, nothing sent until Speichern ---
-
     const pendingSkillDecisions = new Map();
+    const pendingAbilityPicks = [];
+    const pendingSpellIds = new Set();
 
-    document.querySelectorAll('.levelup-skill-decision').forEach((button) => {
-        button.addEventListener('click', () => {
-            const skillId = button.dataset.skillId;
-            pendingSkillDecisions.set(skillId, button.dataset.decision === 'apply');
+    function updateCounter() {
+        const count = pendingSkillDecisions.size + pendingAbilityPicks.length + pendingSpellIds.size;
+        counter.textContent = String(count);
+        counter.hidden = count === 0;
+    }
 
-            const row = button.closest('li');
-            row.querySelectorAll('.levelup-skill-decision').forEach((sibling) => {
-                sibling.classList.toggle('active', sibling === button);
+    // Skills: segmented "Steigern" / "Verwerfen"
+    root.querySelectorAll('[data-decision]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            pendingSkillDecisions.set(button.dataset.skillId, button.dataset.decision === 'apply');
+            button.closest('.segmented').querySelectorAll('[data-decision]').forEach(function (other) {
+                other.setAttribute('aria-pressed', other === button ? 'true' : 'false');
             });
+            updateCounter();
         });
     });
 
-    // --- Heroic abilities: stage a pick per row, disable that row afterwards ---
-
-    const pendingAbilityPicks = [];
-
-    document.querySelectorAll('.levelup-learn-ability').forEach((button) => {
-        button.addEventListener('click', () => {
+    // Heroic abilities
+    root.querySelectorAll('[data-learn-ability]').forEach(function (button) {
+        button.addEventListener('click', function () {
             const row = button.closest('li');
-            const select = row.querySelector('.levelup-school-select');
-            const pick = { heroic_ability_id: parseInt(button.dataset.abilityId, 10) };
+            const select = row.querySelector('[data-school-select]');
+            const pick = { heroic_ability_id: parseInt(button.dataset.learnAbility, 10) };
             if (select && select.value) {
                 pick.school_skill_id = parseInt(select.value, 10);
             }
             pendingAbilityPicks.push(pick);
-
             button.disabled = true;
             button.textContent = 'Vorgemerkt';
             if (select) {
                 select.disabled = true;
             }
+            updateCounter();
         });
     });
 
-    // --- Spells: stage a pick per row, disable that row afterwards ---
-
-    const pendingSpellIds = new Set();
-
-    document.querySelectorAll('.levelup-learn-spell').forEach((button) => {
-        button.addEventListener('click', () => {
-            pendingSpellIds.add(parseInt(button.dataset.spellId, 10));
+    // Spells
+    root.querySelectorAll('[data-learn-spell]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            pendingSpellIds.add(parseInt(button.dataset.learnSpell, 10));
             button.disabled = true;
             button.textContent = 'Vorgemerkt';
+            updateCounter();
         });
     });
 
-    // --- Save: apply every staged change, then back to the sheet ---
-
-    document.getElementById('levelup-save').addEventListener('click', () => {
+    saveButton.addEventListener('click', function () {
         const requests = [];
-
-        pendingSkillDecisions.forEach((apply, skillId) => {
-            requests.push(postJson(`/character/${id}/skills/${skillId}/advance`, { apply }));
+        pendingSkillDecisions.forEach(function (apply, skillId) {
+            requests.push(postJson('/character/' + id + '/skills/' + skillId + '/advance', { apply: apply }));
+        });
+        pendingAbilityPicks.forEach(function (pick) {
+            requests.push(postJson('/character/' + id + '/heroic-abilities', pick));
+        });
+        pendingSpellIds.forEach(function (spellId) {
+            requests.push(postJson('/character/' + id + '/spells', { spell_id: spellId }));
         });
 
-        pendingAbilityPicks.forEach((pick) => {
-            requests.push(postJson(`/character/${id}/heroic-abilities`, pick));
-        });
-
-        pendingSpellIds.forEach((spellId) => {
-            requests.push(postJson(`/character/${id}/spells`, { spell_id: spellId }));
-        });
-
-        Promise.all(requests).then(() => {
-            window.location.href = `/character/${id}`;
-        });
+        saveButton.disabled = true;
+        Promise.all(requests)
+            .then(function () { window.location.href = '/character/' + id; })
+            .catch(function (error) {
+                saveButton.disabled = false;
+                window.ui.toast(error.message, 'error');
+            });
     });
-})();
+}());

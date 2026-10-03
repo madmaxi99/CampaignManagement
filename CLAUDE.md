@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only, no auth.
+Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only. Players need no login; the DM area is locked by a single DM password (see `docs/UX-KONZEPT.md`).
 
 **Current state: no application code exists in the working tree.** The previous PHP/Slim/Twig/MariaDB app (`backend/`, `provisioning/`) has been deleted (see `git status` — shown as pending `D` deletions, not yet committed). The repo right now holds only planning/reference docs (`docs/`), in-world narrative content (`Story/`), and a stray `.env` left over from the old Docker setup. Do not assume any file, class, route, or template from an older conversation still exists — verify with `ls`/`git status` first. The next build is planned as a Campaign Management System per `docs/superpowers/specs/2026-09-24-campaign-management-roadmap.md` and its follow-up specs; treat those specs as the design intent for what to build, not as a description of code that currently exists.
 

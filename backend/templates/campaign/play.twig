@@ -1,0 +1,184 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+{% import "campaign/_mode.twig" as mode %}
+{% import "campaign/_cards.twig" as cards %}
+
+{% block title %}{{ campaign.name_de }} spielen{% endblock %}
+
+{% block content %}
+    {% set base = '/dm/campaign/' ~ campaign.id %}
+    {{ mode.header(campaign, 'play') }}
+
+    <div class="play-workspace" data-campaign-id="{{ campaign.id }}">
+
+        {# ---------- Quick access ---------- #}
+        <aside class="quick ui-card" aria-label="Schnellzugriff">
+            <div class="ui-search">
+                {{ ui.icon('search') }}
+                <input class="ui-input" type="search" id="quick-search" placeholder="NPC, Ort, Item …" autocomplete="off" aria-label="Schnellzugriff durchsuchen">
+            </div>
+
+            {% for group in [
+                {'title': 'NPCs', 'icon': 'user', 'type': 'npc', 'rows': npcs},
+                {'title': 'Orte', 'icon': 'map-pin', 'type': 'place', 'rows': placeTree},
+                {'title': 'Items', 'icon': 'package', 'type': 'item', 'rows': items},
+                {'title': 'Monster', 'icon': 'skull', 'type': 'bestiary', 'rows': monsters}
+            ] %}
+                {% if group.rows is not empty %}
+                    <div class="quick__group" data-quick-group>
+                        <h2 class="quick__title">{{ ui.icon(group.icon) }} {{ group.title }}</h2>
+                        <ul class="plain-list">
+                            {% for row in group.rows %}
+                                <li data-quick-item="{{ row.name_de|lower }}">
+                                    <a class="entity-link" href="#" data-entity-type="{{ group.type }}" data-entity-id="{{ row.id }}">{% if group.type == 'place' and row.number_label %}<span class="outline__num">#{{ row.number_label }}</span>{% endif %}{{ row.name_de }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <p class="ui-muted" data-quick-empty hidden>Nichts gefunden.</p>
+        </aside>
+
+        {# ---------- Main ---------- #}
+        <section class="play-main">
+            <div class="ui-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash>
+                <button class="ui-tab" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">{{ ui.icon('book-open') }} Lesen</button>
+                <button class="ui-tab" role="tab" id="tab-chronicle" aria-controls="panel-chronicle" aria-selected="false">{{ ui.icon('notebook-pen') }} Chronik</button>
+                <button class="ui-tab" role="tab" id="tab-dice" aria-controls="panel-dice" aria-selected="false">{{ ui.icon('dices') }} Würfeln</button>
+            </div>
+
+            {# ----- Read ----- #}
+            <div class="ui-tabpanel ui-stack" id="panel-read" role="tabpanel" aria-labelledby="tab-read">
+                {% if campaign.background_de %}
+                    <details class="ui-details" open>
+                        <summary><span class="ui-details__title">Hintergrund</span></summary>
+                        <div class="ui-details__body"><p class="pre-wrap">{{ campaign.background_de|linkify(entityRegistry) }}</p></div>
+                    </details>
+                {% endif %}
+
+                {% if chapters|length > 1 %}
+                    <div class="ui-row chapter-jump">
+                        {% for chapter in chapters %}<a class="ui-btn ui-btn--ghost ui-btn--small" href="#chapter-{{ chapter.id }}">{{ chapter.label }}: {{ chapter.title_de }}</a>{% endfor %}
+                    </div>
+                {% endif %}
+
+                {% for chapter in chapters %}
+                    <section class="ui-card ui-stack" id="chapter-{{ chapter.id }}">
+                        <h2 class="ui-card__title">{{ ui.icon('scroll-text') }} Kapitel {{ chapter.label }}: {{ chapter.title_de }}</h2>
+                        {% if chapter.notes_de %}<p class="pre-wrap">{{ chapter.notes_de|linkify(entityRegistry) }}</p>{% endif %}
+                        {% for place in placeTree|filter(x => x.chapter_id == chapter.id) %}
+                            {% set full = places|filter(x => x.id == place.id)|first %}
+                            {% if full.description_de or full.dm_text_de or full.image_path %}
+                                <article class="place-read" id="location-{{ full.id }}">
+                                    <h3>{% if full.number_label %}<span class="place-read__num">#{{ full.number_label }}</span>{% endif %}{{ full.name_de }}</h3>
+                                    {% if full.image_path %}<img class="place-image" src="/{{ full.image_path }}" alt="{{ full.name_de }}" onerror="this.remove()">{% endif %}
+                                    {% if full.description_de %}<p class="read-aloud pre-wrap">{{ full.description_de|linkify(entityRegistry) }}</p>{% endif %}
+                                    {% if full.dm_text_de %}<p class="dm-text pre-wrap">{{ full.dm_text_de|linkify(entityRegistry) }}</p>{% endif %}
+                                </article>
+                            {% endif %}
+                        {% endfor %}
+                    </section>
+                {% else %}
+                    <div class="ui-empty">{{ ui.icon('scroll-text') }}<strong>Noch keine Kapitel</strong><span>Lege sie im Planen-Modus an.</span><a class="ui-btn ui-btn--gold ui-btn--small" href="{{ base }}?e=chapter-new">Kapitel anlegen</a></div>
+                {% endfor %}
+
+                {% set unassigned = placeTree|filter(x => x.chapter_id is null) %}
+                {% if unassigned is not empty %}
+                    <section class="ui-card ui-stack">
+                        <h2 class="ui-card__title">{{ ui.icon('map') }} Weitere Orte</h2>
+                        {% for place in unassigned %}
+                            {% set full = places|filter(x => x.id == place.id)|first %}
+                            {% if full.description_de or full.dm_text_de or full.image_path %}
+                                <article class="place-read" id="location-{{ full.id }}">
+                                    <h3>{% if full.number_label %}<span class="place-read__num">#{{ full.number_label }}</span>{% endif %}{{ full.name_de }}</h3>
+                                    {% if full.image_path %}<img class="place-image" src="/{{ full.image_path }}" alt="{{ full.name_de }}" onerror="this.remove()">{% endif %}
+                                    {% if full.description_de %}<p class="read-aloud pre-wrap">{{ full.description_de|linkify(entityRegistry) }}</p>{% endif %}
+                                    {% if full.dm_text_de %}<p class="dm-text pre-wrap">{{ full.dm_text_de|linkify(entityRegistry) }}</p>{% endif %}
+                                </article>
+                            {% endif %}
+                        {% endfor %}
+                    </section>
+                {% endif %}
+            </div>
+
+            {# ----- Chronicle ----- #}
+            <div class="ui-tabpanel ui-stack" id="panel-chronicle" role="tabpanel" aria-labelledby="tab-chronicle" hidden>
+                <form class="ui-card ui-stack" data-chronicle-form>
+                    <h2 class="ui-card__title">{{ ui.icon('notebook-pen') }} Was ist passiert?</h2>
+                    <div class="ui-field"><label class="visually-hidden" for="chr-title">Überschrift</label><input class="ui-input" id="chr-title" name="title_de" maxlength="100" placeholder="Überschrift, z. B. Session 4 (optional)"></div>
+                    <div class="ui-field"><label class="visually-hidden" for="chr-text">Text</label><textarea class="ui-textarea" id="chr-text" name="text_de" rows="4" required placeholder="Alberta hat geholfen, Krakul ist gefallen, der Wein wurde gefunden …"></textarea></div>
+                    <div><button type="submit" class="ui-btn">{{ ui.icon('check') }} Eintragen</button></div>
+                </form>
+
+                {% for entry in chronicle %}
+                    <article class="ui-card chronicle-entry" data-entry-id="{{ entry.id }}" data-entry-title="{{ entry.title_de }}" data-entry-text="{{ entry.text_de }}">
+                        <div class="ui-row" style="justify-content: space-between">
+                            <h3 style="margin: 0">{{ entry.title_de ?? entry.created_at|date('d.m.Y') }}</h3>
+                            <span class="ui-row">
+                                <span class="ui-muted">{{ entry.created_at|date('d.m.Y H:i') }}</span>
+                                <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-entry-edit aria-label="Eintrag bearbeiten">{{ ui.icon('pencil') }}</button>
+                                <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-entry-delete aria-label="Eintrag löschen">{{ ui.icon('trash-2') }}</button>
+                            </span>
+                        </div>
+                        <p class="pre-wrap" style="margin: var(--space-2) 0 0">{{ entry.text_de }}</p>
+                    </article>
+                {% else %}
+                    <div class="ui-empty">{{ ui.icon('notebook-pen') }}<strong>Die Chronik ist leer</strong><span>Alles, was am Tisch passiert, kommt hier hinein.</span></div>
+                {% endfor %}
+
+                <div class="ui-card ui-stack">
+                    <h3 class="ui-card__title">{{ ui.icon('triangle-alert') }} Neustart</h3>
+                    <p class="ui-muted">Eine neue Gruppe soll die Kampagne spielen? Das leert die Chronik und die Notizen bei den NPCs. Inhalt und Katalog bleiben.</p>
+                    <div><button type="button" class="ui-btn ui-btn--danger" data-dm-post data-url="{{ base }}/restart" data-after="reload" data-confirm="Chronik und NPC-Notizen löschen? Der Inhalt der Kampagne bleibt." data-confirm-label="Ja, neu starten">{{ ui.icon('flame') }} Kampagne neu starten</button></div>
+                </div>
+            </div>
+
+            {# ----- Dice ----- #}
+            <div class="ui-tabpanel ui-stack" id="panel-dice" role="tabpanel" aria-labelledby="tab-dice" hidden>
+                <section class="ui-card ui-stack">
+                    <h2 class="ui-card__title">{{ ui.icon('dices') }} Würfel</h2>
+                    <div class="dice-result" data-dice-result aria-live="polite">–</div>
+                    <div class="dice-row">
+                        {% for die in [4, 6, 8, 10, 12, 20] %}
+                            <button type="button" class="ui-btn ui-btn--ghost" data-die="{{ die }}">W{{ die }}</button>
+                        {% endfor %}
+                    </div>
+                    <p class="ui-muted" data-dice-history></p>
+                </section>
+
+                {% for table in encounterTables %}
+                    <section class="ui-card">{{ cards.encounter_table(table, entityRegistry) }}</section>
+                {% else %}
+                    <div class="ui-empty">{{ ui.icon('dices') }}<strong>Keine Begegnungstabellen</strong><span>Wähle bei einem Ort im Planen-Modus eine Zufallsbegegnungs-Tabelle, dann steht sie hier.</span></div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    {# ---------- Dialog content (cloned into the entity dialog) ---------- #}
+    <div hidden>
+        {% for npc in npcs %}<template id="tpl-npc-{{ npc.id }}">{{ cards.npc(npc, campaign.id, entityRegistry) }}</template>{% endfor %}
+        {% for place in places %}<template id="tpl-place-{{ place.id }}">{{ cards.place(place, entityRegistry) }}</template>{% endfor %}
+        {% for item in items %}<template id="tpl-item-{{ item.id }}">{{ cards.item(item, entityRegistry) }}</template>{% endfor %}
+        {% for monster in monsters %}<template id="tpl-bestiary-{{ monster.id }}">{{ cards.creature(monster, entityRegistry) }}</template>{% endfor %}
+    </div>
+
+    <dialog class="ui-sheet ui-sheet--wide" id="entity-sheet">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <div id="entity-sheet-body"></div>
+    </dialog>
+
+    <dialog class="ui-sheet" id="chronicle-sheet">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <form class="ui-stack" id="chronicle-edit-form">
+            <h2>Eintrag bearbeiten</h2>
+            <div class="ui-field"><label for="che-title">Überschrift</label><input class="ui-input" id="che-title" name="title_de" maxlength="100"></div>
+            <div class="ui-field"><label for="che-text">Text</label><textarea class="ui-textarea" id="che-text" name="text_de" rows="6" required></textarea></div>
+            <div class="ui-row"><button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button><button type="button" class="ui-btn ui-btn--ghost" data-ui-close>Abbrechen</button></div>
+        </form>
+    </dialog>
+
+    <script src="{{ asset('js/dm-forms.js') }}"></script>
+    <script src="{{ asset('js/campaign-play.js') }}"></script>
+{% endblock %}

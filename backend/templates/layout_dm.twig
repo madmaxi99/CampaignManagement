@@ -1,0 +1,38 @@
+{% extends "_base.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block body_class %}dm{% endblock %}
+
+{% block shell %}
+    {% set path = current_url() %}
+    <div class="dm-shell">
+        <aside class="dm-sidebar">
+            <a class="dm-brand" href="/dm">{{ ui.icon('crown') }} {{ app_name }}</a>
+
+            <nav class="dm-nav" aria-label="DM-Navigation">
+                <span class="dm-nav__label">Spielleitung</span>
+                <a href="/dm"{% if path == '/dm' or path starts with '/dm/campaign' %} aria-current="page"{% endif %}>{{ ui.icon('castle') }} Kampagnen</a>
+                <a href="/dm/party"{% if path == '/dm/party' %} aria-current="page"{% endif %}>{{ ui.icon('users') }} Gruppe</a>
+                <a href="/dm/catalog"{% if path starts with '/dm/catalog' %} aria-current="page"{% endif %}>{{ ui.icon('skull') }} Katalog</a>
+                <span class="dm-nav__label">Spielersicht</span>
+                <a href="/characters">{{ ui.icon('users') }} Charaktere</a>
+                <span class="dm-nav__label">Entwicklung</span>
+                <a href="/dm/styleguide"{% if path == '/dm/styleguide' %} aria-current="page"{% endif %}>{{ ui.icon('feather') }} Styleguide</a>
+            </nav>
+
+            <div class="dm-sidebar__foot">
+                <form method="post" action="/dm/logout">
+                    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+                    <button type="submit" class="ui-btn ui-btn--ghost ui-btn--block">{{ ui.icon('log-out') }} Abmelden</button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="dm-main">
+            <div class="ui-banner">{{ ui.icon('lock') }} Nur für den DM – Spieler sehen diese Seiten nicht.</div>
+            <main class="dm-content">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+{% endblock %}

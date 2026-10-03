@@ -41,6 +41,8 @@ Regel: Der Katalog enthält nur Regelwerk und bleibt statisch. Was zu einer Kamp
 
 Keine Verbindung. Ein gefundenes Item wird später als Text (Name, Beschreibung) in `character_inventory` kopiert.
 
+`characters.memory_de` ist das "Gedächtnis": privater Freitext des Spielers pro Charakter (Route `POST /character/{id}/memory`, wird beim Tippen automatisch gespeichert). Die Liste "Meine Charaktere" lebt nur im Browser (`localStorage`), nicht in der DB.
+
 ## Neustart
 
 `CampaignRepository::restart` leert `campaign_chronicle` und setzt `campaign_npcs.notes_de` auf NULL (eine Transaktion). Inhalt und Katalog bleiben unberührt.
@@ -56,12 +58,18 @@ Es gibt keine Migration: Die DB wird neu aufgesetzt (`provisioning/docker-compos
 ## Auswirkungen auf den Code
 
 - `backend/src/CampaignRepository.php`: Orte (`places`, `createPlace`, `updatePlace`, `locations` = nummerierte Orte der Kapitel), `items`, `encounterTables`, NPC-CRUD, `restart()`.
-- `backend/src/WorldRepository.php` und `backend/templates/world.twig`: Seite `/world` mit Bestiary und Zufallsbegegnungen. Navigation: Characters, Campaign, Bestiary, Zufallsbegegnungen.
-- `backend/templates/campaign/dm_screen.twig`: Items in der Seitenleiste, Zufallsbegegnungen der Orte, Fundort bei NPCs, Begegnungstabelle im Orte-Formular.
-- `backend/public/js/campaign-place-editor.js`: kein "Aus Katalog hinzufügen" mehr. Routen: `.../npcs`, `.../places` (anlegen, ändern, Bild), `.../chronicle`, `POST /campaign/{id}/restart`.
+- `backend/src/RulesRepository.php` und `backend/templates/rules.twig`: Seite `/rules`, das Regelwerk zum Nachschlagen für Spieler (Items, Fertigkeiten, Zauber, Berufe, Völker, Heldenfähigkeiten, Tabellen). Ohne Bestiary und Begegnungstabellen.
+- `backend/src/WorldRepository.php` und `backend/templates/dm/catalog.twig`: Seite `/dm/catalog` (nur DM) mit Bestiary und Zufallsbegegnungen. Der DM-Bereich liegt komplett unter `/dm` und ist per DM-Passwort gesperrt (`DmAuth`, `DmGate`, siehe `docs/UX-KONZEPT.md`); die alten URLs `/campaign` und `/world` leiten dorthin um.
+- `backend/routes/dm_campaign.php`: alle DM-Routen der Kampagnen (Liste, Planen, Spielen, Anlegen/Ändern/Löschen von Kampagne, Kapiteln, Orten, NPCs, Items, Monstern und Chronik, Neustart). Alles unter `/dm`, also hinter `DmGate`.
+- `backend/templates/campaign/`: `list.twig` (Kampagnen), `plan.twig` mit `edit/*.twig` (Planen: Gliederung links, Editor rechts, `?e=place-12` wählt den Eintrag), `play.twig` (Spielen: Schnellzugriff, Tabs Lesen, Chronik, Würfeln), `_cards.twig` (Karten in den Dialogen), `_mode.twig` (Umschalter Planen/Spielen).
+- `backend/public/js/dm-forms.js` (generische Formulare, Löschen, Notizen-Autosave per `data-*`-Attribute) und `campaign-play.js` (Schnellzugriff, Dialog, Würfel, Chronik).
 
 ## Offen
 
-- Kampagnen-Items lassen sich noch nicht anlegen oder bearbeiten, nur anzeigen.
-- Planen- und Spielen-Modus, "Item ins Inventar", Gedächtnis der Spielercharaktere und DM-Werkzeuge sind noch nicht gebaut.
-- Die Items der Kampagne zeigen im Fundort nur den Namen des Ortes, eine Auswahl im Formular fehlt.
+- "Item ins Inventar eines Charakters übernehmen" ist noch nicht gebaut.
+- NPC-Generator und Schnell-Encounter (Spielen-Modus) stehen noch aus.
+
+## Ergänzungen Teilprojekt 4
+
+- `catalog_bestiary.image_path`: optionales Bild der Vorlage (`images/bestiary/<id>.<ext>`).
+- `dm_party(character_id, added_at)`: Merkliste des DMs für die Gruppenübersicht, ohne Verbindung zu Kampagnen; `ON DELETE CASCADE` vom Charakter.

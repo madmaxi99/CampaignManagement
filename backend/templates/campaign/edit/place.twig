@@ -1,0 +1,70 @@
+{% import "_ui.twig" as ui %}
+{% set base = '/dm/campaign/' ~ campaign.id %}
+{% set parentValue = entity ? entity.parent_id : preset.parent_id %}
+{% set chapterValue = entity ? entity.chapter_id : preset.chapter_id %}
+<form class="ui-card ui-stack" data-dm-form
+      data-action="{{ entity ? base ~ '/places/' ~ entity.id : base ~ '/places' }}"
+      data-after="{{ entity ? 'reload' : 'goto:' ~ base ~ '?e=place-{id}' }}"
+      {% if entity %}data-id="{{ entity.id }}"{% endif %}
+      data-upload-url="{{ base }}/places/{id}/image">
+    <h2 class="ui-card__title">{{ ui.icon('map-pin') }} {{ entity ? entity.name_de : 'Neuer Ort' }}</h2>
+
+    <div class="ui-field"><label for="p-name">Name</label><input class="ui-input" id="p-name" name="name_de" maxlength="150" required value="{{ entity.name_de|default('') }}"></div>
+
+    <div class="field-pair">
+        <div class="ui-field">
+            <label for="p-parent">Liegt in</label>
+            <select class="ui-select" id="p-parent" name="parent_id">
+                <option value="">– oberste Ebene –</option>
+                {% for p in placeTree|filter(x => not entity or x.id != entity.id) %}
+                    <option value="{{ p.id }}" {{ parentValue is not null and p.id == parentValue ? 'selected' }}>{{ '– '|repeat(p.depth) }}{{ p.name_de }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="ui-field">
+            <label for="p-chapter">Kapitel</label>
+            <select class="ui-select" id="p-chapter" name="chapter_id">
+                <option value="">– keins –</option>
+                {% for c in chapters %}<option value="{{ c.id }}" {{ chapterValue is not null and c.id == chapterValue ? 'selected' }}>{{ c.label }}: {{ c.title_de }}</option>{% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="field-pair">
+        <div class="ui-field">
+            <label for="p-number">Nummer auf der Karte</label>
+            <input class="ui-input" id="p-number" name="number_label" maxlength="10" value="{{ entity.number_label|default('') }}" placeholder="z. B. 5">
+            <span class="ui-field__hint">Orte mit Nummer erscheinen als "#5" im Text und im Kapitel.</span>
+        </div>
+        <div class="ui-field">
+            <label for="p-position">Reihenfolge</label>
+            <input class="ui-input" id="p-position" name="position" type="number" value="{{ entity ? entity.position : '' }}" placeholder="automatisch">
+            <span class="ui-field__hint">Kleinere Zahlen stehen weiter oben.</span>
+        </div>
+    </div>
+
+    <div class="ui-field"><label for="p-desc">Beschreibung (zum Vorlesen)</label><textarea class="ui-textarea" id="p-desc" name="description_de" rows="5">{{ entity.description_de|default('') }}</textarea></div>
+    <div class="ui-field dm-field"><label for="p-dm">Nur für den DM</label><textarea class="ui-textarea" id="p-dm" name="dm_text_de" rows="5">{{ entity.dm_text_de|default('') }}</textarea><span class="ui-field__hint">Wie du dir den Ort vorstellst, Geheimnisse, Hinweise.</span></div>
+
+    <div class="ui-field">
+        <label for="p-enc">Zufallsbegegnungen</label>
+        <select class="ui-select" id="p-enc" name="encounter_table_id">
+            <option value="">– keine –</option>
+            {% for t in encounterTableOptions %}<option value="{{ t.id }}" {{ entity and entity.encounter_table_id == t.id ? 'selected' }}>{{ t.name_de }}</option>{% endfor %}
+        </select>
+    </div>
+
+    <div class="ui-field">
+        <label for="p-image">Bild</label>
+        {% if entity and entity.image_path %}<img class="place-image" src="/{{ entity.image_path }}" alt="{{ entity.name_de }}">{% endif %}
+        <input class="ui-input" id="p-image" type="file" name="image" accept="image/jpeg,image/png,image/webp">
+    </div>
+
+    <div class="ui-row">
+        <button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+        {% if entity %}
+            <a class="ui-btn ui-btn--ghost" href="{{ base }}?e=place-new&parent={{ entity.id }}{% if entity.chapter_id %}&chapter={{ entity.chapter_id }}{% endif %}">{{ ui.icon('plus') }} Unterort</a>
+            <button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="{{ base }}/places/{{ entity.id }}" data-confirm="Ort „{{ entity.name_de }}“ löschen?" data-after="goto:{{ base }}">{{ ui.icon('trash-2') }} Löschen</button>
+        {% endif %}
+    </div>
+</form>

@@ -1,0 +1,48 @@
+{% import "_ui.twig" as ui %}
+{% set base = '/dm/campaign/' ~ campaign.id %}
+{% set chapterValue = entity ? entity.chapter_id : preset.chapter_id %}
+{% set placeValue = entity ? entity.place_id : preset.place_id %}
+<form class="ui-card ui-stack" data-dm-form
+      data-action="{{ entity ? base ~ '/items/' ~ entity.id : base ~ '/items' }}"
+      data-after="{{ entity ? 'reload' : 'goto:' ~ base ~ '?e=item-{id}' }}"
+      {% if entity %}data-id="{{ entity.id }}"{% endif %}
+      data-upload-url="{{ base }}/items/{id}/image">
+    <h2 class="ui-card__title">{{ ui.icon('package') }} {{ entity ? entity.name_de : 'Neues Item' }}</h2>
+    <p class="ui-muted">Bücher, Briefe, Quest-Items oder die Flasche Wein, die ein Trinker sucht. Regel-Gegenstände wie Schwerter bleiben im Katalog.</p>
+
+    <div class="ui-field"><label for="i-name">Name</label><input class="ui-input" id="i-name" name="name_de" maxlength="150" required value="{{ entity.name_de|default('') }}"></div>
+    <div class="ui-field"><label for="i-desc">Beschreibung (zum Vorlesen)</label><textarea class="ui-textarea" id="i-desc" name="description_de" rows="3">{{ entity.description_de|default('') }}</textarea></div>
+    <div class="ui-field dm-field"><label for="i-dm">Nur für den DM</label><textarea class="ui-textarea" id="i-dm" name="dm_text_de" rows="4">{{ entity.dm_text_de|default('') }}</textarea></div>
+    <div class="ui-field"><label for="i-text">Text (bei Büchern und Briefen)</label><textarea class="ui-textarea" id="i-text" name="text_de" rows="8">{{ entity.text_de|default('') }}</textarea><span class="ui-field__hint">Kurz halten, selten mehr als zwei Seiten. Du liest ihn vor oder gibst ihn weiter.</span></div>
+
+    <div class="field-pair">
+        <div class="ui-field">
+            <label for="i-place">Zu finden in</label>
+            <select class="ui-select" id="i-place" name="place_id">
+                <option value="">– kein Ort –</option>
+                {% for p in placeTree %}<option value="{{ p.id }}" {{ placeValue is not null and p.id == placeValue ? 'selected' }}>{{ '– '|repeat(p.depth) }}{{ p.name_de }}</option>{% endfor %}
+            </select>
+        </div>
+        <div class="ui-field">
+            <label for="i-chapter">Kapitel</label>
+            <select class="ui-select" id="i-chapter" name="chapter_id">
+                <option value="">– keins –</option>
+                {% for c in chapters %}<option value="{{ c.id }}" {{ chapterValue is not null and c.id == chapterValue ? 'selected' }}>{{ c.label }}: {{ c.title_de }}</option>{% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="ui-field"><label for="i-hint">Fundort-Hinweis</label><input class="ui-input" id="i-hint" name="found_hint_de" maxlength="255" value="{{ entity.found_hint_de|default('') }}" placeholder="in der Ecke der Bibliothek, nach etwas Suchen"></div>
+
+    <div class="ui-field">
+        <label for="i-image">Bild</label>
+        {% if entity and entity.image_path %}<img class="place-image" src="/{{ entity.image_path }}" alt="{{ entity.name_de }}">{% endif %}
+        <input class="ui-input" id="i-image" type="file" name="image" accept="image/jpeg,image/png,image/webp">
+    </div>
+
+    <div class="ui-row">
+        <button type="submit" class="ui-btn">{{ ui.icon('check') }} Speichern</button>
+        {% if entity %}
+            <button type="button" class="ui-btn ui-btn--danger" data-dm-delete data-url="{{ base }}/items/{{ entity.id }}" data-confirm="Item „{{ entity.name_de }}“ löschen?" data-after="goto:{{ base }}">{{ ui.icon('trash-2') }} Löschen</button>
+        {% endif %}
+    </div>
+</form>

@@ -1,0 +1,27 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}Katalog: Begegnungen{% endblock %}
+
+{% block content %}
+    {% include 'dm/_catalog_tabs.twig' with {section: 'encounters'} %}
+    <p class="ui-muted">Die Zufallsbegegnungen sind festes Regelwerk und hier nur zum Nachschlagen. Orte in der Kampagne wählen eine Tabelle aus.</p>
+
+    <div class="ui-grid">
+        {% for table in encounterTables %}
+            <article class="ui-card">
+                <h3>{{ ui.icon('dices') }} {{ table.name_de }}</h3>
+                <table class="ui-table">
+                    <tbody>
+                        {% for e in table.entries %}
+                            <tr>
+                                <td><strong>{{ e.max_roll is null ? e.min_roll ~ '+' : (e.min_roll == e.max_roll ? e.min_roll : e.min_roll ~ '–' ~ e.max_roll) }}</strong></td>
+                                <td>{{ [e.creature_de ? (e.quantity_de ? e.quantity_de ~ ' × ' ~ e.creature_de : e.creature_de), e.text_de]|filter(v => v)|join(' – ') }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </article>
+        {% endfor %}
+    </div>
+{% endblock %}

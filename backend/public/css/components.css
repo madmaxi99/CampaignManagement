@@ -1,0 +1,581 @@
+/*
+ * Design-system components. All classes carry the ui- prefix so they never
+ * collide with the old stylesheet. See /dm/styleguide for every component.
+ */
+
+/* ---------- Icon ---------- */
+.ui-icon {
+    width: 1.25em;
+    height: 1.25em;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vertical-align: -0.2em;
+}
+
+/* ---------- Card ---------- */
+.ui-card {
+    background: var(--card);
+    border: var(--border);
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow-1);
+    padding: var(--space-4);
+}
+
+.ui-card--raised {
+    box-shadow: var(--shadow-2);
+}
+
+.ui-card--link {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ui-card--link:hover {
+    color: inherit;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+}
+
+.ui-card__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-3);
+}
+
+.ui-card--dm {
+    border-color: var(--honey);
+    background: linear-gradient(180deg, var(--honey-light), var(--card) 60%);
+}
+
+/* ---------- Ribbon heading ---------- */
+.ui-ribbon {
+    display: inline-block;
+    position: relative;
+    margin: 0 0 var(--space-4);
+    padding: var(--space-2) var(--space-5);
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    color: #fff;
+    background: var(--forest);
+    border-radius: var(--radius-s);
+    box-shadow: var(--shadow-1);
+}
+
+.ui-ribbon::before,
+.ui-ribbon::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    width: 14px;
+    height: 100%;
+    background: var(--forest-dark);
+    z-index: -1;
+}
+
+.ui-ribbon::before {
+    left: -10px;
+    clip-path: polygon(100% 0, 0 0, 40% 50%, 0 100%, 100% 100%);
+}
+
+.ui-ribbon::after {
+    right: -10px;
+    clip-path: polygon(0 0, 100% 0, 60% 50%, 100% 100%, 0 100%);
+}
+
+/* ---------- Buttons ---------- */
+.ui-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    min-height: var(--touch);
+    padding: 0 var(--space-4);
+    font: 700 var(--fs-body) / 1 var(--font-body);
+    letter-spacing: 0.02em;
+    color: #fff;
+    background: var(--forest);
+    border: 2px solid var(--forest-dark);
+    border-radius: var(--radius-m);
+    box-shadow: 0 3px 0 var(--forest-dark);
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.15s ease;
+}
+
+.ui-btn:hover {
+    color: #fff;
+    background: #44825a;
+}
+
+.ui-btn:active {
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 var(--forest-dark);
+}
+
+.ui-btn[disabled],
+.ui-btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ui-btn--gold {
+    color: var(--ink);
+    background: var(--honey);
+    border-color: var(--honey-dark);
+    box-shadow: 0 3px 0 var(--honey-dark);
+}
+
+.ui-btn--gold:hover {
+    color: var(--ink);
+    background: #efb54c;
+}
+
+.ui-btn--ghost {
+    color: var(--forest-dark);
+    background: transparent;
+    border-color: var(--card-edge);
+    box-shadow: none;
+}
+
+.ui-btn--ghost:hover {
+    color: var(--forest-dark);
+    background: var(--forest-light);
+}
+
+.ui-btn--danger {
+    background: var(--berry);
+    border-color: var(--berry-dark);
+    box-shadow: 0 3px 0 var(--berry-dark);
+}
+
+.ui-btn--danger:hover {
+    background: #c75d55;
+}
+
+.ui-btn--small {
+    min-height: 36px;
+    padding: 0 var(--space-3);
+    font-size: var(--fs-small);
+}
+
+.ui-btn--icon {
+    width: var(--touch);
+    padding: 0;
+}
+
+.ui-btn--block {
+    display: flex;
+    width: 100%;
+}
+
+/* ---------- Form fields ---------- */
+.ui-field {
+    display: grid;
+    align-content: start;
+    gap: var(--space-1);
+    margin-bottom: var(--space-4);
+}
+
+.ui-field > label,
+.ui-label {
+    font-weight: 700;
+    color: var(--ink);
+}
+
+.ui-input,
+.ui-select,
+.ui-textarea {
+    width: 100%;
+    min-height: var(--touch);
+    padding: var(--space-2) var(--space-3);
+    font: inherit;
+    color: var(--ink);
+    background: #fff;
+    border: 2px solid var(--card-edge);
+    border-radius: var(--radius-s);
+}
+
+.ui-textarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+.ui-input:focus,
+.ui-select:focus,
+.ui-textarea:focus {
+    outline: none;
+    border-color: var(--forest);
+    box-shadow: 0 0 0 3px var(--forest-light);
+}
+
+.ui-field__hint {
+    font-size: var(--fs-small);
+    color: var(--hint);
+}
+
+.ui-field--error .ui-input,
+.ui-field--error .ui-select,
+.ui-field--error .ui-textarea {
+    border-color: var(--berry);
+}
+
+.ui-field__error {
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--berry-dark);
+}
+
+.ui-search {
+    position: relative;
+}
+
+.ui-search .ui-icon {
+    position: absolute;
+    left: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--hint);
+    pointer-events: none;
+}
+
+.ui-search .ui-input {
+    padding-left: 2.6rem;
+    border-radius: 999px;
+}
+
+/* ---------- Tabs ---------- */
+.ui-tabs {
+    display: flex;
+    gap: var(--space-1);
+    overflow-x: auto;
+    border-bottom: 2px solid var(--card-edge);
+    margin-bottom: var(--space-4);
+    scrollbar-width: none;
+}
+
+.ui-tab {
+    flex: none;
+    min-height: var(--touch);
+    padding: 0 var(--space-4);
+    font: 700 var(--fs-body) / 1 var(--font-body);
+    color: var(--ink-soft);
+    background: transparent;
+    border: 0;
+    border-bottom: 4px solid transparent;
+    cursor: pointer;
+}
+
+.ui-tab[aria-selected="true"] {
+    color: var(--forest-dark);
+    border-bottom-color: var(--honey);
+}
+
+.ui-tabpanel[hidden] {
+    display: none;
+}
+
+/* ---------- Badge ---------- */
+.ui-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: 2px var(--space-3);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--forest-dark);
+    background: var(--forest-light);
+    border-radius: 999px;
+}
+
+.ui-badge--gold { color: var(--honey-dark); background: var(--honey-light); }
+.ui-badge--berry { color: var(--berry-dark); background: var(--berry-light); }
+.ui-badge--sky { color: #2c607d; background: var(--sky-light); }
+
+/* ---------- Meter (TP / WP) ---------- */
+.ui-bar {
+    position: relative;
+    height: 26px;
+    overflow: hidden;
+    background: var(--paper-deep);
+    border: 2px solid var(--card-edge);
+    border-radius: 999px;
+}
+
+.ui-bar__fill {
+    height: 100%;
+    background: linear-gradient(180deg, #5c9b6a, var(--forest));
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.ui-bar--hp .ui-bar__fill { background: linear-gradient(180deg, #d4675f, var(--berry)); }
+.ui-bar--wp .ui-bar__fill { background: linear-gradient(180deg, #5b9bc0, var(--sky)); }
+
+.ui-bar__label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: var(--fs-small);
+    font-weight: 800;
+    color: var(--ink);
+    text-shadow: 0 0 3px #fff, 0 0 3px #fff;
+}
+
+/* ---------- Avatar ---------- */
+.ui-avatar {
+    width: 56px;
+    height: 56px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    color: var(--honey-dark);
+    background: var(--honey-light);
+    border: 3px solid var(--honey);
+    border-radius: 50%;
+}
+
+.ui-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.ui-avatar--large {
+    width: 96px;
+    height: 96px;
+}
+
+/* ---------- Stepper (wizard) ---------- */
+.ui-stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-5);
+    padding: 0;
+    list-style: none;
+}
+
+.ui-step {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    font-weight: 800;
+    color: var(--hint);
+    background: var(--paper-deep);
+    border: 2px solid var(--card-edge);
+    border-radius: 50%;
+}
+
+.ui-step + .ui-step {
+    position: relative;
+    margin-left: var(--space-3);
+}
+
+.ui-step + .ui-step::before {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    width: var(--space-3);
+    height: 2px;
+    background: var(--card-edge);
+}
+
+.ui-step--done {
+    color: #fff;
+    background: var(--forest);
+    border-color: var(--forest-dark);
+}
+
+.ui-step--current {
+    color: var(--ink);
+    background: var(--honey);
+    border-color: var(--honey-dark);
+}
+
+/* ---------- Table (becomes a card list on phones) ---------- */
+.ui-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.ui-table th {
+    text-align: left;
+    font-family: var(--font-display);
+    color: var(--forest-dark);
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 2px solid var(--card-edge);
+}
+
+.ui-table td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--card-edge);
+}
+
+@media (max-width: 640px) {
+    .ui-table--cards thead {
+        display: none;
+    }
+
+    .ui-table--cards,
+    .ui-table--cards tbody,
+    .ui-table--cards tr,
+    .ui-table--cards td {
+        display: block;
+        width: 100%;
+    }
+
+    .ui-table--cards tr {
+        margin-bottom: var(--space-3);
+        padding: var(--space-2) 0;
+        background: var(--card);
+        border: var(--border);
+        border-radius: var(--radius-m);
+    }
+
+    .ui-table--cards td {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-3);
+        border: 0;
+    }
+
+    .ui-table--cards td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--ink-soft);
+    }
+}
+
+/* ---------- Empty state ---------- */
+.ui-empty {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    padding: var(--space-6) var(--space-4);
+    text-align: center;
+    color: var(--ink-soft);
+    background: rgba(255, 251, 240, 0.6);
+    border: 2px dashed var(--card-edge);
+    border-radius: var(--radius-m);
+}
+
+.ui-empty .ui-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    color: var(--honey);
+}
+
+/* ---------- Banner (DM notice) ---------- */
+.ui-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    font-weight: 700;
+    color: var(--honey-dark);
+    background: var(--honey-light);
+    border-bottom: 2px solid var(--honey);
+}
+
+.ui-banner--info {
+    color: #2c607d;
+    background: var(--sky-light);
+    border-color: var(--sky);
+}
+
+/* ---------- Sheet / modal (<dialog>) ---------- */
+.ui-sheet {
+    width: min(560px, calc(100vw - 2 * var(--space-4)));
+    max-height: calc(100vh - 2 * var(--space-5));
+    padding: var(--space-5);
+    color: var(--ink);
+    background: var(--card);
+    border: var(--border);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-2);
+}
+
+.ui-sheet::backdrop {
+    background: rgba(58, 44, 29, 0.45);
+}
+
+.ui-sheet__close {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+}
+
+/* Phones: the sheet slides up from the bottom edge. */
+@media (max-width: 640px) {
+    .ui-sheet {
+        width: 100%;
+        max-width: none;
+        margin: auto 0 0;
+        max-height: 92vh;
+        border-radius: var(--radius-l) var(--radius-l) 0 0;
+        padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom));
+    }
+}
+
+/* ---------- Toast ---------- */
+.ui-toasts {
+    position: fixed;
+    left: 50%;
+    bottom: calc(var(--tabbar-height) + var(--space-4));
+    z-index: 100;
+    display: grid;
+    gap: var(--space-2);
+    transform: translateX(-50%);
+    width: min(420px, calc(100vw - 2 * var(--space-4)));
+    pointer-events: none;
+}
+
+.ui-toast {
+    padding: var(--space-3) var(--space-4);
+    font-weight: 700;
+    color: #fff;
+    background: var(--forest-dark);
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow-2);
+}
+
+.ui-toast--error {
+    background: var(--berry-dark);
+}
+
+/* ---------- Layout helpers ---------- */
+.ui-stack {
+    display: grid;
+    gap: var(--space-4);
+}
+
+.ui-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.ui-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}
+
+.ui-muted {
+    color: var(--ink-soft);
+}

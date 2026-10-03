@@ -1,0 +1,204 @@
+{% extends "layout.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}Regelwerk{% endblock %}
+
+{% macro entry(title, search, badges, body) %}
+    <details class="ui-details" data-search="{{ search|lower }}">
+        <summary>
+            <span class="ui-details__title">{{ title }}</span>
+            <span class="ui-details__badges">{{ badges|raw }}</span>
+        </summary>
+        <div class="ui-details__body">{{ body|raw }}</div>
+    </details>
+{% endmacro %}
+
+{% import _self as r %}
+
+{% macro roll(min, max) %}{{ min == max ? min : min ~ '–' ~ max }}{% endmacro %}
+
+{% block content %}
+    <div class="ui-row page-head">
+        <h1>Regelwerk</h1>
+    </div>
+
+    <div class="ui-search">
+        {{ ui.icon('search') }}
+        <input class="ui-input" type="search" id="rules-search" placeholder="Im Regelwerk suchen …" autocomplete="off" aria-label="Regelwerk durchsuchen">
+    </div>
+
+    <div class="ui-tabs rules-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash style="margin-top: var(--space-3)">
+        <button class="ui-tab" role="tab" id="tab-items" aria-controls="panel-items" aria-selected="true">Items</button>
+        <button class="ui-tab" role="tab" id="tab-skills" aria-controls="panel-skills" aria-selected="false">Fertigkeiten</button>
+        <button class="ui-tab" role="tab" id="tab-spells" aria-controls="panel-spells" aria-selected="false">Zauber</button>
+        <button class="ui-tab" role="tab" id="tab-professions" aria-controls="panel-professions" aria-selected="false">Berufe</button>
+        <button class="ui-tab" role="tab" id="tab-kins" aria-controls="panel-kins" aria-selected="false">Völker</button>
+        <button class="ui-tab" role="tab" id="tab-heroic" aria-controls="panel-heroic" aria-selected="false">Heldenfähigkeiten</button>
+        <button class="ui-tab" role="tab" id="tab-tables" aria-controls="panel-tables" aria-selected="false">Tabellen</button>
+    </div>
+
+    {# ---------- Items ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-items" role="tabpanel" aria-labelledby="tab-items">
+        {% for group, title in {'weapon': 'Waffen', 'armor': 'Rüstungen', 'misc': 'Ausrüstung'} %}
+            <h2>{{ title }}</h2>
+            {% for i in items[group] %}
+                {% set badges %}
+                    {% if group == 'weapon' %}<span class="ui-badge ui-badge--berry">{{ i.damage_de }}</span>{% endif %}
+                    {% if group == 'armor' %}<span class="ui-badge ui-badge--sky">RS {{ i.armor_value }}</span>{% endif %}
+                    <span class="ui-badge ui-badge--gold">{{ i.price_de }}</span>
+                {% endset %}
+                {% set body %}
+                    <p>{{ i.description_de }}</p>
+                    <dl class="facts">
+                        {% if group == 'weapon' %}
+                            <div><dt>Griff</dt><dd>{{ i.grip_de }}</dd></div>
+                            <div><dt>Reichweite</dt><dd>{{ i.range_de }}</dd></div>
+                            <div><dt>Schaden</dt><dd>{{ i.damage_de }}</dd></div>
+                            {% if i.str_requirement %}<div><dt>Benötigte STA</dt><dd>{{ i.str_requirement }}</dd></div>{% endif %}
+                            {% if i.durability %}<div><dt>Haltbarkeit</dt><dd>{{ i.durability }}</dd></div>{% endif %}
+                            {% if i.traits_de %}<div><dt>Merkmale</dt><dd>{{ i.traits_de }}</dd></div>{% endif %}
+                        {% elseif group == 'armor' %}
+                            <div><dt>Platz</dt><dd>{{ i.armor_slot == 'head' ? 'Kopf' : 'Körper' }}</dd></div>
+                            <div><dt>Rüstungswert</dt><dd>{{ i.armor_value }}</dd></div>
+                            {% if i.armor_penalties %}<div><dt>Abzüge</dt><dd>{{ i.armor_penalties|join(', ') }}</dd></div>{% endif %}
+                        {% endif %}
+                        <div><dt>Seltenheit</dt><dd>{{ i.rarity }}</dd></div>
+                        <div><dt>Preis</dt><dd>{{ i.price_de }}</dd></div>
+                    </dl>
+                {% endset %}{{ r.entry(i.name_de, i.name_de ~ ' ' ~ i.description_de, badges, body) }}
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    {# ---------- Fertigkeiten ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
+        {% for group, title in {'regular': 'Fertigkeiten', 'combat': 'Kampffertigkeiten', 'secondary': 'Sekundäre Fertigkeiten'} %}
+            <h2>{{ title }}</h2>
+            {% for s in skills[group] %}
+                {% set badges %}<span class="ui-badge">{{ s.attribute_code }}</span>{% endset %}
+                {% set body %}
+                    <p>{{ s.description_de ?: 'Keine Beschreibung.' }}</p>
+                {% endset %}{{ r.entry(s.name_de, s.name_de ~ ' ' ~ s.description_de, badges, body) }}
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    {# ---------- Zauber ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-spells" role="tabpanel" aria-labelledby="tab-spells" hidden>
+        {% for school, data in schools %}
+            <h2>{{ school }}</h2>
+            {% if data.lore_de %}<p class="ui-muted">{{ data.lore_de }}</p>{% endif %}
+            {% for s in data.spells %}
+                {% set badges %}
+                    <span class="ui-badge ui-badge--gold">{{ s.type == 'trick' ? 'Trick' : 'Zauber' ~ (s.rank ? ' ' ~ s.rank : '') }}</span>
+                    <span class="ui-badge ui-badge--sky">{{ s.wp_note_de }}</span>
+                {% endset %}
+                {% set body %}
+                    <dl class="facts">
+                        {% if s.components_de %}<div><dt>Vorgabe</dt><dd>{{ s.components_de }}</dd></div>{% endif %}
+                        {% if s.casting_time_de %}<div><dt>Zauberdauer</dt><dd>{{ s.casting_time_de }}</dd></div>{% endif %}
+                        {% if s.range_de %}<div><dt>Reichweite</dt><dd>{{ s.range_de }}</dd></div>{% endif %}
+                        {% if s.duration_de %}<div><dt>Wirkungsdauer</dt><dd>{{ s.duration_de }}</dd></div>{% endif %}
+                    </dl>
+                    <p>{{ s.effect_de }}</p>
+                {% endset %}{{ r.entry(s.name_de, s.name_de ~ ' ' ~ school ~ ' ' ~ s.effect_de, badges, body) }}
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    {# ---------- Berufe ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-professions" role="tabpanel" aria-labelledby="tab-professions" hidden>
+        {% for p in professions %}
+            {% set badges %}<span class="ui-badge">{{ p.key_attribute_de }}</span>{% if p.kin_restriction_de %}<span class="ui-badge ui-badge--gold">nur {{ p.kin_restriction_de }}</span>{% endif %}{% endset %}
+            {% set body %}
+                <dl class="facts">
+                    <div><dt>Schlüsselattribut</dt><dd>{{ p.key_attribute_de }}</dd></div>
+                    <div><dt>Fertigkeiten zur Wahl</dt><dd>{{ p.skills|join(', ') }}</dd></div>
+                </dl>
+                {% for a in p.abilities %}
+                    <p><strong>{{ a.name_de }}.</strong> {{ a.description_de }}</p>
+                {% endfor %}
+                {% if p.grants_magic %}<p class="ui-muted">Dieser Beruf bringt Zauberei mit.</p>{% endif %}
+            {% endset %}{{ r.entry(p.name_de, p.name_de ~ ' ' ~ p.skills|join(' '), badges, body) }}
+        {% endfor %}
+    </div>
+
+    {# ---------- Völker ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-kins" role="tabpanel" aria-labelledby="tab-kins" hidden>
+        {% for k in kins %}
+            {% set badges %}<span class="ui-badge">W12 {{ k.d12_min == k.d12_max ? k.d12_min : k.d12_min ~ '–' ~ k.d12_max }}</span>{% endset %}
+            {% set body %}
+                <dl class="facts"><div><dt>Grundbewegung</dt><dd>{{ k.movement_base }} m</dd></div></dl>
+                {% for a in k.abilities %}
+                    <p><strong>{{ a.name_de }}.</strong> {{ a.description_de }}</p>
+                {% endfor %}
+            {% endset %}{{ r.entry(k.name_de, k.name_de, badges, body) }}
+        {% endfor %}
+    </div>
+
+    {# ---------- Heldenfähigkeiten ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-heroic" role="tabpanel" aria-labelledby="tab-heroic" hidden>
+        {% for h in heroicAbilities %}
+            {% set badges %}{% if h.wp_note_de %}<span class="ui-badge ui-badge--sky">WP {{ h.wp_note_de }}</span>{% endif %}{% if h.repeatable %}<span class="ui-badge ui-badge--gold">mehrfach</span>{% endif %}{% endset %}
+            {% set body %}
+                {% if h.requirement_de %}<p class="ui-muted">Voraussetzung: {{ h.requirement_de }}</p>{% endif %}
+                <p>{{ h.description_de }}</p>
+            {% endset %}{{ r.entry(h.name_de, h.name_de ~ ' ' ~ h.description_de, badges, body) }}
+        {% endfor %}
+    </div>
+
+    {# ---------- Tabellen ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-tables" role="tabpanel" aria-labelledby="tab-tables" hidden>
+        <section class="ui-card" data-search="verletzungen wounded table">
+            <h2 class="ui-card__title">{{ ui.icon('heart') }} Verletzungen (W20)</h2>
+            <table class="ui-table ui-table--cards">
+                <thead><tr><th>Wurf</th><th>Verletzung</th><th>Wirkung</th><th>Heilung</th></tr></thead>
+                <tbody>
+                    {% for t in tables.injuries %}
+                        <tr><td data-label="Wurf">{{ r.roll(t.roll_min, t.roll_max) }}</td><td data-label="Verletzung"><strong>{{ t.name_de }}</strong></td><td data-label="Wirkung">{{ t.effect_de }}</td><td data-label="Heilung">{{ t.healing_de ?: '–' }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        {% for key, title in {'combat_mishaps_melee': 'Nahkampf-Patzer', 'combat_mishaps_ranged': 'Fernkampf-Patzer', 'magical_mishaps': 'Magische Patzer'} %}
+            <section class="ui-card" data-search="{{ title|lower }} patzer">
+                <h2 class="ui-card__title">{{ ui.icon('dices') }} {{ title }}</h2>
+                <table class="ui-table ui-table--cards">
+                    <thead><tr><th>Wurf</th><th>Wirkung</th></tr></thead>
+                    <tbody>{% for t in tables[key] %}<tr><td data-label="Wurf">{{ t.roll }}</td><td data-label="Wirkung">{{ t.effect_de }}</td></tr>{% endfor %}</tbody>
+                </table>
+            </section>
+        {% endfor %}
+
+        <section class="ui-card" data-search="furcht angst">
+            <h2 class="ui-card__title">{{ ui.icon('skull') }} Furcht</h2>
+            <table class="ui-table ui-table--cards">
+                <thead><tr><th>Wurf</th><th>Ereignis</th><th>Wirkung</th></tr></thead>
+                <tbody>{% for t in tables.fear_events %}<tr><td data-label="Wurf">{{ t.roll }}</td><td data-label="Ereignis"><strong>{{ t.name_de }}</strong></td><td data-label="Wirkung">{{ t.effect_de }}</td></tr>{% endfor %}</tbody>
+            </table>
+        </section>
+
+        <section class="ui-card" data-search="rast rasten erholung">
+            <h2 class="ui-card__title">{{ ui.icon('flame') }} Rast</h2>
+            {% for t in tables.rest_types %}
+                <p><strong>{{ t.name_de }}</strong> <span class="ui-badge ui-badge--gold">{{ t.duration_de }}</span><br>{{ t.effect_de }}</p>
+            {% endfor %}
+        </section>
+
+        <section class="ui-card" data-search="gefahren">
+            <h2 class="ui-card__title">{{ ui.icon('triangle-alert') }} Gefahren</h2>
+            {% for t in tables.hazards %}
+                <p><strong>{{ t.name_de }}</strong><br>{{ t.description_de }}</p>
+            {% endfor %}
+        </section>
+    </div>
+
+    <div class="ui-empty" data-rules-empty hidden>
+        {{ ui.icon('search') }}
+        <strong>Nichts gefunden</strong>
+        <span>Probier einen anderen Suchbegriff.</span>
+    </div>
+
+    <script src="{{ asset('js/rules.js') }}"></script>
+{% endblock %}

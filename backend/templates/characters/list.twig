@@ -1,37 +1,73 @@
 {% extends "layout.twig" %}
+{% import "_ui.twig" as ui %}
 
-{% block title %}Characters{% endblock %}
+{% block title %}Charaktere{% endblock %}
 
-{% macro character_card(character, deletable) %}
-    <div class="character-card-wrapper">
-        <a class="character-card" href="/character/{{ character.id }}">
-            {% if character.portrait_path %}
-                <img class="character-card-portrait" src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">
-            {% endif %}
-            <h2>{{ character.name_de }}</h2>
-            <p class="character-card-meta">{{ character.kin_de }} &middot; {{ character.age_de }} &middot; {{ character.profession_de }}</p>
-            <div class="character-card-vitals">
-                <span>TP {{ character.hp_current }}/{{ character.hp_max }}</span>
-                <span>WP {{ character.wp_current }}/{{ character.wp_max }}</span>
-            </div>
+{% macro card(c) %}
+    {% import "_ui.twig" as ui %}
+    <article class="char-card" data-char-id="{{ c.id }}" data-name="{{ c.name_de|lower }}" data-default="{{ c.is_default ? 1 : 0 }}"
+             data-search="{{ [c.name_de, c.kin_de, c.age_de, c.profession_de]|join(' ')|lower }}">
+        <a class="char-card__main" href="/character/{{ c.id }}">
+            <span class="ui-avatar">
+                {% if c.portrait_path %}<img src="/{{ c.portrait_path }}" alt="" loading="lazy">{% else %}{{ ui.icon('user') }}{% endif %}
+            </span>
+            <span class="char-card__text">
+                <strong class="char-card__name">{{ c.name_de }}</strong>
+                <span class="ui-muted">{{ c.kin_de }} · {{ c.age_de }} · {{ c.profession_de }}</span>
+            </span>
         </a>
-        {% if deletable %}
-            <button type="button" class="button-danger character-card-delete" data-id="{{ character.id }}">Löschen</button>
-        {% endif %}
-    </div>
+        <div class="char-card__vitals">
+            <div class="ui-bar ui-bar--hp" role="meter" aria-label="Trefferpunkte" aria-valuemin="0" aria-valuemax="{{ c.hp_max }}" aria-valuenow="{{ c.hp_current }}">
+                <div class="ui-bar__fill" style="width: {{ c.hp_max > 0 ? (c.hp_current / c.hp_max * 100)|round : 0 }}%"></div>
+                <span class="ui-bar__label">TP {{ c.hp_current }}/{{ c.hp_max }}</span>
+            </div>
+            <div class="ui-bar ui-bar--wp" role="meter" aria-label="Willenskraft" aria-valuemin="0" aria-valuemax="{{ c.wp_max }}" aria-valuenow="{{ c.wp_current }}">
+                <div class="ui-bar__fill" style="width: {{ c.wp_max > 0 ? (c.wp_current / c.wp_max * 100)|round : 0 }}%"></div>
+                <span class="ui-bar__label">WP {{ c.wp_current }}/{{ c.wp_max }}</span>
+            </div>
+        </div>
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon char-card__pin" data-pin aria-pressed="false" aria-label="Zu meinen Charakteren hinzufügen">{{ ui.icon('bookmark') }}</button>
+    </article>
 {% endmacro %}
 
-{% import _self as characters_macros %}
-{% import "_entity_grid_page.twig" as grid_page %}
+{% import _self as list %}
 
 {% block content %}
-    <a class="button-primary" href="/character/create">Charakter erstellen</a>
-    {{ grid_page.render(
-        'Characters',
-        defaultCharacters|map(c => characters_macros.character_card(c, false)),
-        customCharacters|map(c => characters_macros.character_card(c, true)),
-        'Noch keine selbsterstellten Charaktere.'
-    ) }}
+    <div class="ui-row page-head">
+        <h1>Charaktere</h1>
+        <a class="ui-btn ui-btn--gold" href="/character/create">{{ ui.icon('plus') }} Neu erstellen</a>
+    </div>
 
-    <script src="/js/characters-list.js"></script>
+    <section class="chars-mine" data-mine-section>
+        <h2>{{ ui.icon('bookmark') }} Meine Charaktere</h2>
+        <div class="char-list" data-mine></div>
+        <div class="ui-empty" data-mine-empty>
+            {{ ui.icon('bookmark') }}
+            <strong>Noch keiner hier</strong>
+            <span>Tippe beim Charakter auf das Lesezeichen, dann liegt er hier ganz oben.</span>
+        </div>
+    </section>
+
+    <section class="chars-archive">
+        <h2>{{ ui.icon('users') }} Alle Charaktere</h2>
+        <div class="ui-search">
+            {{ ui.icon('search') }}
+            <input class="ui-input" type="search" id="char-search" placeholder="Name, Volk oder Beruf suchen …" autocomplete="off" aria-label="Charaktere suchen">
+        </div>
+        <div class="ui-tabs" role="group" aria-label="Filter" data-filter style="margin-top: var(--space-3)">
+            <button type="button" class="ui-tab" aria-selected="true" data-filter-value="all">Alle</button>
+            <button type="button" class="ui-tab" aria-selected="false" data-filter-value="default">Vorgefertigt</button>
+            <button type="button" class="ui-tab" aria-selected="false" data-filter-value="custom">Eigene</button>
+        </div>
+        <div class="char-list" data-archive>
+            {% for c in characters %}{{ list.card(c) }}{% endfor %}
+        </div>
+        <div class="ui-empty" data-archive-empty hidden>
+            {{ ui.icon('search') }}
+            <strong>Keine Treffer</strong>
+            <span>Probier eine andere Suche oder einen anderen Filter.</span>
+        </div>
+    </section>
+
+    <script src="{{ asset('js/characters-list.js') }}"></script>
 {% endblock %}

@@ -1,0 +1,390 @@
+/* DM campaign pages: list, plan (outline + editor) and play (quick access + tabs). */
+
+.plain-list {
+    display: grid;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.plain-list a {
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.plain-list a:hover {
+    color: var(--forest-dark);
+    text-decoration: underline;
+}
+
+.pre-wrap {
+    white-space: pre-wrap;
+}
+
+.field-pair {
+    display: grid;
+    gap: 0 var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+/* DM-only fields wear the honey frame, like every "Nur für den DM" card. */
+.dm-field textarea,
+.dm-field input {
+    background: var(--honey-light);
+    border-color: var(--honey);
+}
+
+.place-image {
+    display: block;
+    max-width: 100%;
+    max-height: 22rem;
+    margin: var(--space-2) 0;
+    border: var(--border);
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow-1);
+}
+
+/* Text kinds: read aloud vs. DM only */
+.read-aloud {
+    margin: var(--space-3) 0;
+    padding: var(--space-2) var(--space-4);
+    font-style: italic;
+    background: var(--paper);
+    border-left: 5px solid var(--forest);
+    border-radius: 0 var(--radius-s) var(--radius-s) 0;
+}
+
+.dm-text {
+    padding: var(--space-2) var(--space-4);
+    background: var(--honey-light);
+    border-left: 5px solid var(--honey);
+    border-radius: 0 var(--radius-s) var(--radius-s) 0;
+}
+
+.book-text {
+    padding: var(--space-3) var(--space-4);
+    background: #fff;
+    border: 2px dashed var(--card-edge);
+    border-radius: var(--radius-s);
+}
+
+a.segmented__option {
+    text-decoration: none;
+}
+
+.mode-switch {
+    min-width: 16rem;
+}
+
+/* ---------- Campaign list ---------- */
+.campaign-card {
+    display: grid;
+    gap: var(--space-3);
+    align-content: space-between;
+}
+
+.campaign-card__main {
+    color: inherit;
+    text-decoration: none;
+}
+
+.campaign-card__main h3 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* ---------- Plan ---------- */
+.plan-workspace {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 300px minmax(0, 1fr);
+    align-items: start;
+}
+
+.outline {
+    position: sticky;
+    top: var(--space-4);
+    display: grid;
+    gap: 2px;
+    max-height: calc(100vh - 2 * var(--space-4));
+    overflow-y: auto;
+    padding: var(--space-3);
+}
+
+.outline__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-3);
+    padding: 0 var(--space-1) 0 var(--space-2);
+    font-size: var(--fs-small);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--hint);
+}
+
+.outline__item {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    min-height: 36px;
+    padding: var(--space-1) var(--space-2);
+    padding-left: calc(var(--space-2) + var(--depth, 0) * 1.1rem);
+    color: var(--ink);
+    text-decoration: none;
+    border-radius: var(--radius-s);
+}
+
+.outline__item:hover {
+    background: var(--forest-light);
+}
+
+.outline__item.is-active {
+    font-weight: 700;
+    color: var(--forest-dark);
+    background: var(--honey-light);
+    box-shadow: inset 4px 0 0 var(--honey);
+}
+
+.outline__num {
+    flex: none;
+    min-width: 1.4rem;
+    font-weight: 800;
+    color: var(--honey-dark);
+}
+
+.outline__text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.outline__empty {
+    margin: 0;
+    padding: var(--space-1) var(--space-2);
+    font-size: var(--fs-small);
+    color: var(--hint);
+}
+
+.plan-editor {
+    min-width: 0;
+}
+
+/* ---------- Play ---------- */
+.play-workspace {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 280px minmax(0, 1fr);
+    align-items: start;
+}
+
+.quick {
+    position: sticky;
+    top: var(--space-4);
+    display: grid;
+    gap: var(--space-3);
+    max-height: calc(100vh - 2 * var(--space-4));
+    overflow-y: auto;
+}
+
+.quick__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-2);
+    font-size: var(--fs-lead);
+}
+
+.quick .plain-list a {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+    min-height: 32px;
+}
+
+.play-main {
+    min-width: 0;
+}
+
+.place-read {
+    padding-top: var(--space-3);
+    border-top: 1px dashed var(--card-edge);
+}
+
+.place-read h3 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+}
+
+.place-read__num {
+    color: var(--honey-dark);
+}
+
+.chapter-jump {
+    gap: var(--space-2);
+}
+
+.chronicle-entry p {
+    overflow-wrap: anywhere;
+}
+
+/* Dice */
+.dice-result {
+    display: grid;
+    place-items: center;
+    min-height: 5.5rem;
+    font-family: var(--font-display);
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--forest-dark);
+    background: var(--paper);
+    border: 2px dashed var(--card-edge);
+    border-radius: var(--radius-m);
+}
+
+.dice-result::after {
+    content: attr(data-die);
+    font-family: var(--font-body);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    color: var(--hint);
+}
+
+.dice-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(4.5rem, 1fr));
+    gap: var(--space-2);
+}
+
+/* Encounter tables */
+.event-table-list {
+    display: grid;
+    gap: var(--space-1);
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.event-entry {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-s);
+}
+
+.event-entry.rolled {
+    background: var(--honey-light);
+    box-shadow: inset 4px 0 0 var(--honey);
+    font-weight: 700;
+}
+
+.event-roll {
+    flex: none;
+    min-width: 2.6rem;
+    font-weight: 800;
+    color: var(--honey-dark);
+}
+
+/* Entity dialog */
+.ui-sheet--wide {
+    width: min(760px, calc(100vw - 2 * var(--space-4)));
+}
+
+.card-block {
+    display: grid;
+    gap: var(--space-2);
+}
+
+.stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+@media (max-width: 1100px) {
+    .plan-workspace,
+    .play-workspace {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .outline,
+    .quick {
+        position: static;
+        max-height: 20rem;
+    }
+}
+
+/* ---------- Catalog editors and party (SP4) ---------- */
+.ui-check {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: var(--touch);
+    font-weight: 600;
+}
+
+.ui-check input {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--forest);
+}
+
+.attack-row {
+    display: grid;
+    gap: var(--space-2);
+    background: var(--paper);
+    box-shadow: none;
+}
+
+.party-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.party-card {
+    display: grid;
+    gap: var(--space-3);
+    align-content: start;
+}
+
+.party-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: inherit;
+    text-decoration: none;
+}
+
+.party-card__name {
+    display: block;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+    color: var(--forest-dark);
+}
+
+.party-candidates {
+    display: grid;
+    gap: var(--space-2);
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+.party-candidate {
+    min-height: var(--touch);
+    padding: var(--space-2) var(--space-3);
+    font: inherit;
+    text-align: left;
+    color: var(--ink);
+    background: var(--card);
+    border: var(--border);
+    border-radius: var(--radius-s);
+    cursor: pointer;
+}
+
+.party-candidate:hover {
+    background: var(--honey-light);
+}

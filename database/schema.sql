@@ -158,6 +158,8 @@ CREATE TABLE characters (
     flaw_id INT NOT NULL,
     appearance_de TEXT NOT NULL,
     memento_de TEXT NOT NULL,
+    -- Private free text of the player ("Gedächtnis"), never shown to anyone else on purpose.
+    memory_de TEXT NULL,
     -- Web-relative path (from the public/ root, no leading slash), e.g.
     -- 'images/characters/erzmeister_aodhan.jpg'. NULL = no portrait yet.
     -- Once set (default roster seed data, or a player upload via the sheet),
@@ -293,7 +295,9 @@ CREATE TABLE catalog_bestiary (
     resistances_de TEXT NULL,
     immunities_de TEXT NULL,
     traits_de TEXT NULL,
-    kit_de TEXT NULL
+    kit_de TEXT NULL,
+    -- Web-relative path from the public/ root, no leading slash.
+    image_path VARCHAR(255) NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE catalog_bestiary_attacks (
@@ -643,4 +647,12 @@ CREATE TABLE catalog_hazards (
     code VARCHAR(30) PRIMARY KEY,
     name_de VARCHAR(50) NOT NULL,
     description_de TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- The DM's party of the day: a plain shortlist of characters for the party
+-- overview. No link to any campaign; deleting a character removes the row.
+CREATE TABLE dm_party (
+    character_id INT PRIMARY KEY,
+    added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

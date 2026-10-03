@@ -122,14 +122,35 @@
     function render() {
         const steps = visibleSteps();
         const position = steps.indexOf(state.step) + 1;
+        const stepper = steps.map((step, index) => {
+            const done = index < position - 1;
+            const current = index === position - 1;
+            return `<li class="ui-step${done ? ' ui-step--done' : ''}${current ? ' ui-step--current' : ''}"${current ? ' aria-current="step"' : ''}>${done ? '&#10003;' : index + 1}</li>`;
+        }).join('');
         root.innerHTML = `
             <div class="wizard-step">
+                <ol class="ui-stepper" aria-label="Fortschritt">${stepper}</ol>
                 <p class="wizard-progress">Schritt ${position} von ${steps.length} &middot; ${STEP_TITLES[state.step]}</p>
                 ${state.error ? `<p class="wizard-error">${escapeHtml(state.error)}</p>` : ''}
                 ${renderStep()}
             </div>
         `;
+        applyDesignSystem();
         attachHandlers();
+    }
+
+    // The step markup is built as strings; give its controls the design-system classes.
+    function applyDesignSystem() {
+        root.querySelectorAll('.wizard-nav button').forEach((button) => {
+            button.classList.add('ui-btn');
+            if (button.id === 'prev-step') {
+                button.classList.add('ui-btn--ghost');
+            }
+        });
+        root.querySelectorAll('#swap-button').forEach((button) => button.classList.add('ui-btn', 'ui-btn--small', 'ui-btn--gold'));
+        root.querySelectorAll('input[type="text"], input[type="number"]').forEach((input) => input.classList.add('ui-input'));
+        root.querySelectorAll('textarea').forEach((textarea) => textarea.classList.add('ui-textarea'));
+        root.querySelectorAll('select').forEach((select) => select.classList.add('ui-select'));
     }
 
     function renderStep() {
@@ -585,6 +606,14 @@
                 if (status !== 200) {
                     setError(data.error || 'Unbekannter Fehler beim Anlegen.');
                     return;
+                }
+                // A character made here is "mine" in this browser (see characters-list.js).
+                try {
+                    const mine = JSON.parse(window.localStorage.getItem('trpg.myCharacters') || '[]');
+                    mine.push(String(data.id));
+                    window.localStorage.setItem('trpg.myCharacters', JSON.stringify(mine));
+                } catch (error) {
+                    // not remembered, the character exists anyway
                 }
                 window.location.href = `/character/${data.id}`;
             });

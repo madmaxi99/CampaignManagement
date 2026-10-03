@@ -1,0 +1,33 @@
+{% extends "_base.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}DM-Anmeldung{% endblock %}
+{% block body_class %}dm-login-page{% endblock %}
+
+{% block shell %}
+    <main class="dm-login">
+        <section class="ui-card ui-card--raised dm-login__card">
+            <h1 class="ui-card__title" style="font-size: var(--fs-h2)">{{ ui.icon('lock') }} Nur für den DM</h1>
+
+            {% if not configured %}
+                <p class="ui-banner ui-banner--info">Das DM-Passwort ist noch nicht eingerichtet. Der DM-Bereich bleibt gesperrt, bis in der <code>.env</code> ein <code>DM_PASSWORD_HASH</code> steht (siehe <code>backend/bin/hash-dm-password.php</code>).</p>
+            {% else %}
+                {% if error %}
+                    <p class="ui-banner" role="alert" style="background: var(--berry-light); color: var(--berry-dark); border-color: var(--berry)">{{ error }}</p>
+                {% endif %}
+                <form method="post" action="/dm/login">
+                    <input type="hidden" name="_csrf" value="{{ csrf_token }}">
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <div class="ui-field">
+                        <label for="dm-password">Passwort</label>
+                        <input class="ui-input" id="dm-password" name="password" type="password" autocomplete="current-password" autofocus required>
+                    </div>
+                    <button type="submit" class="ui-btn ui-btn--block">{{ ui.icon('log-in') }} Anmelden</button>
+                </form>
+            {% endif %}
+
+            <hr>
+            <a class="ui-btn ui-btn--ghost ui-btn--block" href="/characters">{{ ui.icon('arrow-left') }} Zurück zu den Charakteren</a>
+        </section>
+    </main>
+{% endblock %}

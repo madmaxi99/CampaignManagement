@@ -7,6 +7,8 @@ use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Slim\Psr7\Factory\ResponseFactory;
 
 require __DIR__ . '/../vendor/autoload.php';
 require __DIR__ . '/../src/Database.php';
@@ -16,6 +18,11 @@ require __DIR__ . '/../src/CampaignStandRepository.php';
 require __DIR__ . '/../src/WorldRepository.php';
 require __DIR__ . '/../src/EntityLinker.php';
 require __DIR__ . '/../src/CharacterCreationRepository.php';
+require __DIR__ . '/../src/RulesRepository.php';
+require __DIR__ . '/../src/DmAuth.php';
+require __DIR__ . '/../src/SessionMiddleware.php';
+require __DIR__ . '/../src/DmGate.php';
+require __DIR__ . '/../src/CatalogEditorRepository.php';
 
 $db = Database::connect();
 $characterRepository = new CharacterRepository($db);
@@ -23,11 +30,34 @@ $campaignRepository = new CampaignRepository($db);
 $standRepository = new CampaignStandRepository($db);
 $worldRepository = new WorldRepository($db);
 $characterCreationRepository = new CharacterCreationRepository($db);
+$rulesRepository = new RulesRepository($db);
+$catalogEditor = new CatalogEditorRepository($db);
+$dmAuth = new DmAuth(getenv('DM_PASSWORD_HASH') ?: null, sys_get_temp_dir());
 
 $app = AppFactory::create();
 
 $twig = Twig::create(__DIR__ . '/../templates', ['cache' => false]);
+
+// Middleware runs bottom-up: session first, then the DM lock, then the view globals.
 $app->add(TwigMiddleware::create($app, $twig));
+$app->add(function (Request $request, RequestHandler $handler) use ($twig, $dmAuth) {
+    $environment = $twig->getEnvironment();
+    $environment->addGlobal('is_dm', $dmAuth->isLoggedIn());
+    $environment->addGlobal('csrf_token', $dmAuth->csrfToken());
+
+    return $handler->handle($request);
+});
+$app->add(new DmGate($dmAuth, new ResponseFactory()));
+$app->add(new SessionMiddleware());
+
+$twig->getEnvironment()->addGlobal('app_name', 'Abenteuerbuch');
+$twig->getEnvironment()->addFilter(new \Twig\TwigFilter('repeat', fn (string $text, int $times): string => str_repeat($text, max(0, $times))));
+// asset('css/x.css') -> /css/x.css?v=<mtime>, so browsers pick up changes.
+$twig->getEnvironment()->addFunction(new \Twig\TwigFunction('asset', function (string $path): string {
+    $file = __DIR__ . '/' . $path;
+
+    return '/' . $path . '?v=' . (is_file($file) ? filemtime($file) : 0);
+}));
 $twig->getEnvironment()->addFilter(new \Twig\TwigFilter('linkify', [EntityLinker::class, 'linkify'], ['is_safe' => ['html']]));
 
 function loadSheet(CharacterRepository $repository, int $id): ?array
@@ -54,6 +84,16 @@ function loadSheet(CharacterRepository $repository, int $id): ?array
         'armor' => $repository->armor($characterId),
         'inventory' => $repository->inventory($characterId),
     ];
+}
+
+/** Login redirect target: only paths inside /dm, never an external URL. */
+function safeDmTarget(mixed $next): string
+{
+    if (is_string($next) && preg_match('#^/dm(/[A-Za-z0-9_\-./]*)?$#', $next) === 1) {
+        return $next;
+    }
+
+    return '/dm';
 }
 
 function jsonResponse(Response $response, array $data, int $status = 200): Response
@@ -144,228 +184,78 @@ $app->post('/characters', function (Request $request, Response $response) use ($
 $app->get('/characters', function (Request $request, Response $response) use ($characterRepository) {
     $twig = Twig::fromRequest($request);
 
-    $characters = $characterRepository->listAll();
-    $defaultCharacters = array_values(array_filter($characters, fn (array $c) => (bool) $c['is_default']));
-    $customCharacters = array_values(array_filter($characters, fn (array $c) => !$c['is_default']));
-
     return $twig->render($response, 'characters/list.twig', [
-        'defaultCharacters' => $defaultCharacters,
-        'customCharacters' => $customCharacters,
+        'characters' => $characterRepository->listAll(),
     ]);
 });
 
-$app->get('/world', function (Request $request, Response $response) use ($worldRepository) {
-    return Twig::fromRequest($request)->render($response, 'world.twig', [
-        'bestiary' => $worldRepository->bestiary(),
-        'encounterTables' => $worldRepository->encounterTables(),
+$app->get('/rules', function (Request $request, Response $response) use ($rulesRepository) {
+    return Twig::fromRequest($request)->render($response, 'rules.twig', [
+        'items' => $rulesRepository->items(),
+        'skills' => $rulesRepository->skills(),
+        'schools' => $rulesRepository->spellsBySchool(),
+        'professions' => $rulesRepository->professions(),
+        'kins' => $rulesRepository->kins(),
+        'heroicAbilities' => $rulesRepository->heroicAbilities(),
+        'tables' => $rulesRepository->tables(),
     ]);
 });
 
-$app->get('/campaign', function (Request $request, Response $response) use ($campaignRepository) {
-    $twig = Twig::fromRequest($request);
+// ---- DM login / logout / old URLs ----
 
-    $campaigns = $campaignRepository->listAll();
-    $defaultCampaigns = array_values(array_filter($campaigns, fn (array $c) => (bool) $c['is_default']));
-    $customCampaigns = array_values(array_filter($campaigns, fn (array $c) => !$c['is_default']));
+$app->get('/dm/login', function (Request $request, Response $response) use ($dmAuth) {
+    if ($dmAuth->isLoggedIn()) {
+        return $response->withHeader('Location', '/dm')->withStatus(302);
+    }
 
-    return $twig->render($response, 'campaign/list.twig', [
-        'defaultCampaigns' => $defaultCampaigns,
-        'customCampaigns' => $customCampaigns,
+    return Twig::fromRequest($request)->render($response, 'dm/login.twig', [
+        'configured' => $dmAuth->isConfigured(),
+        'next' => safeDmTarget($request->getQueryParams()['next'] ?? null),
+        'error' => null,
     ]);
 });
 
-$app->get('/campaign/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($campaignRepository, $standRepository) {
-    $campaign = $campaignRepository->find((int) $args['id']);
-    if ($campaign === null) {
-        return $response->withStatus(404);
+$app->post('/dm/login', function (Request $request, Response $response) use ($dmAuth) {
+    $body = (array) $request->getParsedBody();
+    $next = safeDmTarget($body['next'] ?? null);
+    $render = fn (?string $error, int $status) => Twig::fromRequest($request)->render(
+        $response->withStatus($status),
+        'dm/login.twig',
+        ['configured' => $dmAuth->isConfigured(), 'next' => $next, 'error' => $error]
+    );
+
+    if (!$dmAuth->validCsrf((string) ($body['_csrf'] ?? ''))) {
+        return $render('Sitzung abgelaufen, bitte noch einmal versuchen.', 403);
     }
 
-    $campaignId = (int) $campaign['id'];
-    $twig = Twig::fromRequest($request);
+    $clientId = $request->getServerParams()['REMOTE_ADDR'] ?? 'unknown';
+    $result = $dmAuth->attempt((string) ($body['password'] ?? ''), $clientId);
 
-    $locations = $campaignRepository->locations($campaignId);
-    $bestiary = $campaignRepository->bestiary($campaignId);
-    $npcs = $campaignRepository->npcs($campaignId);
-    $places = $campaignRepository->places($campaignId);
-
-    $entityRegistry = [];
-    foreach ($locations as $location) {
-        $entityRegistry[] = ['match' => '#' . $location['number_label'], 'type' => 'location', 'id' => (int) $location['id']];
-    }
-    foreach ($bestiary as $creature) {
-        $entityRegistry[] = ['match' => $creature['name_de'], 'type' => 'bestiary', 'id' => (int) $creature['id']];
-    }
-    foreach ($npcs as $npc) {
-        $entityRegistry[] = ['match' => $npc['name_de'], 'type' => 'npc', 'id' => (int) $npc['id']];
-    }
-
-    return $twig->render($response, 'campaign/dm_screen.twig', [
-        'campaign' => $campaign,
-        'chapters' => $campaignRepository->chapters($campaignId),
-        'locations' => $locations,
-        'bestiary' => $bestiary,
-        'npcs' => $npcs,
-        'npcFormData' => [
-            'bestiary' => $campaignRepository->bestiaryOptions(),
-            'npcs' => array_column(array_map(fn (array $n) => [
-                'id' => (int) $n['id'],
-                'values' => [
-                    'name_de' => $n['name_de'], 'description_de' => $n['description_de'], 'dm_text_de' => $n['dm_text_de'],
-                    'notes_de' => $n['notes_de'], 'found_hint_de' => $n['found_hint_de'], 'bestiary_id' => $n['bestiary_id'],
-                ],
-            ], $npcs), 'values', 'id'),
-        ],
-        'places' => $places,
-        'items' => $campaignRepository->items($campaignId),
-        'encounterTableOptions' => $campaignRepository->encounterTableOptions(),
-        'placeFormData' => array_column(array_map(fn (array $p) => [
-            'id' => (int) $p['id'],
-            'values' => [
-                'name_de' => $p['name_de'], 'parent_id' => $p['parent_id'],
-                'description_de' => $p['description_de'], 'dm_text_de' => $p['dm_text_de'],
-                'encounter_table_id' => $p['encounter_table_id'],
-            ],
-        ], $places), 'values', 'id'),
-        'chronicle' => $standRepository->chronicle($campaignId),
-        'encounterTables' => $campaignRepository->encounterTables($campaignId),
-        'entityRegistry' => $entityRegistry,
-    ]);
+    return match ($result) {
+        'ok' => $response->withHeader('Location', $next)->withStatus(302),
+        'locked' => $render('Zu viele Versuche. Bitte in ' . $dmAuth->lockedSeconds($clientId) . ' Sekunden noch einmal versuchen.', 429),
+        'unconfigured' => $render(null, 503),
+        default => $render('Das Passwort stimmt nicht.', 401),
+    };
 });
 
-$app->post('/campaign/{id:[0-9]+}/npcs', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    if ($campaignRepository->find((int) $args['id']) === null) {
-        return $response->withStatus(404);
-    }
+$app->post('/dm/logout', function (Request $request, Response $response) use ($dmAuth) {
+    $dmAuth->logout();
 
-    $body = json_decode((string) $request->getBody(), true) ?? [];
-    try {
-        $npcId = $campaignRepository->createNpc((int) $args['id'], $body);
-    } catch (InvalidArgumentException $e) {
-        return jsonResponse($response, ['error' => $e->getMessage()], 422);
-    }
-
-    return jsonResponse($response, ['id' => $npcId], 201);
+    return $response->withHeader('Location', '/characters')->withStatus(302);
 });
 
-$app->post('/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    $campaignId = (int) $args['id'];
-    $npcId = (int) $args['npcId'];
-    if (!$campaignRepository->npcInCampaign($campaignId, $npcId)) {
-        return $response->withStatus(404);
-    }
-
-    $body = json_decode((string) $request->getBody(), true) ?? [];
-    try {
-        $campaignRepository->updateNpc($campaignId, $npcId, $body);
-    } catch (InvalidArgumentException $e) {
-        return jsonResponse($response, ['error' => $e->getMessage()], 422);
-    }
-
-    return jsonResponse($response, ['updated' => true]);
+$app->get('/dm/styleguide', function (Request $request, Response $response) {
+    return Twig::fromRequest($request)->render($response, 'dm/styleguide.twig');
 });
 
-$app->post('/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}/portrait', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    $campaignId = (int) $args['id'];
-    $npcId = (int) $args['npcId'];
-    if (!$campaignRepository->npcInCampaign($campaignId, $npcId)) {
-        return $response->withStatus(404);
-    }
+// Old URLs of the previous layout.
+$app->get('/campaign', fn (Request $request, Response $response) => $response->withHeader('Location', '/dm')->withStatus(301));
+$app->get('/campaign/{id:[0-9]+}', fn (Request $request, Response $response, array $args) => $response->withHeader('Location', '/dm/campaign/' . $args['id'])->withStatus(301));
+$app->get('/world', fn (Request $request, Response $response) => $response->withHeader('Location', '/dm/catalog')->withStatus(301));
 
-    $stored = storeUploadedImage($request->getUploadedFiles()['portrait'] ?? null, 'images/npcs', $npcId);
-    if (isset($stored['error'])) {
-        return jsonResponse($response, ['error' => $stored['error']], 422);
-    }
-    $campaignRepository->setNpcPortrait($npcId, $stored['path']);
-
-    return jsonResponse($response, ['portrait_path' => $stored['path']]);
-});
-
-$app->post('/campaign/{id:[0-9]+}/restart', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    if ($campaignRepository->find((int) $args['id']) === null) {
-        return $response->withStatus(404);
-    }
-    $campaignRepository->restart((int) $args['id']);
-
-    return jsonResponse($response, ['restarted' => true]);
-});
-
-$app->post('/campaign/{id:[0-9]+}/places', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    if ($campaignRepository->find((int) $args['id']) === null) {
-        return $response->withStatus(404);
-    }
-
-    $body = json_decode((string) $request->getBody(), true) ?? [];
-    try {
-        $placeId = $campaignRepository->createPlace((int) $args['id'], $body);
-    } catch (InvalidArgumentException $e) {
-        return jsonResponse($response, ['error' => $e->getMessage()], 422);
-    }
-
-    return jsonResponse($response, ['id' => $placeId], 201);
-});
-
-$app->post('/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    $campaignId = (int) $args['id'];
-    $placeId = (int) $args['placeId'];
-    if (!$campaignRepository->placeInCampaign($campaignId, $placeId)) {
-        return $response->withStatus(404);
-    }
-
-    $body = json_decode((string) $request->getBody(), true) ?? [];
-    try {
-        $campaignRepository->updatePlace($campaignId, $placeId, $body);
-    } catch (InvalidArgumentException $e) {
-        return jsonResponse($response, ['error' => $e->getMessage()], 422);
-    }
-
-    return jsonResponse($response, ['updated' => true]);
-});
-
-$app->post('/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}/image', function (Request $request, Response $response, array $args) use ($campaignRepository) {
-    $placeId = (int) $args['placeId'];
-    if (!$campaignRepository->placeInCampaign((int) $args['id'], $placeId)) {
-        return $response->withStatus(404);
-    }
-
-    $stored = storeUploadedImage($request->getUploadedFiles()['image'] ?? null, 'images/places', $placeId);
-    if (isset($stored['error'])) {
-        return jsonResponse($response, ['error' => $stored['error']], 422);
-    }
-    $campaignRepository->setPlaceImage($placeId, $stored['path']);
-
-    return jsonResponse($response, ['image_path' => $stored['path']]);
-});
-
-$app->post('/campaign/{id:[0-9]+}/chronicle', function (Request $request, Response $response, array $args) use ($campaignRepository, $standRepository) {
-    if ($campaignRepository->find((int) $args['id']) === null) {
-        return $response->withStatus(404);
-    }
-    $body = json_decode((string) $request->getBody(), true) ?? [];
-    try {
-        $entryId = $standRepository->addChronicleEntry((int) $args['id'], $body);
-    } catch (InvalidArgumentException $e) {
-        return jsonResponse($response, ['error' => $e->getMessage()], 422);
-    }
-
-    return jsonResponse($response, ['id' => $entryId], 201);
-});
-
-$app->post('/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', function (Request $request, Response $response, array $args) use ($standRepository) {
-    $body = json_decode((string) $request->getBody(), true) ?? [];
-    try {
-        $found = $standRepository->updateChronicleEntry((int) $args['id'], (int) $args['entryId'], $body);
-    } catch (InvalidArgumentException $e) {
-        return jsonResponse($response, ['error' => $e->getMessage()], 422);
-    }
-
-    return $found ? jsonResponse($response, ['updated' => true]) : $response->withStatus(404);
-});
-
-$app->delete('/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', function (Request $request, Response $response, array $args) use ($standRepository) {
-    return $standRepository->deleteChronicleEntry((int) $args['id'], (int) $args['entryId'])
-        ? jsonResponse($response, ['deleted' => true])
-        : $response->withStatus(404);
-});
+(require __DIR__ . '/../routes/dm_campaign.php')($app, $campaignRepository, $standRepository);
+(require __DIR__ . '/../routes/dm_catalog.php')($app, $catalogEditor, $worldRepository);
 
 $app->get('/character/create', function (Request $request, Response $response) {
     $twig = Twig::fromRequest($request);
@@ -402,6 +292,13 @@ $app->post('/character/{id:[0-9]+}/conditions/{code}/toggle', withCharacter($cha
     $active = $characterRepository->toggleCondition((int) $character['id'], $args['code']);
 
     return jsonResponse($response, ['code' => $args['code'], 'active' => $active]);
+}));
+
+$app->post('/character/{id:[0-9]+}/memory', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
+    $body = json_decode((string) $request->getBody(), true);
+    $characterRepository->setMemory((int) $character['id'], (string) ($body['text'] ?? ''));
+
+    return jsonResponse($response, ['saved' => true]);
 }));
 
 $app->post('/character/{id:[0-9]+}/currency', withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository) {
