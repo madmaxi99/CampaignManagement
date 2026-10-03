@@ -471,11 +471,6 @@ CREATE TABLE catalog_age (
     description_de VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-INSERT INTO catalog_age (id, name_de, description_de) VALUES
-    (1, 'Jung', 'GEW und KON +1'),
-    (2, 'Erwachsen', '—'),
-    (3, 'Alt', 'STA, GEW und KON -2, INT und WIL +1');
-
 CREATE TABLE catalog_professions (
     code VARCHAR(30) PRIMARY KEY,
     name_de VARCHAR(50) NOT NULL,

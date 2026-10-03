@@ -1,6 +1,6 @@
 # Schema
 
-Stand: 2026-10-02. Setzt `docs/CONCEPT.md` um. Maßgeblich ist `database/schema.sql`, dieses Dokument erklärt nur die Aufteilung. MariaDB, `_de`-Suffix für deutsche Texte, `utf8mb4`, InnoDB.
+Stand: 2026-10-02. Setzt `docs/CONCEPT.md` um. Maßgeblich ist `database/01_schema.sql`, dieses Dokument erklärt nur die Aufteilung. MariaDB, `_de`-Suffix für deutsche Texte, `utf8mb4`, InnoDB.
 
 ## Überblick
 
@@ -49,11 +49,11 @@ Keine Verbindung. Ein gefundenes Item wird später als Text (Name, Beschreibung)
 
 ## Seeds
 
-Es gibt keine Migration: Die DB wird neu aufgesetzt (`provisioning/docker-compose.yml` lädt Schema und Seeds in Reihenfolge). Die `migrate_*.sql`-Dateien sind Historie des alten Modells und gehören nicht mehr dazu. Später werden die Seeds zu einem einzigen zusammengefasst.
+Es gibt keine Migration: Die DB wird neu aufgesetzt (`provisioning/docker-compose.yml` lädt die drei Dateien in Reihenfolge).
 
-- `seed_ridderhohe.sql`, `seed_versinkender_turm.sql`: je eine Kampagne. Die Räume sind Orte unter einem Hauptort (Ridderhöhe, Magdalas Turm), die Turm-Stockwerke haben ihr Bild. Die zwei Zufallsereignis-Tabellen von Ridderhöhe stehen als Text in den DM-Beschreibungen der Orte #1 und #4. Der Gruftschrecken und Krakul sind als `is_unique` markiert.
-- `seed_encounter_tables.sql`: Begegnungstabellen Wald, Straße, Ruine (nach dem Bestiary).
-- `seed_catalog_content.sql`: Beispielkampagne "Der Hundekampfring" mit geschachtelten Orten, drei Items, zwei NPCs.
+- `01_schema.sql`: alle Tabellen.
+- `02_catalog.sql`: Katalog (alle `catalog_*`-Tabellen): Regelwerk, Items, Bestiary inkl. Abenteuer-Monster, Begegnungstabellen. Id 3 in `catalog_bestiary` bleibt bewusst frei (Portrait `images/creatures/3.jpg` der Dame des Hügels, die den allgemeinen Geist nutzt).
+- `03_examples.sql`: Beispiel-Charaktere (Aodhan, 7 Quickstart-Pregens) und Beispiel-Kampagnen. Ridderhöhe und Der Versinkende Turm: Die Räume sind Orte unter einem Hauptort (Ridderhöhe, Magdalas Turm), die Turm-Stockwerke haben ihr Bild. Die zwei Zufallsereignis-Tabellen von Ridderhöhe stehen als Text in den DM-Beschreibungen der Orte #1 und #4. Der Gruftschrecken und Krakul sind als `is_unique` markiert. Der Hundekampfring: Beispielkampagne mit geschachtelten Orten, drei Items, zwei NPCs.
 
 ## Auswirkungen auf den Code
 
