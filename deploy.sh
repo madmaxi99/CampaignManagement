@@ -4,10 +4,10 @@ set -euo pipefail
 # Deploys the current branch to the VPS: pulls latest, rebuilds containers,
 # installs backend dependencies.
 #
-# Requires your SSH key to be authorized on the VPS (root@185.192.96.141) —
-# no ~/.ssh/config entry needed.
+# Requires the "amt-solo-vps" entry in ~/.ssh/config
+# (root@185.192.96.141, IdentityFile ~/.ssh/amt_solo_vps).
 
-VPS_HOST="root@185.192.96.141"
+VPS_HOST="amt-solo-vps"
 REMOTE_PATH="/opt/campaignManagement"
 
 # alias.sh assigns to $UID, which bash treats as readonly — run it under zsh
