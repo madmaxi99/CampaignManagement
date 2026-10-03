@@ -181,6 +181,10 @@ $app->post('/characters', function (Request $request, Response $response) use ($
     return jsonResponse($response, ['id' => $characterId]);
 });
 
+$app->get('/', function (Request $request, Response $response) {
+    return $response->withHeader('Location', '/characters')->withStatus(302);
+});
+
 $app->get('/characters', function (Request $request, Response $response) use ($characterRepository) {
     $twig = Twig::fromRequest($request);
 
