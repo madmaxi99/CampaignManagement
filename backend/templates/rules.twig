@@ -303,8 +303,12 @@
             {% set body %}
                 <dl class="facts">
                     <div><dt>Schlüsselattribut</dt><dd>{{ p.key_attribute_de }}</dd></div>
-                    <div><dt>Fertigkeiten zur Wahl</dt><dd>{{ p.skills|join(', ') }}</dd></div>
                 </dl>
+                <h3 class="rules-subhead">Fertigkeiten zur Wahl</h3>
+                <ul class="rules-skill-list">
+                    {% for s in p.skills %}<li>{{ s }}</li>{% endfor %}
+                    {% if p.grants_magic %}<li><em>eine gewählte Zauberschule</em></li>{% endif %}
+                </ul>
                 {% for a in p.abilities %}
                     <p><strong>{{ a.name_de }}.</strong> {{ a.description_de }}</p>
                 {% endfor %}

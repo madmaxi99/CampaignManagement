@@ -636,6 +636,20 @@
     background: var(--paper);
 }
 
+.rules-subhead {
+    margin: var(--space-3) 0 var(--space-2);
+    font-size: 1rem;
+    color: var(--ink-soft);
+}
+
+.rules-skill-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-1) var(--space-4);
+    margin: 0;
+    padding-left: var(--space-5);
+}
+
 #panel-items h2,
 #panel-skills h2,
 #panel-spells h2 {

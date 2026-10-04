@@ -226,7 +226,7 @@
             const selected = state.professionCode === profession.code;
             const pool = profession.skillPool
                 .map((skill) => `${skill.name_de} (${ATTRIBUTE_LABELS[skill.attribute_code]})`)
-                .join(', ');
+                .join(', ') + (profession.grants_magic ? ', gewählte Zauberschule' : '');
 
             let abilitySection;
             if (profession.heroicAbilities.length === 0 && profession.grants_magic) {
@@ -373,7 +373,7 @@
             <div class="wizard-choice-list">${ageRows}</div>
 
             <h3>Fertigkeiten-Pool deines Berufs</h3>
-            <p class="wizard-intro">Wähle genau 6 aus dem Fertigkeiten-Pool deines Berufs (${state.poolPicks.length}/6):</p>
+            <p class="wizard-intro">Wähle genau 6 der 8 Fertigkeiten deines Berufs (${state.poolPicks.length}/6):</p>
             <div class="wizard-choice-grid">${poolRows}</div>
 
             <h3>Ausrüstung</h3>
