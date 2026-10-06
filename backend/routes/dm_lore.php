@@ -22,6 +22,7 @@ return function (App $app): void {
         ['slug' => 'voelker', 'title' => 'Völker'],
         ['slug' => 'land', 'title' => 'Das Land'],
         ['slug' => 'orte', 'title' => 'Städte und Orte'],
+        ['slug' => 'schauplaetze', 'title' => 'Schauplätze'],
         ['slug' => 'haeuser', 'title' => 'Häuser und Gilden'],
     ];
 

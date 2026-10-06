@@ -92,6 +92,11 @@ Alle Namen und Himmelsrichtungen sind *(Vorschlag)*, die Rahmenbedingungen *(Nut
 
 Dazu kommen etliche Dörfer und Siedlungen, in denen alle gemischt leben.
 
+**Schauplätze der Beispielkampagnen** *(Vorschlag, im Nordwesten und an der Küste)*
+- **Nebeltal und Ridderhöhe:** Westende des Grenzforsts. Grabhügel eines Ritters im Dienst des Drachenkaisers (Macht aus der Zeit vor Korvanis, lokale Legende). Die Ork-Stammesführerin Maladûk schickt Goblins zum Plündern, auf eigene Faust unter Varrok. Kleiner Grenzzwischenfall.
+- **Magdalas Turm:** vor der Küste bei Salzbruck, Fischerdorf Fischersand. Der Turm steigt alle 20 Jahre aus dem Meer.
+- **Nebelmark und Rynda:** Moorland im Nordwesten zwischen Salzbruck und Grenzforst. Die Krone ist weit weg, die Dörfer verwalten sich selbst. Banditen real, Untote nur Gerüchte.
+
 ## 7. Namen und Häuser
 Alles *(Vorschlag)*.
 
