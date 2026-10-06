@@ -388,3 +388,65 @@ a.segmented__option {
 .party-candidate:hover {
     background: var(--honey-light);
 }
+
+/* ---------- Lore chapters (/dm/lore) ---------- */
+.lore-chapter {
+    padding: var(--space-5) var(--space-6);
+}
+
+.lore-chapter > h2 {
+    margin-top: 0;
+}
+
+.lore-chapter > :not(h2):not(.lore-pager):not(.lore-map) {
+    max-width: 46rem;
+}
+
+.lore-chapter h3 {
+    margin: var(--space-5) 0 var(--space-2);
+}
+
+.lore-chapter p,
+.lore-chapter ul {
+    margin: 0 0 var(--space-3);
+}
+
+.lore-chapter ul {
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-1);
+}
+
+.lore-chapter dl {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-3);
+}
+
+.lore-chapter dt {
+    font-weight: 700;
+    color: var(--forest-dark);
+}
+
+.lore-chapter dd {
+    margin: 0;
+}
+
+.lore-chapter table {
+    border-collapse: collapse;
+    margin-bottom: var(--space-3);
+}
+
+.lore-chapter th,
+.lore-chapter td {
+    padding: var(--space-1) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+}
+
+.lore-pager {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+}

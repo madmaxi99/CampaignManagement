@@ -1,0 +1,314 @@
+{#
+    Lore content, shared by /lore (players) and /dm/lore (DM).
+    Uses its own flag `lore_dm`, NOT the global `is_dm`: the DM may open /lore
+    while logged in and must still see the spoiler-free player version there.
+    Player text is told by a neutral chronicler from Weidenmark's point of view
+    and must stay free of secrets (no Grauer Bund, no murder case).
+    DM-only parts are plain reference text, not narrated.
+#}
+<article class="lore">
+    <div class="ui-row page-head">
+        <h1>Lore</h1>
+        {% if lore_dm %}<span class="ui-badge ui-badge--berry">mit SL-Teilen</span>{% endif %}
+    </div>
+
+    <p class="lore-lead">Aufgezeichnet von einem Chronisten in Weidenmark, im Jahr 214 nach dem Fall.</p>
+
+    <nav class="ui-card lore-toc" aria-label="Inhalt">
+        <h2 class="ui-card__title">Inhalt</h2>
+        <ol>
+            <li><a href="#prolog">Prolog: Der Fall</a></li>
+            <li><a href="#nachbarn">Die Nachbarn</a></li>
+            <li><a href="#weidenmark">Weidenmark von innen</a></li>
+            <li><a href="#gerede">Was man sich erzählt</a></li>
+            {% if lore_dm %}
+                <li><a href="#alltag">Kalender, Geld und Wappen <span class="ui-badge ui-badge--berry">SL</span></a></li>
+                <li><a href="#namen">Namenskonventionen <span class="ui-badge ui-badge--berry">SL</span></a></li>
+            {% endif %}
+        </ol>
+    </nav>
+
+    {# ---------- Prolog ---------- #}
+    <section id="prolog">
+        <h2>Prolog: Der Fall</h2>
+        <p>
+            Es heißt, es gab eine Zeit, da kannte man nur ein Reich. Korvanis spannte seine Straßen von den Bergen im Norden bis ans Meer, und wer unter seinem Banner reiste, schlief sicher. Die Zwerge lieferten Erz, die Elfen Rat, die Halblinge Korn, und in den Provinzen sprachen die Statthalter Recht im Namen eines einzigen Throns.
+        </p>
+        <p>
+            Dann starb der Herrscher, ohne zu bestimmen, wer nach ihm kommen sollte. Die Statthalter griffen nach der Krone, jeder mit gutem Recht und keiner mit dem besten. Die Straßen verfielen, während sie stritten. Und im Osten, wo die Banner dünn geworden waren, hörten die Hobgoblins und die Orc-Banden auf, nur zuzusehen.
+        </p>
+        <p>
+            Sie kamen im Winter. Man hat sie zurückgedrängt, besiegt hat man sie nie. Korvanis aber stand nicht wieder auf. Aus seinen Provinzen wurden Grafschaften, Herzogtümer und Städtebünde, und im Landesinneren wuchs ein Reich zum Kaiserreich heran. Eines dieser Stücke ist Weidenmark: ein Tal, ein Fluss, ein Moor und ein paar Grafen, die alle behaupten, einen Statthalter zum Ahnen zu haben.
+        </p>
+        <p>
+            Seitdem zählt man die Jahre nach dem Fall, und es sind schon zweihundertvierzehn. Jedes der Erbreiche hält sich für die wahre Nachfolge. Wer es besser wissen könnte, ist lange tot.
+        </p>
+    </section>
+
+    {# ---------- Nachbarn ---------- #}
+    <section id="nachbarn">
+        <h2>Die Nachbarn</h2>
+        <p>
+            Weidenmark hat fruchtbares Land und einen schwachen König, und jeder Nachbar will etwas davon oder fürchtet etwas von ihm. So sieht man sie von hier aus.
+        </p>
+
+        <figure class="lore-map">
+            <img src="/images/lore/karte.svg" alt="Grobe Karte: Weidenmark in der Mitte, im Norden Kar-Dumhad, im Westen Aelenor, im Süden Kesselau und das Nebelmoor, im Osten die Graue Meute und das Land der Dark Kin, im Südosten die Küste mit Trallhafen" width="800" height="600" loading="lazy">
+            <figcaption>Grobe Skizze, ohne Maßstab.</figcaption>
+        </figure>
+
+        <h3>Rund um das Tal</h3>
+
+        <h4>Kar-Dumhad im Norden</h4>
+        <p>
+            Aus den Bergen kommen das Erz und die Schmiedekunst, ohne die kein Pflug und kein Schwert in Weidenmark etwas taugen. Die Zwerge des Kronrats erheben dafür Zoll an den Pässen, und ihre Verträge sind älter als jedes Haus im Tal. Man schätzt sie und ärgert sich über sie. Ihr Wort gilt, und sie vergessen keine Beleidigung.
+        </p>
+
+        <h4>Aelenor im Westen</h4>
+        <p>
+            Hinter dem Waldsaum beginnt das Reich der Elfen. Seit menschliche Erben nach dem Fall in ihre Wälder drangen, lassen sie kaum noch jemanden hinein. Man bewundert sie, fürchtet sie und weiß erstaunlich wenig über sie. Wer einen Elfen zu Gesicht bekommt, erzählt es noch Jahre später.
+        </p>
+
+        <h4>Kesselau im Süden</h4>
+        <p>
+            Das Herzogtum ist straffer geführt als Weidenmark. Auch dort wollte ein Erbe das Reich wieder zusammenfügen, und es sieht bis heute so aus. Beide Länder streiten um den Grenzfluss, um Zoll und Fischrechte. Es ist ein Rivale, kein Feind. Jede Seite wartet darauf, dass die andere schwächer wird.
+        </p>
+
+        <h4>Karrmoos im Moor</h4>
+        <p>
+            Wo der Grenzfluss im Nebelmoor versickert, liegt Karrmoos, eine Freistatt, die weder Weidenmark noch Kesselau beansprucht. Cat People, Lizard People und versprengte Satyr leben dort, und niemand fragt, wovor sie geflohen sind.
+        </p>
+
+        <h4>Die Graue Meute und der Osten</h4>
+        <p>
+            Im Osten wird das Land karger. Die Wolfkin der Grauen Meute hüten die Heide, ehrlich, aber unberechenbar. Wer ihnen schwört, muss es halten. Dahinter beginnt das Land derer, die Korvanis zerbrachen: das Khanat Zhurgask der Hobgoblins, die Orc-Banden der Wundmark, die Goblin-Warrens der Grubenländer und die verstreuten Clans der Oger. Man unterscheidet selten zwischen ihnen, und man spürt sie an verstärkten Patrouillen und an Geschichten. Die Grenze war nie wirklich sicher.
+        </p>
+
+        <h3>Weiter weg</h3>
+
+        <h4>Trallhafen an der Küste</h4>
+        <p>
+            Der Städtebund ist Weidenmarks Tor zur Welt. Dort regieren Kaufmannsräte statt Adel, Menschen und Mallard handeln Seite an Seite, und man ist pragmatisch und neutral. Man macht Geschäfte mit Trallhafen, vertraut ihm aber nicht.
+        </p>
+
+        <h4>Das Kaiserreich Sorvenne</h4>
+        <p>
+            Das Reich im Landesinneren zerfiel nicht, sondern wurde in denselben Jahren fester und größer. Heute ist es reich, selbstsicher und führt einen Kaiser, dessen Wille Gesetz ist. Es drängt auf alle seine Nachbarn, auch auf Weidenmark, bisher mit Briefen und Gesandten. Offiziell herrscht Höflichkeit. Inoffiziell ist Argwohn angebracht.
+        </p>
+
+        <h4>Die Distelmark</h4>
+        <p>
+            Ein Bund freier Bauerngemeinden, der aus einem Aufstand gegen den Adel der Erben entstand. Jeder König ist dort verdächtig. Für Weidenmark ist sie ein unbequemes Beispiel dafür, dass es auch ohne Adel geht.
+        </p>
+
+        <h4>Sonnwacht</h4>
+        <p>
+            Ein Priesterstaat, den ein Klerus-Rat regiert. Die Lichtwacht-Lehre entstand dort aus der Erfahrung der Invasion: Licht gegen Dunkelheit, und Wachsamkeit gegen alles, was sich versteckt. Ihre Wanderprediger kommen schon lange nach Weidenmark, und ihre Lehre hat hier Fuß gefasst.
+        </p>
+
+        <h4>Illyth</h4>
+        <p>
+            Eine kleine Gemeinschaft von Zauberkundigen, Menschen und Elfen, die Wissen aus Korvanis gerettet haben und es heute an jeden verkaufen. Offiziell ist sie neutral. Nützlich ist sie, aber niemandes Freund.
+        </p>
+    </section>
+
+    {# ---------- Weidenmark von innen ---------- #}
+    <section id="weidenmark">
+        <h2>Weidenmark von innen</h2>
+        <p>
+            Wer in Weidenmark etwas gelten will, muss wissen, wem er gegenübersteht. Das Tal ist klein, aber jede Gruppe will etwas anderes.
+        </p>
+
+        <h3>Die Krone</h3>
+        <p>
+            König Alderich sitzt in Weidenstein, der alten Residenz am Fluss. Er hat Prestige, aber wenig Macht. Selbst die Münze heißt noch Krone, obwohl die Krone kaum noch etwas kauft: Die Tradition hat die Kraft überlebt.
+        </p>
+
+        <h3>Die Grafenhäuser</h3>
+        <p>
+            Die Grafen halten das Land, und sie stammen allesamt von alten Statthaltern von Korvanis ab. Keiner hat einen besseren Anspruch, also gibt keiner nach.
+        </p>
+        <p>
+            In Illenfurt sitzt ein Haus, das die Brücke am Grenzfluss und damit den wichtigsten Zoll kontrolliert. Es lebt vom Fluss und will, dass er so bleibt. In Rohrmark am Rand des Moors regiert Gräfin Adelind. Sie will das Moor trockenlegen, um Ackerland zu gewinnen, und das würde den Fluss verändern. Deshalb sind die beiden Häuser Gegenspieler. Talenstein hält sich an den Ackerbau und hält sich heraus. Hirschau am Waldrand ist vorsichtig, wegen der Nähe zu Aelenor.
+        </p>
+        {% if lore_dm %}
+            <aside class="ui-card ui-card--dm lore-dm" id="grafenhaus-illenfurt">
+                <h4><span class="ui-badge ui-badge--berry">SL</span> Illenfurt und Graf Wieland</h4>
+                <p>
+                    Graf Wielands Haus wird auffällig wohlhabend und will die Zölle zu seinen Gunsten verschärfen. Das ist ein sichtbarer Ausschlag des Subplots (siehe unten). Hinweis für den Tisch: Sein Wappen ist seit Kurzem deutlich reicher verziert.
+                </p>
+            </aside>
+        {% endif %}
+
+        <h3>Die Zünfte von Corlantis</h3>
+        <p>
+            Weidenmark hat zwei Städte, und das ist Absicht. Weidenstein ist die Stadt des Königs, Corlantis die des Geldes. Sie liegt am Weg zur Küste, trägt einen Namen, der noch nach Korvanis klingt, und besitzt einen Freibrief aus der Nachkriegszeit: Die junge Krone tauschte damals Autonomie gegen das Geld und die Unterstützung der Kaufleute. Seitdem regiert ein Rat der Zünfte unter einem auf Zeit gewählten Ratsvorsteher. Die Stadt gehört formal zu Weidenmark, aber sie macht, was ihre Zünfte wollen. Bei Hof sieht man das nicht gern.
+        </p>
+
+        <h3>Die Lichtwacht</h3>
+        <p>
+            In den meisten Städten steht eine Kapelle, und bei Einbruch der Nacht werden Lampen entzündet. Die Wächter versprechen Ordnung und ein reines Gewissen, wer will, kann ins Licht treten und beichten. Eine Staatsreligion ist sie nicht, aber sie wächst. Strengere Wächter stoßen sich daran, dass der Adel Geheimnisse pflegt und dass das Land so offen gegenüber den seltenen Völkern ist, ohne dass es zu Verfolgung kommt.
+        </p>
+
+        <h3>Die Leute im Land</h3>
+        <p>
+            Die <strong>Marschleute</strong> im Nebelmoor leben für sich, mit eigenen Kräutern und eigenem Aberglauben, und werden von Städtern belächelt. Das <strong>Flussvolk</strong> verbindet die Städte auf Booten und Fähren, die <strong>Mallard</strong> bauen Stelzenhäuser am Wasser und handeln. Die <strong>Halblinge</strong> der Auenmark bestellen die Felder, in Dörfern wie Talwiesen und Grünau, geführt von Ältestenräten, und zahlen ihre Abgaben an die Krone. In Steinfurt am Fuß der Pässe hat sich ein kleines <strong>Zwergenviertel</strong> eingerichtet. In den Grenzdörfern des Ostens, etwa in Grenzhag, dienen <strong>Wolfkin</strong> als Späher und Söldner. Und unter den Menschen leben Cat People, Lizard People, Satyr und Frog People, mal verspottet, mal geschätzt, aber nie vertrieben.
+        </p>
+
+        {% if lore_dm %}
+            <aside class="ui-card ui-card--dm lore-dm" id="subplot">
+                <h4><span class="ui-badge ui-badge--berry">SL</span> Subplot: Sorvennes weiche Einflussnahme</h4>
+                <p>
+                    Der Graue Bund, ein Selbsterhalt-Kartell aus Zunftleuten in Corlantis, ist die Schnittstelle. Ein innerer Zirkel nimmt Geld aus Sorvenne an, um den Streit der Grafenhäuser um Moorentwässerung und Flusszölle zu seinen Gunsten zu entscheiden. Der Zirkel glaubt, er benutze Sorvenne. In Wahrheit testet Sorvenne, wie leicht sich Weidenmark von innen fügig machen lässt, weiche Einflussnahme statt Krieg. Ausgearbeitet in <code>Story/characters/secret-society.md</code>.
+                </p>
+                <h4>Eskalationsleiter</h4>
+                <dl>
+                    <dt>Grundrauschen (schon jetzt)</dt>
+                    <dd>Fremde Münzen im Umlauf (Sorvenner Solidus), ein Grafenhaus wird auffällig wohlhabend, Getreide- und Gewürzpreise ziehen an, verstärkte Patrouillen an der Wundmark, Wanderprediger aus Sonnwacht wettern gegen „fremden Einfluss“, Ämter gehen oft an Bund-nahe Leute.</dd>
+                    <dt>Mittelfristig (ohne Eingreifen)</dt>
+                    <dd>Das begünstigte Grafenhaus erlässt schärfere Vorschriften und neue Zölle, Kritiker werden eingeschüchtert oder verschwinden, erste gezielte Attentate, Grenzzwischenfälle an der Wundmark, die offiziell den Orcs angelastet, aber von Sorvenne inszeniert werden.</dd>
+                    <dt>Langfristig (Eskalation)</dt>
+                    <dd>Die Krone wird durch das Sorvenne-gestützte Grafenhaus entmachtet, es kommt zum Bürgerkrieg, Sorvenne nutzt das Chaos für eine offene Intervention, und Kesselau, Distelmark, Kar-Dumhad und Trallhafen müssen Stellung beziehen.</dd>
+                </dl>
+            </aside>
+        {% endif %}
+    </section>
+
+    {# ---------- Was man sich erzählt ---------- #}
+    <section id="gerede">
+        <h2>Was man sich erzählt</h2>
+        <p>
+            Nicht alles, was in Weidenmark gesagt wird, ist wahr, und nicht alles Wahre wird gesagt. Das hört man auf Märkten, in Wirtshäusern und an den Anlegern.
+        </p>
+
+        <h3>Im Moor</h3>
+        <ul class="lore-sayings">
+            <li>Die Irrlichter im Nebelmoor sind die Geister der Verirrten. Wer einem folgt, wird einer.</li>
+            <li>Bei Aurentia, der Stadt, die das Moor verschluckt hat, brennen die Lichter am hellsten. Man sagt, es seien die Ertrunkenen vom Untergang.</li>
+            <li>Nur Marschleute kennen die sicheren Pfade. Wer ohne sie geht, kommt nicht wieder.</li>
+            <li>Über dem Türrahmen ein Schutzzeichen, im Haus ein gesegneter Kräuterspruch: Das hält das Moor fern.</li>
+            <li>Unter den Ruinen von Aurentia liegen noch die Archive der alten Provinz. Wer sie findet, kennt die Ansprüche aller Grafenhäuser.</li>
+        </ul>
+        {% if lore_dm %}
+            <aside class="ui-card ui-card--dm lore-dm" id="aurentia">
+                <h4><span class="ui-badge ui-badge--berry">SL</span> Aurentia als Abenteuerziel</h4>
+                <p>
+                    Unter dem Wasser liegen geflutete, weitgehend intakte Keller und Katakomben, nie vollständig geplündert. Mögliche Haken: Vorkriegs-Archive und Reliquien, interessant für Gelehrte, den Magierrat von Illyth oder den Grauen Bund (alte Rechtsansprüche?). Die Irrlicht-Legende lässt sich konkret mit Aurentia verknüpfen.
+                </p>
+            </aside>
+        {% endif %}
+
+        <h3>Über die alten Völker</h3>
+        <ul class="lore-sayings">
+            <li>Ein Zwerg verlässt seine Halle auch im Tod nicht. Sein Geist geht in den Stein, und der Stein wacht.</li>
+            <li>Ein Eid auf den Berg wiegt mehr als ein Siegel auf Papier.</li>
+            <li>Elfen altern nicht, und sie haben jeden Krieg gesehen, von dem Menschen nur Lieder kennen.</li>
+            <li>Wer den Waldsaum ohne Einladung betritt, kommt nicht verloren. Man führt ihn zurück, und kein Elf sagt dazu ein Wort.</li>
+            <li>Das Wolfkin-Rudel heult in der Dämmerung, um die Ahnen zu befragen. Wer einen Eid bricht, dem traut kein Wolfkin je wieder.</li>
+        </ul>
+
+        <h3>An der Grenze</h3>
+        <ul class="lore-sayings">
+            <li>Hobgoblins schlafen nie, sie haben nur Wachen und Ablösungen.</li>
+            <li>Orcs haben einen eigenen Kodex, und wer ihn kennt, kann mit ihnen handeln.</li>
+            <li>Wer nach Karrmoos flieht, wird nicht gefragt, wovor.</li>
+        </ul>
+
+        <h3>Von Höfen, Märkten und Kapellen</h3>
+        <ul class="lore-sayings">
+            <li>Korvanis fiel nicht an den Feind, es fiel an sich selbst.</li>
+            <li>Wer sich auf die Krone verlässt, lebt von der Tradition.</li>
+            <li>In Corlantis hat jeder einen Preis und jeder eine Zunft.</li>
+            <li>Wer über die Brücke von Illenfurt geht, zahlt, und wer nicht zahlt, schwimmt.</li>
+            <li>Der Kaiser von Sorvenne kommt nie selbst. Er schickt einen Brief, und im Brief steht eine Bitte, die keine ist.</li>
+            <li>Dem Licht ist alles recht, außer dem Verstecken.</li>
+            <li>Ein Herdgeist-Talisman hält das Haus gemütlich und die Vorratskammer voll, und ein satter Gast bringt Segen.</li>
+            <li>Der Fluss vergisst nichts, aber er zahlt auch keinen Zoll.</li>
+        </ul>
+    </section>
+
+    {# ---------- DM only: Alltag ---------- #}
+    {% if lore_dm %}
+        <section id="alltag">
+            <h2>Kalender, Geld und Wappen <span class="ui-badge ui-badge--berry">SL</span></h2>
+            <p>Nachschlagewerk für den Tisch. Dieser Teil bleibt vorerst beim DM.</p>
+
+            <h3>Währung</h3>
+            <p>
+                Drei Münzen, gleich gerechnet wie im Regelbuch: <strong>10 Heller = 1 Krone</strong> und <strong>10 Kronen = 1 Dukat</strong>.
+            </p>
+            <dl>
+                <dt>Heller</dt>
+                <dd>Kleinste Münze für den Alltag (Brot, Bier, Fischzoll), entspricht Kupfer.</dd>
+                <dt>Krone</dt>
+                <dd>Standardwährung, entspricht Silber. Sie heißt so, obwohl die reale Krone schwach ist.</dd>
+                <dt>Dukat</dt>
+                <dd>Große Geschäfte, Adel und Fernhandel, entspricht Gold.</dd>
+                <dt>Sorvenner Solidus</dt>
+                <dd>Anders geprägte Silber- oder Goldmünze, mechanisch identisch. Fällt beim Wechseln auf und kursiert zunehmend in Corlantis (Hinweis auf den Subplot).</dd>
+                <dt>Erzbarren aus Kar-Dumhad</dt>
+                <dd>Reine Fluff-Zahlungsform im Fernhandel, entspricht größeren Dukat-Summen, im Alltag Weidenmarks nicht in Umlauf.</dd>
+            </dl>
+
+            <h3>Kalender</h3>
+            <p>Zwölf Monate, an Landwirtschaft und Jahreszeiten orientiert. Das aktuelle Jahr ist 214 n.F.</p>
+            <ol>
+                <li>Frostmond</li>
+                <li>Eismond</li>
+                <li>Lenzing</li>
+                <li>Saatmond</li>
+                <li>Blütenmond</li>
+                <li><strong>Sonnwend</strong>: Lichtwacht-Hochfest zur Sommersonnenwende, das Licht auf dem Höhepunkt.</li>
+                <li>Heumond</li>
+                <li><strong>Erntemond</strong>: endet mit dem Fest der Heiligen Roswitha, der die alten Erntebräuche zugeschrieben werden.</li>
+                <li>Spätlese</li>
+                <li>Nebelmond</li>
+                <li>Fallmond</li>
+                <li><strong>Lichtkehr</strong>: Lichtwacht-Hochfest zur Wintersonnenwende, am dunkelsten Punkt des Jahres.</li>
+            </ol>
+
+            <h3>Wappen</h3>
+            <dl>
+                <dt>Weidenmark</dt>
+                <dd>Silberne Weide auf blauem Grund.</dd>
+                <dt>Illenfurt</dt>
+                <dd>Goldener Brückenbogen auf rotem Grund, seit Kurzem auffällig reicher verziert.</dd>
+                <dt>Rohrmark</dt>
+                <dd>Silberne Schilfähren auf grünem Grund.</dd>
+                <dt>Talenstein</dt>
+                <dd>Goldene Kornähre auf braunem Grund.</dd>
+                <dt>Hirschau</dt>
+                <dd>Dunkler Hirsch auf gedecktem Grün.</dd>
+                <dt>Corlantis</dt>
+                <dd>Schwarze Krähe auf goldenem Grund, Zunftsymbol und kein Adelswappen.</dd>
+                <dt>Lichtwacht</dt>
+                <dd>Brennende Kerze oder aufgehende Sonne in einem Kreis, Wächter tragen sie als Anhänger.</dd>
+                <dt>Die Fremden</dt>
+                <dd>Kar-Dumhad: gekreuzte Hämmer vor grauem Berg. Aelenor: Blatt oder Baum in gedeckten Naturtönen. Graue Meute: Wolfskopf-Silhouette in Grau und Schwarz. Sorvenne: goldene Sonne auf purpurnem Grund, bewusst prunkvoller als alles in Weidenmark.</dd>
+            </dl>
+        </section>
+
+        <section id="namen">
+            <h2>Namenskonventionen <span class="ui-badge ui-badge--berry">SL</span></h2>
+            <p>Ein Spickzettel, damit Orte und Personen am Tisch zum Volk passen.</p>
+            <dl>
+                <dt>Menschen (Weidenmark)</dt>
+                <dd>Deutsch-mittelalterlich. Orte: Landschaftsmerkmal plus Endung (<em>-furt</em> Übergang, <em>-mark</em> Grenzland, <em>-stein</em> Fels oder Burg, <em>-au</em> Flussaue, <em>-hag</em> Grenzdorf, <em>-stett</em> Siedlung), z. B. Habichtstein, Dornau, Kesselstett. Personen: germanische Vornamen (Konrad, Hilde, Ottokar, Reinhild), Häuser oft „von [Ort]“ oder nach dem Beruf.</dd>
+                <dt>Korvanis-Erbe</dt>
+                <dd>Lateinisch und imperial, weil älter als die heutige Sprache: Corlantis, Valerion, Aurentia, Marcanum, Solventia.</dd>
+                <dt>Zwerge</dt>
+                <dd>Harte Konsonanten (k, g, d, r, th), oft „Kar-“ für Halle oder Hold: Kar-Dumhad, Kar-Rhogash, Thrakenhold. Personen: Grimnar Eisenfaust, Borgnir Steinschlag, Durngrim Kupferbart.</dd>
+                <dt>Elfen</dt>
+                <dd>Weich, vokalreich, fließend: Ilyandra, Faelithrin, Sylwen, Threnoril.</dd>
+                <dt>Halblinge</dt>
+                <dd>Wie Menschen, aber sanfter und idyllischer (Tal-, Grün-, -wiesen, -feld, -bach). Orte: Talwiesen, Grünau, Apfelbach, Honigfeld. Personen: Tilda Apfelkern, Bennit Honigmund, Rosalinde Feldmaus.</dd>
+                <dt>Mallard</dt>
+                <dd>Orte als Wasser-Komposita (Uferstill, Wellenbach, Schilfhafen, Flossau), Personen lautmalerisch (Quorrin, Pladdel, Riffa).</dd>
+                <dt>Wolfkin</dt>
+                <dd>Einfache Naturnamen mit zweiteiligen Beinamen statt Nachnamen: Grauschnauze, Eisenpranke, Nachtfell, Sturmklaue.</dd>
+                <dt>Dark Kin</dt>
+                <dd>Hart, guttural, fremd. Orc: Gorrukh, Uzgar. Hobgoblin (oft mit Rang): Drogmar Eisenklaue. Goblin: Skrannix, Piffnik. Ogre: Krallzahn. Orte mit „Wund-“ als düsterem Präfix.</dd>
+            </dl>
+        </section>
+    {% endif %}
+</article>

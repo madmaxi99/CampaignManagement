@@ -24,6 +24,9 @@
             <a class="player-tab" href="/rules"{% if path == '/rules' %} aria-current="page"{% endif %}>
                 {{ ui.icon('book-open') }}<span>Regeln</span>
             </a>
+            <a class="player-tab" href="/lore"{% if path == '/lore' %} aria-current="page"{% endif %}>
+                {{ ui.icon('scroll-text') }}<span>Lore</span>
+            </a>
             <a class="player-tab" href="{{ is_dm ? '/dm' : '/dm/login' }}">
                 {{ ui.icon('lock') }}<span>DM</span>
             </a>

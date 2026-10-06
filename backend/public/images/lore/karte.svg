@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" role="img" aria-labelledby="map-title map-desc" font-family="Georgia, 'Times New Roman', serif">
+  <title id="map-title">Grobe Karte von Weidenmark und seinen Nachbarn</title>
+  <desc id="map-desc">Schematische Skizze ohne Maßstab: Weidenmark in der Mitte, im Norden die Berge von Kar-Dumhad, im Westen der Wald von Aelenor, im Süden Kesselau und das Nebelmoor, im Osten die Heide der Grauen Meute und dahinter das Land der Dark Kin, im Südosten die Küste mit Trallhafen.</desc>
+
+  <defs>
+    <pattern id="moor" width="12" height="8" patternUnits="userSpaceOnUse">
+      <path d="M0 6 q3 -4 6 0 t6 0" fill="none" stroke="#5f8a7a" stroke-width="1.2"/>
+    </pattern>
+    <pattern id="heide" width="10" height="10" patternUnits="userSpaceOnUse">
+      <circle cx="3" cy="3" r="1" fill="#b79a5c"/>
+    </pattern>
+  </defs>
+
+  <!-- Hintergrund -->
+  <rect width="800" height="600" rx="18" fill="#fbf4e2"/>
+  <rect x="6" y="6" width="788" height="588" rx="14" fill="none" stroke="#e6d4a6" stroke-width="3"/>
+
+  <!-- Meer / Küste -->
+  <path d="M470 600 C 520 540, 560 520, 610 525 C 680 530, 730 500, 800 505 L800 600 Z" fill="#cfe3ec" stroke="#3f7fa3" stroke-width="2"/>
+  <text x="700" y="560" font-size="15" fill="#2c607d" font-style="italic" text-anchor="middle">Das Meer</text>
+
+  <!-- Wald von Aelenor (Westen) -->
+  <g fill="#9cc79a" stroke="#3a7349" stroke-width="1.5">
+    <path d="M40 200 Q 90 170 170 190 Q 235 215 240 280 Q 235 345 175 365 Q 100 380 55 340 Q 25 270 40 200 Z" fill="#dcebd9"/>
+    <g fill="#8fbf8c">
+      <path d="M80 250 l14 -28 l14 28 z"/><path d="M118 235 l14 -28 l14 28 z"/><path d="M160 255 l14 -28 l14 28 z"/>
+      <path d="M95 300 l14 -28 l14 28 z"/><path d="M140 310 l14 -28 l14 28 z"/><path d="M190 300 l14 -28 l14 28 z"/>
+      <path d="M75 335 l14 -28 l14 28 z"/><path d="M125 350 l14 -28 l14 28 z"/>
+    </g>
+  </g>
+  <text x="140" y="152" font-size="20" font-weight="700" fill="#2b5937" text-anchor="middle">Aelenor</text>
+  <text x="140" y="170" font-size="12" fill="#6a5a45" font-style="italic" text-anchor="middle">Elfen, verschlossen</text>
+
+  <!-- Berge von Kar-Dumhad (Norden) -->
+  <g fill="#c9c2b5" stroke="#6a5a45" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M270 150 l32 -58 l32 58 z"/><path d="M325 150 l40 -76 l40 76 z"/><path d="M395 150 l34 -64 l34 64 z"/>
+    <path d="M455 150 l38 -70 l38 70 z"/><path d="M510 160 l30 -54 l30 54 z"/>
+  </g>
+  <g fill="#fff" opacity="0.9"><path d="M365 74 l-10 18 l10 -4 l10 4 z"/><path d="M493 80 l-9 16 l9 -4 l9 4 z"/></g>
+  <text x="420" y="50" font-size="20" font-weight="700" fill="#4a3d2c" text-anchor="middle">Kar-Dumhad</text>
+  <text x="420" y="68" font-size="12" fill="#6a5a45" font-style="italic" text-anchor="middle">Zwerge, Erz und Zoll</text>
+
+  <!-- Dark Kin (Osten, außen) -->
+  <path d="M690 105 L800 100 L800 480 L690 470 Q 675 300 690 105 Z" fill="#6b4a45" stroke="#3a2c1d" stroke-width="2"/>
+  <g fill="#f3e6c4" text-anchor="middle" font-weight="700">
+    <text x="745" y="140" font-size="14">Zhurgask</text>
+    <text x="745" y="248" font-size="14">Wundmark</text>
+    <text x="745" y="356" font-size="13">Grubenländer</text>
+    <text x="745" y="440" font-size="14">Ogergrund</text>
+  </g>
+  <g fill="#e6d4a6" text-anchor="middle" font-size="11" font-style="italic">
+    <text x="745" y="156">Hobgoblins</text>
+    <text x="745" y="264">Orcs</text>
+    <text x="745" y="372">Goblins</text>
+    <text x="745" y="456">Oger</text>
+  </g>
+  <text x="745" y="90" font-size="13" font-weight="700" fill="#6b4a45" text-anchor="middle">Dark Kin</text>
+
+  <!-- Heide der Grauen Meute -->
+  <path d="M590 200 Q 650 185 690 215 L 690 400 Q 650 420 600 395 Q 585 300 590 200 Z" fill="#efe1b8" stroke="#b79a5c" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <path d="M590 200 Q 650 185 690 215 L 690 400 Q 650 420 600 395 Q 585 300 590 200 Z" fill="url(#heide)"/>
+  <text x="645" y="285" font-size="14" font-weight="700" fill="#5a4630" text-anchor="middle">Graue Meute</text>
+  <text x="645" y="302" font-size="11" fill="#6a5a45" font-style="italic" text-anchor="middle">Wolfkin, Heide</text>
+
+  <!-- Kesselau (Süden) -->
+  <path d="M130 450 Q 210 440 300 470 Q 380 495 450 480 L 470 600 L 90 600 Q 80 520 130 450 Z" fill="#ecd9d4" stroke="#b84a42" stroke-width="2"/>
+  <text x="300" y="545" font-size="20" font-weight="700" fill="#8a3029" text-anchor="middle">Kesselau</text>
+  <text x="300" y="563" font-size="12" fill="#6a5a45" font-style="italic" text-anchor="middle">Herzogtum</text>
+
+  <!-- Weidenmark (Mitte) -->
+  <path d="M290 200 L380 165 L500 170 L570 220 L592 300 L565 380 L505 440 L400 455 L315 435 L272 355 L282 270 Z" fill="#f6edc9" stroke="#e6a93a" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Nebelmoor -->
+  <ellipse cx="300" cy="425" rx="72" ry="32" fill="#cfe0d5" stroke="#5f8a7a" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <ellipse cx="300" cy="425" rx="72" ry="32" fill="url(#moor)"/>
+  <text x="322" y="429" font-size="13" font-weight="700" fill="#3d6154" text-anchor="middle">Nebelmoor</text>
+  <circle cx="262" cy="440" r="4" fill="#3d6154"/>
+  <text x="247" y="455" font-size="10" fill="#3d6154" text-anchor="middle" font-style="italic">Karrmoos</text>
+
+  <!-- Grenzfluss zu Kesselau -->
+  <path d="M345 440 C 400 470, 480 455, 548 447" fill="none" stroke="#3f7fa3" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Die Weide (Hauptfluss) -->
+  <path d="M420 172 C 420 230, 470 262, 480 320 S 520 410, 548 447 S 585 500, 612 528" fill="none" stroke="#3f7fa3" stroke-width="4" stroke-linecap="round"/>
+  <text x="446" y="266" font-size="11" fill="#2c607d" font-style="italic" transform="rotate(62 446 266)">die Weide</text>
+
+  <!-- Orte -->
+  <g fill="#3a2c1d" stroke="#fbf4e2" stroke-width="1.5">
+    <rect x="415" y="166" width="10" height="10"/>
+    <rect x="396" y="246" width="10" height="10"/>
+    <rect x="517" y="392" width="10" height="10"/>
+    <circle cx="440" cy="453" r="5"/>
+    <circle cx="293" cy="372" r="5"/>
+    <circle cx="298" cy="262" r="5"/>
+    <circle cx="470" cy="352" r="5"/>
+    <circle cx="582" cy="298" r="5"/>
+    <rect x="603" y="520" width="10" height="10"/>
+  </g>
+  <g font-size="12" fill="#3a2c1d">
+    <text x="432" y="188">Steinfurt</text>
+    <text x="380" y="241" text-anchor="end">Weidenstein</text>
+    <text x="531" y="396">Corlantis</text>
+    <text x="440" y="441" text-anchor="middle">Illenfurt</text>
+    <text x="283" y="364" text-anchor="end">Rohrmark</text>
+    <text x="298" y="281" text-anchor="middle">Hirschau</text>
+    <text x="478" y="370">Talenstein</text>
+    <text x="578" y="285" text-anchor="end">Grenzhag</text>
+    <text x="598" y="526" text-anchor="end">Trallhafen</text>
+  </g>
+  <!-- Aurentia (Ruine im Moor) -->
+  <g stroke="#6a5a45" stroke-width="2" stroke-linecap="round">
+    <path d="M338 398 v-14 M346 398 v-18 M354 398 v-10"/>
+  </g>
+  <text x="372" y="394" font-size="11" fill="#6a5a45" font-style="italic">Aurentia (Ruinen)</text>
+
+  <text x="425" y="318" font-size="24" font-weight="700" font-style="italic" fill="#9a6208" text-anchor="middle">Weidenmark</text>
+  <text x="425" y="336" font-size="12" fill="#6a5a45" font-style="italic" text-anchor="middle">das Kernland</text>
+
+  <!-- Ferne Mächte -->
+  <g>
+    <rect x="22" y="22" width="190" height="96" rx="10" fill="#fff9e8" stroke="#e6d4a6" stroke-width="2"/>
+    <text x="34" y="44" font-size="13" font-weight="700" fill="#4a3d2c">Weiter entfernt</text>
+    <text x="34" y="64" font-size="12" fill="#6a5a45">Sorvenne: Landesinneres</text>
+    <text x="34" y="82" font-size="12" fill="#6a5a45">Distelmark, Sonnwacht,</text>
+    <text x="34" y="100" font-size="12" fill="#6a5a45">Illyth: jenseits der Grenzen</text>
+  </g>
+
+  <!-- Kompass und Hinweis -->
+  <g transform="translate(748 44)" fill="#4a3d2c" stroke="#4a3d2c">
+    <path d="M0 -26 L7 0 L0 -6 L-7 0 Z" fill="#b84a42" stroke="none"/>
+    <path d="M0 26 L7 0 L0 6 L-7 0 Z" fill="#e6d4a6" stroke="none"/>
+    <text y="-30" font-size="13" font-weight="700" text-anchor="middle" stroke="none">N</text>
+  </g>
+</svg>

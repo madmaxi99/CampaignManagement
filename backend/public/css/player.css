@@ -125,3 +125,86 @@
         bottom: var(--space-4);
     }
 }
+
+/* ---------- Lore (shared by /lore and /dm/lore) ---------- */
+.lore {
+    max-width: 46rem;
+}
+
+.lore-lead {
+    font-size: var(--fs-lead);
+    color: var(--ink-soft);
+}
+
+.lore-toc ol {
+    margin: 0;
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-1);
+}
+
+.lore section {
+    margin-top: var(--space-6);
+    scroll-margin-top: var(--space-4);
+}
+
+.lore h3 {
+    margin-top: var(--space-5);
+}
+
+.lore dl {
+    display: grid;
+    gap: var(--space-3);
+    margin: 0 0 var(--space-3);
+}
+
+.lore dt {
+    font-weight: 700;
+    color: var(--forest-dark);
+}
+
+.lore dd {
+    margin: 0;
+}
+
+.lore-dm {
+    margin: var(--space-4) 0;
+}
+
+.lore-dm h3,
+.lore-dm h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: 0;
+}
+
+.lore h4 {
+    margin: var(--space-4) 0 var(--space-1);
+}
+
+.lore-sayings {
+    margin: 0 0 var(--space-3);
+    padding-left: var(--space-5);
+    display: grid;
+    gap: var(--space-2);
+    font-style: italic;
+}
+
+.lore-map {
+    margin: var(--space-4) 0;
+}
+
+.lore-map img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-m);
+}
+
+.lore-map figcaption {
+    margin-top: var(--space-1);
+    font-size: var(--fs-small);
+    color: var(--ink-soft);
+    font-style: italic;
+}

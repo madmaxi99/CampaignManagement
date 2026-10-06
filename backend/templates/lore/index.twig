@@ -1,0 +1,7 @@
+{% extends "layout.twig" %}
+
+{% block title %}Lore{% endblock %}
+
+{% block content %}
+    {% include "lore/_content.twig" with {lore_dm: false} %}
+{% endblock %}

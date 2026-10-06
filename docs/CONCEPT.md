@@ -14,7 +14,9 @@ Das System ersetzt die **Zettelwirtschaft** des DMs, nicht das Spiel. Es soll si
 
 Charakter und Kampagne kennen sich nicht. Die einzige Verbindung ist indirekt: Findet die Gruppe ein Item, schreibt der Spieler es in sein Inventar, als Text, ohne Verknüpfung.
 
-Jede Kampagne ist **getrennt**. Die Welt (`docs/lore/world.md`) bleibt im Kopf des DMs und in seinen Notizen. Eine Kampagne kennt nur ihren Schauplatz: Spielt sie im Turm oder in der Höhle, ist es egal, wie das Land heißt oder ob Krieg herrscht. Wird etwas davon wichtig, legt der DM einen NPC an, der es weiß.
+Neben den drei Sparten gibt es die **Lore**: eine statische, erklärende Welteinführung (`/lore` für alle, `/dm/lore` für den DM mit zusätzlichen SL-Teilen wie Subplot und Namenskonventionen). Sie liegt als Twig-Template im Code und ändert sich nur per Deploy. Quelle der Wahrheit für die SL-Notizen bleibt `docs/lore/world.md`.
+
+Jede Kampagne ist **getrennt**. Die Lore ist kein Teil der Kampagne: Eine Kampagne kennt nur ihren Schauplatz: Spielt sie im Turm oder in der Höhle, ist es egal, wie das Land heißt oder ob Krieg herrscht. Wird etwas davon wichtig, legt der DM einen NPC an, der es weiß.
 
 ## Zwei Modi einer Kampagne
 
@@ -96,3 +98,31 @@ Jeder Spielercharakter bekommt einen Button **Gedächtnis**. Dort schreibt der S
 - Planung der nächsten Session für eigene Kampagnen
 - Bedrohungsuhren, Wünsche und Beziehungen bei NPCs
 - Handouts mit Bildern
+
+
+## Story
+ich möchte die Story ein wenig überarbieten vlt mehr auf die Geschichte von Weidenmakr spezialisieren.
+  Wir hatten eine Korvanis oderso und vor ca +200 Jahren ist die Republik mit wem Wahlsystem zerfallen Demokratie auseinandergebaut oderso... keine Ahnung leute waren zu gierig.
+  Es gab einen langen Bürgerkriegt, Die Gewinner sind die heutigen Adelshäuser. es sherrschte lange zeit frieden aber jetzt gibt es Druck von außerhalb.
+
+
+  Wie hieß das zitat aus star wars " mit klatschendem Beifall ging die Republik unter" so was in der Art möchte ich in der Hintergrund Story haben. wir lassen uns da was einfallen.
+
+  Kommen wie zur aktuellen Lage: lange gab es frieden jettzt kommt eine Bedrohung aus <Himmelsrichtung> ich weiß noch nicht wer oder wie aber es gibt eien bedrohung Die Orks haben in letzter Zeit sich "radikalisiert" 
+neue Staats from waren noch vor wenigen Jahren diverse verfeindete Stämme, recht firedlich neuer Anführer hat sie alle vereint. Noch tun sie nichts und die verhalten sich friedlich. Diplomatie bla bla.
+Aber weidenmarks adel hat angst, der Monarch macht nichts bleibt weiter Diplomatisch treibt handel vorran
+  Dadurch entstehen unuhen, adel spaltet sich.
+
+Die Bürge gehen nicht von Krieg aus. man erzählt isch was paranoide machen sich gedanekn aber alle habnen vertrauen zum Monarch (m/w/d)
+Es gibt "neu adel" (name WIP) eine gruppe Reicher Kaufleute. Besitzen recht viel kümmern sich um viel haben recht viel macht werden nur vom adel nicht anerkannt dort ist auch konflikt.
+
+Die verschiedenen Völker Elf Zwerg Mallard, Mensch, Halbling Wolkin leben auf dem Land meist für sich in ihren Kulturen:
+Zwerg im Gebirge in <himmelsrichtung>
+Mallard im Sump in <kompass>
+Wolfkin an der grenze zu den Orks viele Wälder dort.
+Halblinge leben in einem abgeschiednen tal kaum kontakt recht friedlich sind selten woanders zu treffen.
+Elfen und menschen recht verstreut überall
+in den Städte Kulturschock. große Städte mit allem.  alles gemischt, jeder arbeitet bla bla bla...
+
+Erstmal kein Verweis auf andere Völker. Sollen "geheim" bleiben.
+Gibt die üblichen Gilden in den Städten keine ahnung ob es sinn macht, dass eine gilde städte übergreifend ist oder auch branchen übregreifend.

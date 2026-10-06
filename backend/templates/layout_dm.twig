@@ -14,8 +14,10 @@
                 <a href="/dm"{% if path == '/dm' or path starts with '/dm/campaign' %} aria-current="page"{% endif %}>{{ ui.icon('castle') }} Kampagnen</a>
                 <a href="/dm/party"{% if path == '/dm/party' %} aria-current="page"{% endif %}>{{ ui.icon('users') }} Gruppe</a>
                 <a href="/dm/catalog"{% if path starts with '/dm/catalog' %} aria-current="page"{% endif %}>{{ ui.icon('skull') }} Katalog</a>
+                <a href="/dm/lore"{% if path starts with '/dm/lore' %} aria-current="page"{% endif %}>{{ ui.icon('scroll-text') }} Lore</a>
                 <span class="dm-nav__label">Spielersicht</span>
                 <a href="/characters">{{ ui.icon('users') }} Charaktere</a>
+                <a href="/lore">{{ ui.icon('scroll-text') }} Lore</a>
                 <span class="dm-nav__label">Entwicklung</span>
                 <a href="/dm/styleguide"{% if path == '/dm/styleguide' %} aria-current="page"{% endif %}>{{ ui.icon('feather') }} Styleguide</a>
             </nav>

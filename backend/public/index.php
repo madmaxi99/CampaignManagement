@@ -205,6 +205,8 @@ $app->get('/rules', function (Request $request, Response $response) use ($rulesR
     ]);
 });
 
+$app->get('/lore', fn (Request $request, Response $response) => Twig::fromRequest($request)->render($response, 'lore/index.twig'));
+
 // ---- DM login / logout / old URLs ----
 
 $app->get('/dm/login', function (Request $request, Response $response) use ($dmAuth) {
@@ -253,6 +255,7 @@ $app->get('/dm/styleguide', function (Request $request, Response $response) {
     return Twig::fromRequest($request)->render($response, 'dm/styleguide.twig');
 });
 
+
 // Old URLs of the previous layout.
 $app->get('/campaign', fn (Request $request, Response $response) => $response->withHeader('Location', '/dm')->withStatus(301));
 $app->get('/campaign/{id:[0-9]+}', fn (Request $request, Response $response, array $args) => $response->withHeader('Location', '/dm/campaign/' . $args['id'])->withStatus(301));
@@ -260,6 +263,7 @@ $app->get('/world', fn (Request $request, Response $response) => $response->with
 
 (require __DIR__ . '/../routes/dm_campaign.php')($app, $campaignRepository, $standRepository);
 (require __DIR__ . '/../routes/dm_catalog.php')($app, $catalogEditor, $worldRepository);
+(require __DIR__ . '/../routes/dm_lore.php')($app);
 
 $app->get('/character/create', function (Request $request, Response $response) {
     $twig = Twig::fromRequest($request);
