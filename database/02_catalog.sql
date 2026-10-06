@@ -385,7 +385,9 @@ INSERT INTO catalog_kins (code, name_de, d12_min, d12_max, movement_base) VALUES
     ('elf', 'Elf', 10, 10, 10),
     ('ente', 'Ente', 11, 11, 8),
     ('halbling', 'Halbling', 5, 7, 8),
-    ('mensch', 'Mensch', 1, 4, 10),
+    ('halbelf', 'Halb-Elf', 3, 3, 10),
+    ('halbork', 'Halb-Ork', 4, 4, 10),
+    ('mensch', 'Mensch', 1, 2, 10),
     ('wolfsmensch', 'Wolfsmensch', 12, 12, 12),
     ('zwerg', 'Zwerg', 8, 9, 8);
 
@@ -441,11 +443,15 @@ INSERT INTO catalog_heroic_abilities (id, name_de, requirement_de, wp_note_de, d
     (48, 'Quartiermeister', 'Wildnisleben 12', '1', 'Du bist gut darin, geeignete Lagerplätze zu finden. Das Lagermachen auf Reisen gelingt dir automatisch.', 0),
     (49, 'Schildblock', 'Beliebige STÄ-basierte Nahkampfwaffenfertigkeit 12', '2', 'Du kannst dieses Talent aktivieren, wenn du mit einem Schild parierst, um mit einem Vorteil zu würfeln. Damit kannst du auch körperliche Monsterangriffe (keine Flächenangriffe) parieren, die normalerweise nicht pariert werden können; dafür benötigst du einen Schild und erhältst einen Vorteil auf den Wurf. Dieses Talent kann mit Defensiv kombiniert werden.', 0),
     (50, 'Wurfarm', 'Beliebige Nahkampfwaffenfertigkeit 12', '2', 'Du kannst eine Nahkampfwaffe mit enormer Wucht auf einen Gegner in einer Entfernung von bis zu deinem STÄ-Wert in Metern werfen. Es muss eine einhändige Waffe sein. Würfle den Angriff wie gewohnt. Der Gegner kann dem Angriff wie üblich ausweichen oder ihn parieren. Die Waffe landet dem Gegner vor die Füße.', 0),
-    (51, 'Wiesel', 'Ausweichen 12', '3', 'Wirst du angegriffen und befindet sich ein anderer Spielercharakter innerhalb von 2 Metern, kannst du dieses Talent aktivieren, damit der Angriff stattdessen diesen Charakter trifft. Dieses Talent wirkt nicht gegen Flächenangriffe, und du musst es aktivieren, bevor du versuchst auszuweichen oder zu parieren. Das neue Ziel darf ganz normal versuchen auszuweichen oder zu parieren.', 0);
+    (51, 'Wiesel', 'Ausweichen 12', '3', 'Wirst du angegriffen und befindet sich ein anderer Spielercharakter innerhalb von 2 Metern, kannst du dieses Talent aktivieren, damit der Angriff stattdessen diesen Charakter trifft. Dieses Talent wirkt nicht gegen Flächenangriffe, und du musst es aktivieren, bevor du versuchst auszuweichen oder zu parieren. Das neue Ziel darf ganz normal versuchen auszuweichen oder zu parieren.', 0),
+    (52, 'Letzte Reserve', NULL, '3', 'Wenn du auf 0 TP fallen würdest, kannst du dieses Talent aktivieren (keine Aktion). Du bleibst stattdessen mit 1 TP stehen und kannst in dieser Runde ganz normal handeln. Einmal pro Rast.', 0),
+    (53, 'Zwei Welten', NULL, '3', 'Du kannst dieses Talent aktivieren, um einen Vorteil auf eine Probe zum Überzeugen oder Entdecken zu erhalten, oder auf eine WIL-Probe gegen Verzauberung.', 0);
 
 -- catalog_kin_heroic_abilities
 INSERT INTO catalog_kin_heroic_abilities (kin_code, heroic_ability_id) VALUES
     ('elf', 4),
+    ('halbelf', 53),
+    ('halbork', 52),
     ('ente', 5),
     ('ente', 6),
     ('halbling', 2),

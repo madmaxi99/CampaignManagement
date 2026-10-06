@@ -275,6 +275,13 @@
 
     {# ---------- Zauber ---------- #}
     <div class="ui-tabpanel ui-stack" id="panel-spells" role="tabpanel" aria-labelledby="tab-spells" hidden>
+        {# Ideas only, not in the catalog: what the official Free League books add (Book of Magic, Path of Glory, announced Trudvang). #}
+        <aside class="ui-card">
+            <h3 class="ui-card__title">Könnten noch dazukommen</h3>
+            <h4 class="rules-subhead">Zauberschulen</h4>
+            <p class="ui-muted">Dämonologie, Harmonismus, Illusionismus, Nekromantie, Symbolismus, Hexerei, Alchemie, Verzauberung, Drakomantie (aus dem Book of Magic, Dämonologie und Nekromantie auch in Path of Glory).</p>
+        </aside>
+
         {% for school, data in schools %}
             <h2>{{ school }}</h2>
             {% if data.lore_de %}<p class="ui-muted">{{ data.lore_de }}</p>{% endif %}
