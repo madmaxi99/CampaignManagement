@@ -28,7 +28,7 @@
 
         <article class="lore-chapter ui-card">
             <h2>{% if number %}{{ number }}. {% endif %}{{ chapter.title }}</h2>
-            {% include 'lore/chapters/' ~ chapter.slug ~ '.twig' %}
+            {% include 'lore/chapters/' ~ chapter.slug ~ '.twig' with {lore_dm: true} %}
 
             <nav class="lore-pager" aria-label="Kapitelwechsel">
                 {% if prev %}<a class="ui-btn ui-btn--ghost" href="/dm/lore?k={{ prev.slug }}">{{ ui.icon('arrow-left') }} {{ prev.title }}</a>{% else %}<span></span>{% endif %}

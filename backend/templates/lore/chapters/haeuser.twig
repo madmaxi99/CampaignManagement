@@ -1,40 +1,36 @@
-<h3>Das Königshaus</h3>
-<dl>
-    <dt>Hadrik Sarn</dt>
-    <dd>Der Konsul und erste König, König Hadrik I.</dd>
-    <dt>Haus Sarn</dt>
-    <dd>Das heutige Königshaus.</dd>
-    <dt>Königin Odela Sarn</dt>
-    <dd>Die aktuelle Monarchin. Alt, ruhig, diplomatisch. Sie hat in ihrer Regierung nie einen Krieg geführt.</dd>
-</dl>
+{% import "lore/_macros.twig" as m %}
+{% set dm = lore_dm|default(false) %}
+<div class="ui-stack">
+    <h2>Königshaus und Adel</h2>
+    <p>Die Adelshäuser stammen aus dem Stab des ersten Königs, Hadrik I. Man unterscheidet Schwertadel (Offiziere und Kriegsherren) und Briefadel (Verwalter und Berater).</p>
 
-<h3>Die Adelshäuser</h3>
-<p>Sie stammen aus dem Stab Hadriks.</p>
-<dl>
-    <dt>Haus Eberwein <small>(Schwertadel)</small></dt>
-    <dd>Marschall des Reichs. Hält die Nordmark am Grenzforst. Sitz: Burg Falkenhag.</dd>
-    <dt>Haus Thalheim <small>(Briefadel)</small></dt>
-    <dd>Kanzler und Verwaltung. Sitz: Hohenfurt.</dd>
-    <dt>Haus Gerrin <small>(Schwertadel)</small></dt>
-    <dd>Westmark und Küste. Sitz: Salzbruck.</dd>
-    <dt>Haus Lorn <small>(Briefadel)</small></dt>
-    <dd>Münze und Zölle. Sitz: Steinbach.</dd>
-    <dt>Haus Kaltenbach <small>(Schwertadel)</small></dt>
-    <dd>Ostmark zu Dornmark. Sitz: Lindhain.</dd>
-</dl>
+    {{ m.card('Haus Sarn', 'Königshaus', 'ui-badge--gold', 'Das Königshaus, gegründet von Hadrik I., der dem Bürgerkrieg ein Ende setzte. Der Hof sitzt in Hohenfurt und das Haus spricht Recht und hält den Frieden im ganzen Land. Königin Odela Sarn regiert ruhig und diplomatisch und hat nie einen Krieg geführt.') }}
+    {{ m.card('Haus Eberwein', 'Schwertadel', '', 'Der Marschall des Reichs. Das Haus befehligt das Heer und hält die Nordmark am Grenzforst, damit Karawanen und Händler sicher an die Grenze und wieder zurück kommen. Sitz ist Burg Falkenhag. Haupt des Hauses ist Marschall Gerhard Eberwein.') }}
+    {{ m.card('Haus Thalheim', 'Briefadel', '', 'Kanzler und Verwaltung des Reichs. Das Haus führt die Kanzlei in Hohenfurt, schreibt die Gesetze nieder, führt die Archive und sorgt dafür, dass ein Befehl des Königs auch in der letzten Gemeinde ankommt.' ~ (dm ? ' Haupt des Hauses ist Kanzlerin Ysolde Thalheim.' : '')) }}
+    {{ m.card('Haus Gerrin', 'Schwertadel', '', 'Westmark und Küste. Das Haus schützt den einzigen Hafen des Landes, die Küstenwacht und die Schiffe, die Salzbruck anlaufen. Sitz ist Salzbruck.' ~ (dm ? ' Haupt des Hauses ist Bertram Gerrin.' : '')) }}
+    {{ m.card('Haus Lorn', 'Briefadel', '', 'Münze und Zölle. Das Haus prägt das Geld des Königs, treibt die Zölle an Straßen und Brücken ein und hält die Handelswege mit den Zwergen in Ordnung. Sitz ist Steinbach.' ~ (dm ? ' Haupt des Hauses ist Dorgrim Lorn.' : '')) }}
+    {{ m.card('Haus Kaltenbach', 'Schwertadel', '', 'Die Ostmark zu Dornmark. Das Haus bewacht die Grenze im Osten, hält die Straße nach Dornfeld offen und kümmert sich um den Marktfrieden in Lindhain. Sitz ist Lindhain.' ~ (dm ? ' Haupt des Hauses ist Marta Kaltenbach.' : '')) }}
 
-<h3>Die Orks</h3>
-<dl>
-    <dt>Karth</dt>
-    <dd>Früher sieben verfeindete Stämme, jetzt „die Vereinten Stämme“. Bekannt sind der Stamm Ul-Dren (Varroks eigener), der Stamm Maladûk und der Stamm Gorrash.</dd>
-    <dt>Varrok Ul-Dren, genannt „der Einer“</dt>
-    <dd>Der Anführer. Klug, ruhig, gewinnend, spricht besser Gemeinsprache, als man erwartet. Er hat die Stämme nicht mit Gewalt geeint, sondern durch Verhandlung und Beispiel. Er will Größe für sein Volk, Handel und Frieden.</dd>
-</dl>
+    <h2>Weidenhanse und Gilden</h2>
+    <p>Die Patrizier sind reiche Kaufleute mit viel Besitz und Einfluss, die der Adel nicht als seinesgleichen anerkennt. Ihre Gilden sind städteübergreifend, jede für eine Branche und stehen alle unter dem Dach der Weidenhanse.</p>
 
-<h3>Gilden</h3>
-<dl>
-    <dt>Handelsgilden</dt>
-    <dd>Städteübergreifend, eine pro Branche. Sie gehören den Patriziern und bilden das Netzwerk des Handels.</dd>
-    <dt>Handwerkszünfte</dt>
-    <dd>Lokal in jeder Stadt. Sie halten zum alten Adel.</dd>
-</dl>
+    {{ m.card('Die Weidenhanse', 'Patrizier', 'ui-badge--gold', 'Der große Bund der mächtigsten Handelshäuser, mit Sitz in Rotenmark. Sie entscheidet über Warenpreise, Karawanenrouten und Handelsabkommen und hält die Handelsgilden in ihrer Hand. Zwischen Hanse und Adel gibt es eine leise Spannung, aber keinen Streit.' ~ (dm ? ' Vorsteherin ist Hansemeisterin Ilsabeth Brandt.' : '')) }}
+    {{ m.card('Die Kornherren', 'Handelsgilde', 'ui-badge--gold', 'Das Getreide des Kernlands läuft über ihre Speicher in Hohenfurt. Die Kornherren sorgen für faire Brotpreise und dafür, dass überall im Land genug für den Winter eingelagert ist, auch in einem schlechten Erntejahr.' ~ (dm ? ' Gildemeisterin ist Lindis Kornblum.' : '')) }}
+    {{ m.card('Die Erzgilde', 'Handelsgilde', 'ui-badge--gold', 'Sie handelt in Steinbach mit den Zwergen. Was in Tharnhall, Orrindum und Kelrok an Erz, Eisen und Werkzeug entsteht, geht durch ihre Hände und wird zu fairen Preisen im Land verteilt.' ~ (dm ? ' Gildemeisterin ist Brunhild Eisenmund.' : '')) }}
+    {{ m.card('Die Salzgilde', 'Handelsgilde', 'ui-badge--gold', 'Sie hält die Hafenstadt Salzbruck am Laufen. Sie verteilt Salz, Fisch und Seefracht ins Land und achtet darauf, dass auch kleine Dörfer im Landesinneren ihr Salz zum Einlegen bekommen.' ~ (dm ? ' Gildemeister ist Aldo Rohrbach.' : '')) }}
+    {{ m.card('Die Karawanengilde', 'Handelsgilde', 'ui-badge--gold', 'Sie sitzt in Rotenmark und organisiert die Karawanen auf der Straße nach Karth. Sie stellt Führer und Wachen und verhandelt Zölle und Schutz mit den Wolfkin am Grenzforst.' ~ (dm ? ' Gildemeisterin ist Fenja Rauh.' : '')) }}
+
+    <h2>Handwerkszünfte</h2>
+    <p>Die Zünfte sind lokal in jeder Stadt, halten zum alten Adel und sind auf die Hanse nicht immer gut zu sprechen.</p>
+
+    {{ m.card('Die Schmiedezunft', 'Zunft', 'ui-badge--sky', 'Sie bildet Lehrlinge aus und wacht über die Qualität von Hufeisen, Pflugscharen und Klingen. Ein Stück ohne Zunftzeichen gilt als Pfusch.' ~ (dm ? ' Zunftmeister ist Ulrich Hammerl.' : '')) }}
+    {{ m.card('Die Steinmetzzunft', 'Zunft', 'ui-badge--sky', 'Sie baut und erhält Brücken, Mauern und Straßen und teilt sich ihre Geheimnisse mit den Zwergen.' ~ (dm ? ' Zunftmeisterin ist Gimra Felsenhand.' : '')) }}
+    {{ m.card('Die Zimmerleutezunft', 'Zunft', 'ui-badge--sky', 'Sie baut Häuser, Boote und Fachwerk. Wer auf einem Dach Hilfe braucht, ruft nach ihr.' ~ (dm ? ' Zunftmeister ist Silvanis Eichenwart.' : '')) }}
+
+    <h2>Die Stämme von Karth</h2>
+    <p>Früher gab es sieben verfeindete Stämme, jetzt nennen sie sich „die Vereinten Stämme“.</p>
+
+    {{ m.card('Stamm Ul-Dren', 'Orks', 'ui-badge--berry', 'Der Stamm des Anführers mit dem großen Hauptlager. Hier hat Varrok Ul-Dren, „der Schlichter“, die Stämme zusammengerufen.') }}
+    {{ m.card('Stamm Maladûk', 'Orks', 'ui-badge--berry', 'Ein Stamm im Nordosten, geführt von Maladûk. Er hat sich Varrok angeschlossen.') }}
+    {{ m.card('Stamm Gorrash', 'Orks', 'ui-badge--berry', 'Ein Stamm im Nordwesten. Über seine Führung ist in Weidenmark wenig bekannt.') }}
+</div>

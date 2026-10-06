@@ -1,7 +1,43 @@
 {% extends "layout.twig" %}
+{% import "_ui.twig" as ui %}
 
 {% block title %}Lore{% endblock %}
 
+{% macro tab(id, label, selected) %}
+    <button class="ui-tab" role="tab" id="tab-{{ id }}" aria-controls="panel-{{ id }}" aria-selected="{{ selected ? 'true' : 'false' }}">{{ label }}</button>
+{% endmacro %}
+
+
+{% import _self as l %}
+{% import "lore/_macros.twig" as m %}
+
 {% block content %}
-    {% include "lore/_content.twig" with {lore_dm: false} %}
+    <div class="ui-row page-head">
+        <h1>Lore</h1>
+    </div>
+
+    <div class="ui-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash>
+        {{ l.tab('lore', 'Lore', true) }}
+        {{ l.tab('personen', 'Personen', false) }}
+        {{ l.tab('haeuser', 'Häuser und Gilden', false) }}
+        {{ l.tab('karte', 'Karte', false) }}
+    </div>
+
+    <div class="ui-tabpanel lore" id="panel-lore" role="tabpanel" aria-labelledby="tab-lore">
+        {% include 'lore/_story.twig' %}
+    </div>
+
+    <div class="ui-tabpanel lore ui-stack" id="panel-personen" role="tabpanel" aria-labelledby="tab-personen" hidden>
+        {% include 'lore/chapters/personen.twig' %}
+    </div>
+
+    <div class="ui-tabpanel lore" id="panel-haeuser" role="tabpanel" aria-labelledby="tab-haeuser" hidden>
+        {% include 'lore/chapters/haeuser.twig' %}
+    </div>
+
+    <div class="ui-tabpanel lore" id="panel-karte" role="tabpanel" aria-labelledby="tab-karte" hidden>
+        <figure class="lore-map">
+            <img src="{{ asset('images/lore/weidenmark.svg') }}" alt="Karte von Weidenmark und Umgebung">
+        </figure>
+    </div>
 {% endblock %}

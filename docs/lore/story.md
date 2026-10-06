@@ -29,7 +29,7 @@ Stand: 2026-10-05. Grundlage für den Chronisten-Text auf `/dm/lore` und später
 
 ## 4. Heute
 - Es gibt keinen Konflikt. Es gibt nur Gerede und eine Möglichkeit. *(Nutzer)*
-- **Orks:** Vor wenigen Jahren verfeindete Stämme, jetzt von einem neuen Anführer vereint. Sie verhalten sich friedlich. *(Nutzer)*
+- **Orks:** Seit jeher verfeindete Stämme, vor wenigen Tagen von einem neuen Anführer vereint. Sie verhalten sich friedlich. *(Nutzer)*
 - **Orkanführer:** hochintelligent und charismatisch, kein Kriegstreiber. Er sieht, wie sich seine Stämme bekriegen, während im Nachbarland Frieden und Wohlstand herrschen. *(Nutzer)*
   - Er hat kaum Forderungen. Er will die Orks zu Größe bringen, ohne Krieg, und Handel treiben. *(Nutzer)*
   - Bisher haben die Orks nicht einmal nach Handel gefragt, sie fokussieren sich auf sich selbst. Ein Diplomat wurde geschickt, hat erklärt, wer jetzt der Chef ist und dass die Stämme vereint sind. Dazu Höflichkeiten und vage Absichten, mehr nicht. Das ist schon passiert. *(Nutzer)*
@@ -72,6 +72,8 @@ Alle Namen und Himmelsrichtungen sind *(Vorschlag)*, die Rahmenbedingungen *(Nut
 - **Westen: das Meer.** Küste mit der einzigen Meeranbindung (Salzbruck). *(Nutzer: mindestens ein Meer)*
 - **Norden: Karth** und davor der **Grenzforst**, ein dichter Wald, der ein Stück über die Grenze reicht. Hier leben die Wolfkin. Karth ist das Land der vereinten Orkstämme. Die Grenze ist durchlässig: reger Handel, die Orks sind neutral. *(Nutzer)*
 - **Osten und Süden: Dornmark.** Ein gewöhnliches Nachbarland ohne Besonderheiten, über das man so viel weiß wie ein normaler Mensch über seine Nachbarländer. Nicht kriegerisch, gemischte Bevölkerung, Halblinge sehr selten. Normaler Handel, Staatsform egal. Eher Wald und Feld, wenige Straßen. *(Nutzer: mindestens ein weiteres Nachbarland außer den Orks, Rest Nutzer)*
+  - **Orte:** Dornfeld (größte bekannte Stadt, im Osten an der Königsstraße von Lindhain) und Eschenau (Städtchen im Süden). *(Vorschlag)*
+  - **Ansprechpartner:** Vogtin Hedda Aschwin (Mensch), Stadtherrin von Dornfeld, zuständig für Grenze, Zoll und Handel mit Lindhain. Forstmeisterin Ragna Eschen (Wolfkin), Hüterin der Wälder um Eschenau. *(Vorschlag)*
 - **Süden und Osten: der Eisenkamm.** Hochgebirge der Zwerge in L-Form vom Meer entlang der Südgrenze, dann nach Nordosten entlang der Grenze zu Dornmark. Drei Orte: **Tharnhall** (Süden), **Orrindum** (Südosten), **Kelrok** (Osten). Hier entspringt die Weide.
 - **Südwesten: das Haldertal.** Sackgassental hinter den **Wallkämmen**, die nach außen als Landesgrenze gelten. Halblinge, fast ohne Kontakt, nur der schwer begehbare **Eselspfad** führt hinein.
 - **Südwesten, Küste: die Rohrlande.** Sumpfland der Mallard, wo die Weide ins Meer mündet.
@@ -101,24 +103,36 @@ Dazu kommen etliche Dörfer und Siedlungen, in denen alle gemischt leben.
 Alles *(Vorschlag)*.
 
 **Das Königshaus**
-- **Konsul und erster König: Hadrik Sarn** (König Hadrik I.).
-- **Haus Sarn:** das heutige Königshaus.
+- **Konsul und erster König: Hadrik Sarn** (König Hadrik I.). Den Spielern wird er als erster König genannt, der dem Bürgerkrieg ein Ende setzte.
+- **Haus Sarn:** das heutige Königshaus. Hof in Hohenfurt, spricht Recht und hält den Frieden im ganzen Land.
 - **Aktuelle Monarchin: Königin Odela Sarn.** Alt, ruhig, diplomatisch, hat in ihrer Regierung nie einen Krieg geführt.
 
 **Die Adelshäuser** (aus dem Stab Hadriks)
-- **Haus Eberwein** (Schwertadel): Marschall des Reichs. Hält die Nordmark am Grenzforst. Sitz: Burg Falkenhag.
-- **Haus Thalheim** (Briefadel): Kanzler und Verwaltung. Sitz in Hohenfurt.
-- **Haus Gerrin** (Schwertadel): Westmark und Küste. Sitz: Salzbruck.
-- **Haus Lorn** (Briefadel): Münze und Zölle. Sitz: Steinbach.
-- **Haus Kaltenbach** (Schwertadel): Ostmark zu Dornmark. Sitz: Lindhain.
+- **Haus Eberwein** (Schwertadel): Marschall des Reichs. Befehligt das Heer und hält die Nordmark am Grenzforst, damit Karawanen und Händler sicher an die Grenze und zurück kommen. Sitz: Burg Falkenhag. Haupt: Marschall **Gerhard Eberwein** (Mensch).
+- **Haus Thalheim** (Briefadel): Kanzler und Verwaltung. Führt die Kanzlei, schreibt die Gesetze nieder, führt die Archive und sorgt dafür, dass ein Befehl des Königs auch die letzte Gemeinde erreicht. Sitz in Hohenfurt. Haupt: Kanzlerin **Ysolde Thalheim** (Halb-Elfe).
+- **Haus Gerrin** (Schwertadel): Westmark und Küste. Schützt den einzigen Hafen, stellt die Küstenwacht und sichert die Schiffe, die Salzbruck anlaufen. Sitz: Salzbruck. Haupt: **Bertram Gerrin** (Mensch).
+- **Haus Lorn** (Briefadel): Münze und Zölle. Prägt das Geld des Königs, treibt die Zölle an Straßen und Brücken ein und hält die Handelswege mit den Zwergen in Ordnung. Sitz: Steinbach. Haupt: **Dorgrim Lorn** (Zwerg).
+- **Haus Kaltenbach** (Schwertadel): Ostmark zu Dornmark. Bewacht die Grenze im Osten, hält die Straße nach Dornfeld offen und sorgt für den Marktfrieden in Lindhain. Sitz: Lindhain. Haupt: **Marta Kaltenbach** (Mensch).
 
 **Die Orks**
-- **Land:** Karth. Früher sieben verfeindete Stämme, jetzt „die Vereinten Stämme“.
-- **Anführer: Varrok Ul-Dren, genannt „der Einer“.** Klug, ruhig, gewinnend. Spricht besser Gemeinsprache, als man erwartet. Er hat die Stämme nicht mit Gewalt geeint, sondern durch Verhandlung und Beispiel. Er will Größe für sein Volk, Handel und Frieden. *(Nutzer: Ziel, Rest Vorschlag)*
+- **Land:** Karth. Früher sieben verfeindete Stämme, jetzt „die Vereinten Stämme“. Auf der Karte stehen drei: **Stamm Ul-Dren** (Varroks eigener, Hauptlager), **Stamm Maladûk** (Nordosten, geführt von Maladûk, Orkin) und **Stamm Gorrash** (Nordwesten, Führung in Weidenmark kaum bekannt). *(Vorschlag)*
+- **Anführer: Varrok Ul-Dren, genannt „der Schlichter“ (so hieß er schon vor der Einigung, weil er Streit zwischen den Stämmen schlichtete).** Klug, ruhig, gewinnend. Spricht besser Gemeinsprache, als man erwartet. Wie er die Stämme geeint hat, kann sich in Weidenmark niemand recht erklären (DM: durch Verhandlung und Beispiel, nicht mit Gewalt). Er will Größe für sein Volk, Handel und Frieden. *(Nutzer: Ziel, Rest Vorschlag)*
 
 ## 8. Gilden
-- **Handelsgilden:** städteübergreifend, pro Branche, gehören den Patriziern. Das Netzwerk. *(Vorschlag)*
-- **Handwerkszünfte:** lokal pro Stadt, halten zum alten Adel. *(Vorschlag)*
+Auf `/lore` (Spieler) stehen Gilden und Zünfte als Karten mit Aufgabe, die Gilden- und Zunftmeister nur im DM-Kapitel „Personen“ (`/dm/lore?k=personen`, vollständige Liste). Alles *(Vorschlag)*.
+
+- **Weidenhanse:** Bund der mächtigsten Patrizier (reiche Kaufleute, vom Adel nicht anerkannt), Sitz Rotenmark. Entscheidet über Warenpreise, Karawanenrouten und Handelsabkommen, hält die Handelsgilden. Leise Spannung mit dem Adel. Vorsteherin: **Ilsabeth Brandt** (Mensch).
+
+**Handelsgilden** (städteübergreifend, pro Branche, unter der Weidenhanse)
+- **Kornherren** (Hohenfurt): Getreide des Kernlands. Sorgen für faire Brotpreise und Wintervorräte. Leitung: **Lindis Kornblum** (Halblingin).
+- **Erzgilde** (Steinbach): Handel mit den Zwergen, Erz, Eisen, Werkzeug. Leitung: **Brunhild Eisenmund** (Zwergin).
+- **Salzgilde** (Salzbruck): Salz, Fisch, Seefracht, auch für kleine Dörfer im Landesinneren. Leitung: **Aldo Rohrbach** (Mallard).
+- **Karawanengilde** (Rotenmark): Karawanen nach Karth, Führer, Wachen, Zölle und Schutz mit den Wolfkin. Leitung: **Fenja Rauh** (Halb-Orkin).
+
+**Handwerkszünfte** (lokal pro Stadt, halten zum alten Adel, nicht immer gut auf die Hanse zu sprechen)
+- **Schmiedezunft:** Ausbildung und Qualität, Zunftzeichen. Zunftmeister: **Ulrich Hammerl** (Mensch).
+- **Steinmetzzunft:** Brücken, Mauern, Straßen. Zunftmeisterin: **Gimra Felsenhand** (Zwergin).
+- **Zimmerleutezunft:** Häuser, Boote, Fachwerk. Zunftmeister: **Silvanis Eichenwart** (Elf).
 
 ## 9. Grüße
 Ein Gruß ist ein Eröffnungswort und braucht keine Antwort. Danach geht es normal weiter („Awo. Was kann ich heute für euch tun?“). *(Nutzer, Wörter Vorschlag)*

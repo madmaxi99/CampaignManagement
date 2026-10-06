@@ -208,3 +208,7 @@
     color: var(--ink-soft);
     font-style: italic;
 }
+
+.lore .ui-card h3 {
+    margin-top: 0;
+}

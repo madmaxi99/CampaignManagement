@@ -1,0 +1,45 @@
+{% import "lore/_macros.twig" as m %}
+{% set dm = lore_dm|default(false) %}
+<div class="ui-stack">
+{% if dm %}
+<p class="lore-lead">Die vollständige Liste. Auf <code>/lore</code> stehen nur die wichtigsten Personen. Wer für die Geschichte wichtig wird, kommt nach und nach dort hinzu.</p>
+{% else %}
+<p class="lore-lead">Die wichtigsten Gesichter, die man in Weidenmark kennen sollte.</p>
+{% endif %}
+
+<h2>Das Königshaus</h2>
+{{ m.card('Königin Odela Sarn', 'Mensch', '', 'Die Monarchin, alt, ruhig und diplomatisch. Sie glaubt an Verhandlung statt an Waffen und hat nie einen Krieg geführt.') }}
+
+<h2>Die Adelshäuser</h2>
+{{ m.card('Marschall Gerhard Eberwein', 'Mensch', '', 'Haus Eberwein, Marschall des Reichs. Hält die Nordmark am Grenzforst und sitzt auf Burg Falkenhag. Sein Blick geht seit Tagen nach Norden.') }}
+{% if dm %}
+{{ m.card('Kanzlerin Ysolde Thalheim', 'Halb-Elfe', 'ui-badge--sky', 'Haus Thalheim, Kanzlerin und oberste Verwalterin. Sitzt in Hohenfurt und hat mehr gelesen als gesagt.') }}
+{{ m.card('Bertram Gerrin', 'Mensch', '', 'Haus Gerrin, Herr von Westmark und Küste. Sitzt in Salzbruck und kennt jeden Kapitän im Hafen.') }}
+{{ m.card('Dorgrim Lorn', 'Zwerg', 'ui-badge--gold', 'Haus Lorn, Hüter von Münze und Zöllen. Sitzt in Steinbach und lässt sich keinen Heller abhandeln.') }}
+{{ m.card('Marta Kaltenbach', 'Mensch', '', 'Haus Kaltenbach, Herrin der Ostmark. Sitzt in Lindhain und handelt mit Dornmark.') }}
+{% endif %}
+
+{% if dm %}
+<h2>Weidenhanse und Gilden</h2>
+{{ m.card('Hansemeisterin Ilsabeth Brandt', 'Mensch', '', 'Vorsteherin der Weidenhanse in Rotenmark. Sie verhandelt mit dem Hof, mit den Zünften und, wenn es sein muss, auch mit Karawanen aus Karth.') }}
+{{ m.card('Gildemeisterin Lindis Kornblum', 'Halblingin', 'ui-badge--gold', 'Leiterin der Kornherren in Hohenfurt. Eine der wenigen Halblinge, die das Haldertal verlassen haben. Sie rechnet nach, ob die Speicher für den Winter reichen und lässt sich dabei nichts vormachen.') }}
+{{ m.card('Gildemeisterin Brunhild Eisenmund', 'Zwergin', 'ui-badge--gold', 'Leiterin der Erzgilde in Steinbach. Sie kennt die Hallen im Eisenkamm und die Preise für jedes Fass Erz.') }}
+{{ m.card('Gildemeister Aldo Rohrbach', 'Mallard', 'ui-badge--sky', 'Leiter der Salzgilde in Salzbruck. Aufgewachsen in den Rohrlanden, weiß er, was in den Booten steckt, bevor sie anlegen.') }}
+{{ m.card('Gildemeisterin Fenja Rauh', 'Halb-Orkin', 'ui-badge--berry', 'Leiterin der Karawanengilde in Rotenmark. Sie spricht Gemeinsprache wie die Sprache der Grenze und kennt jeden Weg nach Karth.') }}
+
+<h2>Handwerkszünfte</h2>
+{{ m.card('Zunftmeister Ulrich Hammerl', 'Mensch', '', 'Leiter der Schmiedezunft. Er prüft jedes Zunftzeichen selbst.') }}
+{{ m.card('Zunftmeisterin Gimra Felsenhand', 'Zwergin', 'ui-badge--gold', 'Leiterin der Steinmetzzunft. Sie hält die Brücken und Mauern des Landes instand.') }}
+{{ m.card('Zunftmeister Silvanis Eichenwart', 'Elf', 'ui-badge--sky', 'Leiter der Zimmerleutezunft. Er hat schon Dächer gedeckt, als Weidenmark noch nicht Weidenmark hieß.') }}
+
+<h2>Dornmark</h2>
+{{ m.card('Vogtin Hedda Aschwin', 'Mensch', '', 'Stadtherrin von Dornfeld, der größten Stadt Dornmarks. Sie spricht für Dornmark, wenn es um Grenze, Zoll und Handel mit Lindhain geht und ist in Weidenmark gut bekannt.') }}
+{{ m.card('Forstmeisterin Ragna Eschen', 'Wolfkin', 'ui-badge--sky', 'Hüterin der Wälder rund um Eschenau. Sie kennt die Wege zwischen Dornmark und dem Eisenkamm und weiß, wer sie benutzt.') }}
+{% endif %}
+
+<h2>Karth</h2>
+{{ m.card('Varrok Ul-Dren, „der Schlichter“', 'Ork', 'ui-badge--berry', 'Anführer der Vereinten Stämme. Er ist ruhig, gewinnend und spricht besser Gemeinsprache, als man erwartet. Schon vor der Einigung hieß er bei den Stämmen „der Schlichter“, weil er ihre Streitigkeiten beilegte. Er verspricht seinem Volk Wohlstand ohne Krieg.') }}
+{% if dm %}
+{{ m.card('Maladûk', 'Orkin', 'ui-badge--berry', 'Führerin des Stamms Maladûk. Bekannt als eine der Stammesführerinnen, die sich Varrok angeschlossen haben.') }}
+{% endif %}
+</div>

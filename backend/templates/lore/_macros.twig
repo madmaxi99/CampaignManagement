@@ -1,0 +1,10 @@
+{# One card per person, house, guild or tribe: title, badge, short explanation. #}
+{% macro card(title, badge, badge_class, text) %}
+    <div class="ui-card">
+        <div class="ui-row">
+            <h3 class="ui-card__title">{{ title }}</h3>
+            <span class="ui-badge {{ badge_class }}">{{ badge }}</span>
+        </div>
+        <p>{{ text|raw }}</p>
+    </div>
+{% endmacro %}

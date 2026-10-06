@@ -24,6 +24,7 @@ return function (App $app): void {
         ['slug' => 'orte', 'title' => 'Städte und Orte'],
         ['slug' => 'schauplaetze', 'title' => 'Schauplätze'],
         ['slug' => 'haeuser', 'title' => 'Häuser und Gilden'],
+        ['slug' => 'personen', 'title' => 'Personen'],
     ];
 
     $app->get('/dm/lore', function (Request $request, Response $response) use ($chapters) {
