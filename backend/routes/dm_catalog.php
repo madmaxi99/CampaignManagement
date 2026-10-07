@@ -2,10 +2,14 @@
 
 declare(strict_types=1);
 
+use Flyka\CampaignManagement\CatalogEditorRepository;
+use Flyka\CampaignManagement\WorldRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Views\Twig;
+use function Flyka\CampaignManagement\Http\jsonResponse;
+use function Flyka\CampaignManagement\Http\storeUploadedImage;
 
 /**
  * DM routes of the catalog editors (items, bestiary), the read-only
@@ -18,11 +22,14 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
         try {
             return $action();
         } catch (InvalidArgumentException $e) {
-            return jsonResponse($response, ['error' => $e->getMessage()], 422);
+            return jsonResponse($response, [
+                'error' => $e->getMessage(),
+            ], 422);
         }
     };
 
-    $redirect = fn (Response $response, string $to) => $response->withHeader('Location', $to)->withStatus(302);
+    $redirect = fn (Response $response, string $to) => $response->withHeader('Location', $to)
+        ->withStatus(302);
 
     $app->get('/dm/catalog', fn (Request $request, Response $response) => $redirect($response, '/dm/catalog/items'));
 
@@ -45,16 +52,18 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
         ]);
     });
 
-    $app->post('/dm/catalog/items', function (Request $request, Response $response) use ($catalog, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $catalog->saveItem(null, $json($request))], 201));
-    });
+    $app->post('/dm/catalog/items', fn (Request $request, Response $response) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $catalog->saveItem(null, $json($request)),
+    ], 201)));
 
     $app->post('/dm/catalog/items/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($catalog, $json, $guard) {
         if ($catalog->item((int) $args['id']) === null) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, fn () => jsonResponse($response, ['id' => $catalog->saveItem((int) $args['id'], $json($request))]));
+        return $guard($response, fn (): Response => jsonResponse($response, [
+            'id' => $catalog->saveItem((int) $args['id'], $json($request)),
+        ]));
     });
 
     $app->delete('/dm/catalog/items/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($catalog, $guard) {
@@ -62,10 +71,12 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($catalog, $response, $args) {
+        return $guard($response, function () use ($catalog, $response, $args): Response {
             $catalog->deleteItem((int) $args['id']);
 
-            return jsonResponse($response, ['deleted' => true]);
+            return jsonResponse($response, [
+                'deleted' => true,
+            ]);
         });
     });
 
@@ -89,16 +100,18 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
         ]);
     });
 
-    $app->post('/dm/catalog/bestiary', function (Request $request, Response $response) use ($catalog, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $catalog->saveCreature(null, $json($request))], 201));
-    });
+    $app->post('/dm/catalog/bestiary', fn (Request $request, Response $response) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $catalog->saveCreature(null, $json($request)),
+    ], 201)));
 
     $app->post('/dm/catalog/bestiary/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($catalog, $json, $guard) {
         if ($catalog->creature((int) $args['id']) === null) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, fn () => jsonResponse($response, ['id' => $catalog->saveCreature((int) $args['id'], $json($request))]));
+        return $guard($response, fn (): Response => jsonResponse($response, [
+            'id' => $catalog->saveCreature((int) $args['id'], $json($request)),
+        ]));
     });
 
     $app->delete('/dm/catalog/bestiary/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($catalog, $guard) {
@@ -106,61 +119,67 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($catalog, $response, $args) {
+        return $guard($response, function () use ($catalog, $response, $args): Response {
             $catalog->deleteCreature((int) $args['id']);
 
-            return jsonResponse($response, ['deleted' => true]);
+            return jsonResponse($response, [
+                'deleted' => true,
+            ]);
         });
     });
 
-    $app->post('/dm/catalog/bestiary/{id:[0-9]+}/image', function (Request $request, Response $response, array $args) use ($catalog) {
+    $app->post('/dm/catalog/bestiary/{id:[0-9]+}/image', function (Request $request, Response $response, array $args) use ($catalog): Response {
         $id = (int) $args['id'];
         if ($catalog->creature($id) === null) {
             return $response->withStatus(404);
         }
         $stored = storeUploadedImage($request->getUploadedFiles()['image'] ?? null, 'images/bestiary', $id);
         if (isset($stored['error'])) {
-            return jsonResponse($response, ['error' => $stored['error']], 422);
+            return jsonResponse($response, [
+                'error' => $stored['error'],
+            ], 422);
         }
         $catalog->setCreatureImage($id, $stored['path']);
 
-        return jsonResponse($response, ['image_path' => $stored['path']]);
+        return jsonResponse($response, [
+            'image_path' => $stored['path'],
+        ]);
     });
 
     // ---------- encounter tables (read-only) ----------
 
-    $app->get('/dm/catalog/encounters', function (Request $request, Response $response) use ($world) {
-        return Twig::fromRequest($request)->render($response, 'dm/catalog_encounters.twig', [
-            'encounterTables' => $world->encounterTables(),
-        ]);
-    });
+    $app->get('/dm/catalog/encounters', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/catalog_encounters.twig', [
+        'encounterTables' => $world->encounterTables(),
+    ]));
 
     // ---------- party ----------
 
-    $app->get('/dm/party', function (Request $request, Response $response) use ($catalog) {
-        return Twig::fromRequest($request)->render($response, 'dm/party.twig', [
-            'members' => $catalog->party(),
-            'candidates' => $catalog->partyCandidates(),
+    $app->get('/dm/party', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/party.twig', [
+        'members' => $catalog->party(),
+        'candidates' => $catalog->partyCandidates(),
+    ]));
+
+    $app->post('/dm/party', fn (Request $request, Response $response) => $guard($response, function () use ($catalog, $json, $request, $response): Response {
+        $catalog->addToParty((int) ($json($request)['character_id'] ?? 0));
+
+        return jsonResponse($response, [
+            'added' => true,
+        ], 201);
+    }));
+
+    $app->delete('/dm/party', function (Request $request, Response $response) use ($catalog): Response {
+        $catalog->clearParty();
+
+        return jsonResponse($response, [
+            'cleared' => true,
         ]);
     });
 
-    $app->post('/dm/party', function (Request $request, Response $response) use ($catalog, $json, $guard) {
-        return $guard($response, function () use ($catalog, $json, $request, $response) {
-            $catalog->addToParty((int) ($json($request)['character_id'] ?? 0));
-
-            return jsonResponse($response, ['added' => true], 201);
-        });
-    });
-
-    $app->delete('/dm/party', function (Request $request, Response $response) use ($catalog) {
-        $catalog->clearParty();
-
-        return jsonResponse($response, ['cleared' => true]);
-    });
-
-    $app->delete('/dm/party/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($catalog) {
+    $app->delete('/dm/party/{id:[0-9]+}', function (Request $request, Response $response, array $args) use ($catalog): Response {
         $catalog->removeFromParty((int) $args['id']);
 
-        return jsonResponse($response, ['removed' => true]);
+        return jsonResponse($response, [
+            'removed' => true,
+        ]);
     });
 };

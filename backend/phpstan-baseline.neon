@@ -1,0 +1,73 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Offset ''chapter''\|''item''\|''npc''\|''place'' on array\{chapter\: array, place\: array, npc\: array, item\: array\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: routes/dm_campaign.php
+
+		-
+			message: '#^Offset ''age_code'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''appearance_de'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''flaw_roll'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''gear_option_id'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''heroic_ability…'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''kin_code'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''learned_skill_ids'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''memento_de'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''name_de'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''profession_code'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php
+
+		-
+			message: '#^Offset ''raw_attributes'' on array\{name_de\: string, kin_code\: string, profession_code\: string, age_code\: string, raw_attributes\: array\<string, int\>, learned_skill_ids\: array\<int\>, heroic_ability_choice\: string, profession_heroic_ability_id\?\: int, \.\.\.\} on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.offset
+			count: 1
+			path: src/CharacterCreationRepository.php

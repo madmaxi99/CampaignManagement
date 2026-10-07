@@ -19,6 +19,7 @@ services:
       COMPOSER_HOME: /var/www/.composer
     volumes:
       - ../backend:/var/www/html:rw
+      - ../database:/var/www/database:ro
       - composer:/var/www/.composer:rw
     working_dir: /var/www/html
     depends_on:
@@ -50,8 +51,6 @@ services:
       - "127.0.0.1:8071:80"
     environment:
       PMA_HOST: mariadb
-      PMA_USER: "${DB_USER}"
-      PMA_PASSWORD: "${DB_PASSWORD}"
     depends_on:
       mariadb:
         condition: service_healthy

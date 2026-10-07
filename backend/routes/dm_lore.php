@@ -14,20 +14,53 @@ use Slim\Views\Twig;
  */
 return function (App $app): void {
     $chapters = [
-        ['slug' => 'uebersicht', 'title' => 'Übersicht'],
-        ['slug' => 'korvanis', 'title' => 'Korvanis'],
-        ['slug' => 'beifall', 'title' => 'Der Beifall'],
-        ['slug' => 'ruhige-jahre', 'title' => 'Die ruhigen Jahre'],
-        ['slug' => 'heute', 'title' => 'Weidenmark heute'],
-        ['slug' => 'voelker', 'title' => 'Völker'],
-        ['slug' => 'land', 'title' => 'Das Land'],
-        ['slug' => 'orte', 'title' => 'Städte und Orte'],
-        ['slug' => 'schauplaetze', 'title' => 'Schauplätze'],
-        ['slug' => 'haeuser', 'title' => 'Häuser und Gilden'],
-        ['slug' => 'personen', 'title' => 'Personen'],
+        [
+            'slug' => 'uebersicht',
+            'title' => 'Übersicht',
+        ],
+        [
+            'slug' => 'korvanis',
+            'title' => 'Korvanis',
+        ],
+        [
+            'slug' => 'beifall',
+            'title' => 'Der Beifall',
+        ],
+        [
+            'slug' => 'ruhige-jahre',
+            'title' => 'Die ruhigen Jahre',
+        ],
+        [
+            'slug' => 'heute',
+            'title' => 'Weidenmark heute',
+        ],
+        [
+            'slug' => 'voelker',
+            'title' => 'Völker',
+        ],
+        [
+            'slug' => 'land',
+            'title' => 'Das Land',
+        ],
+        [
+            'slug' => 'orte',
+            'title' => 'Städte und Orte',
+        ],
+        [
+            'slug' => 'schauplaetze',
+            'title' => 'Schauplätze',
+        ],
+        [
+            'slug' => 'haeuser',
+            'title' => 'Häuser und Gilden',
+        ],
+        [
+            'slug' => 'personen',
+            'title' => 'Personen',
+        ],
     ];
 
-    $app->get('/dm/lore', function (Request $request, Response $response) use ($chapters) {
+    $app->get('/dm/lore', function (Request $request, Response $response) use ($chapters): Response {
         $slug = (string) ($request->getQueryParams()['k'] ?? $chapters[0]['slug']);
         $index = array_search($slug, array_column($chapters, 'slug'), true);
         if ($index === false) {

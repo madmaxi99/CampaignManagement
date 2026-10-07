@@ -2,17 +2,24 @@
 
 declare(strict_types=1);
 
+namespace Flyka\CampaignManagement;
+
+use PDO;
+
 /**
  * Read-only rules reference for players (/rules): the ruleset part of the
  * catalog. Deliberately without bestiary and encounter tables (DM only).
  */
-final class RulesRepository
+final readonly class RulesRepository
 {
-    public function __construct(private PDO $db)
-    {
+    public function __construct(
+        private PDO $db
+    ) {
     }
 
-    /** Weapons, armor and misc items, each with its rule values. */
+    /**
+     * Weapons, armor and misc items, each with its rule values.
+     */
     public function items(): array
     {
         $rows = $this->db->query(<<<SQL
@@ -27,17 +34,23 @@ final class RulesRepository
             ORDER BY i.name_de
             SQL)->fetchAll();
 
-        $groups = ['weapon' => [], 'armor' => [], 'misc' => []];
+        $groups = [
+            'weapon' => [],
+            'armor' => [],
+            'misc' => [],
+        ];
         foreach ($rows as $row) {
-            $row['price_de'] = self::price($row);
-            $row['armor_penalties'] = self::armorPenalties($row);
+            $row['price_de'] = $this->price($row);
+            $row['armor_penalties'] = $this->armorPenalties($row);
             $groups[$row['kind']][] = $row;
         }
 
         return $groups;
     }
 
-    /** Skills grouped by category. */
+    /**
+     * Skills grouped by category.
+     */
     public function skills(): array
     {
         $rows = $this->db->query(<<<SQL
@@ -46,7 +59,11 @@ final class RulesRepository
             ORDER BY s.name_de
             SQL)->fetchAll();
 
-        $groups = ['regular' => [], 'combat' => [], 'secondary' => []];
+        $groups = [
+            'regular' => [],
+            'combat' => [],
+            'secondary' => [],
+        ];
         foreach ($rows as $row) {
             $groups[$row['category']][] = $row;
         }
@@ -54,7 +71,9 @@ final class RulesRepository
         return $groups;
     }
 
-    /** Spells and tricks grouped by school. */
+    /**
+     * Spells and tricks grouped by school.
+     */
     public function spellsBySchool(): array
     {
         $rows = $this->db->query(<<<SQL
@@ -99,9 +118,13 @@ final class RulesRepository
             SQL);
 
         foreach ($professions as &$profession) {
-            $skillStmt->execute(['code' => $profession['code']]);
+            $skillStmt->execute([
+                'code' => $profession['code'],
+            ]);
             $profession['skills'] = $skillStmt->fetchAll(PDO::FETCH_COLUMN);
-            $abilityStmt->execute(['code' => $profession['code']]);
+            $abilityStmt->execute([
+                'code' => $profession['code'],
+            ]);
             $profession['abilities'] = $abilityStmt->fetchAll();
         }
 
@@ -120,7 +143,9 @@ final class RulesRepository
             WHERE kh.kin_code = :code ORDER BY h.name_de
             SQL);
         foreach ($kins as &$kin) {
-            $stmt->execute(['code' => $kin['code']]);
+            $stmt->execute([
+                'code' => $kin['code'],
+            ]);
             $kin['abilities'] = $stmt->fetchAll();
         }
 
@@ -134,10 +159,13 @@ final class RulesRepository
         )->fetchAll();
     }
 
-    /** Roll tables and short rules: wounds, mishaps, fear, rest, hazards. */
+    /**
+     * Roll tables and short rules: wounds, mishaps, fear, rest, hazards.
+     */
     public function tables(): array
     {
-        $query = fn (string $sql) => $this->db->query($sql)->fetchAll();
+        $query = fn (string $sql) => $this->db->query($sql)
+            ->fetchAll();
 
         return [
             'injuries' => $query('SELECT roll_min, roll_max, name_de, effect_de, healing_de FROM catalog_injuries ORDER BY roll_min'),
@@ -150,10 +178,14 @@ final class RulesRepository
         ];
     }
 
-    private static function price(array $row): string
+    private function price(array $row): string
     {
         $parts = [];
-        foreach (['gold' => 'Gold', 'silver' => 'Silber', 'copper' => 'Kupfer'] as $key => $label) {
+        foreach ([
+            'gold' => 'Gold',
+            'silver' => 'Silber',
+            'copper' => 'Kupfer',
+        ] as $key => $label) {
             if ((int) $row['price_' . $key] > 0) {
                 $parts[] = $row['price_' . $key] . ' ' . $label;
             }
@@ -162,13 +194,16 @@ final class RulesRepository
         return $parts === [] ? '–' : implode(', ', $parts);
     }
 
-    private static function armorPenalties(array $row): array
+    private function armorPenalties(array $row): array
     {
         $labels = [
-            'penalty_stealth' => 'Heimlichkeit', 'penalty_evasion' => 'Ausweichen', 'penalty_acrobatics' => 'Akrobatik',
-            'penalty_perception' => 'Wahrnehmung', 'penalty_ranged' => 'Fernkampf',
+            'penalty_stealth' => 'Heimlichkeit',
+            'penalty_evasion' => 'Ausweichen',
+            'penalty_acrobatics' => 'Akrobatik',
+            'penalty_perception' => 'Wahrnehmung',
+            'penalty_ranged' => 'Fernkampf',
         ];
 
-        return array_values(array_filter($labels, fn (string $key) => !empty($row[$key]), ARRAY_FILTER_USE_KEY));
+        return array_values(array_filter($labels, fn (string $key): bool => ! empty($row[$key]), ARRAY_FILTER_USE_KEY));
     }
 }

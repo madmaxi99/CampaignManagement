@@ -99,21 +99,6 @@
     margin: 0;
 }
 
-/* Three-column workspace: tree | content | details (campaign editor, SP3). */
-.dm-workspace {
-    display: grid;
-    gap: var(--space-4);
-    grid-template-columns: 280px minmax(0, 1fr) 320px;
-    align-items: start;
-}
-
-/* Tablet and narrow desktop: the sidebar becomes a horizontal strip. */
-@media (max-width: 1100px) {
-    .dm-workspace {
-        grid-template-columns: minmax(0, 1fr);
-    }
-}
-
 @media (max-width: 900px) {
     .dm-shell {
         grid-template-columns: minmax(0, 1fr);

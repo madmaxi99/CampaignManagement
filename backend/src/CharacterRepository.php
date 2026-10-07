@@ -2,10 +2,16 @@
 
 declare(strict_types=1);
 
-final class CharacterRepository
+namespace Flyka\CampaignManagement;
+
+use InvalidArgumentException;
+use PDO;
+
+final readonly class CharacterRepository
 {
-    public function __construct(private PDO $db)
-    {
+    public function __construct(
+        private PDO $db
+    ) {
     }
 
     public function listAll(): array
@@ -44,53 +50,12 @@ final class CharacterRepository
             JOIN catalog_flaws fl ON fl.id = c.flaw_id
             WHERE c.id = :id
             SQL);
-        $stmt->execute(['id' => $id]);
+        $stmt->execute([
+            'id' => $id,
+        ]);
         $character = $stmt->fetch();
 
         return $character === false ? null : $character;
-    }
-
-    /**
-     * Movement/carrying capacity/damage bonus aren't stored -- they're always
-     * derivable from the kin (movement_base, joined in by findById above) and
-     * the STA/GEW attribute values. Returns them under the same field names
-     * (movement/carrying_capacity/damage_bonus_sta_de/damage_bonus_gew_de)
-     * the stored columns used to have.
-     *
-     * @param array<int,array{code:string,value:int}> $attributes
-     */
-    public function derivedStats(array $character, array $attributes): array
-    {
-        $attributeValues = [];
-        foreach ($attributes as $attribute) {
-            $attributeValues[$attribute['code']] = (int) $attribute['value'];
-        }
-        $gew = $attributeValues['GEW'] ?? 0;
-        $sta = $attributeValues['STA'] ?? 0;
-
-        $movementModifier = match (true) {
-            $gew <= 6 => -4,
-            $gew <= 9 => -2,
-            $gew <= 12 => 0,
-            $gew <= 15 => 2,
-            default => 4,
-        };
-
-        return [
-            'movement' => (int) $character['movement_base'] + $movementModifier,
-            'carrying_capacity' => (int) ceil($sta / 2),
-            'damage_bonus_sta_de' => $this->damageBonus($sta),
-            'damage_bonus_gew_de' => $this->damageBonus($gew),
-        ];
-    }
-
-    private function damageBonus(int $value): string
-    {
-        return match (true) {
-            $value <= 12 => '—',
-            $value <= 16 => 'W4',
-            default => 'W6',
-        };
     }
 
     /**
@@ -103,7 +68,10 @@ final class CharacterRepository
         $stmt = $this->db->prepare(
             'UPDATE characters SET portrait_path = :path WHERE id = :id AND portrait_path IS NULL'
         );
-        $stmt->execute(['path' => $path, 'id' => $characterId]);
+        $stmt->execute([
+            'path' => $path,
+            'id' => $characterId,
+        ]);
 
         return $stmt->rowCount() === 1;
     }
@@ -117,7 +85,9 @@ final class CharacterRepository
             WHERE ca.character_id = :character_id
             ORDER BY FIELD(a.code, 'STA', 'KON', 'GEW', 'INT', 'WIL', 'CHA')
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -131,7 +101,9 @@ final class CharacterRepository
             WHERE cc.character_id = :character_id
             ORDER BY FIELD(c.attribute_code, 'STA', 'KON', 'GEW', 'INT', 'WIL', 'CHA')
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -145,7 +117,10 @@ final class CharacterRepository
             WHERE cs.character_id = :character_id AND sk.category = :category
             ORDER BY sk.name_de
             SQL);
-        $stmt->execute(['character_id' => $characterId, 'category' => $category]);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'category' => $category,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -159,7 +134,9 @@ final class CharacterRepository
             WHERE cs.character_id = :character_id AND cs.marked_for_advancement = 1
             ORDER BY sk.name_de
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -169,7 +146,11 @@ final class CharacterRepository
         $stmt = $this->db->prepare(
             'UPDATE character_skills SET marked_for_advancement = :marked WHERE character_id = :character_id AND skill_id = :skill_id'
         );
-        $stmt->execute(['marked' => $marked ? 1 : 0, 'character_id' => $characterId, 'skill_id' => $skillId]);
+        $stmt->execute([
+            'marked' => $marked ? 1 : 0,
+            'character_id' => $characterId,
+            'skill_id' => $skillId,
+        ]);
     }
 
     public function advanceSkill(int $characterId, int $skillId, bool $apply): int
@@ -185,12 +166,18 @@ final class CharacterRepository
                 'UPDATE character_skills SET marked_for_advancement = 0 WHERE character_id = :character_id AND skill_id = :skill_id'
             );
         }
-        $update->execute(['character_id' => $characterId, 'skill_id' => $skillId]);
+        $update->execute([
+            'character_id' => $characterId,
+            'skill_id' => $skillId,
+        ]);
 
         $stmt = $this->db->prepare(
             'SELECT value FROM character_skills WHERE character_id = :character_id AND skill_id = :skill_id'
         );
-        $stmt->execute(['character_id' => $characterId, 'skill_id' => $skillId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'skill_id' => $skillId,
+        ]);
 
         return (int) $stmt->fetch()['value'];
     }
@@ -200,7 +187,9 @@ final class CharacterRepository
         $stmt = $this->db->prepare(
             'SELECT name_de, wp_note_de, description_de FROM character_talents WHERE character_id = :character_id ORDER BY id'
         );
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -218,7 +207,9 @@ final class CharacterRepository
             WHERE cs.character_id = :character_id
             ORDER BY s.type DESC, s.name_de
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -239,9 +230,11 @@ final class CharacterRepository
             JOIN catalog_skills sk ON sk.id = cs.skill_id
             WHERE cs.character_id = :character_id AND sk.category = 'secondary' AND cs.value > 0
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
-        return array_map('intval', array_column($stmt->fetchAll(), 'id'));
+        return array_map(intval(...), array_column($stmt->fetchAll(), 'id'));
     }
 
     /**
@@ -262,7 +255,7 @@ final class CharacterRepository
             LEFT JOIN catalog_casting_times ct ON ct.code = s.casting_time_code
             LEFT JOIN catalog_spell_durations sd ON sd.code = s.duration_code
             WHERE s.school_id IN (
-                    SELECT id FROM catalog_schools WHERE skill_id IN ($placeholders) OR skill_id IS NULL
+                    SELECT id FROM catalog_schools WHERE skill_id IN ({$placeholders}) OR skill_id IS NULL
                 )
               AND (s.rank = 1 OR s.rank IS NULL)
               AND s.id NOT IN (SELECT spell_id FROM character_spells WHERE character_id = ?)
@@ -276,7 +269,10 @@ final class CharacterRepository
     public function learnSpell(int $characterId, int $spellId): void
     {
         $stmt = $this->db->prepare('INSERT IGNORE INTO character_spells (character_id, spell_id) VALUES (:character_id, :spell_id)');
-        $stmt->execute(['character_id' => $characterId, 'spell_id' => $spellId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'spell_id' => $spellId,
+        ]);
     }
 
     /**
@@ -303,18 +299,23 @@ final class CharacterRepository
                   )
             ORDER BY cha.name_de
             SQL);
-        $stmt->execute(['character_id' => $characterId, 'profession_code' => $professionCode]);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'profession_code' => $professionCode,
+        ]);
 
         return array_values(array_filter(
             $stmt->fetchAll(),
-            static fn (array $row) => (int) $row['times_owned'] === 0 || (bool) $row['repeatable']
+            static fn (array $row): bool => (int) $row['times_owned'] === 0 || (bool) $row['repeatable']
         ));
     }
 
     public function heroicAbilityById(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT name_de, wp_note_de, description_de FROM catalog_heroic_abilities WHERE id = :id');
-        $stmt->execute(['id' => $id]);
+        $stmt->execute([
+            'id' => $id,
+        ]);
         $row = $stmt->fetch();
 
         return $row === false ? null : $row;
@@ -347,24 +348,20 @@ final class CharacterRepository
             JOIN character_attributes ca ON ca.character_id = :character_id AND ca.attribute_code = sk.attribute_code
             WHERE sk.id = :skill_id
             SQL);
-        $stmt->execute(['character_id' => $characterId, 'skill_id' => $skillId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'skill_id' => $skillId,
+        ]);
         $attributeValue = (int) $stmt->fetch()['attribute_value'];
 
         $update = $this->db->prepare(
             'UPDATE character_skills SET value = :value WHERE character_id = :character_id AND skill_id = :skill_id AND value = 0'
         );
-        $update->execute(['value' => $this->baseChance($attributeValue) * 2, 'character_id' => $characterId, 'skill_id' => $skillId]);
-    }
-
-    private function baseChance(int $value): int
-    {
-        return match (true) {
-            $value <= 5 => 3,
-            $value <= 8 => 4,
-            $value <= 12 => 5,
-            $value <= 15 => 6,
-            default => 7,
-        };
+        $update->execute([
+            'value' => CharacterRules::baseChance($attributeValue) * 2,
+            'character_id' => $characterId,
+            'skill_id' => $skillId,
+        ]);
     }
 
     public function weapons(int $characterId): array
@@ -373,7 +370,9 @@ final class CharacterRepository
             'SELECT id AS row_id, name_de, grip_de, range_de, damage_de, traits_de
              FROM character_weapons WHERE character_id = :character_id ORDER BY position'
         );
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -384,7 +383,11 @@ final class CharacterRepository
         $stmt = $this->db->prepare(
             'INSERT INTO character_weapons (character_id, position, name_de) VALUES (:character_id, :position, :name_de)'
         );
-        $stmt->execute(['character_id' => $characterId, 'position' => $position, 'name_de' => 'Neue Waffe']);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'position' => $position,
+            'name_de' => 'Neue Waffe',
+        ]);
 
         return (int) $this->db->lastInsertId();
     }
@@ -406,14 +409,16 @@ final class CharacterRepository
             FROM character_armor
             WHERE character_id = :character_id ORDER BY FIELD(slot, 'head', 'body')
             SQL);
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
 
     public function updateArmorSlot(int $characterId, string $slot, array $fields): void
     {
-        if (!in_array($slot, ['head', 'body'], true)) {
+        if (! in_array($slot, ['head', 'body'], true)) {
             throw new InvalidArgumentException('Ungültiger Rüstungs-Slot.');
         }
 
@@ -424,9 +429,12 @@ final class CharacterRepository
         }
         $set = array_map(static fn ($value) => is_bool($value) ? (int) $value : $value, $set);
 
-        $assignments = implode(', ', array_map(static fn (string $field) => "{$field} = :{$field}", array_keys($set)));
+        $assignments = implode(', ', array_map(static fn (string $field): string => "{$field} = :{$field}", array_keys($set)));
         $stmt = $this->db->prepare("UPDATE character_armor SET {$assignments} WHERE character_id = :character_id AND slot = :slot");
-        $stmt->execute($set + ['character_id' => $characterId, 'slot' => $slot]);
+        $stmt->execute($set + [
+            'character_id' => $characterId,
+            'slot' => $slot,
+        ]);
     }
 
     public function inventory(int $characterId): array
@@ -435,7 +443,9 @@ final class CharacterRepository
             'SELECT id AS row_id, name_de, description_de, quantity
              FROM character_inventory WHERE character_id = :character_id ORDER BY position'
         );
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return $stmt->fetchAll();
     }
@@ -446,7 +456,11 @@ final class CharacterRepository
         $stmt = $this->db->prepare(
             'INSERT INTO character_inventory (character_id, position, name_de) VALUES (:character_id, :position, :name_de)'
         );
-        $stmt->execute(['character_id' => $characterId, 'position' => $position, 'name_de' => 'Neuer Gegenstand']);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'position' => $position,
+            'name_de' => 'Neuer Gegenstand',
+        ]);
 
         return (int) $this->db->lastInsertId();
     }
@@ -464,10 +478,14 @@ final class CharacterRepository
     public function delete(int $characterId): void
     {
         $stmt = $this->db->prepare('DELETE FROM characters WHERE id = :id AND is_default = 0');
-        $stmt->execute(['id' => $characterId]);
+        $stmt->execute([
+            'id' => $characterId,
+        ]);
     }
 
-    /** The player's private "Gedächtnis" text. Empty text clears it. */
+    /**
+     * The player's private "Gedächtnis" text. Empty text clears it.
+     */
     public function setMemory(int $characterId, string $text): void
     {
         $text = trim($text);
@@ -507,14 +525,19 @@ final class CharacterRepository
         $maxColumn = $prefix . '_max';
 
         $stmt = $this->db->prepare("SELECT {$maxColumn} AS max_value FROM characters WHERE id = :character_id");
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
         $row = $stmt->fetch();
         $max = (int) $row['max_value'];
 
         $clamped = max(0, min($max, $value));
 
         $update = $this->db->prepare("UPDATE characters SET {$currentColumn} = :value WHERE id = :character_id");
-        $update->execute(['value' => $clamped, 'character_id' => $characterId]);
+        $update->execute([
+            'value' => $clamped,
+            'character_id' => $characterId,
+        ]);
 
         return $clamped;
     }
@@ -524,15 +547,22 @@ final class CharacterRepository
         $stmt = $this->db->prepare(
             'SELECT active FROM character_conditions WHERE character_id = :character_id AND condition_code = :code'
         );
-        $stmt->execute(['character_id' => $characterId, 'code' => $code]);
+        $stmt->execute([
+            'character_id' => $characterId,
+            'code' => $code,
+        ]);
         $row = $stmt->fetch();
 
-        $newActive = !((bool) $row['active']);
+        $newActive = ! ((bool) $row['active']);
 
         $update = $this->db->prepare(
             'UPDATE character_conditions SET active = :active WHERE character_id = :character_id AND condition_code = :code'
         );
-        $update->execute(['active' => $newActive ? 1 : 0, 'character_id' => $characterId, 'code' => $code]);
+        $update->execute([
+            'active' => $newActive ? 1 : 0,
+            'character_id' => $characterId,
+            'code' => $code,
+        ]);
 
         return $newActive;
     }
@@ -540,7 +570,9 @@ final class CharacterRepository
     private function nextPosition(string $table, int $characterId): int
     {
         $stmt = $this->db->prepare("SELECT COALESCE(MAX(position), 0) + 1 FROM {$table} WHERE character_id = :character_id");
-        $stmt->execute(['character_id' => $characterId]);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
 
         return (int) $stmt->fetchColumn();
     }
@@ -557,14 +589,20 @@ final class CharacterRepository
             return;
         }
 
-        $assignments = implode(', ', array_map(static fn (string $field) => "{$field} = :{$field}", array_keys($set)));
+        $assignments = implode(', ', array_map(static fn (string $field): string => "{$field} = :{$field}", array_keys($set)));
         $stmt = $this->db->prepare("UPDATE {$table} SET {$assignments} WHERE id = :id AND character_id = :character_id");
-        $stmt->execute($set + ['id' => $rowId, 'character_id' => $characterId]);
+        $stmt->execute($set + [
+            'id' => $rowId,
+            'character_id' => $characterId,
+        ]);
     }
 
     private function removeFromCharacterItemTable(string $table, int $characterId, int $rowId): void
     {
         $stmt = $this->db->prepare("DELETE FROM {$table} WHERE id = :id AND character_id = :character_id");
-        $stmt->execute(['id' => $rowId, 'character_id' => $characterId]);
+        $stmt->execute([
+            'id' => $rowId,
+            'character_id' => $characterId,
+        ]);
     }
 }
