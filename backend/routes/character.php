@@ -116,6 +116,25 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
         ]);
     }));
 
+    $app->post('/character/{id:[0-9]+}/rest', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
+        $body = json_decode((string) $request->getBody(), true);
+        $condition = $body['condition'] ?? null;
+        try {
+            $result = $characterRepository->rest(
+                (int) $character['id'],
+                (string) ($body['type'] ?? ''),
+                (bool) ($body['tended'] ?? false),
+                is_string($condition) && $condition !== '' ? $condition : null
+            );
+        } catch (InvalidArgumentException $e) {
+            return jsonResponse($response, [
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+
+        return jsonResponse($response, $result);
+    }));
+
     $app->post('/character/{id:[0-9]+}/conditions/{code}/toggle', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
         $active = $characterRepository->toggleCondition((int) $character['id'], $args['code']);
 

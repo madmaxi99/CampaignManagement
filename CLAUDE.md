@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only. Players need no login; the DM area is locked by a single DM password (`DM_PASSWORD_HASH`, see `docs/UX-KONZEPT.md`). The app is live (PHP 8.3 / Slim 4 / Twig / MariaDB, Docker). The concept is in `docs/CONCEPT.md` (catalog, character, campaign), the DB schema in `docs/SCHEMA.md`.
+Dragonbane-based TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only. Players need no login; the DM area is locked by a single DM password (`DM_PASSWORD_HASH`, see `docs/UX-KONZEPT.md`). The app is live (PHP 8.3 / Slim 4 / Twig / MariaDB, Docker). The concept is in `docs/CONCEPT.md` (catalog, character, campaign), the DB schema in `docs/SCHEMA.md`.
 
 ## Repository layout
 
@@ -12,9 +12,8 @@ Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and pl
 - **`database/`** — `01_schema.sql`, `02_catalog.sql`, `03_examples.sql`; mounted into the MariaDB container as init scripts (only run on an empty volume, so schema changes need `dcv` to recreate it).
 - **`provisioning/`** — `docker-compose.yml` (nginx, php-fpm, mariadb, phpmyadmin) plus `backend/` (Dockerfile, nginx.conf, php.ini).
 - **`alias.sh`**, **`deploy.sh`** — local Docker aliases (`dc`, `dcud`, `dcv`, `rcomposer`, `rphp`; source `alias.sh` under zsh) and the VPS deploy script.
-- **`docs/own-system/`** — the custom homebrew ruleset, the authoritative source of truth for all game rules: `00-overview.md` plus core-mechanic files (`01-…` to `10-gm-tools.md`) and catalogs (`11-…` to `17-…`). `docs/own-system/tools/*.py` are standalone stdlib-only Python simulators for balance checks; run them from inside that directory, e.g. `python3 balance_simulator.py`.
 - **`docs/lore/`**, **`Story/`** — in-world campaign content (world, NPCs, locations, per-chapter prose). Not rules, not code.
-- **`docs/ruleset-comparison/`** — historical research on off-the-shelf rulesets; reasoning for building the own system.
+- **`docs/ruleset-comparison/`** — research on off-the-shelf rulesets; reasoning for choosing Dragonbane (the rules source is `docs/DB_DE_Schnellstarter_2-0_web-2njzid.pdf`).
 
 ## Working here
 

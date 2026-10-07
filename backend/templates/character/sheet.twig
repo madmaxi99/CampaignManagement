@@ -39,7 +39,10 @@
             <h1>{{ character.name_de }}</h1>
             <p class="ui-muted">{{ character.kin_de }} · {{ character.age_de }} · {{ character.profession_de }}</p>
         </div>
-        <a class="ui-btn ui-btn--gold ui-btn--small sheet-hero__levelup" href="/character/{{ character.id }}/levelup">{{ ui.icon('star') }} Level-up</a>
+        <div class="sheet-hero__actions">
+            <a class="ui-btn ui-btn--gold ui-btn--small" href="/character/{{ character.id }}/levelup">{{ ui.icon('star') }} Level-up</a>
+            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-ui-open="#rest-sheet">{{ ui.icon('flame') }} Rast</button>
+        </div>
     </header>
 
     <div class="sheet-sticky">
@@ -275,6 +278,31 @@
         </section>
     </div>
 </div>
+
+<dialog class="ui-sheet" id="rest-sheet" data-rest-sheet>
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <h2>{{ ui.icon('flame') }} Rast</h2>
+    <p class="ui-muted">Verschnaufen und Kurze Rast gehen je nur einmal pro Tagesabschnitt.</p>
+    <div class="ui-stack">
+        <button type="button" class="ui-btn ui-btn--block" data-rest="breather">Verschnaufen <small>· 1 Runde · W6 WP</small></button>
+        <fieldset class="rest-short ui-stack">
+            <legend>Kurze Rast <small>· 1 Viertel</small></legend>
+            <p class="ui-field__hint">W6 TP, W6 WP und ein Zustand deiner Wahl.</p>
+            <label class="rest-short__tended"><input type="checkbox" data-rest-tended> Jemand pflegt dich (gelungene Heilkunde-Probe): 2W6 TP</label>
+            <div class="ui-field">
+                <label for="rest-condition">Zustand heilen</label>
+                <select class="ui-input" id="rest-condition" data-rest-condition>
+                    <option value="">keinen</option>
+                    {% for condition in conditions %}
+                        <option value="{{ condition.code }}">{{ condition.name_de }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="button" class="ui-btn ui-btn--block" data-rest="short">Kurze Rast halten</button>
+        </fieldset>
+        <button type="button" class="ui-btn ui-btn--gold ui-btn--block" data-rest="long">Lange Rast <small>· 1 Tagesabschnitt · sicherer Ort · alle TP und WP, alle Zustände weg</small></button>
+    </div>
+</dialog>
 
 <dialog class="ui-sheet" id="detail-sheet">
     <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>

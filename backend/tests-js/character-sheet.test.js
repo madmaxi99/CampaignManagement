@@ -10,6 +10,15 @@ const HTML = `
         <span class="ui-bar__label">6 / 10</span>
         <button data-vital-step="1">+</button>
     </div>
+    <div data-vital="wp" data-current="2" data-max="8">
+        <div class="ui-bar"><div class="ui-bar__fill"></div><span class="ui-bar__label">2 / 8</span></div>
+    </div>
+    <dialog data-rest-sheet>
+        <button data-rest="breather">Verschnaufen</button>
+        <input type="checkbox" data-rest-tended>
+        <select data-rest-condition><option value="">keinen</option><option value="tired">Erschöpft</option></select>
+        <button data-rest="short">Kurze Rast</button>
+    </dialog>
     <button class="condition-chip" aria-pressed="false" data-condition="tired">Erschöpft</button>
     <input type="checkbox" data-skill-mark="3">
     <div class="gear-entry">
@@ -70,6 +79,27 @@ test('toggles a condition from the server answer', async () => {
     await flush();
 
     assert.equal(chip.getAttribute('aria-pressed'), 'true');
+});
+
+test('a short rest sends the choices and shows what the server healed', async () => {
+    const { document, fetch, toasts } = await openSheet({
+        'POST /character/5/rest': { hp_current: 9, wp_current: 5, hp_gain: 3, wp_gain: 3, cleared: ['tired'] },
+    });
+    const chip = document.querySelector('[data-condition="tired"]');
+    chip.setAttribute('aria-pressed', 'true');
+
+    change(document.querySelector('[data-rest-tended]'), true);
+    change(document.querySelector('[data-rest-condition]'), 'tired');
+    click(document.querySelector('[data-rest="short"]'));
+    await flush();
+
+    assert.deepEqual(fetch.calls, [
+        { method: 'POST', url: '/character/5/rest', body: { type: 'short', tended: true, condition: 'tired' } },
+    ]);
+    assert.equal(document.querySelector('[data-vital="hp"] .ui-bar__label').textContent, '9 / 10');
+    assert.equal(document.querySelector('[data-vital="wp"] .ui-bar__label').textContent, '5 / 8');
+    assert.equal(chip.getAttribute('aria-pressed'), 'false');
+    assert.equal(toasts.at(-1).message, '+3 TP, +3 WP, 1 Zustand geheilt');
 });
 
 test('undoes a skill mark that could not be saved', async () => {

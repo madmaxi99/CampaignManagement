@@ -91,6 +91,54 @@ final class CharacterRoutesTest extends AppTestCase
         ])->getStatusCode());
     }
 
+    public function testRestHealsAccordingToTheRestType(): void
+    {
+        $id = (int) $this->json($this->request('POST', '/characters', $this->wizardPayload()), 200)['id'];
+        $base = '/character/' . $id;
+        $condition = (string) $this->db->query('SELECT code FROM catalog_conditions ORDER BY code LIMIT 1')
+            ->fetchColumn();
+        $hpMax = (int) $this->db->query("SELECT hp_max FROM characters WHERE id = {$id}")
+            ->fetchColumn();
+        $wpMax = (int) $this->db->query("SELECT wp_max FROM characters WHERE id = {$id}")
+            ->fetchColumn();
+        $this->request('POST', $base . '/hp', [
+            'value' => 0,
+        ]);
+        $this->request('POST', $base . '/wp', [
+            'value' => 0,
+        ]);
+        $this->request('POST', "{$base}/conditions/{$condition}/toggle");
+
+        $breather = $this->json($this->request('POST', $base . '/rest', [
+            'type' => 'breather',
+        ]), 200);
+        self::assertSame(0, $breather['hp_gain']);
+        self::assertGreaterThanOrEqual(min(1, $wpMax), $breather['wp_gain']);
+        self::assertLessThanOrEqual(min(6, $wpMax), $breather['wp_gain']);
+        self::assertSame([], $breather['cleared']);
+
+        $short = $this->json($this->request('POST', $base . '/rest', [
+            'type' => 'short',
+            'tended' => true,
+            'condition' => $condition,
+        ]), 200);
+        self::assertLessThanOrEqual(min(12, $hpMax), $short['hp_gain']);
+        self::assertGreaterThan(0, $short['hp_gain']);
+        self::assertSame([$condition], $short['cleared']);
+
+        $this->request('POST', "{$base}/conditions/{$condition}/toggle");
+        $long = $this->json($this->request('POST', $base . '/rest', [
+            'type' => 'long',
+        ]), 200);
+        self::assertSame($hpMax, $long['hp_current']);
+        self::assertSame($wpMax, $long['wp_current']);
+        self::assertSame([$condition], $long['cleared']);
+
+        self::assertSame(422, $this->request('POST', $base . '/rest', [
+            'type' => 'nap',
+        ])->getStatusCode());
+    }
+
     public function testWizardRejectsInvalidInput(): void
     {
         $payload = $this->wizardPayload();

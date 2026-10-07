@@ -19,6 +19,7 @@ function init(sheet) {
     }
 
     // ---- Vitals: − / + around a bar
+    const renderVital = {};
     document.querySelectorAll('[data-vital]').forEach(function (vital) {
         const key = vital.dataset.vital;
         const bar = vital.querySelector('.ui-bar');
@@ -32,6 +33,8 @@ function init(sheet) {
             label.textContent = current + ' / ' + max;
             bar.setAttribute('aria-valuenow', String(current));
         }
+
+        renderVital[key] = render;
 
         vital.querySelectorAll('[data-vital-step]').forEach(function (button) {
             button.addEventListener('click', function () {
@@ -63,6 +66,45 @@ function init(sheet) {
                 .catch(toastError);
         });
     });
+
+    // ---- Rest: the server rolls the dice and answers with the new values
+    const restSheet = document.querySelector('[data-rest-sheet]');
+    if (restSheet) {
+        restSheet.querySelectorAll('[data-rest]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const type = button.dataset.rest;
+                const body = { type };
+                if (type === 'short') {
+                    body.tended = restSheet.querySelector('[data-rest-tended]').checked;
+                    body.condition = restSheet.querySelector('[data-rest-condition]').value;
+                }
+                sendJson('POST', '/character/' + id + '/rest', body)
+                    .then(function (data) {
+                        ['hp', 'wp'].forEach(function (key) {
+                            renderVital[key](data[key + '_current']);
+                        });
+                        data.cleared.forEach(function (code) {
+                            const chip = document.querySelector('[data-condition="' + code + '"]');
+                            if (chip) {
+                                chip.setAttribute('aria-pressed', 'false');
+                            }
+                        });
+                        if (typeof restSheet.close === 'function') {
+                            restSheet.close();
+                        }
+                        window.ui.toast(
+                            '+' +
+                                data.hp_gain +
+                                ' TP, +' +
+                                data.wp_gain +
+                                ' WP' +
+                                (data.cleared.length > 0 ? ', ' + data.cleared.length + ' Zustand geheilt' : '')
+                        );
+                    })
+                    .catch(toastError);
+            });
+        });
+    }
 
     // ---- Skill advancement marks
     document.querySelectorAll('[data-skill-mark]').forEach(function (box) {

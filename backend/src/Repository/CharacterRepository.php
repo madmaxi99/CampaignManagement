@@ -593,6 +593,84 @@ final readonly class CharacterRepository
         return $clamped;
     }
 
+    /**
+     * Applies a rest of the Dragonbane rules and returns the new values.
+     * 'breather': W6 WP. 'short': W6 TP (2W6 if tended), W6 WP and one condition of choice.
+     * 'long': all TP and WP back and every condition removed.
+     *
+     * @return array{hp_current: int, wp_current: int, hp_gain: int, wp_gain: int, cleared: list<string>}
+     */
+    public function rest(int $characterId, string $type, bool $tended = false, ?string $condition = null): array
+    {
+        if (! in_array($type, ['breather', 'short', 'long'], true)) {
+            throw new InvalidArgumentException('Unbekannte Rast.');
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT hp_current, hp_max, wp_current, wp_max FROM characters WHERE id = :character_id'
+        );
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
+        $row = $stmt->fetch();
+        if ($row === false) {
+            throw new InvalidArgumentException('Unbekannter Charakter.');
+        }
+        $hp = (int) $row['hp_current'];
+        $wp = (int) $row['wp_current'];
+        $hpMax = (int) $row['hp_max'];
+        $wpMax = (int) $row['wp_max'];
+
+        $activeStmt = $this->db->prepare(
+            'SELECT condition_code FROM character_conditions WHERE character_id = :character_id AND active = 1'
+        );
+        $activeStmt->execute([
+            'character_id' => $characterId,
+        ]);
+        $active = array_map(strval(...), array_column($activeStmt->fetchAll(), 'condition_code'));
+
+        $newHp = $hp;
+        $newWp = $wp;
+        $cleared = [];
+        if ($type === 'long') {
+            $newHp = $hpMax;
+            $newWp = $wpMax;
+            $cleared = $active;
+        } elseif ($type === 'short') {
+            $newHp = min($hpMax, $hp + random_int(1, 6) + ($tended ? random_int(1, 6) : 0));
+            $newWp = min($wpMax, $wp + random_int(1, 6));
+            $cleared = $condition !== null && in_array($condition, $active, true) ? [$condition] : [];
+        } else {
+            $newWp = min($wpMax, $wp + random_int(1, 6));
+        }
+
+        $update = $this->db->prepare(
+            'UPDATE characters SET hp_current = :hp, wp_current = :wp WHERE id = :character_id'
+        );
+        $update->execute([
+            'hp' => $newHp,
+            'wp' => $newWp,
+            'character_id' => $characterId,
+        ]);
+        $clear = $this->db->prepare(
+            'UPDATE character_conditions SET active = 0 WHERE character_id = :character_id AND condition_code = :code'
+        );
+        foreach ($cleared as $code) {
+            $clear->execute([
+                'character_id' => $characterId,
+                'code' => $code,
+            ]);
+        }
+
+        return [
+            'hp_current' => $newHp,
+            'wp_current' => $newWp,
+            'hp_gain' => $newHp - $hp,
+            'wp_gain' => $newWp - $wp,
+            'cleared' => $cleared,
+        ];
+    }
+
     public function toggleCondition(int $characterId, string $code): bool
     {
         $stmt = $this->db->prepare(
