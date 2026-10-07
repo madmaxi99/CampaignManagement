@@ -350,8 +350,9 @@
 
     {# ---------- Tabellen ---------- #}
     <div class="ui-tabpanel ui-stack" id="panel-tables" role="tabpanel" aria-labelledby="tab-tables" hidden>
-        <section class="ui-card" data-search="verletzungen wounded table">
-            <h2 class="ui-card__title">{{ ui.icon('heart') }} Verletzungen (W20)</h2>
+        <details class="ui-details" data-search="verletzungen wounded table">
+            <summary><span class="ui-details__title">{{ ui.icon('heart') }} Verletzungen (W20)</span></summary>
+            <div class="ui-details__body">
             <table class="ui-table ui-table--cards">
                 <thead><tr><th>Wurf</th><th>Verletzung</th><th>Wirkung</th><th>Heilung</th></tr></thead>
                 <tbody>
@@ -360,39 +361,48 @@
                     {% endfor %}
                 </tbody>
             </table>
-        </section>
+        </div>
+        </details>
 
         {% for key, title in {'combat_mishaps_melee': 'Nahkampf-Patzer', 'combat_mishaps_ranged': 'Fernkampf-Patzer', 'magical_mishaps': 'Magische Patzer'} %}
-            <section class="ui-card" data-search="{{ title|lower }} patzer">
-                <h2 class="ui-card__title">{{ ui.icon('dices') }} {{ title }}</h2>
+            <details class="ui-details" data-search="{{ title|lower }} patzer">
+            <summary><span class="ui-details__title">{{ ui.icon('dices') }} {{ title }}</span></summary>
+            <div class="ui-details__body">
                 <table class="ui-table ui-table--cards">
                     <thead><tr><th>Wurf</th><th>Wirkung</th></tr></thead>
                     <tbody>{% for t in tables[key] %}<tr><td data-label="Wurf">{{ t.roll }}</td><td data-label="Wirkung">{{ t.effect_de }}</td></tr>{% endfor %}</tbody>
                 </table>
-            </section>
+            </div>
+        </details>
         {% endfor %}
 
-        <section class="ui-card" data-search="furcht angst">
-            <h2 class="ui-card__title">{{ ui.icon('skull') }} Furcht</h2>
+        <details class="ui-details" data-search="furcht angst">
+            <summary><span class="ui-details__title">{{ ui.icon('skull') }} Furcht</span></summary>
+            <div class="ui-details__body">
             <table class="ui-table ui-table--cards">
                 <thead><tr><th>Wurf</th><th>Ereignis</th><th>Wirkung</th></tr></thead>
                 <tbody>{% for t in tables.fear_events %}<tr><td data-label="Wurf">{{ t.roll }}</td><td data-label="Ereignis"><strong>{{ t.name_de }}</strong></td><td data-label="Wirkung">{{ t.effect_de }}</td></tr>{% endfor %}</tbody>
             </table>
-        </section>
+        </div>
+        </details>
 
-        <section class="ui-card" data-search="rast rasten erholung">
-            <h2 class="ui-card__title">{{ ui.icon('flame') }} Rast</h2>
+        <details class="ui-details" data-search="rast rasten erholung">
+            <summary><span class="ui-details__title">{{ ui.icon('flame') }} Rast</span></summary>
+            <div class="ui-details__body">
             {% for t in tables.rest_types %}
                 <p><strong>{{ t.name_de }}</strong> <span class="ui-badge ui-badge--gold">{{ t.duration_de }}</span><br>{{ t.effect_de }}</p>
             {% endfor %}
-        </section>
+        </div>
+        </details>
 
-        <section class="ui-card" data-search="gefahren">
-            <h2 class="ui-card__title">{{ ui.icon('triangle-alert') }} Gefahren</h2>
+        <details class="ui-details" data-search="gefahren">
+            <summary><span class="ui-details__title">{{ ui.icon('triangle-alert') }} Gefahren</span></summary>
+            <div class="ui-details__body">
             {% for t in tables.hazards %}
                 <p><strong>{{ t.name_de }}</strong><br>{{ t.description_de }}</p>
             {% endfor %}
-        </section>
+        </div>
+        </details>
     </div>
 
     <div class="ui-empty" data-rules-empty hidden>

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
-use Flyka\CampaignManagement\Connection;
+use Flyka\CampaignManagement\Database\Connection;
 use PDO;
 use PHPUnit\Framework\TestCase;
 

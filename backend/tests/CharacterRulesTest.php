@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
-use Flyka\CampaignManagement\CharacterRules;
+use Flyka\CampaignManagement\Service\CharacterRules;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

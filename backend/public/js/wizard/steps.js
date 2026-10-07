@@ -42,6 +42,37 @@ export function attributeModifierText(state, code) {
     return `Alters-Bonus: ${modifier >= 0 ? '+' : ''}${modifier} → Endwert: ${finalAttribute(state, code) ?? '—'}`;
 }
 
+/** "GEW +1 · KON +1" for an age card; the minus is a real minus sign. */
+function ageModifierText(modifiers) {
+    const parts = Object.entries(modifiers).map(
+        ([code, value]) => `${code} ${value > 0 ? '+' : '−'}${Math.abs(value)}`
+    );
+
+    return parts.length > 0 ? parts.join(' · ') : 'keine Attributänderung';
+}
+
+/**
+ * Skills as two alphabetical lists: general ones and combat skills.
+ * `renderRow` turns one skill into its markup.
+ */
+function groupedSkillRows(skills, renderRow) {
+    const byName = (a, b) => a.name_de.localeCompare(b.name_de, 'de');
+    const groups = [
+        ['Allgemeine Fertigkeiten', skills.filter((skill) => skill.category !== 'combat')],
+        ['Kampffertigkeiten', skills.filter((skill) => skill.category === 'combat')],
+    ];
+
+    return groups
+        .filter(([, list]) => list.length > 0)
+        .map(
+            ([title, list]) => `
+                <h4 class="wizard-subheading">${title}</h4>
+                <div class="wizard-choice-grid">${list.sort(byName).map(renderRow).join('')}</div>
+            `
+        )
+        .join('');
+}
+
 export const ATTRIBUTE_ERROR_TEXT = 'Über 18! Bitte einen niedrigeren Rohwert eintragen.';
 
 const nav = (state, catalog, options = {}) => navigation({ enabled: canContinue(state, catalog), ...options });
@@ -78,7 +109,7 @@ function kinStep(state, catalog) {
     `;
 }
 
-function heroicAbilitySection(state, catalog, profession, selected) {
+function heroicAbilitySection(state, catalog, profession) {
     if (profession.heroicAbilities.length === 0 && profession.grants_magic) {
         // "Allgemein" has no skill_id -- you can't train in it, so it's excluded here.
         const schoolRows = catalog.magic.schools
@@ -89,7 +120,6 @@ function heroicAbilitySection(state, catalog, profession, selected) {
                     name: 'magic-school',
                     value: school.id,
                     isChecked: state.magicSchoolId === school.id,
-                    isDisabled: !selected,
                     content: `<strong>${school.name_de}</strong>${descriptionLine(school.description_de)}`,
                 })
             )
@@ -122,7 +152,6 @@ function heroicAbilitySection(state, catalog, profession, selected) {
                 name: 'profession-heroic-ability',
                 value: ability.id,
                 isChecked: state.professionHeroicAbilityId === ability.id,
-                isDisabled: !selected,
                 content: `<strong>${ability.name_de}</strong><p>${ability.description_de}</p>`,
             })
         )
@@ -154,7 +183,7 @@ function professionStep(state, catalog) {
                 content: `
                     ${choiceHead(profession.name_de, `Schlüsselattribut ${ATTRIBUTE_LABELS[profession.key_attribute_code]}`)}
                     <p class="wizard-choice-detail"><strong>8 Fertigkeiten zur Auswahl (im nächsten Schritt wählst du ${POOL_PICK_COUNT} davon):</strong> ${pool}</p>
-                    ${heroicAbilitySection(state, catalog, profession, selected)}
+                    ${heroicAbilitySection(state, catalog, profession)}
                 `,
             });
         })
@@ -185,7 +214,7 @@ function nameSkillsGearStep(state, catalog) {
                 value: code,
                 selected: state.ageCode === code,
                 compact: true,
-                content: `${age.label} <small>(${POOL_PICK_COUNT} + ${age.extra} = ${age.total} Fertigkeiten)</small>`,
+                content: `${age.label} <small>(${POOL_PICK_COUNT} + ${age.extra} = ${age.total} Fertigkeiten)</small> <small>· ${ageModifierText(age.modifiers)}</small>`,
             })
         )
         .join('');
@@ -205,17 +234,15 @@ function nameSkillsGearStep(state, catalog) {
                   }))
           )
         : profession.skillPool;
-    const poolRows = poolSkills
-        .map((skill) =>
-            inlineChoice({
-                type: 'checkbox',
-                className: 'pool-pick',
-                value: skill.id,
-                isChecked: state.poolPicks.includes(skill.id),
-                content: `<strong>${skill.name_de}</strong> <small>(${ATTRIBUTE_LABELS[skill.attribute_code]})</small>${descriptionLine(skill.description_de)}`,
-            })
-        )
-        .join('');
+    const poolRows = groupedSkillRows(poolSkills, (skill) =>
+        inlineChoice({
+            type: 'checkbox',
+            className: 'pool-pick',
+            value: skill.id,
+            isChecked: state.poolPicks.includes(skill.id),
+            content: `<strong>${skill.name_de}</strong> <small>(${ATTRIBUTE_LABELS[skill.attribute_code]})</small>${descriptionLine(skill.description_de)}`,
+        })
+    );
 
     const gearRows = profession.gearOptions
         .map((option) => {
@@ -252,7 +279,7 @@ function nameSkillsGearStep(state, catalog) {
 
         <h3>Fertigkeiten-Pool deines Berufs</h3>
         <p class="wizard-intro">Wähle genau ${POOL_PICK_COUNT} der 8 Fertigkeiten deines Berufs (${state.poolPicks.length}/${POOL_PICK_COUNT}):</p>
-        <div class="wizard-choice-grid">${poolRows}</div>
+        ${poolRows}
 
         <h3>Ausrüstung</h3>
         ${profession.gearOptions.length > 1 ? '<p class="wizard-intro">W6 am Tisch würfeln oder direkt eine Option wählen:</p>' : ''}
@@ -266,23 +293,22 @@ function nameSkillsGearStep(state, catalog) {
 
 function extraSkillsStep(state, catalog) {
     const age = AGE_TABLE[state.ageCode];
-    const rows = catalog.skills
-        .filter((skill) => !state.poolPicks.includes(skill.id))
-        .map((skill) =>
+    const rows = groupedSkillRows(
+        catalog.skills.filter((skill) => !state.poolPicks.includes(skill.id)),
+        (skill) =>
             inlineChoice({
                 type: 'checkbox',
                 className: 'extra-pick',
                 value: skill.id,
                 isChecked: state.extraPicks.includes(skill.id),
-                content: `<strong>${skill.name_de}</strong> <small>(${ATTRIBUTE_LABELS[skill.attribute_code]} &middot; ${skill.category === 'combat' ? 'Kampf' : 'Regulär'})</small>${descriptionLine(skill.description_de)}`,
+                content: `<strong>${skill.name_de}</strong> <small>(${ATTRIBUTE_LABELS[skill.attribute_code]})</small>${descriptionLine(skill.description_de)}`,
             })
-        )
-        .join('');
+    );
 
     return `
         <h2>4. Weitere Fertigkeiten</h2>
         <p class="wizard-intro wizard-count-banner">Wähle ${age.extra} weitere Fertigkeiten frei — aktuell ${state.extraPicks.length} von ${age.extra} gewählt.</p>
-        <div class="wizard-choice-grid">${rows}</div>
+        ${rows}
         ${nav(state, catalog)}
     `;
 }
@@ -347,8 +373,8 @@ function attributesStep(state, catalog) {
 
     return `
         <h2>6. Attribute</h2>
-        <p class="wizard-intro">Würfle 4W6, entferne den niedrigsten Wurf, sechsmal in der Reihenfolge STA, KON, GEW, INT, WIL, CHA.
-           Trage die sechs Ergebnisse ein.</p>
+        <p class="wizard-intro">Würfle sechsmal 4W6 und entferne jeweils den niedrigsten Wurf.
+           Trage die sechs Ergebnisse in beliebiger Reihenfolge ein: Du entscheidest, welcher Wert zu welchem Attribut gehört.</p>
         <div class="wizard-attribute-grid">${cards}</div>
         <p class="wizard-intro">Danach darfst du zwei Werte genau einmal tauschen:</p>
         <div class="wizard-swap-row">

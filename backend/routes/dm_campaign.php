@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-use Flyka\CampaignManagement\Campaign\CampaignChapterRepository;
-use Flyka\CampaignManagement\Campaign\CampaignItemRepository;
-use Flyka\CampaignManagement\Campaign\CampaignMonsterRepository;
-use Flyka\CampaignManagement\Campaign\CampaignNpcRepository;
-use Flyka\CampaignManagement\Campaign\CampaignPlaceRepository;
-use Flyka\CampaignManagement\Campaign\CampaignRepository;
-use Flyka\CampaignManagement\CampaignStandRepository;
+use Flyka\CampaignManagement\Repository\CampaignChapterRepository;
+use Flyka\CampaignManagement\Repository\CampaignItemRepository;
+use Flyka\CampaignManagement\Repository\CampaignMonsterRepository;
+use Flyka\CampaignManagement\Repository\CampaignNpcRepository;
+use Flyka\CampaignManagement\Repository\CampaignPlaceRepository;
+use Flyka\CampaignManagement\Repository\CampaignRepository;
+use Flyka\CampaignManagement\Repository\CampaignStandRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

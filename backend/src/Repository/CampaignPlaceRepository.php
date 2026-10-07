@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Flyka\CampaignManagement\Campaign;
+namespace Flyka\CampaignManagement\Repository;
 
-use Flyka\CampaignManagement\Connection;
-use Flyka\CampaignManagement\Input;
+use Flyka\CampaignManagement\Database\Connection;
+use Flyka\CampaignManagement\Http\Input;
 use InvalidArgumentException;
 
 final readonly class CampaignPlaceRepository

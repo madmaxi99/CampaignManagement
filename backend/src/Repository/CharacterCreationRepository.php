@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Flyka\CampaignManagement;
+namespace Flyka\CampaignManagement\Repository;
 
+use Flyka\CampaignManagement\Database\Connection;
+use Flyka\CampaignManagement\Service\CharacterRules;
 use InvalidArgumentException;
 use Throwable;
 
@@ -78,7 +80,7 @@ final readonly class CharacterCreationRepository
         )->fetchAll();
 
         $poolStmt = $this->db->prepare(<<<SQL
-            SELECT sk.id, sk.name_de, sk.attribute_code, sk.description_de
+            SELECT sk.id, sk.name_de, sk.attribute_code, sk.category, sk.description_de
             FROM catalog_profession_key_skills pks
             JOIN catalog_skills sk ON sk.id = pks.skill_id
             WHERE pks.profession_code = :profession_code

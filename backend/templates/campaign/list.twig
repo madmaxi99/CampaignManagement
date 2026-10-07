@@ -6,7 +6,7 @@
 {% macro campaign_card(campaign) %}
     {% import "_ui.twig" as ui %}
     <article class="ui-card campaign-card">
-        <a class="campaign-card__main" href="/dm/campaign/{{ campaign.id }}">
+        <a class="campaign-card__main" href="/dm/campaign/{{ campaign.id }}/play">
             <h3>{{ ui.icon('castle') }} {{ campaign.name_de }}</h3>
             <p class="ui-muted">{{ campaign.teaser_de ?: 'Noch kein Teaser.' }}</p>
             <div class="ui-row">

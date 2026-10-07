@@ -57,12 +57,16 @@
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--ink-soft);
+    text-align: center;
     text-decoration: none;
 }
 
 .player-tab .ui-icon {
+    box-sizing: content-box;
     width: 1.6rem;
     height: 1.6rem;
+    padding: 2px;
+    border-radius: 8px;
 }
 
 .player-tab[aria-current='page'] {
@@ -70,11 +74,8 @@
 }
 
 .player-tab[aria-current='page'] .ui-icon {
-    padding: 2px;
     color: var(--ink);
     background: var(--honey-light);
-    border-radius: 8px;
-    box-sizing: content-box;
 }
 
 /* Wider screens: the tab bar becomes a slim bar below the header. */

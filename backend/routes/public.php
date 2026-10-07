@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Flyka\CampaignManagement\DmAuth;
-use Flyka\CampaignManagement\RulesRepository;
+use Flyka\CampaignManagement\Auth\DmAuth;
+use Flyka\CampaignManagement\Repository\RulesRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

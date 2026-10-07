@@ -149,10 +149,15 @@ function init(sheet) {
             body[input.dataset.field] = value;
             sendJson('POST', url, body).then(saved).catch(toastError);
 
-            // Keep the collapsed row's title in step with the name field.
+            // Keep the collapsed row's title in step with the name and quantity fields.
             const entry = input.closest('.gear-entry');
-            if (entry && input.dataset.field === 'name_de' && input.dataset.segment !== 'armor') {
-                entry.querySelector('.ui-details__title').textContent = value;
+            if (entry && input.dataset.segment !== 'armor') {
+                if (input.dataset.field === 'name_de') {
+                    (entry.querySelector('.gear-name') ?? entry.querySelector('.ui-details__title')).textContent =
+                        value;
+                } else if (input.dataset.field === 'quantity') {
+                    entry.querySelector('.gear-qty').textContent = (value ?? 0) + '×';
+                }
             }
         });
     });

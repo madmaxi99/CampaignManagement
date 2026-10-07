@@ -8,7 +8,7 @@ Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and pl
 
 ## Repository layout
 
-- **`backend/`** — the app. `public/index.php` (entry point, wiring, player routes), `routes/dm_*.php` (DM route groups), `src/` (PSR-4 namespace `Flyka\CampaignManagement`; `Application` wires everything, `Campaign/` holds the campaign repositories, `Http/functions.php` the route helpers), `templates/` (Twig), `public/{css,js,fonts,icons,images}` (static assets). `tests/` (PHPUnit; unit tests plus DB-backed tests and `AppRoutesTest`, which drives the whole app as DM against the test DB).
+- **`backend/`** — the app. `public/index.php` (entry point, wiring, player routes), `routes/dm_*.php` (DM route groups), `src/` (PSR-4 namespace `Flyka\CampaignManagement`, sorted by layer: `Auth/` DM login, gate and session, `Database/` connection and config, `Http/` input and route helpers, `Repository/` all SQL, `Service/` pure rules; `Application` wires everything), `templates/` (Twig), `public/{css,js,fonts,icons,images}` (static assets). `tests/` (PHPUnit; unit tests plus DB-backed tests and `AppRoutesTest`, which drives the whole app as DM against the test DB).
 - **`database/`** — `01_schema.sql`, `02_catalog.sql`, `03_examples.sql`; mounted into the MariaDB container as init scripts (only run on an empty volume, so schema changes need `dcv` to recreate it).
 - **`provisioning/`** — `docker-compose.yml` (nginx, php-fpm, mariadb, phpmyadmin) plus `backend/` (Dockerfile, nginx.conf, php.ini).
 - **`alias.sh`**, **`deploy.sh`** — local Docker aliases (`dc`, `dcud`, `dcv`, `rcomposer`, `rphp`; source `alias.sh` under zsh) and the VPS deploy script.

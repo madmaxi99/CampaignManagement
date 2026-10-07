@@ -319,7 +319,7 @@
 /* ---------- Meter (TP / WP) ---------- */
 .ui-bar {
     position: relative;
-    height: 26px;
+    height: 30px;
     overflow: hidden;
     background: var(--paper-deep);
     border: 2px solid var(--card-edge);
@@ -348,6 +348,7 @@
     place-items: center;
     font-size: var(--fs-small);
     font-weight: 800;
+    line-height: 1;
     color: var(--ink);
     text-shadow:
         0 0 3px #fff,

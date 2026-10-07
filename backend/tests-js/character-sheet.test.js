@@ -17,6 +17,11 @@ const HTML = `
         <input data-segment="weapons" data-row-id="8" data-field="name_de" value="Schwert">
         <input type="number" data-segment="weapons" data-row-id="8" data-field="durability" value="3">
     </div>
+    <div class="gear-entry">
+        <span class="ui-details__title"><span class="gear-qty">5×</span> <span class="gear-name">Tagesration</span></span>
+        <input data-segment="inventory" data-row-id="9" data-field="name_de" value="Tagesration">
+        <input type="number" data-segment="inventory" data-row-id="9" data-field="quantity" value="5">
+    </div>
     <button data-add="weapons">Neu</button>
     <button data-remove="weapons" data-row-id="8">Entfernen</button>
     <input type="number" id="coins-gold" data-coin value="1">
@@ -92,6 +97,18 @@ test('saves a gear field and keeps the row title in step', async () => {
     ]);
     assert.equal(document.querySelector('.ui-details__title').textContent, 'Langschwert');
     assert.equal(toasts.at(-1).message, 'Gespeichert');
+});
+
+test('shows the inventory quantity in front of the name and keeps it in step', async () => {
+    const { document } = await openSheet();
+    const title = () =>
+        document.querySelector('[data-row-id="9"]').closest('.gear-entry').querySelector('.ui-details__title');
+
+    change(document.querySelector('[data-segment="inventory"][data-field="quantity"]'), '2');
+    change(document.querySelector('[data-segment="inventory"][data-field="name_de"]'), 'Leier');
+    await flush();
+
+    assert.equal(title().textContent, '2× Leier');
 });
 
 test('adding and removing a row reloads the page', async () => {

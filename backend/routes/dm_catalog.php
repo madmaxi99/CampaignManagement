@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use Flyka\CampaignManagement\CatalogEditorRepository;
-use Flyka\CampaignManagement\WorldRepository;
+use Flyka\CampaignManagement\Repository\CatalogEditorRepository;
+use Flyka\CampaignManagement\Repository\WorldRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

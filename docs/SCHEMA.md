@@ -57,7 +57,7 @@ Es gibt keine Migration: Die DB wird neu aufgesetzt (`provisioning/docker-compos
 
 ## Auswirkungen auf den Code
 
-- `backend/src/CampaignRepository.php`: Orte (`places`, `createPlace`, `updatePlace`, `locations` = nummerierte Orte der Kapitel), `items`, `encounterTables`, NPC-CRUD, `restart()`.
+- `backend/src/Repository/CampaignPlaceRepository.php`: Orte (`places`, `createPlace`, `updatePlace`, `locations` = nummerierte Orte der Kapitel), `items`, `encounterTables`, NPC-CRUD, `restart()`.
 - `backend/src/RulesRepository.php` und `backend/templates/rules.twig`: Seite `/rules`, das Regelwerk zum Nachschlagen für Spieler (Items, Fertigkeiten, Zauber, Berufe, Völker, Heldenfähigkeiten, Tabellen). Ohne Bestiary und Begegnungstabellen.
 - `backend/src/WorldRepository.php` und `backend/templates/dm/catalog.twig`: Seite `/dm/catalog` (nur DM) mit Bestiary und Zufallsbegegnungen. Der DM-Bereich liegt komplett unter `/dm` und ist per DM-Passwort gesperrt (`DmAuth`, `DmGate`, siehe `docs/UX-KONZEPT.md`); die alten URLs `/campaign` und `/world` leiten dorthin um.
 - `backend/routes/dm_campaign.php`: alle DM-Routen der Kampagnen (Liste, Planen, Spielen, Anlegen/Ändern/Löschen von Kampagne, Kapiteln, Orten, NPCs, Items, Monstern und Chronik, Neustart). Alles unter `/dm`, also hinter `DmGate`.

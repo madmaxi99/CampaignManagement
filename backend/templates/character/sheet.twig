@@ -235,8 +235,7 @@
                 {% for item in inventory %}
                     <details class="ui-details gear-entry" data-row-id="{{ item.row_id }}"{% if loop.last and item.name_de == 'Neuer Gegenstand' %} open{% endif %}>
                         <summary>
-                            <span class="ui-details__title">{{ item.name_de }}</span>
-                            <span class="ui-details__badges">{% if item.quantity != 1 %}<span class="ui-badge">× {{ item.quantity }}</span>{% endif %}</span>
+                            <span class="ui-details__title"><span class="gear-qty">{{ item.quantity }}×</span> <span class="gear-name">{{ item.name_de }}</span></span>
                         </summary>
                         <div class="ui-details__body">
                             <div class="gear-card__fields">

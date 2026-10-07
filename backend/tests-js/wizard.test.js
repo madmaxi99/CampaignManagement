@@ -75,6 +75,44 @@ test('a magic profession gets the extra magic step', async () => {
     assert.match(progress(root), /^Schritt 2 von 9/);
 });
 
+test('choosing a school directly also chooses the magic profession', async () => {
+    const { root } = await openWizard();
+    pick(root, 'input[name="kin"]', 'human');
+    await advance(root);
+
+    pick(root, 'input[name="magic-school"]', '2');
+    assert.equal(root.querySelector('input[name="profession"][value="mage"]').checked, true);
+    assert.equal(next(root).disabled, false);
+});
+
+test('age cards show how the attributes change', async () => {
+    const { root } = await openWizard();
+    await chooseKinAndProfession(root, 'fighter');
+    await advance(root);
+
+    const card = (code) => root.querySelector(`input[name="age"][value="${code}"]`).closest('label').textContent;
+    assert.match(card('jung'), /GEW \+1 · KON \+1/);
+    assert.match(card('erwachsen'), /keine Attributänderung/);
+    assert.match(card('alt'), /STA −2 · GEW −2 · KON −2 · INT \+1 · WIL \+1/);
+});
+
+test('skills are split into general and combat skills, each alphabetical', async () => {
+    const { root } = await openWizard();
+    await chooseKinAndProfession(root, 'fighter');
+    await advance(root);
+
+    const headings = [...root.querySelectorAll('.wizard-subheading')].map((h) => h.textContent);
+    assert.deepEqual(headings, ['Allgemeine Fertigkeiten', 'Kampffertigkeiten']);
+
+    for (const grid of root.querySelectorAll('.wizard-subheading + .wizard-choice-grid')) {
+        const names = [...grid.querySelectorAll('strong')].map((s) => s.textContent);
+        assert.deepEqual(
+            names,
+            [...names].sort((a, b) => a.localeCompare(b, 'de'))
+        );
+    }
+});
+
 test('walks through all steps and submits the character', async () => {
     const { root, fetch, location } = await openWizard({ 'POST /characters': { id: 42 } });
 

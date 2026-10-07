@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
-use Flyka\CampaignManagement\EntityLinker;
+use Flyka\CampaignManagement\Service\EntityLinker;
 use PHPUnit\Framework\TestCase;
 
 final class EntityLinkerTest extends TestCase

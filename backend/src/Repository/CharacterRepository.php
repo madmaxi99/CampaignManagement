@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Flyka\CampaignManagement;
+namespace Flyka\CampaignManagement\Repository;
 
+use Flyka\CampaignManagement\Database\Connection;
+use Flyka\CampaignManagement\Service\CharacterRules;
 use InvalidArgumentException;
 
 final readonly class CharacterRepository

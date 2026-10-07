@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flyka\CampaignManagement;
+namespace Flyka\CampaignManagement\Auth;
 
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;

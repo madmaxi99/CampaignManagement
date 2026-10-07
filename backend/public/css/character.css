@@ -217,7 +217,7 @@
 }
 
 .char-card__vitals .ui-bar {
-    height: 22px;
+    height: 26px;
 }
 
 .char-card__pin {
@@ -317,7 +317,7 @@
 }
 
 .vital .ui-bar {
-    height: 30px;
+    height: 34px;
 }
 
 .sheet-tabs {
@@ -682,6 +682,12 @@
     margin-bottom: var(--space-4);
 }
 
+.wizard-subheading {
+    margin: var(--space-4) 0 var(--space-2);
+    font-size: var(--fs-body);
+    color: var(--forest-dark);
+}
+
 .wizard-choice,
 .wizard-choice-inline {
     position: relative;
@@ -926,4 +932,9 @@
     gap: var(--space-2);
     margin: 0 0 var(--space-3);
     font-size: var(--fs-small);
+}
+
+.gear-qty {
+    font-weight: 800;
+    color: var(--forest-dark);
 }

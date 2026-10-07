@@ -73,7 +73,10 @@ export function attachHandlers(root, { state, catalog, render, goRelative, submi
         state.professionCode = null;
         state.professionHeroicAbilityId = null;
     });
-    onRadio('profession', (code) => {
+    function selectProfession(code) {
+        if (state.professionCode === code) {
+            return;
+        }
         Object.assign(state, {
             professionCode: code,
             professionHeroicAbilityId: null,
@@ -84,11 +87,16 @@ export function attachHandlers(root, { state, catalog, render, goRelative, submi
             trickPicks: [],
             spellPicks: [],
         });
-    });
+    }
+    onRadio('profession', selectProfession);
+    // Picking a school or heroic ability inside a profession card also picks that profession.
     onRadio('profession-heroic-ability', (id) => {
+        const owner = catalog.professions.find((p) => p.heroicAbilities.some((a) => a.id === integer(id)));
+        selectProfession(owner.code);
         state.professionHeroicAbilityId = integer(id);
     });
     onRadio('magic-school', (id) => {
+        selectProfession(catalog.professions.find((p) => p.grants_magic).code);
         state.magicSchoolId = integer(id);
         state.poolPicks = state.poolPicks.filter(
             (skillId) => !catalog.magic.schools.some((s) => s.skill_id === skillId)

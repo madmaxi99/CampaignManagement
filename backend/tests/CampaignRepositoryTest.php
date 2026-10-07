@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
-use Flyka\CampaignManagement\Campaign\CampaignChapterRepository;
-use Flyka\CampaignManagement\Campaign\CampaignItemRepository;
-use Flyka\CampaignManagement\Campaign\CampaignLookup;
-use Flyka\CampaignManagement\Campaign\CampaignMonsterRepository;
-use Flyka\CampaignManagement\Campaign\CampaignNpcRepository;
-use Flyka\CampaignManagement\Campaign\CampaignPlaceRepository;
-use Flyka\CampaignManagement\Campaign\CampaignRepository;
+use Flyka\CampaignManagement\Repository\CampaignChapterRepository;
+use Flyka\CampaignManagement\Repository\CampaignItemRepository;
+use Flyka\CampaignManagement\Repository\CampaignLookup;
+use Flyka\CampaignManagement\Repository\CampaignMonsterRepository;
+use Flyka\CampaignManagement\Repository\CampaignNpcRepository;
+use Flyka\CampaignManagement\Repository\CampaignPlaceRepository;
+use Flyka\CampaignManagement\Repository\CampaignRepository;
 use InvalidArgumentException;
 
 final class CampaignRepositoryTest extends DatabaseTestCase

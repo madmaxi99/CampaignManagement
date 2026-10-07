@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flyka\CampaignManagement;
+namespace Flyka\CampaignManagement\Service;
 
 /**
  * Pure rule calculations of the own system, independent of the database.

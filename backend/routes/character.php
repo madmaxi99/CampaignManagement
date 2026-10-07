@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Flyka\CampaignManagement\CharacterCreationRepository;
-use Flyka\CampaignManagement\CharacterRepository;
-use Flyka\CampaignManagement\CharacterRules;
+use Flyka\CampaignManagement\Repository\CharacterCreationRepository;
+use Flyka\CampaignManagement\Repository\CharacterRepository;
+use Flyka\CampaignManagement\Service\CharacterRules;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;

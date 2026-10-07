@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Flyka\CampaignManagement;
+namespace Flyka\CampaignManagement\Auth;
 
 /**
  * The single DM password and everything around it: login state in the PHP
