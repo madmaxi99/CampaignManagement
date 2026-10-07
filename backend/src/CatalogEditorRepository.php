@@ -22,12 +22,15 @@ final readonly class CatalogEditorRepository
     private const array PENALTIES = ['penalty_stealth', 'penalty_evasion', 'penalty_acrobatics', 'penalty_perception', 'penalty_ranged'];
 
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
     // ---------- items ----------
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function itemList(): array
     {
         return $this->db->query(
@@ -35,6 +38,9 @@ final readonly class CatalogEditorRepository
         )->fetchAll();
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function item(int $id): ?array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -58,6 +64,8 @@ final readonly class CatalogEditorRepository
 
     /**
      * Creates (id null) or updates an item; returns its id.
+     *
+     * @param array<string, mixed> $input
      */
     public function saveItem(?int $id, array $input): int
     {
@@ -164,6 +172,9 @@ final readonly class CatalogEditorRepository
 
     // ---------- bestiary ----------
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function bestiaryList(): array
     {
         return $this->db->query(
@@ -171,6 +182,9 @@ final readonly class CatalogEditorRepository
         )->fetchAll();
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function creature(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM catalog_bestiary WHERE id = :id');
@@ -191,6 +205,9 @@ final readonly class CatalogEditorRepository
         return $creature;
     }
 
+    /**
+     * @return list<string>
+     */
     public function categories(): array
     {
         return $this->db->query(
@@ -202,6 +219,8 @@ final readonly class CatalogEditorRepository
      * Creates (id null) or updates a stat block. Attacks arrive as the
      * parallel lists attack_roll / attack_title / attack_effect; the attack
      * table is rewritten as a whole.
+     *
+     * @param array<string, mixed> $input
      */
     public function saveCreature(?int $id, array $input): int
     {
@@ -319,6 +338,8 @@ final readonly class CatalogEditorRepository
 
     /**
      * The DM's party with everything the overview cards show.
+     *
+     * @return list<array<string, mixed>>
      */
     public function party(): array
     {
@@ -358,6 +379,8 @@ final readonly class CatalogEditorRepository
 
     /**
      * Characters not in the party yet, for the picker.
+     *
+     * @return list<array<string, mixed>>
      */
     public function partyCandidates(): array
     {

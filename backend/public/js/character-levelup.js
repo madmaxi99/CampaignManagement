@@ -1,31 +1,17 @@
 /*
  * Level-up: every decision is only staged here and sent together on "Speichern".
  */
-(function () {
-    'use strict';
+import { sendJson, toastError } from './lib/http.js';
 
-    const root = document.querySelector('.levelup');
-    if (!root) {
-        return;
-    }
+const page = document.querySelector('.levelup');
+if (page) {
+    init(page);
+}
 
+function init(root) {
     const id = root.dataset.id;
     const saveButton = document.getElementById('levelup-save');
     const counter = document.querySelector('[data-pending-count]');
-
-    function postJson(path, body) {
-        return fetch(path, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body || {}),
-        }).then(function (response) {
-            if (!response.ok) {
-                throw new Error('Speichern fehlgeschlagen.');
-            }
-
-            return response.json();
-        });
-    }
 
     const pendingSkillDecisions = new Map();
     const pendingAbilityPicks = [];
@@ -41,9 +27,12 @@
     root.querySelectorAll('[data-decision]').forEach(function (button) {
         button.addEventListener('click', function () {
             pendingSkillDecisions.set(button.dataset.skillId, button.dataset.decision === 'apply');
-            button.closest('.segmented').querySelectorAll('[data-decision]').forEach(function (other) {
-                other.setAttribute('aria-pressed', other === button ? 'true' : 'false');
-            });
+            button
+                .closest('.segmented')
+                .querySelectorAll('[data-decision]')
+                .forEach(function (other) {
+                    other.setAttribute('aria-pressed', other === button ? 'true' : 'false');
+                });
             updateCounter();
         });
     });
@@ -80,21 +69,23 @@
     saveButton.addEventListener('click', function () {
         const requests = [];
         pendingSkillDecisions.forEach(function (apply, skillId) {
-            requests.push(postJson('/character/' + id + '/skills/' + skillId + '/advance', { apply: apply }));
+            requests.push(sendJson('POST', '/character/' + id + '/skills/' + skillId + '/advance', { apply: apply }));
         });
         pendingAbilityPicks.forEach(function (pick) {
-            requests.push(postJson('/character/' + id + '/heroic-abilities', pick));
+            requests.push(sendJson('POST', '/character/' + id + '/heroic-abilities', pick));
         });
         pendingSpellIds.forEach(function (spellId) {
-            requests.push(postJson('/character/' + id + '/spells', { spell_id: spellId }));
+            requests.push(sendJson('POST', '/character/' + id + '/spells', { spell_id: spellId }));
         });
 
         saveButton.disabled = true;
         Promise.all(requests)
-            .then(function () { window.location.href = '/character/' + id; })
+            .then(function () {
+                window.location.href = '/character/' + id;
+            })
             .catch(function (error) {
                 saveButton.disabled = false;
-                window.ui.toast(error.message, 'error');
+                toastError(error);
             });
     });
-}());
+}

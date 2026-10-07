@@ -304,7 +304,7 @@ a.segmented__option {
     gap: var(--space-2);
 }
 
-@media (max-width: 1100px) {
+@media (width <= 1100px) {
     .plan-workspace,
     .play-workspace {
         grid-template-columns: minmax(0, 1fr);
@@ -398,7 +398,7 @@ a.segmented__option {
     margin-top: 0;
 }
 
-.lore-chapter > :not(h2):not(.lore-pager):not(.lore-map) {
+.lore-chapter > :not(h2, .lore-pager, .lore-map) {
     max-width: 46rem;
 }
 
@@ -441,7 +441,7 @@ a.segmented__option {
 .lore-chapter td {
     padding: var(--space-1) var(--space-3);
     text-align: left;
-    border-bottom: 1px solid var(--line, rgba(0, 0, 0, 0.12));
+    border-bottom: 1px solid var(--line, rgb(0 0 0 / 12%));
 }
 
 .lore-pager {

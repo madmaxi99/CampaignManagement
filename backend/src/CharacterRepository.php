@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace Flyka\CampaignManagement;
 
 use InvalidArgumentException;
-use PDO;
 
 final readonly class CharacterRepository
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function listAll(): array
     {
         $stmt = $this->db->query(<<<SQL
@@ -34,6 +36,8 @@ final readonly class CharacterRepository
      * Joins in kin/age/profession/flaw display text under the same field
      * names (kin_de/age_de/profession_de/flaw_de) the freetext columns used
      * to have, so templates built against those names don't need to change.
+     *
+     * @return array<string, mixed>|null
      */
     public function findById(int $id): ?array
     {
@@ -76,6 +80,9 @@ final readonly class CharacterRepository
         return $stmt->rowCount() === 1;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function attributes(int $characterId): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -92,6 +99,9 @@ final readonly class CharacterRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function conditions(int $characterId): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -108,6 +118,9 @@ final readonly class CharacterRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function skillsByCategory(int $characterId, string $category): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -125,6 +138,9 @@ final readonly class CharacterRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function markedSkills(int $characterId): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -179,9 +195,12 @@ final readonly class CharacterRepository
             'skill_id' => $skillId,
         ]);
 
-        return (int) $stmt->fetch()['value'];
+        return (int) ($stmt->fetch()['value'] ?? 0);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function talents(int $characterId): array
     {
         $stmt = $this->db->prepare(
@@ -194,6 +213,9 @@ final readonly class CharacterRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function spells(int $characterId): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -239,6 +261,7 @@ final readonly class CharacterRepository
 
     /**
      * @param int[] $schoolSkillIds
+     * @return list<array<string, mixed>>
      */
     public function availableSpells(int $characterId, array $schoolSkillIds): array
     {
@@ -282,6 +305,8 @@ final readonly class CharacterRepository
      * explicitly meant as a later pick, not a starting talent). Kin-linked
      * ones are always automatic-only and never appear here. Non-repeatable
      * abilities the character already has are filtered out.
+     *
+     * @return list<array<string, mixed>>
      */
     public function learnableHeroicAbilities(int $characterId, string $professionCode): array
     {
@@ -310,6 +335,9 @@ final readonly class CharacterRepository
         ));
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function heroicAbilityById(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT name_de, wp_note_de, description_de FROM catalog_heroic_abilities WHERE id = :id');
@@ -321,6 +349,9 @@ final readonly class CharacterRepository
         return $row === false ? null : $row;
     }
 
+    /**
+     * @param array<string, mixed> $ability
+     */
     public function learnHeroicAbility(int $characterId, array $ability): void
     {
         $stmt = $this->db->prepare(
@@ -352,7 +383,7 @@ final readonly class CharacterRepository
             'character_id' => $characterId,
             'skill_id' => $skillId,
         ]);
-        $attributeValue = (int) $stmt->fetch()['attribute_value'];
+        $attributeValue = (int) ($stmt->fetch()['attribute_value'] ?? 0);
 
         $update = $this->db->prepare(
             'UPDATE character_skills SET value = :value WHERE character_id = :character_id AND skill_id = :skill_id AND value = 0'
@@ -364,6 +395,9 @@ final readonly class CharacterRepository
         ]);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function weapons(int $characterId): array
     {
         $stmt = $this->db->prepare(
@@ -392,6 +426,9 @@ final readonly class CharacterRepository
         return (int) $this->db->lastInsertId();
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     */
     public function updateWeapon(int $characterId, int $rowId, array $fields): void
     {
         $this->updateFreeTextRow('character_weapons', $characterId, $rowId, $fields, ['name_de', 'grip_de', 'range_de', 'damage_de', 'traits_de']);
@@ -402,6 +439,9 @@ final readonly class CharacterRepository
         $this->removeFromCharacterItemTable('character_weapons', $characterId, $rowId);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function armor(int $characterId): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -416,6 +456,9 @@ final readonly class CharacterRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     */
     public function updateArmorSlot(int $characterId, string $slot, array $fields): void
     {
         if (! in_array($slot, ['head', 'body'], true)) {
@@ -437,6 +480,9 @@ final readonly class CharacterRepository
         ]);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function inventory(int $characterId): array
     {
         $stmt = $this->db->prepare(
@@ -465,6 +511,9 @@ final readonly class CharacterRepository
         return (int) $this->db->lastInsertId();
     }
 
+    /**
+     * @param array<string, mixed> $fields
+     */
     public function updateInventoryItem(int $characterId, int $rowId, array $fields): void
     {
         $this->updateFreeTextRow('character_inventory', $characterId, $rowId, $fields, ['name_de', 'description_de', 'quantity']);
@@ -529,7 +578,7 @@ final readonly class CharacterRepository
             'character_id' => $characterId,
         ]);
         $row = $stmt->fetch();
-        $max = (int) $row['max_value'];
+        $max = (int) ($row['max_value'] ?? 0);
 
         $clamped = max(0, min($max, $value));
 
@@ -553,7 +602,7 @@ final readonly class CharacterRepository
         ]);
         $row = $stmt->fetch();
 
-        $newActive = ! ((bool) $row['active']);
+        $newActive = ! ((bool) ($row['active'] ?? false));
 
         $update = $this->db->prepare(
             'UPDATE character_conditions SET active = :active WHERE character_id = :character_id AND condition_code = :code'
@@ -581,6 +630,9 @@ final readonly class CharacterRepository
      * Updates only the keys of $fields that are also in $allowed (a whitelist
      * of real column names) -- prevents SQL injection via arbitrary field
      * names from request bodies.
+     *
+     * @param list<string> $allowed
+     * @param array<string, mixed> $fields
      */
     private function updateFreeTextRow(string $table, int $characterId, int $rowId, array $fields, array $allowed): void
     {

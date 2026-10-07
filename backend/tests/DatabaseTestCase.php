@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
+use Flyka\CampaignManagement\Connection;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
@@ -15,14 +16,14 @@ use PHPUnit\Framework\TestCase;
  */
 abstract class DatabaseTestCase extends TestCase
 {
-    private static ?PDO $pdo = null;
+    private static ?Connection $pdo = null;
 
     /**
      * @var array<string, string>
      */
     private static array $environment = [];
 
-    protected PDO $db;
+    protected Connection $db;
 
     protected function setUp(): void
     {
@@ -39,9 +40,9 @@ abstract class DatabaseTestCase extends TestCase
         }
     }
 
-    private function connection(): PDO
+    private function connection(): Connection
     {
-        if (self::$pdo instanceof PDO) {
+        if (self::$pdo instanceof Connection) {
             return self::$pdo;
         }
 
@@ -61,10 +62,7 @@ abstract class DatabaseTestCase extends TestCase
         $server->exec("DROP DATABASE IF EXISTS `{$name}`");
         $server->exec("CREATE DATABASE `{$name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
-        $pdo = new PDO("mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4", $user, $password, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        ]);
+        $pdo = new Connection("mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4", $user, $password);
         foreach (['01_schema.sql', '02_catalog.sql'] as $file) {
             $pdo->exec((string) file_get_contents(dirname(__DIR__, 2) . '/database/' . $file));
         }

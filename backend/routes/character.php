@@ -57,19 +57,15 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
 
     $app->get('/api/character-creation/catalog', fn (Request $request, Response $response): Response => jsonResponse($response, $characterCreationRepository->catalog()));
 
-    $app->post('/characters', function (Request $request, Response $response) use ($characterCreationRepository) {
+    $app->post('/characters', function (Request $request, Response $response) use ($characterCreationRepository): Response {
         $body = json_decode((string) $request->getBody(), true) ?? [];
 
         try {
             $characterId = $characterCreationRepository->createCharacter($body);
         } catch (InvalidArgumentException $e) {
-            $response->getBody()
-                ->write(json_encode([
-                    'error' => $e->getMessage(),
-                ]));
-
-            return $response->withHeader('Content-Type', 'application/json')
-                ->withStatus(422);
+            return jsonResponse($response, [
+                'error' => $e->getMessage(),
+            ], 422);
         }
 
         return jsonResponse($response, [

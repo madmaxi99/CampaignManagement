@@ -4,57 +4,19 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
-use Flyka\CampaignManagement\Application;
-use Psr\Http\Message\ResponseInterface;
-use Slim\App;
-use Slim\Psr7\Factory\ServerRequestFactory;
-use Slim\Psr7\Factory\StreamFactory;
-
 /**
- * Drives the whole Slim app (middleware, routes, repositories, templates)
- * against the test database, logged in as DM.
+ * Public pages, DM login and the campaign workflow, driven as a visitor or DM.
  */
-final class AppRoutesTest extends DatabaseTestCase
+final class AppRoutesTest extends AppTestCase
 {
-    private const string PASSWORD = 'test-password';
-
-    private App $app;
-
     private int $campaignId = 0;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->useTestDatabaseInApp();
-        putenv('DM_PASSWORD_HASH=' . password_hash(self::PASSWORD, PASSWORD_DEFAULT));
-
-        // The session must work without cookies/headers inside the CLI test run.
-        ini_set('session.use_cookies', '0');
-        ini_set('session.use_only_cookies', '0');
-        ini_set('session.cache_limiter', '');
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_destroy();
-        }
-        $_SESSION = [];
-
-        // SessionMiddleware sets cookie params, which PHP flags when cookies are off (CLI only).
-        set_error_handler(static fn (int $severity, string $message): bool => str_contains($message, 'session.use_cookies'));
-
-        $this->app = Application::create(dirname(__DIR__));
-    }
 
     protected function tearDown(): void
     {
         if ($this->campaignId !== 0) {
             $this->db->exec('DELETE FROM campaigns WHERE id = ' . $this->campaignId);
         }
-        $this->db->exec('DELETE FROM campaigns WHERE name_de LIKE \'Route-Test%\'');
-        $this->db->exec('DELETE FROM characters WHERE name_de LIKE \'Route-Test%\'');
-        if (session_status() === PHP_SESSION_ACTIVE) {
-            session_destroy();
-        }
-        putenv('DM_PASSWORD_HASH');
-        restore_error_handler();
+        parent::tearDown();
     }
 
     public function testPublicPages(): void
@@ -173,7 +135,7 @@ final class AppRoutesTest extends DatabaseTestCase
         }
 
         // plan and play pages render with all that data
-        foreach ([$base, $base . '?mode=play'] as $path) {
+        foreach ([$base, $base . '/play'] as $path) {
             $response = $this->request('GET', $path);
             self::assertSame(200, $response->getStatusCode(), $path);
             $this->assertCleanBody($response, $path);
@@ -212,66 +174,5 @@ final class AppRoutesTest extends DatabaseTestCase
         ], csrf: false);
 
         self::assertSame(403, $response->getStatusCode());
-    }
-
-    private function loginAsDm(): void
-    {
-        $this->request('GET', '/dm/login');
-        $response = $this->request('POST', '/dm/login', [
-            'password' => self::PASSWORD,
-            '_csrf' => $_SESSION['csrf'],
-            'next' => '/dm',
-        ], form: true);
-
-        self::assertSame(302, $response->getStatusCode());
-        self::assertSame('/dm', $response->getHeaderLine('Location'));
-    }
-
-    /**
-     * @param array<string, mixed>|null $data
-     */
-    private function request(string $method, string $uri, ?array $data = null, bool $form = false, bool $csrf = true): ResponseInterface
-    {
-        $request = (new ServerRequestFactory())->createServerRequest($method, 'http://localhost' . $uri, [
-            'REMOTE_ADDR' => '127.0.0.1',
-        ]);
-        parse_str((string) parse_url($uri, PHP_URL_QUERY), $query);
-        $request = $request->withQueryParams($query);
-
-        if ($data !== null) {
-            if ($form) {
-                $request = $request->withParsedBody($data)
-                    ->withHeader('Content-Type', 'application/x-www-form-urlencoded');
-            } else {
-                $request = $request->withBody((new StreamFactory())->createStream(json_encode($data, JSON_THROW_ON_ERROR)))
-                    ->withHeader('Content-Type', 'application/json');
-            }
-        }
-        if (! $form && $method !== 'GET' && $csrf && isset($_SESSION['csrf'])) {
-            $request = $request->withHeader('X-CSRF-Token', $_SESSION['csrf']);
-        }
-
-        return $this->app->handle($request);
-    }
-
-    private function ok(ResponseInterface $response): void
-    {
-        self::assertContains($response->getStatusCode(), [200, 201], (string) $response->getBody());
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    private function json(ResponseInterface $response, int $status): array
-    {
-        self::assertSame($status, $response->getStatusCode(), (string) $response->getBody());
-
-        return json_decode((string) $response->getBody(), true, flags: JSON_THROW_ON_ERROR);
-    }
-
-    private function assertCleanBody(ResponseInterface $response, string $path): void
-    {
-        $body = (string) $response->getBody();
-        self::assertDoesNotMatchRegularExpression('/(Warning|Notice|Deprecated|Fatal error):/', $body, $path);
     }
 }

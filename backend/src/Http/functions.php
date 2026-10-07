@@ -27,10 +27,13 @@ function safeDmTarget(mixed $next): string
     return '/dm';
 }
 
+/**
+ * @param array<string, mixed> $data
+ */
 function jsonResponse(Response $response, array $data, int $status = 200): Response
 {
     $response->getBody()
-        ->write(json_encode($data));
+        ->write(json_encode($data, JSON_THROW_ON_ERROR));
 
     return $response->withHeader('Content-Type', 'application/json')
         ->withStatus($status);

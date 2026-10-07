@@ -13,12 +13,14 @@ use PDO;
 final readonly class RulesRepository
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
     /**
      * Weapons, armor and misc items, each with its rule values.
+     *
+     * @return array<string, mixed>
      */
     public function items(): array
     {
@@ -50,6 +52,8 @@ final readonly class RulesRepository
 
     /**
      * Skills grouped by category.
+     *
+     * @return array<string, mixed>
      */
     public function skills(): array
     {
@@ -73,6 +77,8 @@ final readonly class RulesRepository
 
     /**
      * Spells and tricks grouped by school.
+     *
+     * @return array<string, mixed>
      */
     public function spellsBySchool(): array
     {
@@ -96,6 +102,9 @@ final readonly class RulesRepository
         return $schools;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function professions(): array
     {
         $professions = $this->db->query(<<<SQL
@@ -131,6 +140,9 @@ final readonly class RulesRepository
         return $professions;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function kins(): array
     {
         $kins = $this->db->query(
@@ -152,6 +164,9 @@ final readonly class RulesRepository
         return $kins;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function heroicAbilities(): array
     {
         return $this->db->query(
@@ -161,10 +176,12 @@ final readonly class RulesRepository
 
     /**
      * Roll tables and short rules: wounds, mishaps, fear, rest, hazards.
+     *
+     * @return array<string, mixed>
      */
     public function tables(): array
     {
-        $query = fn (string $sql) => $this->db->query($sql)
+        $query = fn (string $sql): array => $this->db->query($sql)
             ->fetchAll();
 
         return [
@@ -178,6 +195,9 @@ final readonly class RulesRepository
         ];
     }
 
+    /**
+     * @param array<string, mixed> $row
+     */
     private function price(array $row): string
     {
         $parts = [];
@@ -194,6 +214,10 @@ final readonly class RulesRepository
         return $parts === [] ? '–' : implode(', ', $parts);
     }
 
+    /**
+     * @param array<string, mixed> $row
+     * @return list<string>
+     */
     private function armorPenalties(array $row): array
     {
         $labels = [

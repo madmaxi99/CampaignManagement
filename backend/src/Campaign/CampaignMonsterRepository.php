@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
-use PDO;
 
 final readonly class CampaignMonsterRepository
 {
     public function __construct(
-        private PDO $db,
+        private Connection $db,
         private CampaignLookup $lookup
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function bestiary(int $campaignId): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -38,6 +41,8 @@ final readonly class CampaignMonsterRepository
     /**
      * Full stat block of one bestiary entry (with attacks), e.g. for the
      * template a unique NPC is based on.
+     *
+     * @return array<string, mixed>|null
      */
     public function bestiaryById(int $id): ?array
     {
@@ -55,6 +60,10 @@ final readonly class CampaignMonsterRepository
         return $creature === false ? null : $this->withAttacks([$creature])[0];
     }
 
+    /**
+     * @param list<array<string, mixed>> $creatures
+     * @return list<array<string, mixed>>
+     */
     private function withAttacks(array $creatures): array
     {
         $attackStmt = $this->db->prepare(
@@ -72,6 +81,8 @@ final readonly class CampaignMonsterRepository
 
     /**
      * Bestiary templates for the NPC stat block selector.
+     *
+     * @return list<array<string, mixed>>
      */
     public function bestiaryOptions(): array
     {
@@ -81,6 +92,8 @@ final readonly class CampaignMonsterRepository
 
     /**
      * Catalog stat blocks this campaign does not use yet.
+     *
+     * @return list<array<string, mixed>>
      */
     public function monsterOptions(int $campaignId): array
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
 use PDO;
@@ -12,11 +13,14 @@ use Throwable;
 final readonly class CampaignChapterRepository
 {
     public function __construct(
-        private PDO $db,
+        private Connection $db,
         private CampaignLookup $lookup
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function chapters(int $campaignId): array
     {
         $stmt = $this->db->prepare(
@@ -36,6 +40,8 @@ final readonly class CampaignChapterRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
      */
     private function validatedChapterFields(array $input): array
     {
@@ -52,6 +58,7 @@ final readonly class CampaignChapterRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function createChapter(int $campaignId, array $input): int
     {
@@ -73,6 +80,7 @@ final readonly class CampaignChapterRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function updateChapter(int $campaignId, int $chapterId, array $input): void
     {
@@ -111,8 +119,11 @@ final readonly class CampaignChapterRepository
         $ids = array_map(intval(...), $stmt->fetchAll(PDO::FETCH_COLUMN));
 
         $index = array_search($chapterId, $ids, true);
+        if ($index === false) {
+            return;
+        }
         $target = $direction === 'up' ? $index - 1 : $index + 1;
-        if ($index === false || $target < 0 || $target >= count($ids)) {
+        if ($target < 0 || $target >= count($ids)) {
             return;
         }
         [$ids[$index], $ids[$target]] = [$ids[$target], $ids[$index]];
@@ -121,6 +132,8 @@ final readonly class CampaignChapterRepository
 
     /**
      * Positions 10, 20, ... and labels "1", "2", ... in the given (or current) order.
+     *
+     * @param array<int>|null $orderedIds
      */
     private function renumberChapters(int $campaignId, ?array $orderedIds = null): void
     {

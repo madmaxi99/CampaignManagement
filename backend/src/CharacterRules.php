@@ -36,15 +36,15 @@ final class CharacterRules
      * Movement/carrying capacity/damage bonus aren't stored -- they're always
      * derivable from the kin (movement_base) and the STA/GEW attribute values.
      *
-     * @param array{movement_base: int|string} $character
-     * @param array<int, array{code: string, value: int|string}> $attributes
+     * @param array<string, mixed> $character
+     * @param list<array<string, mixed>> $attributes
      * @return array{movement: int, carrying_capacity: int, damage_bonus_sta_de: string, damage_bonus_gew_de: string}
      */
     public static function derivedStats(array $character, array $attributes): array
     {
         $attributeValues = [];
         foreach ($attributes as $attribute) {
-            $attributeValues[$attribute['code']] = (int) $attribute['value'];
+            $attributeValues[(string) $attribute['code']] = (int) $attribute['value'];
         }
         $gew = $attributeValues['GEW'] ?? 0;
         $sta = $attributeValues['STA'] ?? 0;

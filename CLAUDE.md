@@ -20,7 +20,8 @@ Cairn-homebrew TRPG (tabletop RPG) management system for a Dungeon Master and pl
 
 - Run the app: `source alias.sh && dcud`, served at `http://127.0.0.1:8070` (phpMyAdmin on 8071). Config comes from `.env` (copy `.env.example`); the DB is named `campaign-management`. phpMyAdmin requires a login with the DB credentials.
 - UI copy and in-world content are German; code identifiers and comments are English.
-- QA (run in the php-fpm container): `rcomposer qa` = ECS (`ecs`, fix with `ecs:fix`), Rector (`rector`, apply with `rector:fix`), PHPStan level 5 with baseline (`stan`), PHPUnit (`test`). DB tests rebuild `campaign-management_test` from `database/01_schema.sql` + `02_catalog.sql` using the root credentials from `.env`; without a configured server they are skipped (CI sets `TEST_DB_HOST`/`TEST_DB_PASSWORD`).
+- QA (run in the php-fpm container): `rcomposer qa` = ECS (`ecs`, fix with `ecs:fix`), Rector (`rector`, apply with `rector:fix`), PHPStan level 8 without baseline (`stan`), PHPUnit (`test`). DB tests rebuild `campaign-management_test` from `database/01_schema.sql` + `02_catalog.sql` using the root credentials from `.env`; without a configured server they are skipped (CI sets `TEST_DB_HOST`/`TEST_DB_PASSWORD`).
+- Frontend QA (in `backend/`, needs Node): `npm run lint` = ESLint (`lint:js`), Stylelint (`lint:css`), Prettier check (`format:check`); apply formatting with `npm run format`. JS tests (`npm test`, node:test + jsdom) live in `backend/tests-js/`; they load the page scripts from `public/js` into a jsdom page with a fake `fetch`. CI (`.github/workflows/ci.yml`) runs everything on pushes to `develop` and on every pull request.
 - Multi-line raw SQL in PHP is written as heredoc.
 
 ## Remember me to checkout Obsidian for Atlas

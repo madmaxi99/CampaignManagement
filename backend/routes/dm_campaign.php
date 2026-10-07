@@ -156,7 +156,7 @@ return function (
         ];
         $entity = null;
         if ($entityId !== null) {
-            $found = array_values(array_filter($collections[$type] ?? [], fn (array $row): bool => (int) $row['id'] === $entityId));
+            $found = array_values(array_filter($collections[$type], fn (array $row): bool => (int) $row['id'] === $entityId));
             if ($found === []) {
                 return $response->withHeader('Location', '/dm/campaign/' . $campaign['id'])->withStatus(302);
             }

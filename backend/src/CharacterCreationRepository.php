@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace Flyka\CampaignManagement;
 
 use InvalidArgumentException;
-use PDO;
 use Throwable;
 
 final readonly class CharacterCreationRepository
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function catalog(): array
     {
         return [
@@ -30,12 +32,18 @@ final readonly class CharacterCreationRepository
         ];
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function attributes(): array
     {
         return $this->db->query('SELECT code, name_de FROM catalog_attributes')
             ->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function kins(): array
     {
         $kins = $this->db->query(
@@ -60,6 +68,9 @@ final readonly class CharacterCreationRepository
         return $kins;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function professions(): array
     {
         $professions = $this->db->query(
@@ -132,6 +143,9 @@ final readonly class CharacterCreationRepository
         return $professions;
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function generalHeroicAbilities(): array
     {
         // "General" = no row in either link table, i.e. not owned by any kin or profession.
@@ -144,6 +158,9 @@ final readonly class CharacterCreationRepository
             SQL)->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function flaws(): array
     {
         return $this->db->query(
@@ -151,6 +168,9 @@ final readonly class CharacterCreationRepository
         )->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function mementos(): array
     {
         return $this->db->query(
@@ -158,6 +178,9 @@ final readonly class CharacterCreationRepository
         )->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function appearances(): array
     {
         return $this->db->query(
@@ -165,6 +188,9 @@ final readonly class CharacterCreationRepository
         )->fetchAll();
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function learnableSkills(): array
     {
         return $this->db->query(
@@ -172,6 +198,9 @@ final readonly class CharacterCreationRepository
         )->fetchAll();
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function magicCatalog(): array
     {
         return [
@@ -230,13 +259,7 @@ final readonly class CharacterCreationRepository
     ];
 
     /**
-     * @param array{
-     *     name_de: string, kin_code: string, profession_code: string, age_code: string,
-     *     raw_attributes: array<string,int>, learned_skill_ids: int[],
-     *     heroic_ability_choice: string, profession_heroic_ability_id?: int, flaw_roll: int, gear_option_id: int,
-     *     rolled_silver?: int, memento_de: string, appearance_de: string,
-     *     magic_school_id?: int, known_trick_ids?: int[], known_spell_ids?: int[]
-     * } $input
+     * @param array<string, mixed> $input
      */
     public function createCharacter(array $input): int
     {
@@ -457,6 +480,10 @@ final readonly class CharacterCreationRepository
         );
     }
 
+    /**
+     * @param array<string, mixed> $params
+     * @return array<string, mixed>|null
+     */
     private function fetchOne(string $sql, array $params): ?array
     {
         $stmt = $this->db->prepare($sql);
@@ -491,6 +518,9 @@ final readonly class CharacterCreationRepository
         }
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     private function kinAbilitiesFor(string $kinCode): array
     {
         $stmt = $this->db->prepare(<<<SQL
@@ -510,6 +540,12 @@ final readonly class CharacterCreationRepository
     /**
      * @param int[] $learnedSkillIds
      * @param int[] $knownSpellIds
+     * @param array<string, int> $finalAttributes
+     * @param array<string, mixed> $flaw
+     * @param list<array<string, mixed>> $gearRows
+     * @param array<string, mixed> $kin
+     * @param array<string, mixed> $profession
+     * @param list<array<string, mixed>> $talents
      */
     private function insertCharacter(
         string $name,
@@ -656,7 +692,7 @@ final readonly class CharacterCreationRepository
                         [
                             'id' => $gearItem['item_id'],
                         ]
-                    );
+                    ) ?? throw new InvalidArgumentException('Ausrüstung fehlt im Katalog.');
                     $weaponInsert->execute([
                         'character_id' => $characterId,
                         'position' => $position++,
@@ -673,7 +709,7 @@ final readonly class CharacterCreationRepository
                         [
                             'id' => $gearItem['item_id'],
                         ]
-                    );
+                    ) ?? throw new InvalidArgumentException('Ausrüstung fehlt im Katalog.');
                     $armorSlots[$stats['slot']] = [
                         'name_de' => $gearItem['name_de'],
                     ] + $stats;

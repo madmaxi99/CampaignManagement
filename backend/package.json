@@ -1,0 +1,24 @@
+{
+  "name": "campaign-management-frontend",
+  "private": true,
+  "type": "module",
+  "description": "Frontend tooling (lint and format) for the static assets in public/",
+  "scripts": {
+    "lint": "npm run lint:js && npm run lint:css && npm run format:check",
+    "lint:js": "eslint public/js tests-js",
+    "lint:css": "stylelint \"public/css/*.css\"",
+    "format": "prettier --write \"public/{js,css}/**/*\" \"tests-js/**/*.js\"",
+    "format:check": "prettier --check \"public/{js,css}/**/*\" \"tests-js/**/*.js\"",
+    "test": "node --test \"tests-js/**/*.test.js\"",
+    "qa": "npm run lint && npm test"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.12.0",
+    "globals": "^17.13.0",
+    "jsdom": "^30.1.2",
+    "prettier": "^3.9.9",
+    "stylelint": "^17.16.0",
+    "stylelint-config-standard": "^40.0.0"
+  }
+}

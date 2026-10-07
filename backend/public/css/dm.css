@@ -65,7 +65,7 @@
     background: var(--forest-light);
 }
 
-.dm-nav a[aria-current="page"] {
+.dm-nav a[aria-current='page'] {
     color: var(--forest-dark);
     background: var(--honey-light);
     box-shadow: inset 4px 0 0 var(--honey);
@@ -99,15 +99,14 @@
     margin: 0;
 }
 
-@media (max-width: 900px) {
+@media (width <= 900px) {
     .dm-shell {
         grid-template-columns: minmax(0, 1fr);
     }
 
     .dm-sidebar {
         position: static;
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-flow: row wrap;
         align-items: center;
         height: auto;
         padding: var(--space-3) var(--space-4);

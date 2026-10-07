@@ -6,3 +6,4 @@
 /backend/.php-cs-fixer.cache
 /backend/public/uploads/*
 !/backend/public/uploads/.gitkeep
+/backend/node_modules/

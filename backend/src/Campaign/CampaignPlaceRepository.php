@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
-use PDO;
 
 final readonly class CampaignPlaceRepository
 {
     public function __construct(
-        private PDO $db,
+        private Connection $db,
         private CampaignLookup $lookup
     ) {
     }
 
     /**
      * All places of this campaign with their parent's name and encounter table.
+     *
+     * @return list<array<string, mixed>>
      */
     public function places(int $campaignId): array
     {
@@ -50,6 +52,7 @@ final readonly class CampaignPlaceRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function createPlace(int $campaignId, array $input): int
     {
@@ -77,6 +80,7 @@ final readonly class CampaignPlaceRepository
      * The caller checks that the place belongs to the campaign.
      *
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function updatePlace(int $campaignId, int $placeId, array $input): void
     {
@@ -102,6 +106,8 @@ final readonly class CampaignPlaceRepository
 
     /**
      * Random encounter tables of the catalog, for the place form.
+     *
+     * @return list<array<string, mixed>>
      */
     public function encounterTableOptions(): array
     {
@@ -109,6 +115,10 @@ final readonly class CampaignPlaceRepository
             ->fetchAll();
     }
 
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
     private function validatedPlaceFields(int $campaignId, array $input, ?int $placeId): array
     {
         $name = Input::textOrNull($input['name_de'] ?? null);
@@ -170,6 +180,8 @@ final readonly class CampaignPlaceRepository
 
     /**
      * All places depth-first (parent before children) with 'depth', for the outline.
+     *
+     * @return list<array<string, mixed>>
      */
     public function placeTree(int $campaignId): array
     {
@@ -229,6 +241,8 @@ final readonly class CampaignPlaceRepository
     /**
      * Catalog encounter tables used by this campaign's places. The entry text
      * is "quantity × creature" or the entry's own text.
+     *
+     * @return list<array<string, mixed>>
      */
     public function encounterTables(int $campaignId): array
     {

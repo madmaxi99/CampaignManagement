@@ -1,29 +1,15 @@
 /*
  * Campaign play mode: quick access, entity dialog, dice, encounter tables and chronicle.
  */
-(function () {
-    'use strict';
+import { sendJson, toastError } from './lib/http.js';
 
-    const root = document.querySelector('[data-campaign-id]');
-    if (!root) {
-        return;
-    }
+const page = document.querySelector('[data-campaign-id]');
+if (page) {
+    init(page);
+}
+
+function init(root) {
     const base = '/dm/campaign/' + root.dataset.campaignId;
-
-    async function send(method, url, body) {
-        const options = { method: method };
-        if (body !== undefined) {
-            options.headers = { 'Content-Type': 'application/json' };
-            options.body = JSON.stringify(body);
-        }
-        const response = await fetch(url, options);
-        const data = await response.json().catch(function () { return {}; });
-        if (!response.ok) {
-            throw new Error(data.error || 'Das hat nicht geklappt.');
-        }
-
-        return data;
-    }
 
     // ---- Encounter tables: roll the smallest standard die that covers the table
     const STANDARD_DICE = [4, 6, 8, 10, 12, 20, 100];
@@ -36,10 +22,16 @@
             return;
         }
 
-        const top = Math.max.apply(null, entries.map(function (entry) {
-            return parseInt(entry.dataset.max, 10);
-        }));
-        const die = STANDARD_DICE.find(function (size) { return size >= top; }) || top;
+        const top = Math.max.apply(
+            null,
+            entries.map(function (entry) {
+                return parseInt(entry.dataset.max, 10);
+            })
+        );
+        const die =
+            STANDARD_DICE.find(function (size) {
+                return size >= top;
+            }) || top;
 
         button.addEventListener('click', function () {
             const roll = Math.floor(Math.random() * die) + 1;
@@ -119,11 +111,14 @@
         form.addEventListener('submit', async function (event) {
             event.preventDefault();
             try {
-                await send('POST', base + '/chronicle', { title_de: form.elements.title_de.value, text_de: form.elements.text_de.value });
+                await sendJson('POST', base + '/chronicle', {
+                    title_de: form.elements.title_de.value,
+                    text_de: form.elements.text_de.value,
+                });
                 window.location.href = base + '/play#chronicle';
                 window.location.reload();
             } catch (error) {
-                window.ui.toast(error.message, 'error');
+                toastError(error);
             }
         });
     }
@@ -145,10 +140,10 @@
         } else if (event.target.closest('[data-entry-delete]')) {
             if (await window.ui.confirm('Diesen Eintrag löschen?', 'Ja, löschen')) {
                 try {
-                    await send('DELETE', base + '/chronicle/' + entry.dataset.entryId);
+                    await sendJson('DELETE', base + '/chronicle/' + entry.dataset.entryId);
                     window.location.reload();
                 } catch (error) {
-                    window.ui.toast(error.message, 'error');
+                    toastError(error);
                 }
             }
         }
@@ -157,10 +152,13 @@
     editForm.addEventListener('submit', async function (event) {
         event.preventDefault();
         try {
-            await send('POST', base + '/chronicle/' + editingId, { title_de: editForm.elements.title_de.value, text_de: editForm.elements.text_de.value });
+            await sendJson('POST', base + '/chronicle/' + editingId, {
+                title_de: editForm.elements.title_de.value,
+                text_de: editForm.elements.text_de.value,
+            });
             window.location.reload();
         } catch (error) {
-            window.ui.toast(error.message, 'error');
+            toastError(error);
         }
     });
-}());
+}

@@ -45,7 +45,7 @@
     padding-bottom: env(safe-area-inset-bottom);
     background: var(--card);
     border-top: 2px solid var(--card-edge);
-    box-shadow: 0 -4px 14px rgba(86, 60, 20, 0.08);
+    box-shadow: 0 -4px 14px rgb(86 60 20 / 8%);
 }
 
 .player-tab {
@@ -65,11 +65,11 @@
     height: 1.6rem;
 }
 
-.player-tab[aria-current="page"] {
+.player-tab[aria-current='page'] {
     color: var(--forest-dark);
 }
 
-.player-tab[aria-current="page"] .ui-icon {
+.player-tab[aria-current='page'] .ui-icon {
     padding: 2px;
     color: var(--ink);
     background: var(--honey-light);
@@ -78,18 +78,23 @@
 }
 
 /* Wider screens: the tab bar becomes a slim bar below the header. */
-@media (min-width: 900px) {
+@media (width >= 900px) {
     .player-shell {
         display: flex;
         flex-direction: column;
         padding-bottom: var(--space-6);
     }
 
-    .player-header { order: 1; }
-    .player-tabbar { order: 2; }
-    .player-main { order: 3; }
+    .player-header {
+        order: 1;
+    }
+
+    .player-main {
+        order: 3;
+    }
 
     .player-tabbar {
+        order: 2;
         position: static;
         inset: auto;
         display: flex;
@@ -112,11 +117,11 @@
         border-radius: 999px;
     }
 
-    .player-tab[aria-current="page"] {
+    .player-tab[aria-current='page'] {
         background: var(--forest-light);
     }
 
-    .player-tab[aria-current="page"] .ui-icon {
+    .player-tab[aria-current='page'] .ui-icon {
         padding: 0;
         background: none;
     }

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Flyka\CampaignManagement;
 
 use InvalidArgumentException;
-use PDO;
 
 /**
  * The chronicle of one campaign: everything that happens, free text.
@@ -13,10 +12,13 @@ use PDO;
 final readonly class CampaignStandRepository
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function chronicle(int $campaignId): array
     {
         $stmt = $this->db->prepare(
@@ -31,6 +33,7 @@ final readonly class CampaignStandRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function addChronicleEntry(int $campaignId, array $input): int
     {
@@ -48,6 +51,7 @@ final readonly class CampaignStandRepository
     }
 
     /**
+     * @param array<string, mixed> $input
      * @return bool false when the entry does not exist in this campaign
      * @throws InvalidArgumentException when the input is not valid
      */
@@ -107,6 +111,7 @@ final readonly class CampaignStandRepository
     }
 
     /**
+     * @param array<string, mixed> $input
      * @return array{0: ?string, 1: string}
      */
     private function validatedChronicle(array $input): array

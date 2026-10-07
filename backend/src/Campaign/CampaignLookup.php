@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
-use PDO;
 
 /**
  * Existence and ownership checks shared by the campaign repositories.
@@ -14,7 +14,7 @@ use PDO;
 final readonly class CampaignLookup
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 

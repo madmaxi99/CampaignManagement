@@ -12,10 +12,13 @@ use PDO;
 final readonly class WorldRepository
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function bestiary(): array
     {
         return $this->db->query(
@@ -23,6 +26,9 @@ final readonly class WorldRepository
         )->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function encounterTables(): array
     {
         $tables = $this->db->query('SELECT id, name_de FROM catalog_encounter_tables ORDER BY name_de')

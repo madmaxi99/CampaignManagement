@@ -69,7 +69,7 @@ final readonly class DmGate implements MiddlewareInterface
         $response->getBody()
             ->write(json_encode([
                 'error' => $message,
-            ]));
+            ], JSON_THROW_ON_ERROR));
 
         return $this->noStore($response);
     }

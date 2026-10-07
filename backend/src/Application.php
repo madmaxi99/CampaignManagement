@@ -11,6 +11,7 @@ use Flyka\CampaignManagement\Campaign\CampaignMonsterRepository;
 use Flyka\CampaignManagement\Campaign\CampaignNpcRepository;
 use Flyka\CampaignManagement\Campaign\CampaignPlaceRepository;
 use Flyka\CampaignManagement\Campaign\CampaignRepository;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
@@ -27,6 +28,9 @@ use Twig\TwigFunction;
  */
 final class Application
 {
+    /**
+     * @return App<ContainerInterface|null>
+     */
     public static function create(string $backendDir): App
     {
         $db = Database::connect(DatabaseConfig::fromEnvironment());

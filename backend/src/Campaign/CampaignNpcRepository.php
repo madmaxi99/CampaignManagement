@@ -4,19 +4,22 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
-use PDO;
 
 final readonly class CampaignNpcRepository
 {
     public function __construct(
-        private PDO $db,
+        private Connection $db,
         private CampaignLookup $lookup,
         private CampaignMonsterRepository $monsters
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function npcs(int $campaignId): array
     {
         $stmt = $this->db->prepare(
@@ -51,6 +54,7 @@ final readonly class CampaignNpcRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function createNpc(int $campaignId, array $input): int
     {
@@ -70,6 +74,7 @@ final readonly class CampaignNpcRepository
      * The caller checks that the NPC belongs to the campaign.
      *
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function updateNpc(int $campaignId, int $npcId, array $input): void
     {
@@ -93,6 +98,10 @@ final readonly class CampaignNpcRepository
         ]);
     }
 
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
     private function validatedNpcFields(int $campaignId, array $input): array
     {
         $name = Input::textOrNull($input['name_de'] ?? null);

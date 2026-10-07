@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
-use PDO;
 use Throwable;
 
 final readonly class CampaignRepository
 {
     public function __construct(
-        private PDO $db
+        private Connection $db
     ) {
     }
 
+    /**
+     * @return list<array<string, mixed>>
+     */
     public function listAll(): array
     {
         $stmt = $this->db->query(<<<SQL
@@ -31,6 +34,9 @@ final readonly class CampaignRepository
         return $stmt->fetchAll();
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function find(int $id): ?array
     {
         $stmt = $this->db->prepare('SELECT * FROM campaigns WHERE id = :id');
@@ -44,6 +50,8 @@ final readonly class CampaignRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
      */
     private function validatedCampaignFields(array $input): array
     {
@@ -61,6 +69,7 @@ final readonly class CampaignRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function create(array $input): int
     {
@@ -78,6 +87,7 @@ final readonly class CampaignRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function update(int $campaignId, array $input): void
     {

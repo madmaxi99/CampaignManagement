@@ -4,20 +4,22 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Campaign;
 
+use Flyka\CampaignManagement\Connection;
 use Flyka\CampaignManagement\Input;
 use InvalidArgumentException;
-use PDO;
 
 final readonly class CampaignItemRepository
 {
     public function __construct(
-        private PDO $db,
+        private Connection $db,
         private CampaignLookup $lookup
     ) {
     }
 
     /**
      * Story items of this campaign (books, quest items) with where they are found.
+     *
+     * @return list<array<string, mixed>>
      */
     public function items(int $campaignId): array
     {
@@ -43,6 +45,8 @@ final readonly class CampaignItemRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
      */
     private function validatedItemFields(int $campaignId, array $input): array
     {
@@ -64,6 +68,7 @@ final readonly class CampaignItemRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function createItem(int $campaignId, array $input): int
     {
@@ -81,6 +86,7 @@ final readonly class CampaignItemRepository
 
     /**
      * @throws InvalidArgumentException when the input is not valid
+     * @param array<string, mixed> $input
      */
     public function updateItem(int $campaignId, int $itemId, array $input): void
     {

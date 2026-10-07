@@ -73,22 +73,6 @@
         </div>
     </dialog>
 
-    <script src="{{ asset('js/dm-forms.js') }}"></script>
-    <script>
-        (function () {
-            var dialog = document.getElementById('party-picker');
-            var search = document.getElementById('party-search');
-            document.querySelector('[data-open-picker]').addEventListener('click', function () {
-                dialog.showModal();
-                search.focus();
-            });
-            document.querySelector('[data-close-picker]').addEventListener('click', function () { dialog.close(); });
-            search.addEventListener('input', function () {
-                var term = search.value.trim().toLowerCase();
-                dialog.querySelectorAll('.party-candidate').forEach(function (button) {
-                    button.hidden = term !== '' && button.dataset.search.indexOf(term) === -1;
-                });
-            });
-        }());
-    </script>
+    <script type="module" src="{{ asset('js/dm-forms.js') }}"></script>
+    <script type="module" src="{{ asset('js/party-picker.js') }}"></script>
 {% endblock %}

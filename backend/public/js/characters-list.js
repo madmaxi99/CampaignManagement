@@ -2,38 +2,20 @@
  * Character list: "Meine Charaktere" (remembered in this browser) on top,
  * everything else as a searchable archive.
  */
-(function () {
-    'use strict';
+import { loadMine, saveMine } from './lib/my-characters.js';
 
-    const STORAGE_KEY = 'trpg.myCharacters';
-    const mineList = document.querySelector('[data-mine]');
-    const archiveList = document.querySelector('[data-archive]');
-    if (!mineList || !archiveList) {
-        return;
-    }
+const mineElement = document.querySelector('[data-mine]');
+const archiveElement = document.querySelector('[data-archive]');
+if (mineElement && archiveElement) {
+    init(mineElement, archiveElement);
+}
 
+function init(mineList, archiveList) {
     const mineEmpty = document.querySelector('[data-mine-empty]');
     const archiveEmpty = document.querySelector('[data-archive-empty]');
     const searchInput = document.getElementById('char-search');
     const filterTabs = Array.from(document.querySelectorAll('[data-filter-value]'));
     let filter = 'all';
-
-    function loadMine() {
-        try {
-            const ids = JSON.parse(window.localStorage.getItem(STORAGE_KEY) || '[]');
-            return Array.isArray(ids) ? ids.map(String) : [];
-        } catch (error) {
-            return [];
-        }
-    }
-
-    function saveMine(ids) {
-        try {
-            window.localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
-        } catch (error) {
-            // Private mode etc.: the list just is not remembered.
-        }
-    }
 
     let mine = loadMine();
 
@@ -47,7 +29,10 @@
         const pinned = mine.includes(card.dataset.charId);
         const pin = card.querySelector('[data-pin]');
         pin.setAttribute('aria-pressed', pinned ? 'true' : 'false');
-        pin.setAttribute('aria-label', pinned ? 'Aus meinen Charakteren entfernen' : 'Zu meinen Charakteren hinzufügen');
+        pin.setAttribute(
+            'aria-label',
+            pinned ? 'Aus meinen Charakteren entfernen' : 'Zu meinen Charakteren hinzufügen'
+        );
         card.classList.toggle('char-card--mine', pinned);
         insertSorted(pinned ? mineList : archiveList, card);
     }
@@ -93,4 +78,4 @@
             applyFilter();
         });
     });
-}());
+}

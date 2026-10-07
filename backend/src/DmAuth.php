@@ -103,6 +103,9 @@ final readonly class DmAuth
         return rtrim($this->stateDir, '/') . '/dm-login-' . sha1($clientId) . '.json';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function readState(string $clientId): array
     {
         $file = $this->stateFile($clientId);
@@ -113,6 +116,9 @@ final readonly class DmAuth
         return json_decode((string) file_get_contents($file), true) ?: [];
     }
 
+    /**
+     * @param array<string, mixed> $state
+     */
     private function writeState(string $clientId, array $state): void
     {
         $file = $this->stateFile($clientId);
@@ -123,6 +129,6 @@ final readonly class DmAuth
 
             return;
         }
-        file_put_contents($file, json_encode($state), LOCK_EX);
+        file_put_contents($file, json_encode($state, JSON_THROW_ON_ERROR), LOCK_EX);
     }
 }
