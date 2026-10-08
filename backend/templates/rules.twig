@@ -1,31 +1,8 @@
 {% extends "layout.twig" %}
 {% import "_ui.twig" as ui %}
+{% import "rules/_macros.twig" as r %}
 
 {% block title %}Regelwerk{% endblock %}
-
-{% macro entry(title, search, badges, body) %}
-    <details class="ui-details" data-search="{{ search|lower }}">
-        <summary>
-            <span class="ui-details__title">{{ title }}</span>
-            <span class="ui-details__badges">{{ badges|raw }}</span>
-        </summary>
-        <div class="ui-details__body">{{ body|raw }}</div>
-    </details>
-{% endmacro %}
-
-{% macro quick(title, badge, body) %}
-    {% import _self as s %}
-    {{ s.entry(title, title ~ ' ' ~ body|striptags, '<span class="ui-badge">' ~ badge ~ '</span>', body) }}
-{% endmacro %}
-
-{% macro dm(title, badge, body) %}
-    {% import _self as s %}
-    {{ s.entry(title, title ~ ' spielleitung sl ' ~ body|striptags, '<span class="ui-badge ui-badge--berry">SL</span><span class="ui-badge">' ~ badge ~ '</span>', body) }}
-{% endmacro %}
-
-{% import _self as r %}
-
-{% macro roll(min, max) %}{{ min == max ? min : min ~ '–' ~ max }}{% endmacro %}
 
 {% block content %}
     <div class="ui-row page-head">
@@ -37,61 +14,74 @@
         <input class="ui-input" type="search" id="rules-search" placeholder="Im Regelwerk suchen …" autocomplete="off" aria-label="Regelwerk durchsuchen">
     </div>
 
+
     <div class="ui-tabs rules-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash style="margin-top: var(--space-3)">
-        <button class="ui-tab" role="tab" id="tab-items" aria-controls="panel-items" aria-selected="true">Items</button>
-        <button class="ui-tab" role="tab" id="tab-skills" aria-controls="panel-skills" aria-selected="false">Fertigkeiten</button>
+        <button class="ui-tab" role="tab" id="tab-basics" aria-controls="panel-basics" aria-selected="true">Grundregeln</button>
         <button class="ui-tab" role="tab" id="tab-combat" aria-controls="panel-combat" aria-selected="false">Kampf</button>
-        <button class="ui-tab" role="tab" id="tab-spells" aria-controls="panel-spells" aria-selected="false">Zauber</button>
-        <button class="ui-tab" role="tab" id="tab-professions" aria-controls="panel-professions" aria-selected="false">Berufe</button>
-        <button class="ui-tab" role="tab" id="tab-kins" aria-controls="panel-kins" aria-selected="false">Völker</button>
-        <button class="ui-tab" role="tab" id="tab-heroic" aria-controls="panel-heroic" aria-selected="false">Heldenfähigkeiten</button>
+        <button class="ui-tab" role="tab" id="tab-spells" aria-controls="panel-spells" aria-selected="false">Magie</button>
+        <button class="ui-tab" role="tab" id="tab-character" aria-controls="panel-character" aria-selected="false">Charakter</button>
+        <button class="ui-tab" role="tab" id="tab-equipment" aria-controls="panel-equipment" aria-selected="false">Ausrüstung</button>
         <button class="ui-tab" role="tab" id="tab-tables" aria-controls="panel-tables" aria-selected="false">Tabellen</button>
     </div>
 
-    {# ---------- Items ---------- #}
-    <div class="ui-tabpanel ui-stack" id="panel-items" role="tabpanel" aria-labelledby="tab-items">
-        {% for group, title in {'weapon': 'Waffen', 'armor': 'Rüstungen', 'misc': 'Ausrüstung'} %}
-            <h2>{{ title }}</h2>
-            {% for i in items[group] %}
-                {% set badges %}
-                    {% if group == 'weapon' %}<span class="ui-badge ui-badge--berry">{{ i.damage_de }}</span>{% endif %}
-                    {% if group == 'armor' %}<span class="ui-badge ui-badge--sky">RS {{ i.armor_value }}</span>{% endif %}
-                    <span class="ui-badge ui-badge--gold">{{ i.price_de }}</span>
-                {% endset %}
-                {% set body %}
-                    <p>{{ i.description_de }}</p>
-                    <dl class="facts">
-                        {% if group == 'weapon' %}
-                            <div><dt>Griff</dt><dd>{{ i.grip_de }}</dd></div>
-                            <div><dt>Reichweite</dt><dd>{{ i.range_de }}</dd></div>
-                            <div><dt>Schaden</dt><dd>{{ i.damage_de }}</dd></div>
-                            {% if i.str_requirement %}<div><dt>Benötigte STA</dt><dd>{{ i.str_requirement }}</dd></div>{% endif %}
-                            {% if i.durability %}<div><dt>Haltbarkeit</dt><dd>{{ i.durability }}</dd></div>{% endif %}
-                            {% if i.traits_de %}<div><dt>Merkmale</dt><dd>{{ i.traits_de }}</dd></div>{% endif %}
-                        {% elseif group == 'armor' %}
-                            <div><dt>Platz</dt><dd>{{ i.armor_slot == 'head' ? 'Kopf' : 'Körper' }}</dd></div>
-                            <div><dt>Rüstungswert</dt><dd>{{ i.armor_value }}</dd></div>
-                            {% if i.armor_penalties %}<div><dt>Abzüge</dt><dd>{{ i.armor_penalties|join(', ') }}</dd></div>{% endif %}
-                        {% endif %}
-                        <div><dt>Seltenheit</dt><dd>{{ i.rarity }}</dd></div>
-                        <div><dt>Preis</dt><dd>{{ i.price_de }}</dd></div>
-                    </dl>
-                {% endset %}{{ r.entry(i.name_de, i.name_de ~ ' ' ~ i.description_de, badges, body) }}
-            {% endfor %}
+    {# ---------- Grundregeln ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-basics" role="tabpanel" aria-labelledby="tab-basics">
+        <h2>Würfelproben <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Fertigkeitsprobe', 'W20', '<p>Beschreibe zuerst, was dein Charakter erreichen will, und würfle dann einen W20. Ein Ergebnis kleiner oder gleich deinem Fertigkeitswert ist ein Erfolg. Die SL würfelt nur in herausfordernden Situationen und bewertet nicht, wie schwierig eine Probe ist.</p><p><strong>Fehlschlag:</strong> Ein Wurf über deinem Wert misslingt. Beschreibt gemeinsam mit der SL, was passiert. Die SL kann Fehlschläge mit zusätzlichen Konsequenzen versehen, um die Geschichte spannender zu machen.</p>') }}
+        {{ r.quick('Drache', 'Wurf 1', '<p>Eine 1 auf dem W20 ist besonders erfolgreich. Im Kampf hat ein Drache bestimmte Auswirkungen, er erhöht zum Beispiel den Schaden eines Angriffs. Außerhalb des Kampfes entscheidet die SL über den Effekt, etwa: Du beeindruckst alle um dich herum, du erreichst mehr als beabsichtigt oder die Aktion wird schneller als gewöhnlich ausgeführt.</p><p>Ein Drache auf einer Fertigkeit gibt dir eine Steigerungsmarke (siehe Heldenfähigkeiten, Erfahrung).</p>') }}
+        {{ r.quick('Dämon', 'Wurf 20', '<p>Eine 20 auf dem W20 schlägt immer fehl, unabhängig von deinem Fertigkeitswert und anderen Umständen. Ein Dämon lässt sich nicht strapazieren. Im Kampf kann er zusätzliche Effekte haben, außerhalb davon kann die SL ihn mit Effekten versehen, etwa: Du schädigst dich selbst, einen anderen oder einen Gegenstand, du machst dich vor allen lächerlich oder du machst eine Menge Lärm.</p><p>Ein Dämon auf einer Fertigkeit gibt dir ebenfalls eine Steigerungsmarke.</p>') }}
+        {{ r.quick('Attributsprobe', 'Attribut', '<p>Gibt es keine Fertigkeit, die zur Situation passt, kann die SL stattdessen eine Attributsprobe verlangen, zum Beispiel eine STÄ-Probe, um etwas Schweres zu heben. Gibt es eine Fertigkeit, welche die gewünschte Aktion abdeckt, muss die Probe auf dieser basieren. In unklaren Fällen entscheidet die SL.</p>') }}
+        {{ r.quick('Nur eine Chance', 'Regel', '<p>In der Regel hast du nur eine Chance, eine Probe erfolgreich durchzuführen. Wenn du einmal gewürfelt hast, darfst du den Wurf nicht wiederholen, um das gleiche Ziel zu erreichen. Versuche etwas anderes, warte ab, bis sich die Umstände geändert haben, oder lass einen anderen Charakter ran. Diese Regel gilt nicht im Kampf.</p>') }}
+        {{ r.quick('Vorteil & Nachteil', 'Zwei W20', '<p>Manchmal erleichtern oder erschweren äußere Faktoren eine Probe. Dann erhältst du einen <strong>Vorteil</strong> oder <strong>Nachteil</strong>: Du würfelst zwei W20, aber nur ein Ergebnis zählt. Bei einem Vorteil zählt das bessere (niedrigere), bei einem Nachteil das schlechtere (höhere) Ergebnis. Manche Regeln geben Vorteil oder Nachteil direkt vor, etwa beim Angriff auf einen liegenden Gegner oder beim Schießen auf große Entfernung.</p><p><strong>Mehrere Vor- oder Nachteile:</strong> Würfle für jeden einen zusätzlichen W20 und zähle nur das niedrigste beziehungsweise höchste Ergebnis. Proben mit mehreren Nachteilen haben allerdings nur geringe Erfolgsaussichten, es sei denn, der Fertigkeitswert ist sehr hoch.</p><p><strong>Vorteil und Nachteil zugleich:</strong> Jeder Vorteil hebt einen Nachteil auf und umgekehrt. Bei einem Vorteil und einem Nachteil würfelst du normal (ein W20). Bei zwei Vorteilen und einem Nachteil zählt es als ein Vorteil.</p>') }}
+        {{ r.quick('Hilfe von anderen', 'Vorteil', '<p>Ein anderer Spielercharakter oder NSC kann dich bei einem Wurf unterstützen. Das muss <strong>vor deinem Wurf</strong> erklärt werden und in der Geschichte Sinn ergeben: Die helfende Person muss anwesend sein und in der Lage, deine Aktion zu unterstützen. Die SL hat das letzte Wort. Jedes Mal, wenn dich jemand unterstützt, erhältst du einen Vorteil. Im Kampf zählt das Helfen als Aktion, du verlierst also in dieser Runde deine eigene. NSC können sich gegenseitig helfen, aber immer nur ein Charakter pro Probe.</p>') }}
+        {{ r.quick('Den Wurf strapazieren', 'Optional', '<p>Misslingt eine Fertigkeits- oder Attributsprobe, kannst du den Wurf <strong>strapazieren</strong>: Du darfst es noch einmal versuchen, und das neue Ergebnis gilt, egal wie es ausfällt. Hast du Vorteil oder Nachteil, würfelst du alle Würfel neu. Einen Dämon kannst du nie strapazieren.</p><p>Nach dem erneuten Wurf erleidest du sofort einen <strong>Zustand</strong>, der ein Attribut betrifft: Erschöpft (STÄ), Kränkelnd (KON), Benommen (GEW), Wütend (INT), Verängstigt (WIL) oder Verzagt (CHA). Du hast dann einen Nachteil auf alle Proben, die auf diesem Attribut basieren. Du wählst den Zustand selbst, darfst aber keinen wählen, den du schon hast, und musst erklären können, wie er aus der Handlung entsteht (die SL darf unsinnige Erklärungen ablehnen). Hast du alle sechs Zustände, kannst du nicht mehr strapazieren.</p><p>Von Zuständen erholst du dich durch Rasten. <strong>NSC und Monster</strong> können nicht strapazieren.</p>') }}
+        {{ r.quick('Vergleichende Probe', 'Gegner', '<p>Manchmal musst du einen Gegner in einer vergleichenden Probe besiegen: Ihr beide würfelt. Das kommt nur selten vor und nur, wenn sich jemand aktiv gegen dich stellt. Im Kampf zählt sie nur als Aktion für die handelnde Partei.</p><ul><li>Scheitert deine Probe, scheitert auch deine Aktion, egal wie der Gegner würfelt.</li><li>Gelingt deine Probe und dem Gegner nicht, gelingt deine Aktion.</li><li>Gelingt es beiden, gelingt deine Aktion, wenn dein Wurf kleiner oder gleich dem des Gegners ist. Ist das Ergebnis des Gegners niedriger, scheiterst du.</li></ul><p><strong>Strapazieren:</strong> Auch vergleichende Proben lassen sich strapazieren, aber nur von der handelnden Partei und auch nach dem Wurf des Gegners.</p>') }}
+        {{ r.quick('Offene vergleichende Probe', 'Gegner', '<p>Die SL kann auch dann vergleichende Proben nutzen, wenn keine Partei aktiv ist, zum Beispiel STÄ gegen STÄ beim Armdrücken. Offene vergleichende Proben werden wiederholt, wenn beide scheitern oder beide gelingen und dasselbe Ergebnis würfeln. Beide Seiten dürfen ihren Wurf strapazieren.</p>') }}
+        <h2>Zustände <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Die sechs Zustände', 'Zustand', '<p>Jeder Zustand gibt dir einen <strong>Nachteil</strong> auf alle Proben auf ein bestimmtes Attribut und auf Fertigkeiten, die darauf basieren:</p><ul>
+            <li><strong>Erschöpft</strong> – STÄ</li>
+            <li><strong>Kränkelnd</strong> – KON</li>
+            <li><strong>Benommen</strong> – GEW</li>
+            <li><strong>Wütend</strong> – INT</li>
+            <li><strong>Verängstigt</strong> – WIL</li>
+            <li><strong>Verzagt</strong> – CHA</li>
+        </ul>') }}
+        {{ r.quick('Zustand erleiden', 'Zustand', '<p>Am häufigsten erleidest du einen Zustand, wenn du einen Wurf strapazierst (optionale Regel). Dann wählst du einen Zustand und beschreibst, wie du ihn bekommst. Auch Monsterangriffe oder Zauber können Zustände verursachen.</p><p><strong>Mehrere Zustände:</strong> Hast du den Zustand schon, musst du einen anderen wählen. Hast du alle sechs, verlierst du stattdessen W6 WP. Bist du bei null WP, verlierst du W6 TP.</p><p><strong>Heilung:</strong> Bei einer Kurzen Rast (Viertel) heilst du einen Zustand deiner Wahl, bei einer Langen Rast (Tagesabschnitt) alle.</p>') }}
+        <h2>Verletzung &amp; Tod <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Sterben & Todeswürfe', 'KON', '<p>Sinken deine TP auf null, fällst du zu Boden und riskierst zu sterben. Du kannst dich nicht bewegen und nur versuchen, dich aufzurappeln.</p><p><strong>Todeswurf:</strong> In jeder folgenden Runde musst du in deinem Zug eine Probe auf <strong>KON</strong> ablegen. Sie kann nicht strapaziert werden, auch nicht mit der optionalen Regel. Trage die Ergebnisse auf dem Charakterbogen ein. Nach drei gelungenen Würfen erhältst du W6 TP zurück und musst nicht mehr würfeln. Nach drei Fehlschlägen stirbt dein Charakter. Ein Drache zählt als zwei Erfolge, ein Dämon als zwei Fehlschläge. Nach dem Kampf zählst du weiter die Runden, bis alle Todeswürfe gemacht sind. Gescheiterte Todeswürfe werden zurückgesetzt, wenn du überlebst.</p><p><strong>Weiterer Schaden:</strong> Erleidest du bei null TP zusätzlichen Schaden, zählt das automatisch als gescheiterter Todeswurf.</p>') }}
+        {{ r.quick('Aufrappeln', 'Überzeugen', '<p>Ein anderer Spielercharakter in bis zu 10 Metern Entfernung und in Hörweite kann dich per <strong>Überzeugen</strong> aufrappeln, damit du trotz null TP weiterkämpfst. Das zählt als Aktion. Gelingt es, kannst du normal handeln, musst aber weiter Todeswürfe machen. Du kannst auch versuchen, dich selbst aufzurappeln, mit einer WIL-Probe mit Nachteil (statt Überzeugen).</p>') }}
+        {{ r.quick('Leben retten', 'Heilkunde', '<p>Hast du null TP, kann dich eine andere Person neben dir mit einer gelungenen <strong>Heilkunde</strong>-Probe retten (Aktion). Ohne Verbände erhält sie einen Nachteil. Mehrere Versuche sind erlaubt. Gelingt der Wurf, musst du keine Todeswürfe mehr machen und erhältst W6 TP zurück. Du kannst dein eigenes Leben so nicht retten, auch wenn du dich aufgerappelt hast. Weitere Heilkunde-Würfe haben keine Wirkung, sobald du nicht mehr auf null TP bist, außer beim Rasten. Auch Magie kann Leben retten.</p>') }}
+        {{ r.quick('Sofortiger Tod', 'Tod', '<p>Negative TP werden nicht notiert. Senkt aber ein einziger Angriff deine TP auf einen negativen Wert in Höhe deiner vollen TP, stirbt dein Charakter sofort.</p>') }}
+        {{ r.quick('Schwere Verletzungen', 'KON', '<p>Wurdest du auf null TP gebracht und hast überlebt, riskierst du schwere Verletzungen, die lange heilen und dauerhafte Folgen haben können. Lege eine Probe auf <strong>KON</strong> ab. Scheitert sie, erleidest du eine Verletzung: etwa Nachteile auf bestimmte Attribute und Fertigkeiten, halbierte Bewegung oder dauerhaft gesenkte Fertigkeitswerte. Die Heilzeit halbiert sich, wenn du mindestens einen Tagesabschnitt pro Tag rastest und von jemandem versorgt wirst, der eine Heilkunde-Probe schafft. Dauerhaft gesenkte Fertigkeitswerte kannst du neu erlernen.</p>') }}
+        <h2>Rasten <span class="ui-badge rules-kind">Regel</span></h2>
+        {% for t in tables.rest_types %}
+            {% set badges %}<span class="ui-badge ui-badge--gold">{{ t.duration_de }}</span>{% endset %}
+            {% set body %}<p>{{ t.effect_de }}</p>{% endset %}
+            {{ r.entry(t.name_de, t.name_de ~ ' ' ~ t.effect_de, badges, body) }}
         {% endfor %}
-    </div>
-
-    {# ---------- Fertigkeiten ---------- #}
-    <div class="ui-tabpanel ui-stack" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
-        {% for group, title in {'regular': 'Fertigkeiten', 'combat': 'Kampffertigkeiten', 'secondary': 'Sekundäre Fertigkeiten'} %}
-            <h2>{{ title }}</h2>
-            {% for s in skills[group] %}
-                {% set badges %}<span class="ui-badge">{{ s.attribute_code }}</span>{% endset %}
-                {% set body %}
-                    <p>{{ s.description_de ?: 'Keine Beschreibung.' }}</p>
-                {% endset %}{{ r.entry(s.name_de, s.name_de ~ ' ' ~ s.description_de, badges, body) }}
-            {% endfor %}
+        <h2>Gefahren &amp; Überleben <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Hunger', 'Gefahr', '<p>Du musst mindestens eine Ration Essen pro Tag zu dir nehmen. Nach einem Tag ohne Essen bist du ausgehungert und kannst dich nur noch durch Magie von TP, WP oder Zuständen erholen. Du erleidest außerdem einen Schadenspunkt pro Tag. Erreichst du ausgehungert null TP, stirbst du nach einem Tag. Hast du eine Ration gegessen, bist du nicht mehr ausgehungert und heilst normal.</p>') }}
+        {{ r.quick('Schlafentzug', 'Gefahr', '<p>Du brauchst jeden Tag mindestens eine Schicht ungestörten Schlaf. In Rüstung kannst du nicht schlafen. Nach drei Schichten ohne Schlaf kannst du WP und Zustände nicht mehr heilen (TP normal). Außerdem verlierst du W6 WP pro Schicht, die du wach bleibst. Erreichst du bei Schlafentzug null WP, brichst du zusammen und schläfst mindestens eine Schicht, ohne zu erwachen. Nach einer Schicht Schlaf heilst du WP und Zustände wieder normal.</p>') }}
+        {{ r.quick('Krankheit', 'Gefahr', '<p>Setzt du dich einer gefährlichen Krankheit aus, wird eine offene vergleichende Probe zwischen der <strong>Virulenz</strong> der Krankheit und deiner KON gewürfelt. Gewinnst du, widerstehst du. Sonst wirst du nach einem Tag krank: Du erhältst den Zustand Kränkelnd und verlierst W6 TP. Solange du krank bist, kannst du TP, WP oder Zustände nicht heilen. Jeden Tag wird neu gewürfelt, und jeder Fehlschlag verursacht W6 Schaden. Erreichst du krank null TP, stirbst du einen Tag später. Sobald du die vergleichende Probe gewinnst, bist du geheilt.</p><p><strong>Pflege:</strong> Wer dich mit Heilkunde pflegt, kann den Wurf gegen die Virulenz an deiner Stelle ablegen. Ein Kräutersud gibt einen Vorteil.</p>') }}
+        {% for t in tables.hazards %}
+            {% set body %}{% for paragraph in t.description_de|split("\n\n") %}<p>{{ paragraph }}</p>{% endfor %}{% endset %}
+            {{ r.entry(t.name_de, t.name_de ~ ' ' ~ t.description_de, '', body) }}
         {% endfor %}
+        <h2>Reise &amp; Wildnis <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Lager machen', 'Wildnisleben', '<p>Die Charaktere müssen mindestens einen Tagesabschnitt pro Tag schlafen, um Schlafentzug zu vermeiden. In der Wildnis muss jeder Spielercharakter eine <strong>Wildnisleben</strong>-Probe ablegen, um einen geeigneten Rastplatz zu finden. Wer keinen Schlafpelz hat, würfelt mit Nachteil. Misslingt die Probe, zählt der Tagesabschnitt nicht als Schlaf und kann auch nicht als Rast über einen Tagesabschnitt genutzt werden.</p><p><strong>Zelt:</strong> Ein Zelt gewährt beim Lagermachen einen Vorteil. Bei Erfolg können mehrere Personen im Zelt schlafen, ohne selbst zu würfeln. Ein kleines Zelt bietet Platz für zwei Personen, ein großes für sechs. Würfelt nur eine Person für das Zelt und misslingt es, können andere Charaktere für denselben Tagesabschnitt einzeln würfeln.</p><p><strong>Wache halten:</strong> Zufallsbegegnungen können jederzeit eintreten. Es kann klug sein, in verschiedenen Tagesabschnitten zu schlafen, damit immer jemand wach ist.</p><p><strong>Gefährliche Orte:</strong> An manchen Orten, etwa in einem Verlies voller Feinde, können die Charaktere weder lagern noch eine Rast über einen Tagesabschnitt einlegen. Sie müssen zuerst den Ort verlassen und einen sichereren suchen.</p>') }}
+        {{ r.quick('Nahrung in der Wildnis', 'Tagesabschnitt', '<p>In der Wildnis kann ein Spielercharakter einen Tagesabschnitt mit Jagen, Fischen oder dem Sammeln essbarer Pflanzen verbringen. Währenddessen kommt er auf der Karte nicht voran.</p><p><strong>Jagen:</strong> Du brauchst eine Fernkampfwaffe oder eine Jagdfalle. Zuerst legst du eine Probe auf <strong>Jagen &amp; Fischen</strong> ab, um ein Tier aufzuspüren. Gelingt sie, bestimmt die Jagdtabelle (unter Tabellen), um welches Tier es sich handelt. Das Töten erfordert einen zweiten Wurf, mit der Waffe oder mit Jagen &amp; Fischen bei einer Falle. Manche Tiere lassen sich nicht mit einer Falle fangen. Die Tabelle zeigt, wie viele Rationen das Tier liefert.</p><p><strong>Fischen:</strong> Du brauchst Angelzeug und eine Probe auf Jagen &amp; Fischen. Bei Erfolg fängst du W4 Rationen mit der Angel oder W6 Rationen mit einem Fischernetz.</p><p><strong>Sammeln:</strong> Lege eine Wildnisleben-Probe ab, im Winter mit Nachteil, im Herbst mit Vorteil. Bei Erfolg findest du W3 Rationen essbarer Pilze, Wurzeln und anderer Pflanzen.</p><p><strong>Kochen:</strong> Wer rohen Fisch oder rohes Fleisch isst, riskiert Krankheit: Es wird gegen Virulenz 10 gewürfelt. Pflanzen kann man roh essen, aber zwei Rationen roher Pflanzen decken nur den Tagesbedarf von einer Ration. Das Kochen von bis zu zehn Rationen dauert einen Tagesabschnitt und erfordert eine gelungene Wildnisleben-Probe, sonst gilt das Essen als ungekocht. Eine Feldküche gibt einen Vorteil auf die Probe, ebenso eine richtige Küche, in der man beliebig viel kochen kann. Siehe auch die Heldenfähigkeit Meisterkoch.</p>') }}
+        {{ r.quick('Reiten im Kampf', 'Reiten', '<p>Ein treues Pferd oder ein anderes Reittier ist ein großer Vorteil. Alle Spielercharaktere können aufsteigen und langsam reiten. Anspruchsvollere Manöver erfordern eine <strong>Reiten</strong>-Probe.</p><ul>
+            <li><strong>Satteltaschen:</strong> Die Ausrüstungslisten nennen, wie viel das Tier tragen kann.</li>
+            <li><strong>Bewegung:</strong> Beritten reist du doppelt so schnell wie zu Fuß, etwa 30 Kilometer pro Schicht.</li>
+            <li><strong>Kampf:</strong> Das Reittier muss kampfgeschult sein. Du nutzt seine Bewegungsrate statt deiner. Alle Angriffe und Paraden verwenden den <em>niedrigeren</em> Wert aus Reiten und Waffenfertigkeit. Reiten ersetzt Ausweichen. Ohne Sattel erhalten alle Würfe einen Nachteil. Feinde müssen wählen, ob sie dich oder dein Reittier angreifen. Nahkampfangriffe vom Boden aus gegen dich haben einen Nachteil.</li>
+            <li><strong>Schaden:</strong> Reittiere heilen TP wie Spielercharaktere. Bei null TP macht ein Reittier keine Todeswürfe, es stirbt.</li>
+        </ul>') }}
+        <h2>Traglast <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Traglast', 'STÄ', '<p>Du kannst so viele Gegenstände im Inventar mitführen, wie die Hälfte deiner <strong>STÄ</strong> beträgt (aufgerundet). Nur Gegenstände, die auf deinem Inventarbogen stehen, zählen zur Traglast.</p><ul><li><strong>Griffbereite Waffen:</strong> bis zu drei, auf dem Bogen unter Waffen eingetragen, zählen nicht zur Traglast. Schilde zählen als Waffen.</li><li><strong>Helm &amp; Rüstung:</strong> was du am Körper trägst, hat einen eigenen Abschnitt und zählt nicht.</li><li><strong>Nahrung:</strong> bis zu vier Rationen zählen als ein Gegenstand. Notiere immer, wie viele Rationen du noch hast.</li><li><strong>Fackeln &amp; Laternen:</strong> Fackel, Lampe und Laterne zählen je als ein Gegenstand. Ihr Feuer kann ausgehen, Lampen und Laternen lassen sich mit Lampenöl nachfüllen.</li><li><strong>Pfeile &amp; Schleudersteine:</strong> Du musst nicht jeden Pfeil zählen, jeder Köcher zählt als ein Gegenstand. Solange du den Köcher hast, kannst du deine Waffe benutzen. Schleudersteine musst du gar nicht notieren.</li><li><strong>Rucksack:</strong> erhöht deine Traglast um 2, zählt selbst nicht zur Traglast, und du kannst immer nur einen Rucksack tragen.</li></ul>') }}
+        {{ r.quick('Schwere Gegenstände', 'Gewicht', '<p>Wirklich schwere Gegenstände zählen als zwei, drei oder mehr gewöhnliche Gegenstände. Das steht als <strong>Gewicht</strong> beim Gegenstand. Im Inventar belegen sie so viele Zeilen, wie ihr Gewicht beträgt. Ist kein Gewicht angegeben, beträgt es immer 1.</p>') }}
+        {{ r.quick('Kleinkram & Münzen', 'Gewicht 0', '<p>Kleine, leichte Gegenstände, die sich in einer geschlossenen Faust verstecken lassen, heißen <strong>Kleinkram</strong>. Sie wirken sich nicht auf deine Traglast aus und stehen im eigenen Abschnitt Kleinkram auf dem Bogen. Das Memento ist immer Kleinkram.</p><p><strong>Münzen:</strong> Einzelne Münzen sind Kleinkram, solange es weniger als 100 sind. 100 bis 199 Münzen zählen als ein Gegenstand, 200 bis 299 als zwei, und so weiter.</p>') }}
+        {{ r.quick('Überladen', 'STÄ', '<p>Du kannst zeitweise mehr tragen als deine Traglast. Dann musst du jedes Mal eine <strong>STÄ</strong>-Probe ablegen, wenn du dich in einer Kampfrunde bewegen oder während einer Reise einen Tagesabschnitt gehen willst. Misslingt sie, musst du Gegenstände ablegen oder bleibst stehen.</p><p><strong>Andere tragen:</strong> Wer eine andere Person trägt, gilt automatisch als überladen und kann nicht kämpfen.</p>') }}
+        {{ r.quick('Reittiere & Fahrzeuge', 'Tragkraft', '<p>Mit einem Pferd oder anderen Reittier kann das Tier deine Ausrüstung tragen. Wagen und Boote tragen noch schwerere Lasten. Ihre Tragkraft steht unter Ausrüstung bei den Fahrzeugen und Tieren.</p>') }}
     </div>
 
     {# ---------- Kampf ---------- #}
@@ -99,14 +89,12 @@
         {% set sta_skills = skills.combat|filter(s => s.attribute_code == 'STA') %}
         {% set gew_skills = skills.combat|filter(s => s.attribute_code == 'GEW') %}
 
-        <h2>Ablauf &amp; Initiative</h2>
+        <h2>Ablauf &amp; Initiative <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Runden & Initiative ziehen', 'Runde', '<p>Ein Kampf läuft in <strong>Runden</strong> ab, jede dauert etwa zehn Sekunden. Zu Beginn jeder Runde wird die Initiative gezogen: Jeder Beteiligte zieht eine zufällige Karte von 1 bis 10. Die Zahl bestimmt, wann du in der Runde dran bist (1 zuerst, dann 2 usw.). Diese Position heißt dein <strong>Zug</strong>. Haben alle gehandelt, beginnt die Runde neu mit frischer Initiative.</p>') }}
-        {{ r.dm('NSC-Initiative', 'Initiative', '<p>Um große Kämpfe zu vereinfachen, kann die Spielleitung eine einzige Karte für eine ganze NSC-Gruppe ziehen. Alle handeln dann im selben Zug, die Reihenfolge untereinander legt die Spielleitung fest. Monster haben oft mehrere Züge pro Runde und ziehen entsprechend mehrere Karten. Bei Überraschung wählt die Spielleitung, ob ein Angriff als überraschend gilt.</p>') }}
         {{ r.quick('Überraschung', 'Runde 1', '<p>Führst du einen überraschenden Angriff aus, darfst du dir in der ersten Kampfrunde eine beliebige Initiativkarte aussuchen. Greifen mehrere Charaktere überraschend an, dürfen alle wählen. Die übrigen Kämpfenden ziehen aus den verbleibenden Karten. Ab der zweiten Runde wird wie üblich gezogen.</p>') }}
         {{ r.quick('Warten', 'Initiative', '<p>In deinem Zug kannst du <strong>warten</strong>: Du tauschst deine Initiativkarte mit einem anderen Wesen, das nach dir an der Reihe wäre. Das Gegenüber darf den Tausch nicht ablehnen. Du kannst nicht mit jemandem tauschen, der schon dran war oder selbst gewartet hat. Monster warten nie.</p>') }}
         {{ r.quick('Initiativkarte umdrehen', 'Reaktion', '<p>Hattest du deinen Zug, drehst du deine Karte um. So ist für alle klar, dass du in dieser Runde keine Reaktion (etwa Parieren oder Ausweichen) mehr ausführen kannst.</p>') }}
-
-        <h2>Aktionen &amp; Bewegung</h2>
+        <h2>Aktionen &amp; Bewegung <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Zug: Bewegung und Aktion', 'Zug', '<p>In deinem Zug kannst du dich <strong>bewegen</strong> und <strong>eine Aktion</strong> ausführen. Du schilderst, wie du dich bewegst und was du tun willst; falls nötig wird gewürfelt. Du darfst dich vor oder nach der Aktion bewegen oder die Bewegung aufteilen. Beides muss in deinem Zug geschehen und kann nicht aufgespart werden (außer durch Warten).</p>') }}
         {{ r.quick('Mögliche Aktionen', 'Aktion', '<ul>
             <li><strong>Sprinten:</strong> verdoppelt deine Bewegungsrate in dieser Runde.</li>
@@ -140,20 +128,17 @@
             <li><strong>Feinde:</strong> an einem stehenden Feind, der dich aufhalten will, kommst du nicht vorbei. Ein menschengroßes Wesen blockiert etwa 2×2 Meter, Monster mehr. Du musst ihn zu Boden bringen oder seine TP auf null senken. Freunde darfst du passieren.</li>
         </ul>') }}
         {{ r.quick('Freier Angriff', 'Ausweichen', '<p>Stehst du innerhalb von 2 Metern eines Feindes und bewegst dich freiwillig von ihm weg, musst du eine <strong>Ausweichen</strong>-Probe ablegen. Sie zählt nicht als Aktion. Scheitert sie, erhält der Feind sofort einen zusätzlichen Nahkampfangriff gegen dich, den <strong>Freien Angriff</strong>. Er kostet ihn keine Aktion und kann weder pariert noch ausgewichen werden. Ein Monster führt dabei einen Monsterangriff aus, der auch andere treffen kann.</p><p>Der Freie Angriff entsteht auch, wenn du aus der Distanz startest, aber an einem Feind vorbeiläufst. Wer sich <em>um</em> einen Feind herum bewegt und innerhalb von 2 Metern bleibt, löst ihn nicht aus. Unfreiwillige Bewegung löst nie einen Freien Angriff aus.</p>') }}
-
-        <h2>Heimlicher Angriff &amp; Hinterhalt</h2>
+        <h2>Heimlicher Angriff &amp; Hinterhalt <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Heimlicher Angriff', 'Heimlichkeit', '<p>Schleichst du dich an jemand Ahnungslosen heran und greifst an, ist das ein <strong>heimlicher Angriff</strong>. Er geht mit Nah- und Fernkampfwaffen, aber nie im offenen Kampf (außer mit der Heldenfähigkeit Meuchler).</p><p>Zuerst legst du eine <strong>Heimlichkeit</strong>-Probe ab. Nah genug für den Nahkampf heranzukommen (bei den meisten Waffen innerhalb von 2 Metern) gibt einen Nachteil. Scheitert die Probe, bemerkt dich der Feind und die Initiative wird gezogen. Gelingt sie, gilt dein Angriff als überraschend: Du wählst deine Initiativkarte, erhältst einen <strong>Vorteil</strong> auf den Angriff, und das Ziel kann weder ausweichen noch parieren. Eine <em>unauffällige</em> Waffe verursacht eine Würfelstufe mehr Schaden (z. B. 2W8 statt 2W6). Heimliche Angriffe führt immer ein einzelner Angreifer gegen ein Ziel aus.</p>') }}
         {{ r.quick('Hinterhalt', 'Wahrnehmung', '<p>Ein <strong>Hinterhalt</strong> ist ein heimlicher Angriff aus dem Verborgenen auf einen Feind, der vorbeikommt. Jedes Opfer legt eine <strong>Wahrnehmung</strong>-Probe ab, um ihn zu bemerken (mit Nachteil, wenn die Angreifer gut vorbereitet sind). Wer scheitert, bekommt die untersten Karten (ab 10 aufwärts), zufällig gezogen.</p>') }}
-
-        <h2>Gelände &amp; Karten</h2>
+        <h2>Gelände &amp; Karten <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Kampfkarten', 'Raster', '<p>Mit einem Raster behaltet ihr den Überblick: Jedes Feld ist etwa 2×2 Meter groß. Türen, Wände und Aufstiege werden eingezeichnet. In der Regel steht nur ein Wesen pro Feld, aber du darfst ein Feld mit einem verbündeten Kämpfer durchqueren. Diagonale Bewegung und Angriffe sind erlaubt, nicht aber, wenn beide Felder, zwischen denen du dich bewegst, von Feinden blockiert oder besetzt sind. Wer 5×5-Fuß-Felder gewohnt ist, nutzt sie einfach als 2×2 Meter.</p>') }}
         {{ r.quick('Gelände', 'Gelände', '<ul>
             <li><strong>Beengt:</strong> wenig Platz oder niedrige Decke. Alle Nahkampfwaffen außer Stichwaffen und <em>unauffälligen</em> Waffen erhalten einen Nachteil auf alle Würfe.</li>
             <li><strong>Unwegsam:</strong> schwer begehbar. Bei jeder Bewegung musst du eine Akrobatik-Probe ablegen (keine Aktion). Bei Misserfolg fällst du hin und verlierst den Rest deiner Bewegung.</li>
             <li><strong>Schwach beleuchtet:</strong> Nachteil auf alle Fernkampfangriffe.</li>
         </ul>') }}
-
-        <h2>Nahkampf</h2>
+        <h2>Nahkampf <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Nahkampfangriff', 'Nahkampf', '<p>Für einen Nahkampfangriff musst du in der Regel innerhalb von 2 Metern des Ziels stehen (auf dem Raster auf einem angrenzenden Feld, auch diagonal). Du würfelst auf die Fertigkeit, die zu deiner Waffe gehört. Bei einem Treffer bestimmt die Waffe den Schadenswürfel. Der Schaden wird durch Schadensbonus und Drachenwurf erhöht und durch Rüstung gesenkt.</p>') }}
         {% set badges %}<span class="ui-badge ui-badge--berry">STÄ / GEW</span>{% endset %}
         {% set body %}
@@ -200,8 +185,7 @@
             <li><strong>6:</strong> Du triffst dich selbst. Schaden wie üblich, aber ohne Schadensbonus.</li>
         </ul>') }}
         {{ r.quick('Unbelebte Objekte', 'Schaden', '<p>Triffst du einen leblosen Gegenstand wie eine Tür oder ein Schloss, gelingt der Treffer automatisch. Du würfelst nur den Schaden. Leblose Objekte besitzen oft einen Rüstungswert.</p>') }}
-
-        <h2>Parieren &amp; Ausweichen</h2>
+        <h2>Parieren &amp; Ausweichen <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Parieren', 'Reaktion', '<p>Wirst du im Nahkampf getroffen, kannst du mit einer <strong>gezogenen</strong> Waffe oder einem Schild parieren. Eine Waffe zum Parieren zu ziehen geht nicht, denn freie Aktionen sind nur im eigenen Zug möglich. Du musst das Parieren ansagen, <em>bevor</em> der Angreifer den Schaden würfelt. Du kannst nicht unbewaffnet parieren und nicht denselben Angriff parieren <em>und</em> ausweichen. Parieren ist auch im Liegen möglich. Du würfelst auf deinen Fertigkeitswert der Waffe.</p>
             <ul>
                 <li><strong>Reaktion:</strong> Parieren ersetzt deinen Zug, die Initiativkarte wird sofort umgedreht. Wer schon dran war, kann nicht parieren (außer mit der Heldenfähigkeit Defensiv).</li>
@@ -217,17 +201,14 @@
             <li><strong>Bewegung:</strong> Bei Erfolg darfst du dich bis zu 2 Meter in beliebige Richtung bewegen, ohne Freie Angriffe auszulösen.</li>
             <li><strong>Monster:</strong> Monsterangriffe können in der Regel ausgewichen werden, sofern nicht anders angegeben.</li>
         </ul>') }}
-
-        <h2>Besondere Nahkampfangriffe</h2>
+        <h2>Besondere Nahkampfangriffe <span class="ui-badge rules-kind">Regel</span></h2>
         <p class="ui-muted">Sag vor dem Wurf an, dass du einen besonderen Angriff verwendest. Viele davon sind vergleichende Proben.</p>
-        {{ r.dm('NSC bei besonderen Angriffen', 'Vergleichend', '<p>Würfelt die Spielleitung für einen NSC, der die betreffende Fertigkeit nicht hat, würfelt sie gegen den Standardwert 5.</p>') }}
         {{ r.quick('Schwachstelle finden', 'Stich', '<p>Mit einer Stichwaffe suchst du eine Lücke in Rüstung oder natürlicher Panzerung. Du erhältst einen Nachteil auf den Angriff, aber bei einem Treffer gilt der Feind als ungerüstet.</p>') }}
         {{ r.quick('Zu Boden werfen', 'Vergleichend', '<p>Statt Schaden zu verursachen, versuchst du, den Feind umzuwerfen. Das ist eine vergleichende Probe zwischen deiner Waffenfertigkeit und seinem <strong>Ausweichen</strong>. Hat die Waffe das Merkmal <em>Umwerfen</em>, erhältst du einen Vorteil. Der Angriff zählt für dich als Aktion, nicht für den Gegner, und kann nicht pariert oder ausgewichen werden. Nutzvoll im Team: Ein Freund greift den liegenden Feind an, bevor er aufsteht.</p>') }}
         {{ r.quick('Entwaffnen', 'Vergleichend', '<p>Du versuchst, dem Gegner die Waffe zu entreißen. Vergleichende Probe zwischen deiner und seiner Waffenfertigkeit. Der Angriff zählt als Aktion für dich, nicht für ihn, und kann nicht pariert oder ausgewichen werden. Hält er die Waffe mit beiden Händen, erhältst du einen Nachteil. Gelingt es, landet die Waffe W6 Meter entfernt in einer Richtung deiner Wahl. Das Aufheben ist eine Aktion. Gegen Schilde und natürliche Waffen wirkt Entwaffnen nicht.</p>') }}
         {{ r.quick('Umklammern', 'Prügelei', '<p>Du versuchst, einen humanoiden Gegner zu umklammern. Vergleichende Probe zwischen deiner <strong>Prügelei</strong> und seiner. Der Angriff zählt für dich als Aktion, nicht für ihn, und kann nicht pariert oder ausgewichen werden. Scheitert er, fällst du zu Boden. Gelingt er, fallt ihr beide, und der Feind steckt in deinem Griff.</p><p>Solange du ihn hältst, kann er sich weder bewegen noch Aktionen ausführen, die Körperbewegung erfordern, außer es zu versuchen, sich zu befreien: eine vergleichende Prügelei-Probe, die für ihn eine freie Aktion ist (für dich nicht). Während du hältst, kannst du dich selbst weder bewegen noch Aktionen mit Körperbewegung ausführen, außer <em>brechen</em>: ein unbewaffneter Angriff mit Vorteil, der weder ausgewichen noch pariert werden kann. Den Gegner loszulassen ist eine freie Aktion.</p>') }}
         {{ r.quick('Taktik im Nahkampf', 'Tipp', '<p>Deine wertvollste Ressource sind deine Aktionen: Du hast nur eine pro Runde, Reaktionen eingeschlossen. Greift die Gruppe gemeinsam an, lohnt es sich, einen Gegner zu fokussieren, da er nur einmal parieren oder ausweichen kann. Gegen einen gleich starken Feind kann es klug sein zu warten: Verfehlt sein Angriff, musst du nicht parieren und kannst selbst angreifen, während er sich nicht schützen kann. Dafür gibst du ihm die Initiative. Die Heldenfähigkeiten Defensiv und Blitzschnell helfen hier.</p>') }}
-
-        <h2>Fernkampf</h2>
+        <h2>Fernkampf <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Fernkampfangriff', 'Fernkampf', '<p>Die Waffe muss gezogen sein (freie Aktion). Du solltest mehr als 2 Meter vom Ziel entfernt stehen, also <em>nicht</em> auf einem angrenzenden Feld. Bei 2 Metern oder weniger erhältst du einen Nachteil. Du würfelst auf die Fertigkeit der Waffe. Wurfwaffen nutzen dieselbe Fertigkeit wie im Nahkampf (z. B. Messer oder Speere). Bei einem Treffer bestimmt die Waffe den Schaden, erhöht durch Schadensbonus und Drachenwurf, gesenkt durch Rüstung.</p><p><strong>Reichweite:</strong> Jede Waffe hat eine Reichweite in Metern, in der sie effektiv ist. Bis zur doppelten Reichweite darfst du schießen, dann aber mit Nachteil.</p>') }}
         {{ r.quick('Kritischer Treffer (Fernkampf)', 'Drache', '<p>Ein Drache beim Fernkampfangriff ist ein kritischer Treffer: Er kann nur ausgewichen (oder mit Schild pariert) werden, wenn der Gegner ebenfalls einen Drachen würfelt. Du wählst:</p><ul>
             <li><strong>Doppelter Schaden:</strong> Würfle die Waffenwürfel doppelt (ohne Schadensbonus und andere Boni). Ein kritischer Treffer mit einem Langbogen verursacht 2W12.</li>
@@ -235,55 +216,28 @@
         </ul>') }}
         {{ r.quick('Parieren & Ausweichen (Fernkampf)', 'Schild', '<p>Einen Fernkampfangriff zu parieren erfordert einen <strong>Schild</strong>. Es funktioniert wie im Nahkampf, nur gibt ein Drache keinen Gegenangriff. Ausweichen geht wie im Nahkampf.</p>') }}
         {{ r.quick('Verdeckte Ziele', 'Nachteil', '<p>Ist deine Sicht auf das Ziel teilweise durch ein Hindernis oder eine Person (auch Freund) verdeckt, erhältst du einen Nachteil. Auf dem Raster kannst du an einer Person zwischen dir und dem Ziel vorbei schießen, ebenfalls mit Nachteil. Ist das Ziel völlig außer Sicht (etwa hinter einer Wand), kannst du es nicht beschießen.</p>') }}
-
-        <h2>Schaden, Rüstung &amp; Tod</h2>
+        <h2>Rüstung &amp; Schaden <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Rüstung & Helme', 'Rüstungswert', '<p>Lederrüstung, Kettenhemd oder Plattenpanzer schützen vor Schaden. Rüstung an- oder abzulegen kostet eine Aktion. Du kannst nur eine Rüstung gleichzeitig tragen, sie zählt nicht zur Traglast. Manche Rüstungen geben Nachteile auf bestimmte Fertigkeiten oder schränken die Bewegung ein.</p><p><strong>Rüstungswert:</strong> Bei körperlichem Schaden ziehst du den Rüstungswert vom Schaden ab. Wird der Schaden eines Nahkampfangriffs komplett aufgehoben, nimmt stattdessen die angreifende Waffe den Schaden und kann dabei beschädigt werden.</p><p><strong>Helme:</strong> Sie lassen sich mit der Rüstung kombinieren und erhöhen den Rüstungswert. Auf- und Absetzen kostet eine Aktion. Helme können Nachteile auf bestimmte Fertigkeiten geben.</p>') }}
         {{ r.quick('Schadensarten & Rüstung', 'Optional', '<p>Gilt, wenn die optionale Regel für Schadensarten verwendet wird: Leder und Nietenleder geben +2 Rüstungswert gegen Wucht. Kettenhemd gibt +2 gegen Hieb. Ist die Schadensart nicht angegeben, wirkt die Rüstung normal.</p>') }}
-        {{ r.quick('Sterben & Todeswürfe', 'KON', '<p>Sinken deine TP auf null, fällst du zu Boden und riskierst zu sterben. Du kannst dich nicht bewegen und nur versuchen, dich aufzurappeln.</p><p><strong>Todeswurf:</strong> In jeder folgenden Runde musst du in deinem Zug eine Probe auf <strong>KON</strong> ablegen. Sie kann nicht strapaziert werden, auch nicht mit der optionalen Regel. Trage die Ergebnisse auf dem Charakterbogen ein. Nach drei gelungenen Würfen erhältst du W6 TP zurück und musst nicht mehr würfeln. Nach drei Fehlschlägen stirbt dein Charakter. Ein Drache zählt als zwei Erfolge, ein Dämon als zwei Fehlschläge. Nach dem Kampf zählst du weiter die Runden, bis alle Todeswürfe gemacht sind. Gescheiterte Todeswürfe werden zurückgesetzt, wenn du überlebst.</p><p><strong>Weiterer Schaden:</strong> Erleidest du bei null TP zusätzlichen Schaden, zählt das automatisch als gescheiterter Todeswurf.</p>') }}
-        {{ r.quick('Aufrappeln', 'Überzeugen', '<p>Ein anderer Spielercharakter in bis zu 10 Metern Entfernung und in Hörweite kann dich per <strong>Überzeugen</strong> aufrappeln, damit du trotz null TP weiterkämpfst. Das zählt als Aktion. Gelingt es, kannst du normal handeln, musst aber weiter Todeswürfe machen. Du kannst auch versuchen, dich selbst aufzurappeln, mit einer WIL-Probe mit Nachteil (statt Überzeugen).</p>') }}
-        {{ r.quick('Leben retten', 'Heilkunde', '<p>Hast du null TP, kann dich eine andere Person neben dir mit einer gelungenen <strong>Heilkunde</strong>-Probe retten (Aktion). Ohne Verbände erhält sie einen Nachteil. Mehrere Versuche sind erlaubt. Gelingt der Wurf, musst du keine Todeswürfe mehr machen und erhältst W6 TP zurück. Du kannst dein eigenes Leben so nicht retten, auch wenn du dich aufgerappelt hast. Weitere Heilkunde-Würfe haben keine Wirkung, sobald du nicht mehr auf null TP bist, außer beim Rasten. Auch Magie kann Leben retten.</p>') }}
-        {{ r.quick('Sofortiger Tod', 'Tod', '<p>Negative TP werden nicht notiert. Senkt aber ein einziger Angriff deine TP auf einen negativen Wert in Höhe deiner vollen TP, stirbt dein Charakter sofort.</p>') }}
-        {{ r.dm('NSC bei null TP', 'Tod', '<p>Erreicht ein NSC null TP, gibt es keine Todeswürfe. Die Spielleitung entscheidet, ob er lebt oder stirbt. Ein sofort tötender Angriff tötet einen NSC jedoch ebenso wie einen Spielercharakter.</p>') }}
-        {{ r.quick('Schwere Verletzungen', 'KON', '<p>Wurdest du auf null TP gebracht und hast überlebt, riskierst du schwere Verletzungen, die lange heilen und dauerhafte Folgen haben können. Lege eine Probe auf <strong>KON</strong> ab. Scheitert sie, erleidest du eine Verletzung: etwa Nachteile auf bestimmte Attribute und Fertigkeiten, halbierte Bewegung oder dauerhaft gesenkte Fertigkeitswerte. Die Heilzeit halbiert sich, wenn du mindestens einen Tagesabschnitt pro Tag rastest und von jemandem versorgt wirst, der eine Heilkunde-Probe schafft. Dauerhaft gesenkte Fertigkeitswerte kannst du neu erlernen.</p>') }}
-
-        <h2>Zustände</h2>
-        {{ r.quick('Die sechs Zustände', 'Zustand', '<p>Jeder Zustand gibt dir einen <strong>Nachteil</strong> auf alle Proben auf ein bestimmtes Attribut und auf Fertigkeiten, die darauf basieren:</p><ul>
-            <li><strong>Erschöpft</strong> – STÄ</li>
-            <li><strong>Kränkelnd</strong> – KON</li>
-            <li><strong>Benommen</strong> – GEW</li>
-            <li><strong>Wütend</strong> – INT</li>
-            <li><strong>Verängstigt</strong> – WIL</li>
-            <li><strong>Verzagt</strong> – CHA</li>
-        </ul>') }}
-        {{ r.quick('Zustand erleiden', 'Zustand', '<p>Am häufigsten erleidest du einen Zustand, wenn du einen Wurf strapazierst (optionale Regel). Dann wählst du einen Zustand und beschreibst, wie du ihn bekommst. Auch Monsterangriffe oder Zauber können Zustände verursachen.</p><p><strong>Mehrere Zustände:</strong> Hast du den Zustand schon, musst du einen anderen wählen. Hast du alle sechs, verlierst du stattdessen W6 WP. Bist du bei null WP, verlierst du W6 TP.</p><p><strong>Heilung:</strong> Bei einer Kurzen Rast (Viertel) heilst du einen Zustand deiner Wahl, bei einer Langen Rast (Tagesabschnitt) alle.</p>') }}
-
-        <h2>Hunger, Schlaf &amp; Krankheit</h2>
-        {{ r.quick('Hunger', 'Gefahr', '<p>Du musst mindestens eine Ration Essen pro Tag zu dir nehmen. Nach einem Tag ohne Essen bist du ausgehungert und kannst dich nur noch durch Magie von TP, WP oder Zuständen erholen. Du erleidest außerdem einen Schadenspunkt pro Tag. Erreichst du ausgehungert null TP, stirbst du nach einem Tag. Hast du eine Ration gegessen, bist du nicht mehr ausgehungert und heilst normal.</p>') }}
-        {{ r.quick('Schlafentzug', 'Gefahr', '<p>Du brauchst jeden Tag mindestens eine Schicht ungestörten Schlaf. In Rüstung kannst du nicht schlafen. Nach drei Schichten ohne Schlaf kannst du WP und Zustände nicht mehr heilen (TP normal). Außerdem verlierst du W6 WP pro Schicht, die du wach bleibst. Erreichst du bei Schlafentzug null WP, brichst du zusammen und schläfst mindestens eine Schicht, ohne zu erwachen. Nach einer Schicht Schlaf heilst du WP und Zustände wieder normal.</p>') }}
-        {{ r.quick('Krankheit', 'Gefahr', '<p>Setzt du dich einer gefährlichen Krankheit aus, wird eine offene vergleichende Probe zwischen der <strong>Virulenz</strong> der Krankheit und deiner KON gewürfelt. Gewinnst du, widerstehst du. Sonst wirst du nach einem Tag krank: Du erhältst den Zustand Kränkelnd und verlierst W6 TP. Solange du krank bist, kannst du TP, WP oder Zustände nicht heilen. Jeden Tag wird neu gewürfelt, und jeder Fehlschlag verursacht W6 Schaden. Erreichst du krank null TP, stirbst du einen Tag später. Sobald du die vergleichende Probe gewinnst, bist du geheilt.</p><p><strong>Pflege:</strong> Wer dich mit Heilkunde pflegt, kann den Wurf gegen die Virulenz an deiner Stelle ablegen. Ein Kräutersud gibt einen Vorteil.</p>') }}
-
-        <h2>Reittiere &amp; Improvisierte Waffen</h2>
-        {{ r.quick('Reiten im Kampf', 'Reiten', '<p>Ein treues Pferd oder ein anderes Reittier ist ein großer Vorteil. Alle Spielercharaktere können aufsteigen und langsam reiten. Anspruchsvollere Manöver erfordern eine <strong>Reiten</strong>-Probe.</p><ul>
-            <li><strong>Satteltaschen:</strong> Die Ausrüstungslisten nennen, wie viel das Tier tragen kann.</li>
-            <li><strong>Bewegung:</strong> Beritten reist du doppelt so schnell wie zu Fuß, etwa 30 Kilometer pro Schicht.</li>
-            <li><strong>Kampf:</strong> Das Reittier muss kampfgeschult sein. Du nutzt seine Bewegungsrate statt deiner. Alle Angriffe und Paraden verwenden den <em>niedrigeren</em> Wert aus Reiten und Waffenfertigkeit. Reiten ersetzt Ausweichen. Ohne Sattel erhalten alle Würfe einen Nachteil. Feinde müssen wählen, ob sie dich oder dein Reittier angreifen. Nahkampfangriffe vom Boden aus gegen dich haben einen Nachteil.</li>
-            <li><strong>Schaden:</strong> Reittiere heilen TP wie Spielercharaktere. Bei null TP macht ein Reittier keine Todeswürfe, es stirbt.</li>
-        </ul>') }}
+        <h2>Improvisierte Waffen <span class="ui-badge rules-kind">Regel</span></h2>
         {{ r.quick('Improvisierte Waffen', 'Umgebung', '<p>Die Umgebung lässt sich im Kampf nutzen: als Waffe, Deckung oder zur Fortbewegung. Improvisierte Waffen sind normalerweise nur <strong>einmal</strong> verwendbar und danach verbraucht. Ihr Einsatz ist eine Aktion und lässt sich mit Bewegung kombinieren.</p><p>Pro Kampf stehen meist nur wenige solcher Gegenstände zur Verfügung. Was in der Umgebung herumliegt, siehst du an der Szene.</p>') }}
-        {{ r.dm('Improvisierte Waffen bereitstellen', 'Umgebung', '<p>Zu Kampfbeginn kann die Spielleitung W3 improvisierte Waffen auswürfeln oder festlegen, ihre Position auf der Karte markieren oder sagen, dass sie überall in der Gegend verfügbar sind. Abenteuer können eigene improvisierte Waffen für einen Ort mitbringen.</p>') }}
     </div>
 
-    {# ---------- Zauber ---------- #}
+    {# ---------- Magie ---------- #}
     <div class="ui-tabpanel ui-stack" id="panel-spells" role="tabpanel" aria-labelledby="tab-spells" hidden>
-        {# Ideas only, not in the catalog: what the official Free League books add (Book of Magic, Path of Glory, announced Trudvang). #}
-        <aside class="ui-card">
-            <h3 class="ui-card__title">Könnten noch dazukommen</h3>
-            <h4 class="rules-subhead">Zauberschulen</h4>
-            <p class="ui-muted">Dämonologie, Harmonismus, Illusionismus, Nekromantie, Symbolismus, Hexerei, Alchemie, Verzauberung, Drakomantie (aus dem Book of Magic, Dämonologie und Nekromantie auch in Path of Glory).</p>
-        </aside>
-
+        <h2>Magie <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Zauber wirken', 'WP', '<p>Um einen Zauber zu wirken, gibst du Willenskraftpunkte (WP) aus und legst eine Probe auf deine Fertigkeit in der jeweiligen Schule ab. Gelingt sie, entfaltet der Zauber seine Wirkung wie beschrieben, sonst hat er keine. Du kannst den Wurf strapazieren, falls diese optionale Regel verwendet wird.</p><p>Du besitzt keine Fertigkeitsstufen für einzelne Zauber, nur für die Schule. Entweder du kennst einen Zauber oder nicht. Du behältst die Zauber im Gedächtnis oder in deinem Zauberbuch.</p>') }}
+        {{ r.quick('Kraftstufe', 'WP', '<p>Die Kraftstufe gibt an, wie viel Macht du einem Zauber verleihst. Sie reicht von 1 bis 3. Das Wirken kostet <strong>2 WP je Kraftstufe</strong>, normale Zauber also immer mindestens 2 WP. Manche Zauber kennen keine Kraftstufen und kosten immer 2 WP.</p>') }}
+        {{ r.quick('Zaubertricks', 'WP', '<p>Zaubertricks sind schwache, vergleichsweise harmlose Zauber. Sie kosten 1 WP und gelingen automatisch, brauchen im Kampf aber dennoch eine Aktion.</p>') }}
+        {{ r.quick('Komponenten', 'Vorgabe', '<p>Für einen Zauber brauchst du die in seiner Beschreibung genannten Komponenten, und er wirkt erst, wenn alle vorhanden sind: <strong>Wort</strong> (Gesang oder Wort der Macht), <strong>Geste</strong> (bestimmte Handbewegung), <strong>Fokus</strong> (ein Gegenstand in der Hand, etwa Stab, Kristallkugel oder Amulett) und <strong>Zutaten</strong> (ein Material, das dabei verbraucht wird).</p>') }}
+        {{ r.quick('Zauberdauer', 'Aktion', '<p>Soweit nicht anders angegeben, ist das Wirken im Kampf eine Aktion. Reaktionszauber wirkst du außerhalb deines Zuges, sie ersetzen aber im Gegensatz zu Parieren und Ausweichen nicht deine Aktionen der Runde. Du kannst so viele wirken, wie du willst, solange deine WP reichen.</p>') }}
+        {{ r.quick('Reichweite & Wirkungsbereich', 'Reichweite', '<p>Zauber wirken nicht über ihre Reichweite hinaus. Flächenzaubern kann man weder ausweichen noch sie parieren, außer es steht anders da. Der Wirkungsbereich ist, wenn nicht anders angegeben, kreisförmig mit dem Zaubernden als Mittelpunkt. Du kannst Ziele vom Bereich ausnehmen, erleidest dabei aber einen Nachteil auf den Wurf. <strong>Kugel:</strong> alle Ziele im Bereich außer dem Zaubernden. <strong>Kegel:</strong> ein Bereich, dessen Breite an jedem Punkt der Entfernung zur Quelle entspricht, die Reichweite ist die Länge.</p>') }}
+        {{ r.quick('Wirkungsdauer', 'Dauer', '<p><strong>Sofort:</strong> setzt sofort ein und hält nicht an. <strong>Runde:</strong> bis du in der nächsten Runde wieder am Zug bist. <strong>Viertel:</strong> ein Viertel lang. <strong>Tagesabschnitt:</strong> bis der laufende Tagesabschnitt endet. <strong>Konzentration:</strong> endet, wenn du eine andere Aktion durchführst, Schaden erleidest oder eine WIL-Probe gegen Furcht misslingt. Bei einer plötzlichen Störung, etwa einem Geräusch, brauchst du eine WIL-Probe (keine Aktion), um die Konzentration zu halten.</p>') }}
+        {{ r.quick('Fehlschlag, Drache und Dämon', 'Probe', '<p>Misslingt die Probe, hat der Zauber keine Wirkung, aber du gibst die WP trotzdem aus. Du darfst erzählen, wie sich der Fehlschlag auswirkt, solange es keinen spieltechnischen Effekt hat.</p><p><strong>Drache:</strong> Dein Ziel muss ebenfalls einen Drachen werfen, um dem Zauber zu widerstehen, ihn zu parieren oder ihm auszuweichen. Außerdem wählst du einen Effekt: Schaden oder Reichweite werden verdoppelt, der Zauber kostet keine WP oder du wirkst sofort einen weiteren Zauber (mit Nachteil auf die Probe).</p><p><strong>Dämon:</strong> Du kannst den Wurf nicht strapazieren. Für diesen Fall gibt es die Tabelle Magische Patzer unter Tabellen.</p>') }}
+        {{ r.quick('Magie lernen', 'Lehrer & Grimoire', '<p>Neue Zauber lernst du von einem Lehrer oder aus einem Grimoire. Du brauchst dafür einen Fertigkeitswert in der betreffenden Magieschule (oder in irgendeiner Schule bei allgemeiner Magie).</p><p><strong>Voraussetzungen:</strong> Manche Zauber haben eine Voraussetzung, meist eine Magieschule oder die Kenntnis eines anderen Zaubers.</p><p><strong>Lehrer:</strong> Der einfachste (aber oft teuerste) Weg. Die Unterweisung dauert einen Tagesabschnitt, du kannst den neuen Zauber aber erst nach Ende der Spielsitzung einsetzen. Dann musst du eine Steigerungsmarke der Schule einsetzen, um den Zauber zu lernen, statt die Fertigkeit zu steigern, und legst eine <strong>INT</strong>-Probe mit Vorteil ab. Bei Erfolg lernst du den Zauber, sonst nicht.</p><p><strong>Grimoire:</strong> Mit Glück findest du Zauber in den Grimoires anderer Magier. Du lernst sie wie bei einem Lehrer, würfelst aber auf <strong>Fremdsprachen</strong> statt auf INT, ohne Vorteil.</p><p><strong>Zaubertricks:</strong> Sie sind leichter zu lernen. Von einem Lehrer oder aus einem Grimoire dauert es ein Viertel, ohne Steigerungsmarke und ohne Wurf.</p><p><strong>Magieschulen:</strong> Eine weitere Schule lernst du, indem du zuerst die Heldenfähigkeit Magisches Talent erwirbst und dann mindestens eine Woche bei einem Lehrer mit Fertigkeitswert in der Schule studierst. Am Ende der Woche legst du eine INT-Probe ab. Gelingt sie, erhältst du den Basiswert (INT) als Fertigkeitswert der Schule, sonst kannst du es nach einer weiteren Woche wieder versuchen. Auch Nichtmagier können Magie so lernen.</p>') }}
+        <h2>Zauberliste <span class="ui-badge rules-kind">Liste</span></h2>
         {% for school, data in schools %}
-            <h2>{{ school }}</h2>
+            <h3 class="rules-subhead">{{ school }}</h3>
             {% if data.lore_de %}<p class="ui-muted">{{ data.lore_de }}</p>{% endif %}
             {% for s in data.spells %}
                 {% set badges %}
@@ -303,8 +257,19 @@
         {% endfor %}
     </div>
 
-    {# ---------- Berufe ---------- #}
-    <div class="ui-tabpanel ui-stack" id="panel-professions" role="tabpanel" aria-labelledby="tab-professions" hidden>
+    {# ---------- Charakter ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-character" role="tabpanel" aria-labelledby="tab-character" hidden>
+        <h2>Völker <span class="ui-badge rules-kind">Liste</span></h2>
+        {% for k in kins %}
+            {% set badges %}<span class="ui-badge">W12 {{ k.d12_min == k.d12_max ? k.d12_min : k.d12_min ~ '–' ~ k.d12_max }}</span>{% endset %}
+            {% set body %}
+                <dl class="facts"><div><dt>Grundbewegung</dt><dd>{{ k.movement_base }} m</dd></div></dl>
+                {% for a in k.abilities %}
+                    <p><strong>{{ a.name_de }}.</strong> {{ a.description_de }}</p>
+                {% endfor %}
+            {% endset %}{{ r.entry(k.name_de, k.name_de, badges, body) }}
+        {% endfor %}
+        <h2>Berufe <span class="ui-badge rules-kind">Liste</span></h2>
         {% for p in professions %}
             {% set badges %}<span class="ui-badge">{{ p.key_attribute_de }}</span>{% if p.kin_restriction_de %}<span class="ui-badge ui-badge--gold">nur {{ p.kin_restriction_de }}</span>{% endif %}{% endset %}
             {% set body %}
@@ -322,23 +287,16 @@
                 {% if p.grants_magic %}<p class="ui-muted">Dieser Beruf bringt Zauberei mit.</p>{% endif %}
             {% endset %}{{ r.entry(p.name_de, p.name_de ~ ' ' ~ p.skills|join(' '), badges, body) }}
         {% endfor %}
-    </div>
-
-    {# ---------- Völker ---------- #}
-    <div class="ui-tabpanel ui-stack" id="panel-kins" role="tabpanel" aria-labelledby="tab-kins" hidden>
-        {% for k in kins %}
-            {% set badges %}<span class="ui-badge">W12 {{ k.d12_min == k.d12_max ? k.d12_min : k.d12_min ~ '–' ~ k.d12_max }}</span>{% endset %}
-            {% set body %}
-                <dl class="facts"><div><dt>Grundbewegung</dt><dd>{{ k.movement_base }} m</dd></div></dl>
-                {% for a in k.abilities %}
-                    <p><strong>{{ a.name_de }}.</strong> {{ a.description_de }}</p>
-                {% endfor %}
-            {% endset %}{{ r.entry(k.name_de, k.name_de, badges, body) }}
+        {% for group, title in {'regular': 'Fertigkeiten', 'combat': 'Kampffertigkeiten', 'secondary': 'Sekundäre Fertigkeiten'} %}
+            <h2>{{ title }} <span class="ui-badge rules-kind">Liste</span></h2>
+            {% for s in skills[group] %}
+                {% set badges %}<span class="ui-badge">{{ s.attribute_code }}</span>{% endset %}
+                {% set body %}
+                    <p>{{ s.description_de ?: 'Keine Beschreibung.' }}</p>
+                {% endset %}{{ r.entry(s.name_de, s.name_de ~ ' ' ~ s.description_de, badges, body) }}
+            {% endfor %}
         {% endfor %}
-    </div>
-
-    {# ---------- Heldenfähigkeiten ---------- #}
-    <div class="ui-tabpanel ui-stack" id="panel-heroic" role="tabpanel" aria-labelledby="tab-heroic" hidden>
+        <h2>Heldenfähigkeiten <span class="ui-badge rules-kind">Liste</span></h2>
         {% for h in heroicAbilities %}
             {% set badges %}{% if h.wp_note_de %}<span class="ui-badge ui-badge--sky">WP {{ h.wp_note_de }}</span>{% endif %}{% if h.repeatable %}<span class="ui-badge ui-badge--gold">mehrfach</span>{% endif %}{% endset %}
             {% set body %}
@@ -346,10 +304,66 @@
                 <p>{{ h.description_de }}</p>
             {% endset %}{{ r.entry(h.name_de, h.name_de ~ ' ' ~ h.description_de, badges, body) }}
         {% endfor %}
+        <h2>Erfahrung &amp; Steigern <span class="ui-badge rules-kind">Regel</span></h2>
+        {{ r.quick('Steigerungsmarken', 'Fertigkeit', '<p>Hast du beim Einsatz einer Fertigkeit einen <strong>Drachen</strong> oder <strong>Dämon</strong> gewürfelt, hake das Kästchen neben der Fertigkeit ab. Am Ende der Spielsitzung stellt die SL dir die folgenden Fragen. Antwortest du mit „Ja“ und kannst es begründen, darfst du eine weitere Marke bei einer unmarkierten Fertigkeit deiner Wahl setzen. Die SL hat das letzte Wort, sollte aber großzügig sein.</p><ul><li>Hast du an der Spielsitzung teilgenommen?</li><li>Hast du einen neuen Ort erkundet?</li><li>Hast du einen oder mehrere gefährliche Gegner besiegt?</li><li>Hast du ein Hindernis ohne Gewalt überwunden?</li><li>Hast du deiner Schwäche nachgegeben (optionale Regel)?</li></ul>') }}
+        {{ r.quick('Steigerungswürfe', 'Fertigkeit', '<p>Nach dem Setzen der Marken würfelst du für jede Marke einen W20. Liegt das Ergebnis <strong>über</strong> deinem aktuellen Fertigkeitswert, steigt die Fertigkeit um eins, bis höchstens 18. Danach löschst du die Marken und beginnst in der nächsten Spielsitzung neu.</p>') }}
+        {{ r.quick('Lehrer', 'Dienst', '<p>Ein Tagesabschnitt intensiven Trainings bei einem Lehrer, dessen Fertigkeitswert mindestens 15 beträgt und über deinem eigenen liegt, gibt dir einen zusätzlichen Steigerungswurf. Du würfelst sofort, ohne das Spielsitzungsende abzuwarten. Ein Lehrer kann eine Fertigkeit nur um <strong>eins</strong> anheben. Danach musst du die Fertigkeit erst durch Erfahrung verbessern, bevor du wieder Hilfe von einem Lehrer bekommen kannst. Lehrer, besonders mit hohem Wert, sind meist sehr teuer (siehe Dienste unter Items).</p>') }}
+        {{ r.quick('Magie steigern', 'Magie', '<p>Eine Magieschule, die du schon kennst, lässt sich wie jede andere Fertigkeit verbessern. Neue Zauber und neue Magieschulen erfordern jedoch besonderes Training (siehe Zauber, Magie lernen).</p>') }}
+        {{ r.quick('Neue Heldenfähigkeiten', 'Heldentalent', '<p>Du kannst im Spiel auf zwei Wegen neue Heldenfähigkeiten erhalten:</p><ul><li>Steigerst du eine Fertigkeit auf 18, erhältst du sofort eine neue Heldenfähigkeit deiner Wahl. Sinkt die Fertigkeit später unter 18, behältst du die Fähigkeit und erhältst eine weitere, wenn sie wieder auf 18 steigt.</li><li>Nach einer großen Heldentat können die SL oder das Abenteuer dir eine Heldenfähigkeit schenken. Das sollte ein seltenes Ereignis sein, nie öfter als einmal pro Abenteuer von üblicher Länge.</li></ul><p>Um eine neue Heldenfähigkeit zu erhalten, musst du ihre Voraussetzung an Fertigkeiten erfüllen.</p>') }}
+        {{ r.quick('Schwäche überwinden', 'Optional', '<p>Handelst du während der Sitzung eindeutig gegen deine Schwäche, erhältst du zwei Steigerungsmarken (statt einer fürs Nachgeben). Du hast deine Schwäche damit überwunden und musst sie streichen. Danach musst du eine ganze Sitzung ohne Schwäche spielen, dann darfst du eine neue wählen, am besten eine, die sich aus dem Spiel ergeben hat.</p>') }}
+    </div>
+
+    {# ---------- Ausrüstung ---------- #}
+    <div class="ui-tabpanel ui-stack" id="panel-equipment" role="tabpanel" aria-labelledby="tab-equipment" hidden>
+        {% for group, title in {'weapon': 'Waffen', 'armor': 'Rüstungen', 'misc': 'Ausrüstung'} %}
+            <h2>{{ title }} <span class="ui-badge rules-kind">Liste</span></h2>
+            {% for i in items[group] %}
+                {% set badges %}
+                    {% if group == 'weapon' %}<span class="ui-badge ui-badge--berry">{{ i.damage_de }}</span>{% endif %}
+                    {% if group == 'armor' %}<span class="ui-badge ui-badge--sky">RS {{ i.armor_value }}</span>{% endif %}
+                    <span class="ui-badge ui-badge--gold">{{ i.price_de }}</span>
+                {% endset %}
+                {% set body %}
+                    <p>{{ i.description_de }}</p>
+                    <dl class="facts">
+                        {% if group == 'weapon' %}
+                            <div><dt>Griff</dt><dd>{{ i.grip_de }}</dd></div>
+                            <div><dt>Reichweite</dt><dd>{{ i.range_de }}</dd></div>
+                            <div><dt>Schaden</dt><dd>{{ i.damage_de }}</dd></div>
+                            {% if i.str_requirement %}<div><dt>Benötigte STA</dt><dd>{{ i.str_requirement }}</dd></div>{% endif %}
+                            {% if i.durability %}<div><dt>Haltbarkeit</dt><dd>{{ i.durability }}</dd></div>{% endif %}
+                            {% if i.traits_de %}<div><dt>Merkmale</dt><dd>{{ i.traits_de }}</dd></div>{% endif %}
+                        {% elseif group == 'armor' %}
+                            <div><dt>Platz</dt><dd>{{ i.armor_slot == 'head' ? 'Kopf' : 'Körper' }}</dd></div>
+                            <div><dt>Rüstungswert</dt><dd>{{ i.armor_value }}</dd></div>
+                            {% if i.armor_penalties %}<div><dt>Abzüge</dt><dd>{{ i.armor_penalties|join(', ') }}</dd></div>{% endif %}
+                        {% endif %}
+                        {% if group == 'misc' %}
+                            {% set weight = i.weight + 0 %}
+                            <div><dt>Gewicht</dt><dd>{{ weight == 0 ? 'Kleinkram' : (weight == 0.25 ? '¼' : weight|number_format(0)) }}</dd></div>
+                        {% endif %}
+                        <div><dt>Seltenheit</dt><dd>{{ i.rarity }}</dd></div>
+                        <div><dt>Preis</dt><dd>{{ i.price_de }}</dd></div>
+                    </dl>
+                {% endset %}{{ r.entry(i.name_de, i.name_de ~ ' ' ~ i.description_de, badges, body) }}
+            {% endfor %}
+        {% endfor %}
+        <h2>Dienste <span class="ui-badge rules-kind">Liste</span></h2>
+        {% for sv in services %}
+            {% set badges %}<span class="ui-badge ui-badge--gold">{{ sv.price_de }}{{ sv.unit_de ? ' ' ~ sv.unit_de : '' }}</span>{% endset %}
+            {% set body %}
+                <p>{{ sv.effect_de }}</p>
+                <dl class="facts">
+                    <div><dt>Seltenheit</dt><dd>{{ sv.rarity }}</dd></div>
+                    <div><dt>Preis</dt><dd>{{ sv.price_de }}{{ sv.unit_de ? ' ' ~ sv.unit_de : '' }}</dd></div>
+                </dl>
+            {% endset %}{{ r.entry(sv.name_de, sv.name_de ~ ' ' ~ sv.effect_de, badges, body) }}
+        {% endfor %}
     </div>
 
     {# ---------- Tabellen ---------- #}
     <div class="ui-tabpanel ui-stack" id="panel-tables" role="tabpanel" aria-labelledby="tab-tables" hidden>
+        <h2>Wurftabellen <span class="ui-badge rules-kind">Tabelle</span></h2>
         <details class="ui-details" data-search="verletzungen wounded table">
             <summary><span class="ui-details__title">{{ ui.icon('heart') }} Verletzungen (W20)</span></summary>
             <div class="ui-details__body">
@@ -386,24 +400,11 @@
         </div>
         </details>
 
-        <details class="ui-details" data-search="rast rasten erholung">
-            <summary><span class="ui-details__title">{{ ui.icon('flame') }} Rast</span></summary>
-            <div class="ui-details__body">
-            {% for t in tables.rest_types %}
-                <p><strong>{{ t.name_de }}</strong> <span class="ui-badge ui-badge--gold">{{ t.duration_de }}</span><br>{{ t.effect_de }}</p>
-            {% endfor %}
-        </div>
-        </details>
-
-        <details class="ui-details" data-search="gefahren">
-            <summary><span class="ui-details__title">{{ ui.icon('triangle-alert') }} Gefahren</span></summary>
-            <div class="ui-details__body">
-            {% for t in tables.hazards %}
-                <p><strong>{{ t.name_de }}</strong><br>{{ t.description_de }}</p>
-            {% endfor %}
-        </div>
-        </details>
+        {% for group_tables in tables.roll_tables %}
+            {% for t in group_tables|filter(t => t.code == 'jagd') %}{{ r.rolltable(t) }}{% endfor %}
+        {% endfor %}
     </div>
+
 
     <div class="ui-empty" data-rules-empty hidden>
         {{ ui.icon('search') }}

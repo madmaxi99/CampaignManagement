@@ -15,10 +15,29 @@ const HTML = `
     </div>
     <dialog data-rest-sheet>
         <button data-rest="breather">Verschnaufen</button>
+        <input type="number" data-rest-wp="breather">
+        <input type="number" data-rest-hp="short">
+        <input type="number" data-rest-wp="short">
         <input type="checkbox" data-rest-tended>
         <select data-rest-condition><option value="">keinen</option><option value="tired">Erschöpft</option></select>
         <button data-rest="short">Kurze Rast</button>
     </dialog>
+    <button data-death-open hidden>Todeswürfe</button>
+    <dialog data-death-sheet data-successes="0" data-failures="0">
+        <strong data-death-count="successes">0</strong><strong data-death-count="failures">0</strong>
+        <div data-death-buttons>
+            <button data-death="success">Gelungen</button>
+            <button data-death="failure">Gescheitert</button>
+        </div>
+        <p data-death-dead hidden>tot</p>
+        <fieldset data-death-survive hidden>
+            <input type="number" data-death-hp>
+            <input type="radio" name="death-injury" value="" checked>
+            <input type="radio" name="death-injury" value="4">
+            <button data-death-survive-confirm>Bestätigen</button>
+        </fieldset>
+    </dialog>
+    <li data-injury="7"><button data-injury-remove="7">Geheilt</button></li>
     <button class="condition-chip" aria-pressed="false" data-condition="tired">Erschöpft</button>
     <input type="checkbox" data-skill-mark="3">
     <div class="gear-entry">
@@ -88,13 +107,19 @@ test('a short rest sends the choices and shows what the server healed', async ()
     const chip = document.querySelector('[data-condition="tired"]');
     chip.setAttribute('aria-pressed', 'true');
 
+    change(document.querySelector('[data-rest-hp="short"]'), '9');
+    change(document.querySelector('[data-rest-wp="short"]'), '3');
     change(document.querySelector('[data-rest-tended]'), true);
     change(document.querySelector('[data-rest-condition]'), 'tired');
     click(document.querySelector('[data-rest="short"]'));
     await flush();
 
     assert.deepEqual(fetch.calls, [
-        { method: 'POST', url: '/character/5/rest', body: { type: 'short', tended: true, condition: 'tired' } },
+        {
+            method: 'POST',
+            url: '/character/5/rest',
+            body: { type: 'short', hp_roll: 9, wp_roll: 3, tended: true, condition: 'tired' },
+        },
     ]);
     assert.equal(document.querySelector('[data-vital="hp"] .ui-bar__label').textContent, '9 / 10');
     assert.equal(document.querySelector('[data-vital="wp"] .ui-bar__label').textContent, '5 / 8');
@@ -174,4 +199,62 @@ test('deleting the character also forgets it in this browser', async () => {
 
     assert.deepEqual(JSON.parse(window.localStorage.getItem('trpg.myCharacters')), ['9']);
     assert.equal(location.href, '/characters');
+});
+
+test('death rolls are clicked in, three successes offer the way back with an injury list', async () => {
+    const { document, fetch } = await openSheet({
+        'POST /character/5/death-rolls': { death_successes: 3, death_failures: 1 },
+        'POST /character/5/death-rolls/survive': { hp_current: 4, injury: null },
+    });
+    const survive = document.querySelector('[data-death-survive]');
+    assert.equal(survive.hidden, true);
+
+    click(document.querySelector('[data-death="success"]'));
+    await flush();
+
+    assert.deepEqual(fetch.calls.at(-1), {
+        method: 'POST',
+        url: '/character/5/death-rolls',
+        body: { result: 'success' },
+    });
+    assert.equal(document.querySelector('[data-death-count="successes"]').textContent, '3');
+    assert.equal(document.querySelector('[data-death-count="failures"]').textContent, '1');
+    assert.equal(survive.hidden, false);
+    assert.equal(document.querySelector('[data-death-buttons]').hidden, true);
+
+    document.querySelector('[data-death-hp]').value = '4';
+    document.querySelector('input[name="death-injury"][value="4"]').checked = true;
+    click(document.querySelector('[data-death-survive-confirm]'));
+    await flush();
+
+    assert.deepEqual(fetch.calls.at(-1), {
+        method: 'POST',
+        url: '/character/5/death-rolls/survive',
+        body: { hp_roll: 4, injury_id: '4' },
+    });
+    assert.equal(document.querySelector('.ui-bar__label').textContent, '4 / 10');
+});
+
+test('the death roll button shows at 0 HP and hides again above 0', async () => {
+    const { document } = await openSheet({
+        'POST /character/5/hp': { hp_current: 0, death_successes: 0, death_failures: 0 },
+    });
+    const opener = document.querySelector('[data-death-open]');
+    const minus = document.querySelector('[data-vital-step="-1"]');
+
+    for (let i = 0; i < 6; i += 1) click(minus);
+    assert.equal(opener.hidden, false);
+
+    click(document.querySelector('[data-vital-step="1"]'));
+    assert.equal(opener.hidden, true);
+});
+
+test('an injury can be marked as healed', async () => {
+    const { document, fetch } = await openSheet({ 'DELETE /character/5/injuries/7': { removed: true } });
+
+    click(document.querySelector('[data-injury-remove]'));
+    await flush();
+
+    assert.deepEqual(fetch.calls.at(-1), { method: 'DELETE', url: '/character/5/injuries/7', body: undefined });
+    assert.equal(document.querySelector('[data-injury]'), null);
 });

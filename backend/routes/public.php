@@ -18,6 +18,7 @@ return function (App $app, RulesRepository $rulesRepository, DmAuth $dmAuth): vo
 
     $app->get('/rules', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'rules.twig', [
         'items' => $rulesRepository->items(),
+        'services' => $rulesRepository->services(),
         'skills' => $rulesRepository->skills(),
         'schools' => $rulesRepository->spellsBySchool(),
         'professions' => $rulesRepository->professions(),

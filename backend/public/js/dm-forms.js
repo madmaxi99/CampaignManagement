@@ -1,6 +1,6 @@
 /*
  * Generic DM editing helpers, driven by data attributes (no per-page JS):
- *   form[data-dm-form]  data-action, data-after ("reload" | "goto:/url/{id}"), data-id,
+ *   form[data-dm-form]  data-action, data-after ("reload" | "toast" | "goto:/url/{id}"), data-id,
  *                       data-upload-url ("/x/{id}/image"), data-upload-field (default "image")
  *   [data-dm-delete]    data-url, data-confirm, data-after
  *   [data-dm-post]      data-url, data-body (JSON), data-after
@@ -18,6 +18,8 @@ function after(spec, data) {
         window.location.reload();
     } else if (spec.indexOf('goto:') === 0) {
         window.location.href = spec.slice(5).replace('{id}', data && data.id !== undefined ? data.id : '');
+    } else if (spec === 'toast') {
+        window.ui.toast('Erledigt');
     }
 }
 

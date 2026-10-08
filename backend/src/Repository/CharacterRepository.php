@@ -584,7 +584,8 @@ final readonly class CharacterRepository
 
         $clamped = max(0, min($max, $value));
 
-        $update = $this->db->prepare("UPDATE characters SET {$currentColumn} = :value WHERE id = :character_id");
+        $reset = $prefix === 'hp' && $clamped > 0 ? ', death_successes = 0, death_failures = 0' : '';
+        $update = $this->db->prepare("UPDATE characters SET {$currentColumn} = :value{$reset} WHERE id = :character_id");
         $update->execute([
             'value' => $clamped,
             'character_id' => $characterId,
@@ -594,20 +595,35 @@ final readonly class CharacterRepository
     }
 
     /**
-     * Applies a rest of the Dragonbane rules and returns the new values.
-     * 'breather': W6 WP. 'short': W6 TP (2W6 if tended), W6 WP and one condition of choice.
-     * 'long': all TP and WP back and every condition removed.
+     * Applies a rest of the Dragonbane rules. Nothing is rolled here: the dice are
+     * thrown at the table and the results are passed in.
+     * 'breather': WP roll (W6). 'short': TP roll (W6, or 2W6 if tended), WP roll (W6)
+     * and one condition of choice, plus once per session one more condition through
+     * the memento. 'long': all TP and WP back, every condition removed.
      *
-     * @return array{hp_current: int, wp_current: int, hp_gain: int, wp_gain: int, cleared: list<string>}
+     * @return array{hp_current: int, wp_current: int, hp_gain: int, wp_gain: int, cleared: list<string>, memento_used: bool}
      */
-    public function rest(int $characterId, string $type, bool $tended = false, ?string $condition = null): array
-    {
+    public function rest(
+        int $characterId,
+        string $type,
+        ?int $hpRoll = null,
+        ?int $wpRoll = null,
+        bool $tended = false,
+        ?string $condition = null,
+        ?string $mementoCondition = null
+    ): array {
         if (! in_array($type, ['breather', 'short', 'long'], true)) {
             throw new InvalidArgumentException('Unbekannte Rast.');
         }
+        if ($type !== 'long') {
+            $this->assertRoll($wpRoll, 1, 6, 'WP');
+        }
+        if ($type === 'short') {
+            $tended ? $this->assertRoll($hpRoll, 2, 12, 'TP') : $this->assertRoll($hpRoll, 1, 6, 'TP');
+        }
 
         $stmt = $this->db->prepare(
-            'SELECT hp_current, hp_max, wp_current, wp_max FROM characters WHERE id = :character_id'
+            'SELECT hp_current, hp_max, wp_current, wp_max, memento_used, memento_de FROM characters WHERE id = :character_id'
         );
         $stmt->execute([
             'character_id' => $characterId,
@@ -629,6 +645,19 @@ final readonly class CharacterRepository
         ]);
         $active = array_map(strval(...), array_column($activeStmt->fetchAll(), 'condition_code'));
 
+        $mementoUsed = (bool) $row['memento_used'];
+        if ($mementoCondition !== null) {
+            if ($type !== 'short') {
+                throw new InvalidArgumentException('Das Memento wirkt nur bei einer Kurzen Rast.');
+            }
+            if ($mementoUsed || trim((string) $row['memento_de']) === '') {
+                throw new InvalidArgumentException('Das Memento ist in dieser Spielsitzung nicht mehr verfügbar.');
+            }
+            if ($mementoCondition === $condition || ! in_array($mementoCondition, $active, true)) {
+                throw new InvalidArgumentException('Das Memento heilt einen weiteren, aktiven Zustand.');
+            }
+        }
+
         $newHp = $hp;
         $newWp = $wp;
         $cleared = [];
@@ -637,19 +666,28 @@ final readonly class CharacterRepository
             $newWp = $wpMax;
             $cleared = $active;
         } elseif ($type === 'short') {
-            $newHp = min($hpMax, $hp + random_int(1, 6) + ($tended ? random_int(1, 6) : 0));
-            $newWp = min($wpMax, $wp + random_int(1, 6));
+            $newHp = min($hpMax, $hp + (int) $hpRoll);
+            $newWp = min($wpMax, $wp + (int) $wpRoll);
             $cleared = $condition !== null && in_array($condition, $active, true) ? [$condition] : [];
+            if ($mementoCondition !== null) {
+                $cleared[] = $mementoCondition;
+                $mementoUsed = true;
+            }
         } else {
-            $newWp = min($wpMax, $wp + random_int(1, 6));
+            $newWp = min($wpMax, $wp + (int) $wpRoll);
         }
 
         $update = $this->db->prepare(
-            'UPDATE characters SET hp_current = :hp, wp_current = :wp WHERE id = :character_id'
+            'UPDATE characters SET hp_current = :hp, wp_current = :wp, memento_used = :memento_used,'
+            . ' death_successes = IF(:hp_reset > 0, 0, death_successes), death_failures = IF(:hp_reset2 > 0, 0, death_failures)'
+            . ' WHERE id = :character_id'
         );
         $update->execute([
             'hp' => $newHp,
             'wp' => $newWp,
+            'memento_used' => $mementoUsed ? 1 : 0,
+            'hp_reset' => $newHp,
+            'hp_reset2' => $newHp,
             'character_id' => $characterId,
         ]);
         $clear = $this->db->prepare(
@@ -668,7 +706,175 @@ final readonly class CharacterRepository
             'hp_gain' => $newHp - $hp,
             'wp_gain' => $newWp - $wp,
             'cleared' => $cleared,
+            'memento_used' => $mementoUsed,
         ];
+    }
+
+    /**
+     * Counts one death roll made at the table (KON roll at 0 HP): 'success' and
+     * 'failure' count one, 'dragon' two successes, 'demon' two failures, 'damage'
+     * (further damage at 0 HP) one failure; 'reset' clears both counters.
+     *
+     * @return array{death_successes: int, death_failures: int}
+     */
+    public function recordDeathRoll(int $characterId, string $result): array
+    {
+        $steps = [
+            'success' => [1, 0],
+            'dragon' => [2, 0],
+            'failure' => [0, 1],
+            'damage' => [0, 1],
+            'demon' => [0, 2],
+            'reset' => [0, 0],
+        ];
+        if (! isset($steps[$result])) {
+            throw new InvalidArgumentException('Unbekanntes Todeswurf-Ergebnis.');
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT hp_current, death_successes, death_failures FROM characters WHERE id = :character_id'
+        );
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
+        $row = $stmt->fetch();
+        if ($row === false) {
+            throw new InvalidArgumentException('Unbekannter Charakter.');
+        }
+        if ((int) $row['hp_current'] > 0) {
+            throw new InvalidArgumentException('Todeswürfe gibt es nur bei 0 TP.');
+        }
+
+        $successes = $result === 'reset' ? 0 : min(3, (int) $row['death_successes'] + $steps[$result][0]);
+        $failures = $result === 'reset' ? 0 : min(3, (int) $row['death_failures'] + $steps[$result][1]);
+
+        $update = $this->db->prepare(
+            'UPDATE characters SET death_successes = :successes, death_failures = :failures WHERE id = :character_id'
+        );
+        $update->execute([
+            'successes' => $successes,
+            'failures' => $failures,
+            'character_id' => $characterId,
+        ]);
+
+        return [
+            'death_successes' => $successes,
+            'death_failures' => $failures,
+        ];
+    }
+
+    /**
+     * After three successful death rolls: the character gets back the TP rolled at
+     * the table (W6) and may suffer one injury picked from the catalog.
+     *
+     * @return array{hp_current: int, injury: array<string, mixed>|null}
+     */
+    public function surviveDeathRolls(int $characterId, ?int $hpRoll, ?int $injuryId): array
+    {
+        $this->assertRoll($hpRoll, 1, 6, 'TP');
+
+        $stmt = $this->db->prepare(
+            'SELECT hp_current, hp_max, death_successes FROM characters WHERE id = :character_id'
+        );
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
+        $row = $stmt->fetch();
+        if ($row === false || (int) $row['hp_current'] > 0 || (int) $row['death_successes'] < 3) {
+            throw new InvalidArgumentException('Erst nach drei gelungenen Todeswürfen.');
+        }
+
+        $injury = $injuryId === null ? null : $this->injuryById($injuryId);
+        if ($injuryId !== null && $injury === null) {
+            throw new InvalidArgumentException('Unbekannte Verletzung.');
+        }
+
+        $hp = min((int) $row['hp_max'], (int) $hpRoll);
+        $update = $this->db->prepare(
+            'UPDATE characters SET hp_current = :hp, death_successes = 0, death_failures = 0 WHERE id = :character_id'
+        );
+        $update->execute([
+            'hp' => $hp,
+            'character_id' => $characterId,
+        ]);
+        if ($injury !== null) {
+            $insert = $this->db->prepare(
+                'INSERT INTO character_injuries (character_id, injury_id) VALUES (:character_id, :injury_id)'
+            );
+            $insert->execute([
+                'character_id' => $characterId,
+                'injury_id' => $injuryId,
+            ]);
+        }
+
+        return [
+            'hp_current' => $hp,
+            'injury' => $injury,
+        ];
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function injuries(int $characterId): array
+    {
+        $stmt = $this->db->prepare(<<<SQL
+            SELECT ci.id, i.name_de, i.effect_de, i.healing_de
+            FROM character_injuries ci
+            JOIN catalog_injuries i ON i.id = ci.injury_id
+            WHERE ci.character_id = :character_id
+            ORDER BY ci.id
+            SQL);
+        $stmt->execute([
+            'character_id' => $characterId,
+        ]);
+
+        return $stmt->fetchAll();
+    }
+
+    /**
+     * All injuries of the catalog, to pick one from a list.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function injuryCatalog(): array
+    {
+        return $this->db->query(
+            'SELECT id, roll_min, roll_max, name_de, effect_de, healing_de FROM catalog_injuries ORDER BY roll_min'
+        )
+            ->fetchAll();
+    }
+
+    public function removeInjury(int $characterId, int $rowId): void
+    {
+        $stmt = $this->db->prepare('DELETE FROM character_injuries WHERE id = :id AND character_id = :character_id');
+        $stmt->execute([
+            'id' => $rowId,
+            'character_id' => $characterId,
+        ]);
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function injuryById(int $injuryId): ?array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT id, name_de, effect_de, healing_de FROM catalog_injuries WHERE id = :id'
+        );
+        $stmt->execute([
+            'id' => $injuryId,
+        ]);
+        $row = $stmt->fetch();
+
+        return $row === false ? null : $row;
+    }
+
+    private function assertRoll(?int $roll, int $min, int $max, string $label): void
+    {
+        if ($roll === null || $roll < $min || $roll > $max) {
+            throw new InvalidArgumentException("Der {$label}-Wurf muss zwischen {$min} und {$max} liegen.");
+        }
     }
 
     public function toggleCondition(int $characterId, string $code): bool

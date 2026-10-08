@@ -45,7 +45,7 @@
             <div class="ui-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash>
                 <button class="ui-tab" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">{{ ui.icon('book-open') }} Lesen</button>
                 <button class="ui-tab" role="tab" id="tab-chronicle" aria-controls="panel-chronicle" aria-selected="false">{{ ui.icon('notebook-pen') }} Chronik</button>
-                <button class="ui-tab" role="tab" id="tab-dice" aria-controls="panel-dice" aria-selected="false">{{ ui.icon('dices') }} Würfeln</button>
+                <button class="ui-tab" role="tab" id="tab-tables" aria-controls="panel-tables" aria-selected="false">{{ ui.icon('scroll-text') }} Tabellen</button>
             </div>
 
             {# ----- Read ----- #}
@@ -134,23 +134,12 @@
                 </div>
             </div>
 
-            {# ----- Dice ----- #}
-            <div class="ui-tabpanel ui-stack" id="panel-dice" role="tabpanel" aria-labelledby="tab-dice" hidden>
-                <section class="ui-card ui-stack">
-                    <h2 class="ui-card__title">{{ ui.icon('dices') }} Würfel</h2>
-                    <div class="dice-result" data-dice-result aria-live="polite">–</div>
-                    <div class="dice-row">
-                        {% for die in [4, 6, 8, 10, 12, 20] %}
-                            <button type="button" class="ui-btn ui-btn--ghost" data-die="{{ die }}">W{{ die }}</button>
-                        {% endfor %}
-                    </div>
-                    <p class="ui-muted" data-dice-history></p>
-                </section>
-
+            {# ----- Tables ----- #}
+            <div class="ui-tabpanel ui-stack" id="panel-tables" role="tabpanel" aria-labelledby="tab-tables" hidden>
                 {% for table in encounterTables %}
                     <section class="ui-card">{{ cards.encounter_table(table, entityRegistry) }}</section>
                 {% else %}
-                    <div class="ui-empty">{{ ui.icon('dices') }}<strong>Keine Begegnungstabellen</strong><span>Wähle bei einem Ort im Planen-Modus eine Zufallsbegegnungs-Tabelle, dann steht sie hier.</span></div>
+                    <div class="ui-empty">{{ ui.icon('scroll-text') }}<strong>Keine Begegnungstabellen</strong><span>Wähle bei einem Ort im Planen-Modus eine Zufallsbegegnungs-Tabelle, dann steht sie hier.</span></div>
                 {% endfor %}
             </div>
         </section>

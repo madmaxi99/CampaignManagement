@@ -1,0 +1,44 @@
+{% macro entry(title, search, badges, body) %}
+    <details class="ui-details" data-search="{{ search|lower }}">
+        <summary>
+            <span class="ui-details__title">{{ title }}</span>
+            <span class="ui-details__badges">{{ badges|raw }}</span>
+        </summary>
+        <div class="ui-details__body">{{ body|raw }}</div>
+    </details>
+{% endmacro %}
+
+{% macro quick(title, badge, body) %}
+    {% import _self as s %}
+    {{ s.entry(title, title ~ ' ' ~ body|striptags, '<span class="ui-badge">' ~ badge ~ '</span>', body) }}
+{% endmacro %}
+
+{% macro dm(title, badge, body) %}
+    {% import _self as s %}
+    {{ s.entry(title, title ~ ' spielleitung sl ' ~ body|striptags, '<span class="ui-badge ui-badge--berry">SL</span><span class="ui-badge">' ~ badge ~ '</span>', body) }}
+{% endmacro %}
+
+{% macro roll(min, max) %}{{ min == max ? min : min ~ '–' ~ max }}{% endmacro %}
+
+{% macro rolltable(t) %}
+    {% import _self as s %}
+    <details class="ui-details" data-search="{{ (t.title_de ~ ' ' ~ t.group_de)|lower }}">
+        <summary><span class="ui-details__title">{{ t.title_de }}</span><span class="ui-details__badges"><span class="ui-badge">{{ t.die_de }}</span></span></summary>
+        <div class="ui-details__body">
+            {% if t.intro_de %}<p class="ui-muted">{{ t.intro_de }}</p>{% endif %}
+            <table class="ui-table ui-table--cards">
+                <thead><tr><th>Wurf</th>{% for h in t.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+                <tbody>
+                    {% for row in t.rows %}
+                        <tr>
+                            <td data-label="Wurf">{{ s.roll(row.roll_min, row.roll_max) }}</td>
+                            <td data-label="{{ t.headers[0] }}"><strong>{{ row.name_de }}</strong></td>
+                            {% if t.headers|length > 1 %}<td data-label="{{ t.headers[1] }}">{{ row.effect_de }}</td>{% endif %}
+                            {% if t.headers|length > 2 %}<td data-label="{{ t.headers[2] }}">{{ row.extra_de }}</td>{% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+{% endmacro %}

@@ -39,6 +39,8 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
             'weapons' => $repository->weapons($characterId),
             'armor' => $repository->armor($characterId),
             'inventory' => $repository->inventory($characterId),
+            'injuries' => $repository->injuries($characterId),
+            'injuryCatalog' => $repository->injuryCatalog(),
         ];
     };
 
@@ -101,9 +103,12 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
     $app->post('/character/{id:[0-9]+}/hp', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
         $body = json_decode((string) $request->getBody(), true);
         $newValue = $characterRepository->setHp((int) $character['id'], (int) $body['value']);
+        $after = $characterRepository->findById((int) $character['id']);
 
         return jsonResponse($response, [
             'hp_current' => $newValue,
+            'death_successes' => (int) ($after['death_successes'] ?? 0),
+            'death_failures' => (int) ($after['death_failures'] ?? 0),
         ]);
     }));
 
@@ -123,8 +128,11 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
             $result = $characterRepository->rest(
                 (int) $character['id'],
                 (string) ($body['type'] ?? ''),
+                isset($body['hp_roll']) ? (int) $body['hp_roll'] : null,
+                isset($body['wp_roll']) ? (int) $body['wp_roll'] : null,
                 (bool) ($body['tended'] ?? false),
-                is_string($condition) && $condition !== '' ? $condition : null
+                is_string($condition) && $condition !== '' ? $condition : null,
+                is_string($body['memento_condition'] ?? null) && $body['memento_condition'] !== '' ? $body['memento_condition'] : null
             );
         } catch (InvalidArgumentException $e) {
             return jsonResponse($response, [
@@ -133,6 +141,44 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
         }
 
         return jsonResponse($response, $result);
+    }));
+
+    $app->post('/character/{id:[0-9]+}/death-rolls', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
+        $body = json_decode((string) $request->getBody(), true);
+        try {
+            $result = $characterRepository->recordDeathRoll((int) $character['id'], (string) ($body['result'] ?? ''));
+        } catch (InvalidArgumentException $e) {
+            return jsonResponse($response, [
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+
+        return jsonResponse($response, $result);
+    }));
+
+    $app->post('/character/{id:[0-9]+}/death-rolls/survive', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
+        $body = json_decode((string) $request->getBody(), true);
+        try {
+            $result = $characterRepository->surviveDeathRolls(
+                (int) $character['id'],
+                isset($body['hp_roll']) ? (int) $body['hp_roll'] : null,
+                isset($body['injury_id']) && $body['injury_id'] !== '' ? (int) $body['injury_id'] : null
+            );
+        } catch (InvalidArgumentException $e) {
+            return jsonResponse($response, [
+                'error' => $e->getMessage(),
+            ], 422);
+        }
+
+        return jsonResponse($response, $result);
+    }));
+
+    $app->delete('/character/{id:[0-9]+}/injuries/{rowId:[0-9]+}', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
+        $characterRepository->removeInjury((int) $character['id'], (int) $args['rowId']);
+
+        return jsonResponse($response, [
+            'removed' => true,
+        ]);
     }));
 
     $app->post('/character/{id:[0-9]+}/conditions/{code}/toggle', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {

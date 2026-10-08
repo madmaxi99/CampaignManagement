@@ -94,6 +94,7 @@ final class Application
         );
         (require $backendDir . '/routes/dm_catalog.php')($app, $catalogEditor, $worldRepository);
         (require $backendDir . '/routes/dm_lore.php')($app);
+        (require $backendDir . '/routes/dm_rules.php')($app, $rulesRepository);
 
         return $app;
     }

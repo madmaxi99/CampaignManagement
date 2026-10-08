@@ -104,7 +104,10 @@ CREATE TABLE catalog_items (
     price_gold INT NOT NULL DEFAULT 0,
     price_silver INT NOT NULL DEFAULT 0,
     price_copper INT NOT NULL DEFAULT 0,
-    kind ENUM('weapon', 'armor', 'misc') NOT NULL
+    kind ENUM('weapon', 'armor', 'misc') NOT NULL,
+    -- Gewicht für die Traglast: 1 = ein gewöhnlicher Gegenstand (Standard, wenn das
+    -- Buch kein Gewicht nennt), 0 = Kleinkram ("—" im Buch), 0.25 = Feldration usw.
+    weight DECIMAL(4,2) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE catalog_item_weapons (
@@ -169,6 +172,11 @@ CREATE TABLE characters (
     hp_current INT NOT NULL,
     wp_max INT NOT NULL,
     wp_current INT NOT NULL,
+    -- Todeswürfe bei 0 TP (je 0 bis 3), zurückgesetzt, sobald die TP über 0 liegen.
+    death_successes TINYINT NOT NULL DEFAULT 0,
+    death_failures TINYINT NOT NULL DEFAULT 0,
+    -- 1 = das Memento wurde in dieser Spielsitzung schon benutzt (Reset durch die SL).
+    memento_used BOOLEAN NOT NULL DEFAULT 0,
     coins_gold INT NOT NULL DEFAULT 0,
     coins_silver INT NOT NULL DEFAULT 0,
     coins_copper INT NOT NULL DEFAULT 0,
@@ -644,10 +652,59 @@ CREATE TABLE catalog_hazards (
     description_de TEXT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Allgemeine Wurftabellen des Regelwerks (Reise-Missgeschicke, Jagd, improvisierte
+-- Waffen, Schätze, NSC erschaffen ...). Die App würfelt nie: die Tabellen werden
+-- nur angezeigt, gewürfelt wird am Tisch. group_de gruppiert in /rules, die
+-- Spaltenköpfe stehen in headers_de ("Name|Wirkung|Wert", Trenner "|").
+CREATE TABLE catalog_roll_tables (
+    code VARCHAR(40) PRIMARY KEY,
+    group_de VARCHAR(50) NOT NULL,
+    title_de VARCHAR(100) NOT NULL,
+    die_de VARCHAR(10) NOT NULL,
+    headers_de VARCHAR(150) NOT NULL,
+    intro_de TEXT NULL,
+    display_order INT NOT NULL DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE catalog_roll_table_rows (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    table_code VARCHAR(40) NOT NULL,
+    roll_min INT NOT NULL,
+    roll_max INT NOT NULL,
+    name_de VARCHAR(100) NOT NULL,
+    effect_de TEXT NULL,
+    extra_de VARCHAR(100) NULL,
+    FOREIGN KEY (table_code) REFERENCES catalog_roll_tables(code) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dienstleistungen (Bad, Unterkunft, Leibwächter ...). Eigene Tabelle, weil es
+-- keine Gegenstände sind. unit_de: Einheit des Preises ("pro Tag", "pro Kilometer").
+CREATE TABLE catalog_services (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name_de VARCHAR(100) NOT NULL UNIQUE,
+    rarity ENUM('gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig') NOT NULL DEFAULT 'gewöhnlich',
+    price_gold INT NOT NULL DEFAULT 0,
+    price_silver INT NOT NULL DEFAULT 0,
+    price_copper INT NOT NULL DEFAULT 0,
+    unit_de VARCHAR(50) NULL,
+    effect_de TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- The DM's party of the day: a plain shortlist of characters for the party
 -- overview. No link to any campaign; deleting a character removes the row.
 CREATE TABLE dm_party (
     character_id INT PRIMARY KEY,
     added_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Schwere Verletzungen eines Charakters (aus catalog_injuries gewählt, nicht gewürfelt).
+-- Wird mit "Geheilt" gelöscht.
+CREATE TABLE character_injuries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    character_id INT NOT NULL,
+    injury_id INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (character_id) REFERENCES characters(id) ON DELETE CASCADE,
+    FOREIGN KEY (injury_id) REFERENCES catalog_injuries(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

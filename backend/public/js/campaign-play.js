@@ -1,5 +1,5 @@
 /*
- * Campaign play mode: quick access, entity dialog, dice, encounter tables and chronicle.
+ * Campaign play mode: quick access, entity dialog, encounter tables and chronicle.
  */
 import { sendJson, toastError } from './lib/http.js';
 
@@ -11,31 +11,16 @@ if (page) {
 function init(root) {
     const base = '/dm/campaign/' + root.dataset.campaignId;
 
-    // ---- Encounter tables: roll the smallest standard die that covers the table
-    const STANDARD_DICE = [4, 6, 8, 10, 12, 20, 100];
-
+    // ---- Encounter tables: type in the roll made at the table, the matching row lights up
     function wireTable(table) {
-        const button = table.querySelector('[data-roll-button]');
-        const label = table.querySelector('[data-roll-result]');
+        const input = table.querySelector('[data-roll-input]');
         const entries = Array.from(table.querySelectorAll('.event-entry'));
-        if (!button) {
+        if (!input) {
             return;
         }
 
-        const top = Math.max.apply(
-            null,
-            entries.map(function (entry) {
-                return parseInt(entry.dataset.max, 10);
-            })
-        );
-        const die =
-            STANDARD_DICE.find(function (size) {
-                return size >= top;
-            }) || top;
-
-        button.addEventListener('click', function () {
-            const roll = Math.floor(Math.random() * die) + 1;
-            label.textContent = 'W' + die + ': ' + roll;
+        input.addEventListener('input', function () {
+            const roll = parseInt(input.value, 10);
             entries.forEach(function (entry) {
                 const min = parseInt(entry.dataset.min, 10);
                 const max = parseInt(entry.dataset.max, 10);
@@ -89,21 +74,6 @@ function init(root) {
             empty.hidden = visible > 0;
         });
     }
-
-    // ---- Dice
-    const result = document.querySelector('[data-dice-result]');
-    const history = document.querySelector('[data-dice-history]');
-    const rolls = [];
-    document.querySelectorAll('[data-die]').forEach(function (button) {
-        button.addEventListener('click', function () {
-            const die = parseInt(button.dataset.die, 10);
-            const roll = Math.floor(Math.random() * die) + 1;
-            result.textContent = String(roll);
-            result.dataset.die = 'W' + die;
-            rolls.unshift('W' + die + ': ' + roll);
-            history.textContent = 'Zuletzt: ' + rolls.slice(0, 6).join(' · ');
-        });
-    });
 
     // ---- Chronicle
     const form = document.querySelector('[data-chronicle-form]');

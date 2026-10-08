@@ -44,15 +44,112 @@ function init(sheet) {
                     return;
                 }
                 render(next); // optimistic, corrected by the server answer
+                if (key === 'hp') {
+                    hpChanged(next, true);
+                }
                 sendJson('POST', '/character/' + id + '/' + key, { value: next })
                     .then(function (data) {
                         render(data[key + '_current']);
+                        if (key === 'hp') {
+                            setDeath(data.death_successes, data.death_failures);
+                            hpChanged(data.hp_current, false);
+                        }
                     })
                     .catch(function (error) {
                         render(current);
+                        if (key === 'hp') {
+                            hpChanged(current, false);
+                        }
                         toastError(error);
                     });
             });
+        });
+    });
+
+    // ---- Death rolls at 0 HP: the KON rolls happen at the table, the results are clicked in
+    const deathSheet = document.querySelector('[data-death-sheet]');
+    const deathOpen = document.querySelector('[data-death-open]');
+    let death = deathSheet
+        ? {
+              successes: parseInt(deathSheet.dataset.successes, 10) || 0,
+              failures: parseInt(deathSheet.dataset.failures, 10) || 0,
+          }
+        : { successes: 0, failures: 0 };
+
+    function renderDeath() {
+        if (!deathSheet) {
+            return;
+        }
+        deathSheet.querySelector('[data-death-count="successes"]').textContent = String(death.successes);
+        deathSheet.querySelector('[data-death-count="failures"]').textContent = String(death.failures);
+        deathSheet.querySelector('[data-death-survive]').hidden = death.successes < 3;
+        deathSheet.querySelector('[data-death-dead]').hidden = death.failures < 3;
+        deathSheet.querySelector('[data-death-buttons]').hidden = death.successes >= 3;
+    }
+
+    function setDeath(successes, failures) {
+        death = { successes: successes || 0, failures: failures || 0 };
+        renderDeath();
+    }
+
+    // The dialog opens by itself when the HP drop to 0 and closes again above 0.
+    function hpChanged(current, opening) {
+        if (!deathSheet) {
+            return;
+        }
+        deathOpen.hidden = current > 0;
+        if (current > 0) {
+            setDeath(0, 0);
+            if (typeof deathSheet.close === 'function' && deathSheet.open) {
+                deathSheet.close();
+            }
+        } else if (opening && typeof deathSheet.showModal === 'function' && !deathSheet.open) {
+            deathSheet.showModal();
+        }
+    }
+
+    if (deathSheet) {
+        renderDeath();
+        deathSheet.querySelectorAll('[data-death]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                sendJson('POST', '/character/' + id + '/death-rolls', { result: button.dataset.death })
+                    .then(function (data) {
+                        setDeath(data.death_successes, data.death_failures);
+                    })
+                    .catch(toastError);
+            });
+        });
+        deathSheet.querySelector('[data-death-survive-confirm]').addEventListener('click', function () {
+            const injury = deathSheet.querySelector('input[name="death-injury"]:checked');
+            sendJson('POST', '/character/' + id + '/death-rolls/survive', {
+                hp_roll: parseInt(deathSheet.querySelector('[data-death-hp]').value, 10),
+                injury_id: injury ? injury.value : '',
+            })
+                .then(function (data) {
+                    renderVital.hp(data.hp_current);
+                    hpChanged(data.hp_current, false);
+                    if (data.injury) {
+                        window.location.reload(); // shows the new injury on the sheet
+                    } else {
+                        window.ui.toast('Du lebst: ' + data.hp_current + ' TP');
+                    }
+                })
+                .catch(toastError);
+        });
+    }
+
+    // ---- Injuries: "Geheilt" removes one
+    document.querySelectorAll('[data-injury-remove]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            sendJson('DELETE', '/character/' + id + '/injuries/' + button.dataset.injuryRemove)
+                .then(function () {
+                    const row = button.closest('[data-injury]');
+                    if (row) {
+                        row.remove();
+                    }
+                    saved();
+                })
+                .catch(toastError);
         });
     });
 
@@ -67,22 +164,41 @@ function init(sheet) {
         });
     });
 
-    // ---- Rest: the server rolls the dice and answers with the new values
+    // ---- Rest: the dice are rolled at the table, the results are typed in
     const restSheet = document.querySelector('[data-rest-sheet]');
     if (restSheet) {
         restSheet.querySelectorAll('[data-rest]').forEach(function (button) {
             button.addEventListener('click', function () {
                 const type = button.dataset.rest;
                 const body = { type };
+                const wp = restSheet.querySelector('[data-rest-wp="' + type + '"]');
+                const hp = restSheet.querySelector('[data-rest-hp="' + type + '"]');
+                if (wp) {
+                    body.wp_roll = parseInt(wp.value, 10);
+                }
+                if (hp) {
+                    body.hp_roll = parseInt(hp.value, 10);
+                }
                 if (type === 'short') {
                     body.tended = restSheet.querySelector('[data-rest-tended]').checked;
                     body.condition = restSheet.querySelector('[data-rest-condition]').value;
+                    const memento = restSheet.querySelector('[data-rest-memento]');
+                    if (memento) {
+                        body.memento_condition = memento.value;
+                    }
                 }
                 sendJson('POST', '/character/' + id + '/rest', body)
                     .then(function (data) {
                         ['hp', 'wp'].forEach(function (key) {
                             renderVital[key](data[key + '_current']);
                         });
+                        hpChanged(data.hp_current, false);
+                        if (data.memento_used) {
+                            const mementoField = restSheet.querySelector('[data-rest-memento]');
+                            if (mementoField) {
+                                mementoField.closest('.ui-field').remove();
+                            }
+                        }
                         data.cleared.forEach(function (code) {
                             const chip = document.querySelector('[data-condition="' + code + '"]');
                             if (chip) {

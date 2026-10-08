@@ -27,12 +27,41 @@ final class AppRoutesTest extends AppTestCase
             $this->assertCleanBody($response, $path);
         }
 
+        $rules = (string) $this->request('GET', '/rules')
+            ->getBody();
+        foreach (['Traglast', 'Leibwächter', 'Rasten', 'Sturzschaden', 'Jagd'] as $text) {
+            self::assertStringContainsString($text, $rules);
+        }
+        foreach (['Improvisierte Waffen: Gasthaus', 'Grimmigkeit', 'panel-dm'] as $text) {
+            self::assertStringNotContainsString($text, $rules);
+        }
+
         self::assertSame(302, $this->request('GET', '/')->getStatusCode());
         self::assertSame(404, $this->request('GET', '/character/999999')->getStatusCode());
         self::assertSame('/dm', $this->request('GET', '/campaign')->getHeaderLine('Location'));
         self::assertSame('/dm/campaign/3', $this->request('GET', '/campaign/3')->getHeaderLine('Location'));
         self::assertSame('/dm/catalog', $this->request('GET', '/world')->getHeaderLine('Location'));
         self::assertSame(200, $this->request('GET', '/api/character-creation/catalog')->getStatusCode());
+    }
+
+    public function testExampleCampaignsCanBePlannedAndPlayed(): void
+    {
+        $this->loginAsDm();
+
+        foreach ([1, 2, 3, 4] as $id) {
+            foreach (['', '/play'] as $suffix) {
+                $path = "/dm/campaign/{$id}{$suffix}";
+                $response = $this->request('GET', $path);
+                self::assertSame(200, $response->getStatusCode(), $path);
+                $this->assertCleanBody($response, $path);
+            }
+        }
+
+        $play = (string) $this->request('GET', '/dm/campaign/4/play')
+            ->getBody();
+        self::assertStringContainsString('Wurf am Tisch', $play);
+        self::assertStringNotContainsString('data-die', $play, 'the app never rolls dice');
+        self::assertStringContainsString('Jaldo', $play);
     }
 
     public function testDmAreaIsLockedWithoutLogin(): void
@@ -44,6 +73,29 @@ final class AppRoutesTest extends AppTestCase
         self::assertSame(401, $this->request('POST', '/dm/campaigns', [
             'name_de' => 'Route-Test',
         ])->getStatusCode());
+    }
+
+    public function testGameMasterRulesAreOnlyForTheDm(): void
+    {
+        self::assertSame(302, $this->request('GET', '/dm/rules')->getStatusCode());
+
+        $this->loginAsDm();
+        $expected = [
+            'spielleitung' => 'Gefolge',
+            'kampf' => 'NSC bei null TP',
+            'monster' => 'Grimmigkeit',
+            'reise' => 'Reise-Missgeschicke',
+            'nsc' => 'Eigenart',
+            'beispiele' => 'Improvisierte Waffen: Gasthaus',
+        ];
+        foreach ($expected as $slug => $text) {
+            $response = $this->request('GET', '/dm/rules?k=' . $slug);
+            self::assertSame(200, $response->getStatusCode(), $slug);
+            self::assertStringContainsString($text, (string) $response->getBody(), $slug);
+        }
+
+        self::assertSame(404, $this->request('GET', '/dm/rules?k=gibtesnicht')->getStatusCode());
+        self::assertStringNotContainsString('Grimmigkeit', (string) $this->request('GET', '/rules')->getBody());
     }
 
     public function testWrongPasswordIsRejected(): void

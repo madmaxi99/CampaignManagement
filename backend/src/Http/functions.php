@@ -71,8 +71,15 @@ function storeUploadedImage(?UploadedFileInterface $file, string $dir, int $id):
     }
 
     $targetDir = publicPath($dir);
-    if (! is_dir($targetDir)) {
-        mkdir($targetDir, 0755, true);
+    if (! is_dir($targetDir) && ! @mkdir($targetDir, 0775, true) && ! is_dir($targetDir)) {
+        return [
+            'error' => 'Bild konnte nicht gespeichert werden: Zielordner nicht beschreibbar.',
+        ];
+    }
+    if (! is_writable($targetDir)) {
+        return [
+            'error' => 'Bild konnte nicht gespeichert werden: Zielordner nicht beschreibbar.',
+        ];
     }
     $targetPath = $targetDir . '/' . $id . '.' . $extension;
     $file->moveTo($targetPath);

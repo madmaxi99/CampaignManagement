@@ -8,6 +8,7 @@
         <h1>Gruppe</h1>
         <div class="ui-row">
             <button type="button" class="ui-btn ui-btn--gold" data-open-picker>{{ ui.icon('plus') }} Charakter hinzufügen</button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-dm-post data-url="/dm/party/session-end" data-after="toast" title="Alle Mementos sind wieder benutzbar">{{ ui.icon('flame') }} Sitzung beendet</button>
             {% if members %}
                 <button type="button" class="ui-btn ui-btn--ghost" data-dm-delete data-url="/dm/party" data-confirm="Die ganze Gruppe leeren? Die Charaktere bleiben erhalten." data-after="reload">Gruppe leeren</button>
             {% endif %}

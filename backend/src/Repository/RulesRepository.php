@@ -26,7 +26,7 @@ final readonly class RulesRepository
     public function items(): array
     {
         $rows = $this->db->query(<<<SQL
-            SELECT i.id, i.name_de, i.description_de, i.rarity, i.kind,
+            SELECT i.id, i.name_de, i.description_de, i.rarity, i.kind, i.weight,
                    i.price_gold, i.price_silver, i.price_copper,
                    w.grip_de, w.str_requirement, w.range_de, w.damage_de, w.durability, w.traits_de,
                    a.slot AS armor_slot, a.armor_value,
@@ -49,6 +49,26 @@ final readonly class RulesRepository
         }
 
         return $groups;
+    }
+
+    /**
+     * Services (bath, lodging, bodyguard ...) with their price.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function services(): array
+    {
+        $rows = $this->db->query(<<<SQL
+            SELECT name_de, rarity, price_gold, price_silver, price_copper, unit_de, effect_de
+            FROM catalog_services
+            ORDER BY name_de
+            SQL)->fetchAll();
+
+        foreach ($rows as &$row) {
+            $row['price_de'] = $this->price($row);
+        }
+
+        return $rows;
     }
 
     /**
@@ -193,7 +213,36 @@ final readonly class RulesRepository
             'fear_events' => $query('SELECT roll, name_de, effect_de FROM catalog_fear_events ORDER BY roll'),
             'rest_types' => $query('SELECT name_de, duration_de, effect_de FROM catalog_rest_types ORDER BY name_de'),
             'hazards' => $query('SELECT name_de, description_de FROM catalog_hazards ORDER BY name_de'),
+            'roll_tables' => $this->rollTables(),
         ];
+    }
+
+    /**
+     * The generic roll tables, grouped by their group ("Reise & Wildnis" ...).
+     * Only displayed: the app never rolls.
+     *
+     * @return array<string, list<array<string, mixed>>>
+     */
+    private function rollTables(): array
+    {
+        $tables = $this->db->query(
+            'SELECT code, group_de, title_de, die_de, headers_de, intro_de FROM catalog_roll_tables ORDER BY display_order, title_de'
+        )->fetchAll();
+
+        $stmt = $this->db->prepare(
+            'SELECT roll_min, roll_max, name_de, effect_de, extra_de FROM catalog_roll_table_rows WHERE table_code = :code ORDER BY roll_min'
+        );
+        $groups = [];
+        foreach ($tables as $table) {
+            $stmt->execute([
+                'code' => $table['code'],
+            ]);
+            $table['headers'] = explode('|', (string) $table['headers_de']);
+            $table['rows'] = $stmt->fetchAll();
+            $groups[(string) $table['group_de']][] = $table;
+        }
+
+        return $groups;
     }
 
     /**

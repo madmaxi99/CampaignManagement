@@ -42,6 +42,7 @@
         <div class="sheet-hero__actions">
             <a class="ui-btn ui-btn--gold ui-btn--small" href="/character/{{ character.id }}/levelup">{{ ui.icon('star') }} Level-up</a>
             <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-ui-open="#rest-sheet">{{ ui.icon('flame') }} Rast</button>
+            <button type="button" class="ui-btn ui-btn--small ui-btn--danger" data-ui-open="#death-sheet" data-death-open{% if character.hp_current > 0 %} hidden{% endif %}>{{ ui.icon('skull') }} Todeswürfe</button>
         </div>
     </header>
 
@@ -98,6 +99,24 @@
                 <div><dt>Schadensbonus GEW</dt><dd>{{ character.damage_bonus_gew_de }}</dd></div>
             </dl>
         </section>
+
+        {% if injuries %}
+            <section class="ui-card">
+                <h2 class="ui-card__title">{{ ui.icon('heart') }} Verletzungen</h2>
+                <ul class="injury-list">
+                    {% for injury in injuries %}
+                        <li class="injury" data-injury="{{ injury.id }}">
+                            <div>
+                                <strong>{{ injury.name_de }}</strong>
+                                <span class="ui-muted">{{ injury.healing_de ? 'Heilung: ' ~ injury.healing_de : 'dauerhaft' }}</span>
+                                <p>{{ injury.effect_de }}</p>
+                            </div>
+                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-injury-remove="{{ injury.id }}">Geheilt</button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
 
         <section class="ui-card">
             <h2 class="ui-card__title">{{ ui.icon('scroll-text') }} Über {{ character.name_de }}</h2>
@@ -282,13 +301,18 @@
 <dialog class="ui-sheet" id="rest-sheet" data-rest-sheet>
     <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
     <h2>{{ ui.icon('flame') }} Rast</h2>
-    <p class="ui-muted">Verschnaufen und Kurze Rast gehen je nur einmal pro Tagesabschnitt.</p>
+    <p class="ui-muted">Gewürfelt wird am Tisch, hier trägst du das Ergebnis ein. Verschnaufen und Kurze Rast gehen je nur einmal pro Tagesabschnitt.</p>
     <div class="ui-stack">
-        <button type="button" class="ui-btn ui-btn--block" data-rest="breather">Verschnaufen <small>· 1 Runde · W6 WP</small></button>
-        <fieldset class="rest-short ui-stack">
+        <fieldset class="rest-box ui-stack">
+            <legend>Verschnaufen <small>· 1 Runde</small></legend>
+            <div class="ui-field"><label for="rest-breather-wp">WP-Wurf (W6)</label><input class="ui-input" id="rest-breather-wp" type="number" min="1" max="6" inputmode="numeric" data-rest-wp="breather"></div>
+            <button type="button" class="ui-btn ui-btn--block" data-rest="breather">Verschnaufen</button>
+        </fieldset>
+        <fieldset class="rest-box ui-stack">
             <legend>Kurze Rast <small>· 1 Viertel</small></legend>
-            <p class="ui-field__hint">W6 TP, W6 WP und ein Zustand deiner Wahl.</p>
-            <label class="rest-short__tended"><input type="checkbox" data-rest-tended> Jemand pflegt dich (gelungene Heilkunde-Probe): 2W6 TP</label>
+            <label class="rest-box__tended"><input type="checkbox" data-rest-tended> Jemand pflegt dich (gelungene Heilkunde-Probe): 2W6 statt W6 TP</label>
+            <div class="ui-field"><label for="rest-short-hp">TP-Wurf (W6, gepflegt 2W6)</label><input class="ui-input" id="rest-short-hp" type="number" min="1" max="12" inputmode="numeric" data-rest-hp="short"></div>
+            <div class="ui-field"><label for="rest-short-wp">WP-Wurf (W6)</label><input class="ui-input" id="rest-short-wp" type="number" min="1" max="6" inputmode="numeric" data-rest-wp="short"></div>
             <div class="ui-field">
                 <label for="rest-condition">Zustand heilen</label>
                 <select class="ui-input" id="rest-condition" data-rest-condition>
@@ -298,9 +322,54 @@
                     {% endfor %}
                 </select>
             </div>
+            {% if character.memento_de and not character.memento_used %}
+                <div class="ui-field">
+                    <label for="rest-memento">Memento: weiteren Zustand heilen <small>(einmal pro Spielsitzung)</small></label>
+                    <select class="ui-input" id="rest-memento" data-rest-memento>
+                        <option value="">nicht benutzen</option>
+                        {% for condition in conditions %}
+                            <option value="{{ condition.code }}">{{ condition.name_de }}</option>
+                        {% endfor %}
+                    </select>
+                    <p class="ui-field__hint">{{ character.memento_de }}</p>
+                </div>
+            {% endif %}
             <button type="button" class="ui-btn ui-btn--block" data-rest="short">Kurze Rast halten</button>
         </fieldset>
         <button type="button" class="ui-btn ui-btn--gold ui-btn--block" data-rest="long">Lange Rast <small>· 1 Tagesabschnitt · sicherer Ort · alle TP und WP, alle Zustände weg</small></button>
+    </div>
+</dialog>
+
+<dialog class="ui-sheet" id="death-sheet" data-death-sheet data-successes="{{ character.death_successes }}" data-failures="{{ character.death_failures }}">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <h2>{{ ui.icon('skull') }} Todeswürfe</h2>
+    <p class="ui-muted">Bei 0 TP legst du in jeder Runde eine KON-Probe ab (nicht strapazierbar). Gewürfelt wird am Tisch, hier trägst du das Ergebnis ein. Drei gelungene Würfe: du lebst. Drei Fehlschläge: dein Charakter stirbt.</p>
+    <div class="ui-stack">
+        <div class="death-counters">
+            <div><span class="ui-muted">Gelungen</span> <strong data-death-count="successes">{{ character.death_successes }}</strong> / 3</div>
+            <div><span class="ui-muted">Gescheitert</span> <strong data-death-count="failures">{{ character.death_failures }}</strong> / 3</div>
+        </div>
+        <div class="death-buttons" data-death-buttons>
+            <button type="button" class="ui-btn" data-death="success">Gelungen</button>
+            <button type="button" class="ui-btn ui-btn--gold" data-death="dragon">Drache <small>2 Erfolge</small></button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-death="failure">Gescheitert</button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-death="demon">Dämon <small>2 Fehlschläge</small></button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-death="damage">Weiterer Schaden <small>1 Fehlschlag</small></button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-death="reset">Zurücksetzen</button>
+        </div>
+        <p class="ui-field__hint" data-death-dead hidden><strong>Dein Charakter stirbt.</strong> Die App löscht nichts; mit Zurücksetzen kannst du neu beginnen, falls die Gruppe anders entscheidet.</p>
+        <fieldset class="rest-box ui-stack" data-death-survive hidden>
+            <legend>Du lebst</legend>
+            <div class="ui-field"><label for="death-hp">TP zurück (W6)</label><input class="ui-input" id="death-hp" type="number" min="1" max="6" inputmode="numeric" data-death-hp></div>
+            <div class="ui-field">
+                <span class="ui-label">Verletzung</span>
+                <label class="injury-choice"><input type="radio" name="death-injury" value="" checked> <span>keine Verletzung</span></label>
+                {% for injury in injuryCatalog %}
+                    <label class="injury-choice"><input type="radio" name="death-injury" value="{{ injury.id }}"> <span><strong>{{ injury.name_de }}</strong> <small class="ui-muted">({{ injury.roll_min == injury.roll_max ? injury.roll_min : injury.roll_min ~ '–' ~ injury.roll_max }}, {{ injury.healing_de ? injury.healing_de : 'dauerhaft' }})</small><br>{{ injury.effect_de }}</span></label>
+                {% endfor %}
+            </div>
+            <button type="button" class="ui-btn ui-btn--block" data-death-survive-confirm>Bestätigen</button>
+        </fieldset>
     </div>
 </dialog>
 

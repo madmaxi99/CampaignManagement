@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Base class for tests that need the real schema. The test database is
- * rebuilt once per run from database/01_schema.sql and 02_catalog.sql; tests
+ * rebuilt once per run from database/01_schema.sql, 02_catalog.sql and 03_examples.sql; tests
  * clean up their own rows. Skipped when no database server is configured
  * (TEST_DB_HOST or DB_HOST plus TEST_DB_PASSWORD or DB_ROOT_PASSWORD).
  */
@@ -63,7 +63,7 @@ abstract class DatabaseTestCase extends TestCase
         $server->exec("CREATE DATABASE `{$name}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
         $pdo = new Connection("mysql:host={$host};port={$port};dbname={$name};charset=utf8mb4", $user, $password);
-        foreach (['01_schema.sql', '02_catalog.sql'] as $file) {
+        foreach (['01_schema.sql', '02_catalog.sql', '03_examples.sql'] as $file) {
             $pdo->exec((string) file_get_contents(dirname(__DIR__, 2) . '/database/' . $file));
         }
 
