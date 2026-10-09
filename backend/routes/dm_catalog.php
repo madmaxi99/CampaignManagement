@@ -201,14 +201,6 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
         ], 201);
     }));
 
-    $app->post('/dm/party/session-end', function (Request $request, Response $response) use ($catalog): Response {
-        $catalog->resetMementos();
-
-        return jsonResponse($response, [
-            'reset' => true,
-        ]);
-    });
-
     $app->delete('/dm/party', function (Request $request, Response $response) use ($catalog): Response {
         $catalog->clearParty();
 

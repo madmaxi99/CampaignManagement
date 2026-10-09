@@ -190,50 +190,18 @@ return function (
     $playPage = function (Response $response, Request $request, array $campaign, ?array $chapter) use ($pageData, $stand, $monsters, $catalog, $places, $rules): Response {
         $data = $pageData($campaign);
         $campaignId = (int) $campaign['id'];
-        $allPlaces = $data['places'];
-
-        $current = null;
-        foreach ($allPlaces as $place) {
-            if ($place['id'] === $campaign['current_place_id']) {
-                $current = $place;
-            }
-        }
-        $exits = [];
-        $here = [];
-        if ($current !== null) {
-            foreach ($allPlaces as $place) {
-                $isChild = $place['parent_id'] === $current['id'];
-                $isParent = $place['id'] === $current['parent_id'];
-                $isSibling = $current['parent_id'] !== null && $place['parent_id'] === $current['parent_id'] && $place['id'] !== $current['id'];
-                if ($isChild || $isParent || $isSibling) {
-                    $exits[] = $place;
-                }
-            }
-            $here = array_values(array_filter($data['npcs'], fn (array $npc): bool => $npc['place_id'] === $current['id']));
-        }
-
-        $chapterId = $chapter === null ? null : (int) $chapter['id'];
-        $chapterPlaces = array_values(array_filter($data['placeTree'], fn (array $place): bool => $chapterId === null || $place['chapter_id'] === $chapterId));
-        $firstChapter = $data['chapters'][0]['id'] ?? null;
-        $loosePlaces = $chapterId === null || $chapterId !== $firstChapter
-            ? []
-            : array_values(array_filter($data['placeTree'], fn (array $place): bool => $place['chapter_id'] === null));
+        $groups = $rules->rollTables();
 
         return Twig::fromRequest($request)->render($response, 'campaign/play.twig', $data + [
             'chapter' => $chapter,
-            'chapterPlaces' => $chapterPlaces,
-            'loosePlaces' => $loosePlaces,
-            'currentPlace' => $current,
-            'exits' => $exits,
-            'here' => $here,
             'chronicle' => $stand->chronicle($campaignId),
             'members' => $catalog->party(),
             'candidates' => $catalog->partyCandidates(),
             'foes' => $monsters->foes($campaignId),
             'foeOptions' => $monsters->bestiaryOptions(),
-            'tools' => PlayTools::fromRollTables($rules->rollTables()) + [
-                'encounters' => PlayTools::encounters($places->encounterTables($campaignId)),
-            ],
+            'tableGroups' => array_intersect_key($groups, array_flip(['Reise & Wildnis', 'Improvisierte Waffen'])),
+            'encounterTables' => $places->encounterTables($campaignId),
+            'npcTables' => PlayTools::npcTables($groups),
         ]);
     };
 
@@ -242,14 +210,8 @@ return function (
         if ($all === []) {
             return $playPage($response, $request, $campaign, null);
         }
-        $target = $all[0]['id'];
-        foreach ($all as $chapter) {
-            if ($chapter['id'] === $campaign['current_chapter_id']) {
-                $target = $chapter['id'];
-            }
-        }
 
-        return $response->withHeader('Location', '/dm/campaign/' . $campaign['id'] . '/play/chapter/' . $target)
+        return $response->withHeader('Location', '/dm/campaign/' . $campaign['id'] . '/play/chapter/' . $all[0]['id'])
             ->withStatus(302);
     }));
 
@@ -262,20 +224,6 @@ return function (
 
         return $response->withStatus(404);
     }));
-
-    $app->post('/dm/campaign/{id:[0-9]+}/current', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, function () use ($campaigns, $json, $request, $response, $args): Response {
-        $data = $json($request);
-        $campaigns->setCurrent(
-            (int) $args['id'],
-            isset($data['chapter_id']) ? (int) $data['chapter_id'] : null,
-            isset($data['place_id']) ? (int) $data['place_id'] : null,
-            ! empty($data['note'])
-        );
-
-        return jsonResponse($response, [
-            'saved' => true,
-        ]);
-    })));
 
     // ---------- foes of the current fight ----------
 

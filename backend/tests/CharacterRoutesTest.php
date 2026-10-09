@@ -267,8 +267,6 @@ final class CharacterRoutesTest extends AppTestCase
         ])->getStatusCode(), 'once per session');
 
         $this->loginAsDm();
-        $this->json($this->request('POST', '/dm/party/session-end', []), 200);
-        self::assertSame(0, (int) $this->db->query("SELECT memento_used FROM characters WHERE id = {$id}")->fetchColumn());
     }
 
     public function testWizardRejectsInvalidInput(): void

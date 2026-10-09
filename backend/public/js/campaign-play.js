@@ -1,5 +1,5 @@
 /*
- * Campaign play view: index, entity dialog, foes, tools and chronicle.
+ * Campaign play view: index, entity dialog, foes, chronicle and tools.
  */
 import { sendJson, toastError } from './lib/http.js';
 
@@ -28,17 +28,10 @@ function init(root) {
         return true;
     }
 
-    function openFoes() {
-        const panel = document.getElementById('foes');
-        if (panel) {
-            panel.hidden = false;
-        }
-    }
-
     async function addFoe(bestiaryId, count) {
         try {
             await sendJson('POST', base + '/foes', { bestiary_id: bestiaryId, count: count });
-            window.location.hash = 'gegner';
+            window.location.hash = 'open-foes';
             window.location.reload();
         } catch (error) {
             toastError(error);
@@ -55,14 +48,9 @@ function init(root) {
         if (!link) {
             return;
         }
-        if (link.dataset.entityType === 'place') {
-            if (scrollToPlace(link.dataset.entityId)) {
-                event.preventDefault();
-                return;
-            }
-            if (link.getAttribute('href') !== '#') {
-                return;
-            }
+        if (link.dataset.entityType === 'place' && scrollToPlace(link.dataset.entityId)) {
+            event.preventDefault();
+            return;
         }
         const template = document.getElementById('tpl-' + link.dataset.entityType + '-' + link.dataset.entityId);
         if (!template) {
@@ -85,51 +73,37 @@ function init(root) {
         }
     });
 
-    // ---- Panels: foes (bottom) and tools (right); the hash keeps them open across a reload
-    const foesPanel = document.getElementById('foes');
-    const toolsPanel = document.getElementById('tools');
-    if (window.location.hash === '#gegner') {
-        openFoes();
-    } else if (window.location.hash === '#werkzeuge' && toolsPanel) {
-        toolsPanel.hidden = false;
+    // ---- Tools menu: closes after a pick or a click outside; the hash reopens a dialog after a reload
+    const menu = document.querySelector('.menu');
+    if (menu) {
+        document.addEventListener('click', function (event) {
+            if (!menu.contains(event.target) || event.target.closest('.menu__list button')) {
+                menu.removeAttribute('open');
+            }
+        });
     }
-    document.querySelector('[data-foes-open]')?.addEventListener('click', function () {
-        foesPanel.hidden = !foesPanel.hidden;
-    });
-    document.querySelector('[data-foes-close]')?.addEventListener('click', function () {
-        foesPanel.hidden = true;
-    });
-    document.querySelector('[data-tools-open]')?.addEventListener('click', function () {
-        toolsPanel.hidden = !toolsPanel.hidden;
-    });
-    document.querySelector('[data-tools-close]')?.addEventListener('click', function () {
-        toolsPanel.hidden = true;
-    });
-    document.addEventListener('keydown', function (event) {
-        if (event.key === 'Escape') {
-            if (foesPanel) {
-                foesPanel.hidden = true;
-            }
-            if (toolsPanel) {
-                toolsPanel.hidden = true;
-            }
-        }
-    });
+    const hash = window.location.hash || '';
+    const reopened = hash.indexOf('#open-') === 0 ? document.getElementById(hash.slice(6)) : null;
+    if (reopened && typeof reopened.showModal === 'function') {
+        reopened.showModal();
+    }
 
-    // ---- Foes: hit points typed in with -1/+1, adding with a search that narrows as you type
-    document.addEventListener('click', async function (event) {
-        const step = event.target.closest('[data-foe-hp]');
-        if (!step) {
+    // ---- Foes: type in the hit points after the damage, adding with a search that narrows as you type
+    document.addEventListener('change', async function (event) {
+        const input = event.target.closest('[data-foe-hp-input]');
+        if (!input) {
             return;
         }
-        const foe = step.closest('[data-foe]');
+        const foe = input.closest('[data-foe]');
         const bar = foe.querySelector('[data-foe-bar]');
         const max = parseInt(foe.dataset.foeMax, 10);
-        const hp = Math.max(0, Math.min(max, parseInt(bar.dataset.hp, 10) + parseInt(step.dataset.foeHp, 10)));
+        const hp = Math.max(0, Math.min(max, parseInt(input.value, 10) || 0));
+        input.value = String(hp);
         try {
             await sendJson('POST', base + '/foes/' + foe.dataset.foeId, { hp_current: hp });
         } catch (error) {
             toastError(error);
+            input.value = bar.dataset.hp;
             return;
         }
         bar.dataset.hp = String(hp);
@@ -165,26 +139,6 @@ function init(root) {
         });
     }
 
-    // ---- Current place and chapter of the group
-    document.addEventListener('click', async function (event) {
-        const move = event.target.closest('[data-move-place]');
-        const current = event.target.closest('[data-set-current]');
-        if (!move && !current) {
-            return;
-        }
-        try {
-            if (move) {
-                await sendJson('POST', move.dataset.url, { place_id: move.dataset.movePlace, note: true });
-                window.location.href = base + '/play#location-' + move.dataset.movePlace;
-            } else {
-                await sendJson('POST', current.dataset.url, { chapter_id: current.dataset.chapterId });
-                window.location.reload();
-            }
-        } catch (error) {
-            toastError(error);
-        }
-    });
-
     // ---- Quick access search
     const search = document.getElementById('quick-search');
     if (search) {
@@ -217,7 +171,7 @@ function init(root) {
                     title_de: form.elements.title_de.value,
                     text_de: form.elements.text_de.value,
                 });
-                window.location.hash = 'werkzeuge';
+                window.location.hash = 'open-chronicle';
                 window.location.reload();
             } catch (error) {
                 toastError(error);
@@ -225,44 +179,12 @@ function init(root) {
         });
     }
 
-    // ---- Suggestions from the roll tables: the app picks a row, the DM takes it or drops it
+    // ---- NPC suggestion: the app picks one row per table, the DM saves it or drops it
     const dataNode = document.getElementById('play-data');
-    const tools = dataNode ? JSON.parse(dataNode.textContent) : { tables: [], npc: [], encounters: {} };
+    const tools = dataNode ? JSON.parse(dataNode.textContent) : { npc: [] };
     const pick = function (rows) {
         return rows[Math.floor(Math.random() * rows.length)];
     };
-    const saveToChronicle = async function (text) {
-        try {
-            await sendJson('POST', base + '/chronicle', { text_de: text });
-            window.location.hash = 'werkzeuge';
-            window.location.reload();
-        } catch (error) {
-            toastError(error);
-        }
-    };
-
-    const suggest = document.querySelector('[data-suggest]');
-    if (suggest) {
-        const select = suggest.querySelector('[data-suggest-table]');
-        const result = suggest.querySelector('[data-suggest-result]');
-        const text = suggest.querySelector('[data-suggest-text]');
-        suggest.querySelector('[data-suggest-go]').addEventListener('click', function () {
-            const key = select.value;
-            const table =
-                key.indexOf('enc-') === 0 ? tools.encounters[key.slice(4)] : tools.tables.find((t) => t.code === key);
-            if (!table || !table.rows.length) {
-                return;
-            }
-            text.textContent = table.title + ': ' + pick(table.rows).text;
-            result.hidden = false;
-        });
-        suggest.querySelector('[data-suggest-drop]').addEventListener('click', function () {
-            result.hidden = true;
-        });
-        suggest.querySelector('[data-suggest-take]').addEventListener('click', function () {
-            saveToChronicle(text.textContent);
-        });
-    }
 
     const generator = document.querySelector('[data-npc-generator]');
     if (generator) {
@@ -272,7 +194,7 @@ function init(root) {
         generator.querySelector('[data-npc-go]').addEventListener('click', function () {
             const rows = {};
             tools.npc.forEach(function (table) {
-                rows[table.code] = table.rows.length ? pick(table.rows).text : '';
+                rows[table.code] = table.rows.length ? pick(table.rows) : '';
             });
             name.value = rows.nsc_name || '';
             description.value = [

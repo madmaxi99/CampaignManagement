@@ -163,10 +163,13 @@ final class AppRoutesTest extends AppTestCase
         $play = (string) $this->playPage(4)
             ->getBody();
         self::assertStringNotContainsString('Wurf am Tisch', $play, 'tables live under Regeln');
-        foreach (['aria-label="Index"', 'aria-label="Gruppe"', 'id="foes"', 'id="tools"', 'id="play-data"'] as $part) {
+        foreach (['aria-label="Index"', 'aria-label="Gruppe"', 'id="foes"', 'id="chronicle"', 'id="play-data"', 'class="menu"', 'id="npc-suggestion"'] as $part) {
             self::assertStringContainsString($part, $play);
         }
         self::assertStringNotContainsString('data-die', $play, 'the app never rolls dice');
+        self::assertStringNotContainsString('Sitzung beendet', $play);
+        self::assertStringNotContainsString('data-move-place', $play, 'no place of the group');
+        self::assertStringContainsString('Jagd', $play, 'the hunting table is shown as a table');
         self::assertStringContainsString('Jaldo', $play);
     }
 
@@ -277,26 +280,14 @@ final class AppRoutesTest extends AppTestCase
             self::assertStringContainsString('Alberta II', (string) $response->getBody());
         }
 
-        // chapters of the play view: /play leads to the first chapter, the group moves with the place
+        // chapters of the play view: /play leads to the first chapter, places belong to no chapter
         $redirect = $this->request('GET', $base . '/play');
         self::assertSame(302, $redirect->getStatusCode());
         self::assertSame($base . '/play/chapter/' . $second, $redirect->getHeaderLine('Location'), 'the moved chapter comes first');
-        self::assertSame(200, $this->request('GET', $base . '/play/chapter/' . $chapter)->getStatusCode());
         self::assertSame(404, $this->request('GET', $base . '/play/chapter/999999')->getStatusCode());
-
-        $this->json($this->request('POST', $base . '/current', [
-            'place_id' => $place,
-            'note' => true,
-        ]), 200);
-        self::assertSame($base . '/play/chapter/' . $chapter, $this->request('GET', $base . '/play')->getHeaderLine('Location'), 'the place moved the group to its chapter');
-        $page = (string) $this->request('GET', $base . '/play/chapter/' . $chapter)
-            ->getBody();
-        self::assertStringContainsString('Gruppe ist hier', $page);
-        self::assertStringContainsString('Die Gruppe wechselt zu: Turm neu.', $page, 'the move is noted in the chronicle');
-        $this->json($this->request('POST', $base . '/current', [
-            'place_id' => 999999,
-        ]), 422);
-        $this->json($this->request('POST', $base . '/current', []), 422);
+        foreach ([$chapter, $second] as $id) {
+            self::assertStringContainsString('id="location-' . $place . '"', (string) $this->request('GET', $base . '/play/chapter/' . $id)->getBody(), 'every chapter page lists all places');
+        }
 
         // validation errors become 422
         self::assertSame(422, $this->request('POST', $base . '/npcs', [

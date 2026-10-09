@@ -1,13 +1,12 @@
 {# Foe tracker of the play view: hit points and skills of the monsters of the current fight. #}
 {% import "_ui.twig" as ui %}
 
-<section class="combat" id="foes" aria-label="Gegner" hidden>
+<dialog class="ui-sheet ui-sheet--xl" id="foes" aria-labelledby="foes-title">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
     <div class="combat__bar">
-        <h2 class="ui-card__title">{{ ui.icon('skull') }} Gegner</h2>
-        <span class="ui-muted">Trefferpunkte trägst du nach, gewürfelt wird am Tisch.</span>
-        <span class="combat__spacer"></span>
+        <h2 class="ui-card__title" id="foes-title">{{ ui.icon('skull') }} Gegner</h2>
+        <span class="ui-muted">Trage die Trefferpunkte nach dem Schaden ein.</span>
         {% if foes %}<button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-delete data-url="{{ base }}/foes" data-confirm="Alle Gegner entfernen?" data-after="reload">Alle entfernen</button>{% endif %}
-        <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-foes-close>Zuklappen</button>
     </div>
     <div class="combat__body">
         <div class="foe-grid">
@@ -16,8 +15,7 @@
                     <div class="foe__head">
                         <strong class="foe__name">{{ f.name_de }}</strong>
                         <span class="ui-row">
-                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-foe-hp="-1" aria-label="Ein Trefferpunkt weniger">−1</button>
-                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-foe-hp="1" aria-label="Ein Trefferpunkt mehr">+1</button>
+                            <label class="ui-row foe__hp">TP <input class="ui-input foe-hp" type="number" min="0" max="{{ f.hp }}" value="{{ f.hp_current }}" data-foe-hp-input aria-label="Aktuelle Trefferpunkte von {{ f.name_de }}"> / {{ f.hp }}</label>
                             <button type="button" class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" data-dm-delete data-url="{{ base }}/foes/{{ f.foe_id }}" data-after="reload" aria-label="{{ f.name_de }} entfernen">{{ ui.icon('x') }}</button>
                         </span>
                     </div>
@@ -64,4 +62,4 @@
             </div>
         </div>
     </div>
-</section>
+</dialog>

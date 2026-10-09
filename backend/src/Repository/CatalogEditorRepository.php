@@ -455,14 +455,6 @@ final readonly class CatalogEditorRepository
         $this->db->exec('DELETE FROM dm_party');
     }
 
-    /**
-     * End of a game session: every memento can be used again.
-     */
-    public function resetMementos(): void
-    {
-        $this->db->exec('UPDATE characters SET memento_used = 0');
-    }
-
     // ---------- input helpers ----------
 
     private function required(mixed $value, string $message, int $max): string

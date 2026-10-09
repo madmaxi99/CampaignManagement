@@ -348,7 +348,7 @@ Gruppe, dazu eine Reihenfolge-Leiste "dran/fertig" mit abgetippten Initiative-Ka
 Offen: Händler als Katalogtyp oder Textfeld am NSC; Reihenfolge der Umsetzung.
 
 Spielen-Ansicht (2026-10-09): Das Mockup `docs/mockups/spielen.html` ist in der App umgesetzt (`/dm/campaign/:id/play/chapter/:chapter`).
-Orte gehören heute genau einem Kapitel; Orte in mehreren Kapiteln (wie im Mockup) sind noch nicht modelliert. Eine
+Orte sind in der Spielen-Ansicht kapitelunabhängig (jede Kapitelseite zeigt alle Orte), die App merkt sich weder Ort noch Kapitel der Gruppe. Kopfleiste: Chronik, Gegner, Werkzeuge (Dropdown), Planen/Spielen; alles öffnet als Dialog in der Mitte. Werkzeuge zeigen die Tabellen (Reise, Jagd, improvisierte Waffen, Zufallsbegegnungen) unverändert und einen NSC-Vorschlag. Eine
 Kampagne, Kapitel als Unterseiten (`/play/chapter/N`), links Index mit Suche (Orte, NSC, Monster, Items), Mitte
 Lesetext des Kapitels, rechts Gruppenübersicht, dazu Gegnerliste (TP-Zähler, Fertigkeiten und Angriffe als Text; Initiative und Spickzettel entfallen),
 Kampagnen mit nur einem Kapitel zeigen dieselbe Struktur) und Werkzeuge-Drawer (Chronik, Zufallsvorschläge, NSC-Vorschlag, Erinnerungen).
@@ -364,21 +364,21 @@ Vergleich dessen, was oben geplant ist, mit dem, was die App jetzt kann. "Teilwe
 | Globale Schnellsuche, Drawer (3, 8) | Fehlt | Nur `SearchRepository` und `/dm/search` im Backend, keine Oberfläche. Soll je Bereich kommen |
 | Am Tisch anpinnen (3) | Fehlt | |
 | Gruppe im Spielen (4) | Teilweise | Rechte Spalte der Spielen-Ansicht mit TP, WP, Zustände, Rüstung. Keine automatische Aktualisierung, keine Statusleiste |
-| Aktueller Ort, Ortswechsel, Chronik-Eintrag dazu (4) | Da | Ortsleiste, Pin im Index, Ausgänge als Chips, Ortswechsel schreibt in die Chronik |
-| Aktuelles Kapitel lesbar, Karten zu NSC, Monster, Items (4) | Da | Kapitel-Reiter, aktuelles Kapitel gemerkt, Karten als Seitenpanel |
-| Chronik-Schnelleingabe (4) | Teilweise | Chronik im Werkzeuge-Drawer. Sitzungsnotizen als eigener Teil fehlen |
-| Erinnerungen als Checkliste (4) | Da | Im Werkzeuge-Drawer, ohne Speichern |
-| Kampf-Hilfe (4) | Da | Gegner-Panel mit TP-Zähler, Fertigkeiten, Angriffen, Suche und "In den Kampf" aus Karten. Initiative und Zustände entfallen bewusst |
+| Aktueller Ort, Ortswechsel, Chronik-Eintrag dazu (4) | Entfällt | Bewusst statisch: kein Ort der Gruppe, Orte überall sichtbar |
+| Aktuelles Kapitel lesbar, Karten zu NSC, Monster, Items (4) | Da | Kapitel-Reiter (ohne Merken), Karten als Dialog |
+| Chronik-Schnelleingabe (4) | Teilweise | Eigener Menüpunkt Chronik im Kopf (Dialog). Sitzungsnotizen als eigener Teil fehlen |
+| Erinnerungen als Checkliste (4) | Entfällt | Nicht gewünscht |
+| Kampf-Hilfe (4) | Da | Gegner-Panel mit editierbaren TP, Fertigkeiten, Angriffen, Suche und "In den Kampf" aus Karten. Initiative und Zustände entfallen bewusst |
 | Regel-Drawer mit Suche (4, 6) | Fehlt | Regeln lesen geht auf `/dm/rules`, aber ohne Suche und nicht im Spielfluss |
-| NSC-Generator mit NSC-Liste (5.1) | Teilweise | NSC-Vorschlag im Werkzeuge-Drawer, "Als NSC speichern" legt ihn in der Kampagne an. Keine Filter |
+| NSC-Generator mit NSC-Liste (5.1) | Teilweise | NSC-Vorschlag im Werkzeuge-Menü, "Als NSC speichern" legt ihn in der Kampagne an. Keine Filter |
 | Namensgenerator (5.2) | Fehlt | |
-| Schnell-Encounter (5.3) | Teilweise | Zufallsbegegnung des aktuellen Orts als Vorschlag, noch ohne "Zum Kampf übernehmen" |
-| Zufallsereignisse und Reise-Missgeschick (5.4) | Da | Zufallsvorschlag im Werkzeuge-Drawer, "In die Chronik" |
+| Schnell-Encounter (5.3) | Teilweise | Zufallsbegegnungs-Tabellen der Kampagne im Werkzeuge-Menü, ohne "Zum Kampf übernehmen" |
+| Zufallsereignisse und Reise-Missgeschick (5.4) | Da | Tabellen stehen unverändert im Werkzeuge-Menü, gewürfelt wird am Tisch |
 | Beute-Vorschlag (5.5) | Fehlt | Niedrige Priorität |
 | Gasthaus- und Ort-Generator (5.6) | Fehlt | |
 | Gerüchte und Aufhänger (5.7) | Entfällt | Gehören in den Kampagnentext |
 | Item ins Inventar geben (5.8) | Fehlt | |
-| Improvisierte Waffen (5.9) | Teilweise | Als Tabelle unter Regeln, Vorschlag im Werkzeuge-Drawer |
+| Improvisierte Waffen (5.9) | Da | Als Tabellen im Werkzeuge-Menü und unter Regeln |
 | Wetter und Tageszeit (5.10) | Fehlt | Optional |
 | Nachschlagen als eine Seite (6) | Geändert | Drei getrennte Bereiche: Katalog, Regeln, Lore |
 | "Zur Kampagne hinzufügen" und "Anpinnen" im Katalog (6) | Fehlt | |

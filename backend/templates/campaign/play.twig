@@ -6,9 +6,9 @@
 {% block title %}{{ campaign.name_de }} spielen{% endblock %}
 {% block main_class %} dm-main--fill{% endblock %}
 
-{% macro place_article(place, full, current, entityRegistry) %}
-    <article class="place-read{{ current ? ' is-current' : '' }}" id="location-{{ place.id }}">
-        <h3>{% if full.number_label %}<span class="place-read__num">#{{ full.number_label }}</span>{% endif %}{{ full.name_de }}{% if current %} <span class="ui-badge ui-badge--forest">Gruppe ist hier</span>{% endif %}</h3>
+{% macro place_article(place, full, entityRegistry) %}
+    <article class="place-read" id="location-{{ place.id }}">
+        <h3>{% if full.number_label %}<span class="place-read__num">#{{ full.number_label }}</span>{% endif %}{{ full.name_de }}</h3>
         {% if full.image_path %}<img class="place-image" src="/{{ full.image_path }}" alt="{{ full.name_de }}" onerror="this.remove()">{% endif %}
         {% if full.description_de %}<p class="read-aloud pre-wrap">{{ full.description_de|linkify(entityRegistry) }}</p>{% endif %}
         {% if full.dm_text_de %}<p class="dm-text pre-wrap">{{ full.dm_text_de|linkify(entityRegistry) }}</p>{% endif %}
@@ -20,8 +20,23 @@
 {% block content %}
     {% set base = '/dm/campaign/' ~ campaign.id %}
     {% set actions %}
-        <button type="button" class="ui-btn ui-btn--ghost" data-foes-open>{{ ui.icon('skull') }} Gegner{% if foes %} ({{ foes|length }}){% endif %}</button>
-        <button type="button" class="ui-btn ui-btn--ghost" data-tools-open>{{ ui.icon('wand-sparkles') }} Werkzeuge</button>
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-ui-open="#chronicle">{{ ui.icon('notebook-pen') }} Chronik</button>
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-ui-open="#foes">{{ ui.icon('skull') }} Gegner{% if foes %} ({{ foes|length }}){% endif %}</button>
+        <details class="menu">
+            <summary class="ui-btn ui-btn--ghost ui-btn--small">{{ ui.icon('wand-sparkles') }} Werkzeuge {{ ui.icon('chevron-down') }}</summary>
+            <div class="menu__list" role="menu">
+                {% for group, tables in tableGroups %}
+                    <span class="menu__label">{{ group }}</span>
+                    {% for table in tables %}<button type="button" role="menuitem" data-ui-open="#table-{{ table.code }}">{{ table.title_de }}</button>{% endfor %}
+                {% endfor %}
+                {% if encounterTables %}
+                    <span class="menu__label">Zufallsbegegnungen</span>
+                    {% for table in encounterTables %}<button type="button" role="menuitem" data-ui-open="#encounter-{{ table.id }}">{{ table.name_de }}</button>{% endfor %}
+                {% endif %}
+                <span class="menu__label">Vorschlag</span>
+                <button type="button" role="menuitem" data-ui-open="#npc-suggestion">NSC-Vorschlag</button>
+            </div>
+        </details>
     {% endset %}
 
     <div class="play-shell" data-campaign-id="{{ campaign.id }}">
@@ -34,30 +49,7 @@
                     Kapitel {{ c.label }}: {{ c.title_de }}{% if campaign.current_chapter_id == c.id %} <span class="ui-badge ui-badge--gold">aktuell</span>{% endif %}
                 </a>
             {% endfor %}
-            {% if chapter and campaign.current_chapter_id != chapter.id %}
-                <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-set-current data-url="{{ base }}/current" data-chapter-id="{{ chapter.id }}">Hier weitermachen</button>
-            {% endif %}
         </nav>
-
-        {# ---------- Where the group is ---------- #}
-        <div class="here-bar">
-            {% if currentPlace %}
-                <span class="ui-muted">Ort der Gruppe:</span>
-                <strong>{% if currentPlace.number_label %}#{{ currentPlace.number_label }} {% endif %}{{ currentPlace.name_de }}</strong>
-                {% if here %}
-                    <span class="ui-muted">Hier sind:</span>
-                    {% for n in here %}<a class="here-chip entity-link" href="#" data-entity-type="npc" data-entity-id="{{ n.id }}">{{ n.name_de }}</a>{% endfor %}
-                {% endif %}
-                {% if exits %}
-                    <span class="here-bar__exits">
-                        <span class="ui-muted">Weiter nach</span>
-                        {% for e in exits %}<button type="button" class="here-chip" data-move-place="{{ e.id }}" data-url="{{ base }}/current" title="Gruppe dorthin bewegen und in die Chronik schreiben">{{ e.name_de }}</button>{% endfor %}
-                    </span>
-                {% endif %}
-            {% else %}
-                <span class="ui-muted">Noch kein Ort gewählt. Im Index mit dem Pin den Ort der Gruppe setzen.</span>
-            {% endif %}
-        </div>
 
         <div class="play-work">
 
@@ -68,7 +60,6 @@
                     <input class="ui-input" type="search" id="quick-search" placeholder="Index durchsuchen …" autocomplete="off" aria-label="Index durchsuchen">
                 </div>
 
-                {% set firstChapterId = chapters ? chapters|first.id : null %}
                 {% for group in [
                     {'title': 'Orte', 'type': 'place', 'rows': placeTree},
                     {'title': 'NSC', 'type': 'npc', 'rows': npcs},
@@ -82,12 +73,9 @@
                                 {% for row in group.rows %}
                                     <li class="index-row" data-quick-item="{{ row.name_de|lower }}">
                                         {% if group.type == 'place' %}
-                                            {% set target = row.chapter_id ?? firstChapterId %}
-                                            <a class="entity-link index-link{{ currentPlace and currentPlace.id == row.id ? ' is-active' : '' }}" href="{{ target ? base ~ '/play/chapter/' ~ target ~ '#location-' ~ row.id : '#' }}" data-entity-type="place" data-entity-id="{{ row.id }}" style="--depth: {{ row.depth }}">
+                                            <a class="entity-link index-link" href="#location-{{ row.id }}" data-entity-type="place" data-entity-id="{{ row.id }}" style="--depth: {{ row.depth }}">
                                                 {% if row.number_label %}<span class="outline__num">#{{ row.number_label }}</span>{% endif %}{{ row.name_de }}
-                                                {% if chapters|length > 1 and row.chapter_id %}<small class="ui-muted">K{{ (chapters|filter(c => c.id == row.chapter_id)|first).label }}</small>{% endif %}
                                             </a>
-                                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-move-place="{{ row.id }}" data-url="{{ base }}/current" aria-label="Gruppe nach {{ row.name_de }} bewegen" title="Gruppe hierhin bewegen">{{ ui.icon('map-pin') }}</button>
                                         {% else %}
                                             <a class="entity-link index-link" href="#" data-entity-type="{{ group.type }}" data-entity-id="{{ row.id }}">{{ row.name_de }}</a>
                                         {% endif %}
@@ -115,21 +103,15 @@
                     {% endif %}
                 {% endif %}
 
-                {% for place in chapterPlaces %}
-                    {{ m.place_article(place, places|filter(x => x.id == place.id)|first, currentPlace and currentPlace.id == place.id, entityRegistry) }}
-                {% endfor %}
-
-                {% if loosePlaces %}
-                    <h2 class="ui-card__title">{{ ui.icon('map') }} Weitere Orte</h2>
-                    {% for place in loosePlaces %}
-                        {{ m.place_article(place, places|filter(x => x.id == place.id)|first, currentPlace and currentPlace.id == place.id, entityRegistry) }}
+                {% if placeTree %}
+                    <h2 class="ui-card__title">{{ ui.icon('map') }} Orte</h2>
+                    {% for place in placeTree %}
+                        {{ m.place_article(place, places|filter(x => x.id == place.id)|first, entityRegistry) }}
                     {% endfor %}
                 {% endif %}
 
                 {% if not chapters %}
                     <div class="ui-empty">{{ ui.icon('scroll-text') }}<strong>Noch keine Kapitel</strong><span>Lege sie im Planen-Modus an.</span><a class="ui-btn ui-btn--gold ui-btn--small" href="{{ base }}?e=chapter-new">Kapitel anlegen</a></div>
-                {% elseif not chapterPlaces and not loosePlaces %}
-                    <div class="ui-empty">{{ ui.icon('map') }}<strong>Keine Orte in diesem Kapitel</strong><span>Weise Orte im Planen-Modus einem Kapitel zu.</span></div>
                 {% endif %}
 
                 {% if chapter %}
@@ -148,6 +130,7 @@
         </div>
 
         {% include 'campaign/_foes.twig' %}
+        {% include 'campaign/_chronicle.twig' %}
         {% include 'campaign/_tools.twig' %}
     </div>
 
@@ -159,7 +142,7 @@
         {% for monster in monsters %}<template id="tpl-bestiary-{{ monster.id }}" data-bestiary-id="{{ monster.id }}">{{ cards.creature(monster, entityRegistry) }}</template>{% endfor %}
     </div>
 
-    <dialog class="ui-sheet ui-sheet--side" id="entity-sheet">
+    <dialog class="ui-sheet ui-sheet--wide" id="entity-sheet">
         <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
         <div id="entity-sheet-body"></div>
     </dialog>

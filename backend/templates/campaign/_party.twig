@@ -39,7 +39,6 @@
 
 <p class="ui-muted">Die Spieler pflegen ihre Werte selbst, hier siehst du den Stand beim Neuladen.</p>
 <div class="ui-row">
-    <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-post data-url="/dm/party/session-end" data-after="toast" title="Alle Mementos sind wieder benutzbar">{{ ui.icon('flame') }} Sitzung beendet</button>
     {% if members %}
         <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-delete data-url="/dm/party" data-confirm="Die ganze Gruppe leeren? Die Charaktere bleiben erhalten." data-after="reload">Gruppe leeren</button>
     {% endif %}
