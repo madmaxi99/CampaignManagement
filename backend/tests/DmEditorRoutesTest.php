@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
+use PDO;
+
 /**
  * DM editors outside of the campaign plan: catalog items, bestiary, party
  * and the campaign chronicle.
@@ -86,6 +88,46 @@ final class DmEditorRoutesTest extends AppTestCase
         ])->getStatusCode());
     }
 
+    public function testFoesOfTheFight(): void
+    {
+        $campaign = (int) $this->json($this->request('POST', '/dm/campaigns', [
+            'name_de' => 'Route-Test Kampf',
+        ]), 201)['id'];
+        $base = '/dm/campaign/' . $campaign;
+        $monster = (int) $this->db->query('SELECT id FROM catalog_bestiary ORDER BY id LIMIT 1')
+            ->fetchColumn();
+        $hp = (int) $this->db->query('SELECT hp FROM catalog_bestiary WHERE id = ' . $monster)
+            ->fetchColumn();
+
+        $this->json($this->request('POST', $base . '/foes', [
+            'bestiary_id' => 0,
+        ]), 422);
+        $this->json($this->request('POST', $base . '/foes', [
+            'bestiary_id' => $monster,
+            'count' => 2,
+        ]), 201);
+        $foes = $this->db->query('SELECT id FROM campaign_foes WHERE campaign_id = ' . $campaign . ' ORDER BY id')
+            ->fetchAll(PDO::FETCH_COLUMN);
+        self::assertCount(2, $foes);
+        self::assertStringContainsString('TP ' . $hp . '/' . $hp, (string) $this->request('GET', $base . '/play')->getBody());
+
+        $this->json($this->request('POST', $base . '/foes/' . $foes[0], [
+            'hp_current' => -5,
+        ]), 200);
+        self::assertSame('0', (string) $this->db->query('SELECT hp_current FROM campaign_foes WHERE id = ' . $foes[0])
+            ->fetchColumn());
+        $this->json($this->request('POST', $base . '/foes/' . $foes[0], [
+            'hp_current' => 9999,
+        ]), 200);
+        self::assertSame((string) $hp, (string) $this->db->query('SELECT hp_current FROM campaign_foes WHERE id = ' . $foes[0])
+            ->fetchColumn());
+
+        $this->json($this->request('DELETE', $base . '/foes/' . $foes[1]), 200);
+        $this->json($this->request('DELETE', $base . '/foes'), 200);
+        self::assertSame('0', (string) $this->db->query('SELECT COUNT(*) FROM campaign_foes WHERE campaign_id = ' . $campaign)
+            ->fetchColumn());
+    }
+
     public function testPartyManagement(): void
     {
         $id = (int) $this->json($this->request('POST', '/characters', $this->wizardPayload()), 200)['id'];
@@ -93,7 +135,11 @@ final class DmEditorRoutesTest extends AppTestCase
         $this->json($this->request('POST', '/dm/party', [
             'character_id' => $id,
         ]), 201);
-        self::assertStringContainsString('Route-Test Held', (string) $this->request('GET', '/dm/party')->getBody());
+        $campaign = (int) $this->json($this->request('POST', '/dm/campaigns', [
+            'name_de' => 'Route-Test Gruppe',
+        ]), 201)['id'];
+        $group = (string) $this->request('GET', '/dm/campaign/' . $campaign . '/play')->getBody();
+        self::assertStringContainsString('Route-Test Held', $group);
         $this->json($this->request('DELETE', '/dm/party/' . $id), 200);
         $this->json($this->request('POST', '/dm/party', [
             'character_id' => $id,

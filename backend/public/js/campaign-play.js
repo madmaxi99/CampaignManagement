@@ -1,5 +1,5 @@
 /*
- * Campaign play mode: quick access, entity dialog, encounter tables and chronicle.
+ * Campaign play mode: quick access, entity dialog and chronicle.
  */
 import { sendJson, toastError } from './lib/http.js';
 
@@ -11,34 +11,39 @@ if (page) {
 function init(root) {
     const base = '/dm/campaign/' + root.dataset.campaignId;
 
-    // ---- Encounter tables: type in the roll made at the table, the matching row lights up
-    function wireTable(table) {
-        const input = table.querySelector('[data-roll-input]');
-        const entries = Array.from(table.querySelectorAll('.event-entry'));
-        if (!input) {
-            return;
-        }
-
-        input.addEventListener('input', function () {
-            const roll = parseInt(input.value, 10);
-            entries.forEach(function (entry) {
-                const min = parseInt(entry.dataset.min, 10);
-                const max = parseInt(entry.dataset.max, 10);
-                const open = entry.dataset.openEnded === '1';
-                entry.classList.toggle('rolled', open ? roll >= min : roll >= min && roll <= max);
-            });
-        });
-    }
-
-    document.querySelectorAll('[data-event-table]').forEach(wireTable);
-
-    // ---- Entity dialog (NPC, place, item, monster), also opened from links in texts
+    // ---- Entity dialog (NPC, item, monster), also opened from links in texts
     const sheet = document.getElementById('entity-sheet');
     const sheetBody = document.getElementById('entity-sheet-body');
 
+    // Places are read in the Lesen tab: switch to it and scroll to the place
+    function jumpToPlace(id) {
+        const target = document.getElementById('location-' + id);
+        if (!target) {
+            return false;
+        }
+        const readTab = document.getElementById('tab-read');
+        if (readTab && readTab.getAttribute('aria-selected') !== 'true') {
+            readTab.click();
+        }
+        if (sheet && sheet.open) {
+            sheet.close();
+        }
+        target.scrollIntoView({ block: 'start' });
+        return true;
+    }
+
     document.addEventListener('click', function (event) {
+        const ref = event.target.closest('.location-ref');
+        if (ref && jumpToPlace(ref.getAttribute('href').replace('#location-', ''))) {
+            event.preventDefault();
+            return;
+        }
         const link = event.target.closest('.entity-link');
         if (!link) {
+            return;
+        }
+        if (link.dataset.entityType === 'place' && jumpToPlace(link.dataset.entityId)) {
+            event.preventDefault();
             return;
         }
         const template = document.getElementById('tpl-' + link.dataset.entityType + '-' + link.dataset.entityId);
@@ -47,7 +52,6 @@ function init(root) {
         }
         event.preventDefault();
         sheetBody.replaceChildren(template.content.cloneNode(true));
-        sheetBody.querySelectorAll('[data-event-table]').forEach(wireTable);
         if (!sheet.open) {
             sheet.showModal();
         }

@@ -122,10 +122,10 @@ Entschieden am 2026-10-08:
   Offen bleibt nur, ob das Cockpit die heutige Spielen-Seite ersetzt (Annahme: ja).
 - **D. Beute:** "ganz nett, aber nicht wichtig": niedrige Priorität, nur ein einfacher Vorschlag, ganz am Schluss.
 - **E. Handouts und Soundboard:** unerwünscht, gestrichen.
-- **F. Priorisierung:** Reihenfolge aus Abschnitt 9 passt grundsätzlich. Zuerst ein klickbares Mockup zur Bewertung:
-  `docs/mockups/dm-cockpit.html` (Datei im Browser öffnen, kein Server nötig).
+- **F. Priorisierung:** Reihenfolge aus Abschnitt 9 passt grundsätzlich. Das Mockup dazu (`docs/mockups/dm-cockpit.html`)
+  ist mit dem verworfenen Entwurf gelöscht.
 
-Noch offen: Reaktion auf das Mockup (Layout des Cockpits, Statusleiste, Kampfmenü, Generator-Ablauf).
+Das Cockpit-Layout (Statusleiste, Kampfmenü, Generator-Ablauf) wurde verworfen, siehe Abschnitt 11 und 13.
 
 ## 11. Umsetzungsstand
 
@@ -133,8 +133,8 @@ Stand 2026-10-09: Der erste Umbau (Statusleiste, Kampfmenü, NSC-, Gerüchte- un
 Planungs-Extras, Export/Import) wurde verworfen und zurückgesetzt, weil er die Bedienung insgesamt verschlechtert
 hat (doppelte NSC-Liste, zu viele Tabs beim Spielen, Gerüchte gehören in den Kampagnentext).
 
-- **Bereiche (2026-10-09):** Navigation Kampagnen, Katalog, Regeln, Lore. Die Gruppe gehört zur Kampagne (dritter
-  Schalter neben Planen und Spielen, `/dm/party` bleibt die Adresse).
+- **Bereiche (2026-10-09):** Navigation Kampagnen, Katalog, Regeln, Lore. Die Gruppe gehört zur Kampagne (Reiter
+  im Spielen, neben Lesen und Chronik; `/dm/party` gibt es nur noch für die Schreibzugriffe).
   - **Regeln** (`/dm/rules`): SL-Kapitel mit Kapitelliste links, Tabellen stehen in ihren Kapiteln (improvisierte
     Waffen unter "NSC im Kampf", Reise-Tabellen unter "Reise", NSC-Tabellen unter "NSC erschaffen"), die
     Zufallsbegegnungen sind ein eigenes Kapitel. Das Kapitel "Beispiele" entfällt.
@@ -153,16 +153,16 @@ hat (doppelte NSC-Liste, zu viele Tabs beim Spielen, Gerüchte gehören in den K
 ## 12. Feature-Inventar (Stand 2026-10-09, vor dem Reset)
 
 Alles, was die App konnte, als Stichwortliste. Einträge zu verworfenen Teilen (Generatoren, Gerüchte, Statusleiste,
-Kampfmenü, Export/Import, Rückblick, Kapitel-Haken, "Verknüpft") gibt es nach dem Reset nicht mehr. Zum Streichen, Zusammenlegen und Ergänzen.
+Kampfmenü, Export/Import, Rückblick, Kapitel-Haken, "Verknüpft") gibt es nach dem Reset nicht mehr. `[x]` = gibt es jetzt (Stand nach dem Reset und dem Reiter Gruppe), `[ ]` = fehlt, wurde verworfen oder ist nur im Backend vorhanden (Suche).
 
 ### DM: Allgemein
-- [ ] DM-Login (ein Passwort)
-- [ ] Logout
-- [ ] DM-Navigation
+- [x] DM-Login (ein Passwort)
+- [x] Logout
+- [x] DM-Navigation
 - [ ] Top bar
 - [ ] Schnellsuche (Drawer, Kürzel `/`)
 - [ ] Dialog "Item geben"
-- [ ] Styleguide-Seite
+- [x] Styleguide-Seite
 
 ### DM: Nachschlagen
 - [ ] Suche über Kampagne
@@ -170,72 +170,72 @@ Kampfmenü, Export/Import, Rückblick, Kapitel-Haken, "Verknüpft") gibt es nach
 - [ ] Suche über SL-Regeln
 - [ ] Suche über Lore
 - [ ] Lookup-Seite
-- [ ] SL-Regeln lesen
-- [ ] DM-Lore lesen
-- [ ] Kapitelliste Regeln
-- [ ] Kapitelliste Lore
+- [x] SL-Regeln lesen
+- [x] DM-Lore lesen
+- [x] Kapitelliste Regeln
+- [x] Kapitelliste Lore
 
 ### DM: Kampagnen
-- [ ] Kampagnenliste
-- [ ] Kampagne anlegen
-- [ ] Kampagne bearbeiten (Name, Teaser, Hintergrund)
-- [ ] Kampagne löschen
-- [ ] Standardkampagne
-- [ ] Kampagne neu starten
+- [x] Kampagnenliste
+- [x] Kampagne anlegen
+- [x] Kampagne bearbeiten (Name, Teaser, Hintergrund)
+- [x] Kampagne löschen
+- [x] Standardkampagne
+- [x] Kampagne neu starten
 - [ ] Export (JSON)
 - [ ] Import (JSON)
-- [ ] Zähler in der Übersicht
-- [ ] "Was als Nächstes?"
+- [x] Zähler in der Übersicht
+- [x] "Was als Nächstes?"
 - [ ] Rückblick (Recap)
 - [ ] Rückblick als Text kopieren
-- [ ] Umschalter Planen/Spielen
+- [x] Umschalter Planen/Spielen
 
 ### DM: Planen
-- [ ] Gliederung (Baum)
-- [ ] Kapitel anlegen
-- [ ] Kapitel bearbeiten
-- [ ] Kapitel verschieben
+- [x] Gliederung (Baum)
+- [x] Kapitel anlegen
+- [x] Kapitel bearbeiten
+- [x] Kapitel verschieben
 - [ ] Kapitel "Bereit für die Sitzung"
 - [ ] Vorbereitungs-Checkliste
-- [ ] "In diesem Kapitel"
-- [ ] Ort anlegen
-- [ ] Ort bearbeiten
-- [ ] Ort: Unterorte
-- [ ] Ort: Nummer
-- [ ] Ort: DM-Text
-- [ ] Ort: Bild
-- [ ] Ort: Zufallsbegegnungs-Tabelle
-- [ ] NSC anlegen
-- [ ] NSC bearbeiten
-- [ ] NSC: Porträt
-- [ ] NSC: Kampfwerte verknüpfen
-- [ ] NSC: Spielnotizen
-- [ ] Item anlegen
-- [ ] Item bearbeiten
-- [ ] Item: Bild
-- [ ] Item: Fundort
-- [ ] Monster der Kampagne
-- [ ] Monster: Notizen
+- [x] "In diesem Kapitel"
+- [x] Ort anlegen
+- [x] Ort bearbeiten
+- [x] Ort: Unterorte
+- [x] Ort: Nummer
+- [x] Ort: DM-Text
+- [x] Ort: Bild
+- [x] Ort: Zufallsbegegnungs-Tabelle
+- [x] NSC anlegen
+- [x] NSC bearbeiten
+- [x] NSC: Porträt
+- [x] NSC: Kampfwerte verknüpfen
+- [x] NSC: Spielnotizen
+- [x] Item anlegen
+- [x] Item bearbeiten
+- [x] Item: Bild
+- [x] Item: Fundort
+- [x] Monster der Kampagne
+- [x] Monster: Notizen
 - [ ] Kasten "Verknüpft"
 
 ### DM: Spielen
-- [ ] Lesen-Tab
+- [x] Lesen-Tab
 - [ ] Aktuelles Kapitel
-- [ ] Orte als Lesekarten
-- [ ] Weitere Orte
-- [ ] Karten (Monster, NSC, Ort, Item)
-- [ ] Chronik
-- [ ] Chronik: Schnelleingabe
+- [x] Orte als Lesekarten
+- [x] Weitere Orte
+- [x] Karten (Monster, NSC, Ort, Item)
+- [x] Chronik
+- [x] Chronik: Schnelleingabe
 - [ ] Chronik: Tage
-- [ ] Chronik: Eintrag bearbeiten/löschen
+- [x] Chronik: Eintrag bearbeiten/löschen
 - [ ] Tab Tabellen
-- [ ] Zufallsbegegnungen
+- [x] Zufallsbegegnungen (unter Regeln)
 - [ ] Zufall ziehen (Begegnung)
-- [ ] Zufallsereignisse
-- [ ] Reise-Missgeschicke
-- [ ] Abenteuerort verlassen
-- [ ] Jagd
-- [ ] Improvisierte Waffen (Gasthaus, Höhle, Wald)
+- [x] Zufallsereignisse (unter Regeln)
+- [x] Reise-Missgeschicke (unter Regeln)
+- [x] Abenteuerort verlassen (unter Regeln)
+- [x] Jagd (unter Regeln)
+- [x] Improvisierte Waffen (Gasthaus, Höhle, Wald) (unter Regeln)
 - [ ] NSC-Tab
 - [ ] NSC-Generator
 - [ ] NSC-Generator: einzelne Felder neu ziehen
@@ -258,71 +258,71 @@ Kampfmenü, Export/Import, Rückblick, Kapitel-Haken, "Verknüpft") gibt es nach
 - [ ] Statusleiste (Gruppe)
 - [ ] Statusleiste: Polling
 - [ ] Kampfmenü
-- [ ] Kampf: Gegnerliste
-- [ ] Kampf: Gegner-TP-Zähler
+- [x] Kampf: Gegnerliste (im Reiter Gruppe)
+- [x] Kampf: Gegner-TP-Zähler (im Reiter Gruppe, per −1/+1)
 - [ ] Kampf: Initiative-Feld
 - [ ] "In den Kampf" (Monster, auch mehrere)
 - [ ] Item geben (aus Karte)
 
 ### DM: Gruppe
 - [ ] Gruppenmenü
-- [ ] Charakter hinzufügen
-- [ ] Charakter entfernen
-- [ ] Gruppe leeren
-- [ ] Gruppenkarten (TP, WP, Zustände)
-- [ ] "Sitzung beendet" (Mementos zurück)
+- [x] Charakter hinzufügen (im Reiter Gruppe)
+- [x] Charakter entfernen (im Reiter Gruppe)
+- [x] Gruppe leeren (im Reiter Gruppe)
+- [x] Gruppenkarten (TP, WP, Zustände) (im Reiter Gruppe)
+- [x] "Sitzung beendet" (Mementos zurück) (im Reiter Gruppe)
 - [ ] Item ins Inventar legen
 
 ### DM: Katalog
-- [ ] Katalog-Items
-- [ ] Item bearbeiten/anlegen
-- [ ] Katalog-Bestiary
-- [ ] Monster bearbeiten/anlegen
-- [ ] Monster: Bild
-- [ ] Begegnungstabellen (Ansicht)
+- [x] Katalog-Items
+- [x] Item bearbeiten/anlegen
+- [x] Katalog-Bestiary
+- [x] Monster bearbeiten/anlegen
+- [x] Monster: Bild
+- [x] Begegnungstabellen (Ansicht)
 
 ### Spieler: Allgemein
-- [ ] Startseite
-- [ ] Regeln lesen
-- [ ] Lore lesen
-- [ ] Weiterleitungen (/campaign, /world)
+- [x] Startseite
+- [x] Regeln lesen
+- [x] Lore lesen
+- [x] Weiterleitungen (/campaign, /world)
 
 ### Spieler: Charakter
-- [ ] Charakterliste
-- [ ] Charakter erstellen (Wizard)
-- [ ] Charakterbogen
-- [ ] Charakter löschen
-- [ ] Porträt
-- [ ] TP ändern
-- [ ] WP ändern
-- [ ] Rast
-- [ ] Todeswürfe
-- [ ] Verletzungen
-- [ ] Zustände (Toggle)
-- [ ] Memento
-- [ ] Währung
-- [ ] Fertigkeiten markieren
-- [ ] Fertigkeiten steigern
-- [ ] Zauber
-- [ ] Heldenfähigkeiten
-- [ ] Level-up
-- [ ] Rüstung je Slot
-- [ ] Inventar
+- [x] Charakterliste
+- [x] Charakter erstellen (Wizard)
+- [x] Charakterbogen
+- [x] Charakter löschen
+- [x] Porträt
+- [x] TP ändern
+- [x] WP ändern
+- [x] Rast
+- [x] Todeswürfe
+- [x] Verletzungen
+- [x] Zustände (Toggle)
+- [x] Memento
+- [x] Währung
+- [x] Fertigkeiten markieren
+- [x] Fertigkeiten steigern
+- [x] Zauber
+- [x] Heldenfähigkeiten
+- [x] Level-up
+- [x] Rüstung je Slot
+- [x] Inventar
 
 ### Daten und Technik
-- [ ] campaigns
+- [x] campaigns
 - [ ] campaign_chapters (is_ready)
-- [ ] campaign_places
-- [ ] campaign_npcs
-- [ ] campaign_items
+- [x] campaign_places
+- [x] campaign_npcs
+- [x] campaign_items
 - [ ] campaign_monsters
-- [ ] campaign_chronicle
+- [x] campaign_chronicle
 - [ ] campaign_rumors
-- [ ] catalog_roll_tables
-- [ ] catalog_encounter_tables
+- [x] catalog_roll_tables
+- [x] catalog_encounter_tables
 - [ ] catalog_generator_entries
-- [ ] Migrationen
-- [ ] Tests (PHPUnit, JS)
+- [x] Migrationen
+- [x] Tests (PHPUnit, JS)
 
 ### Fehlt / aufgefallen
 - [ ] Beute-Generator (Loot)
@@ -346,3 +346,41 @@ Kampfansicht (Idee): Gegner gruppiert (Name, Anzahl, TP je Gegner, Rüstung, Ang
 Gruppe, dazu eine Reihenfolge-Leiste "dran/fertig" mit abgetippten Initiative-Karten. Kein Regelwurf in der App.
 
 Offen: Händler als Katalogtyp oder Textfeld am NSC; Reihenfolge der Umsetzung.
+
+## 14. Lücken gegenüber den Abschnitten 3 bis 9 (Stand 2026-10-09)
+
+Vergleich dessen, was oben geplant ist, mit dem, was die App jetzt kann. "Teilweise" heißt: eine einfache Form ist da.
+
+| Plan (Abschnitt) | Stand | Was fehlt |
+|---|---|---|
+| Navigation Kampagnen, Katalog, Regeln, Lore (3) | Da | `Sitzung` und `Werkzeuge` als eigene Punkte sind bewusst nicht vorgesehen |
+| Aktive Kampagne (3) | Fehlt | Kampagne wählen und überall merken |
+| Globale Schnellsuche, Drawer (3, 8) | Fehlt | Nur `SearchRepository` und `/dm/search` im Backend, keine Oberfläche. Soll je Bereich kommen |
+| Am Tisch anpinnen (3) | Fehlt | |
+| Gruppe im Spielen (4) | Teilweise | Reiter Gruppe mit TP, WP, Zustände, Rüstung, Münzen. Keine automatische Aktualisierung, keine Statusleiste |
+| Aktueller Ort, Ortswechsel, Chronik-Eintrag dazu (4) | Fehlt | Es gibt nur "alle Kapitel lesen" |
+| Aktuelles Kapitel lesbar, Karten zu NSC, Monster, Items (4) | Teilweise | Alle Kapitel am Stück, Karten per Link im Dialog. Kein "aktuelles" Kapitel |
+| Chronik-Schnelleingabe (4) | Teilweise | Chronik da. Sitzungsnotizen als eigener Teil fehlen |
+| Erinnerungen als Checkliste (4) | Fehlt | |
+| Kampf-Hilfe (4) | Teilweise | Gegnerliste mit TP-Zähler, Rüstung, Angriffen. Initiative-Reihenfolge und Zustände an Gegnern fehlen, ebenso "In den Kampf" direkt von einer Monsterkarte |
+| Regel-Drawer mit Suche (4, 6) | Fehlt | Regeln lesen geht auf `/dm/rules`, aber ohne Suche und nicht im Spielfluss |
+| NSC-Generator mit NSC-Liste (5.1) | Fehlt | Tabellen für NSC erschaffen liegen nur als Lesetext bei Regeln |
+| Namensgenerator (5.2) | Fehlt | |
+| Schnell-Encounter (5.3) | Fehlt | Begegnungstabellen nur im Katalog und im Ortseditor |
+| Zufallsereignisse und Reise-Missgeschick (5.4) | Teilweise | Tabellen lesbar unter Regeln, Ergebnis nicht in die Chronik übernehmbar |
+| Beute-Vorschlag (5.5) | Fehlt | Niedrige Priorität |
+| Gasthaus- und Ort-Generator (5.6) | Fehlt | |
+| Gerüchte und Aufhänger (5.7) | Entfällt | Gehören in den Kampagnentext |
+| Item ins Inventar geben (5.8) | Fehlt | |
+| Improvisierte Waffen (5.9) | Teilweise | Als Tabelle unter Regeln, Kapitel Kampf |
+| Wetter und Tageszeit (5.10) | Fehlt | Optional |
+| Nachschlagen als eine Seite (6) | Geändert | Drei getrennte Bereiche: Katalog, Regeln, Lore |
+| "Zur Kampagne hinzufügen" und "Anpinnen" im Katalog (6) | Fehlt | |
+| Lore mit Kampagnen-NSC verknüpfen (6) | Fehlt | |
+| Orte-Baum, klickbare Verknüpfungen (7) | Teilweise | Baum da, Namen in Texten sind verlinkt, kein Kasten "Verknüpft" |
+| Vorbereitungs-Checkliste je Kapitel (7) | Fehlt | |
+| Sitzungs-Rückblick aus der Chronik (7) | Fehlt | |
+| Export und Import als JSON (7) | Fehlt | |
+| Tablet-Bedienung, große Touch-Flächen (8) | Nicht geprüft | |
+
+Zusätzlich gebaut, aber nicht im Plan: Gegnerliste pro Kampagne (`campaign_foes`) mit Suchfeld, das die Liste beim Tippen kürzt.

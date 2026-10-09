@@ -11,7 +11,7 @@
 
             <nav class="dm-nav" aria-label="DM-Navigation">
                 <span class="dm-nav__label">Spielleitung</span>
-                <a href="/dm"{% if path == '/dm' or path starts with '/dm/campaign' or path == '/dm/party' %} aria-current="page"{% endif %}>{{ ui.icon('castle') }} Kampagnen</a>
+                <a href="/dm"{% if path == '/dm' or path starts with '/dm/campaign' %} aria-current="page"{% endif %}>{{ ui.icon('castle') }} Kampagnen</a>
                 <a href="/dm/catalog"{% if path starts with '/dm/catalog' %} aria-current="page"{% endif %}>{{ ui.icon('skull') }} Katalog</a>
                 <a href="/dm/rules"{% if path starts with '/dm/rules' %} aria-current="page"{% endif %}>{{ ui.icon('book-open') }} Regeln</a>
                 <a href="/dm/lore"{% if path starts with '/dm/lore' %} aria-current="page"{% endif %}>{{ ui.icon('scroll-text') }} Lore</a>

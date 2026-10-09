@@ -144,7 +144,8 @@ final class AppRoutesTest extends AppTestCase
 
         $play = (string) $this->request('GET', '/dm/campaign/4/play')
             ->getBody();
-        self::assertStringContainsString('Wurf am Tisch', $play);
+        self::assertStringNotContainsString('Wurf am Tisch', $play, 'tables live under Regeln');
+        self::assertStringContainsString('Gruppe', $play);
         self::assertStringNotContainsString('data-die', $play, 'the app never rolls dice');
         self::assertStringContainsString('Jaldo', $play);
     }
@@ -175,7 +176,7 @@ final class AppRoutesTest extends AppTestCase
     {
         $this->loginAsDm();
 
-        foreach (['/dm', '/dm/rules', '/dm/lore', '/dm/party', '/dm/styleguide', '/dm/catalog/items', '/dm/catalog/bestiary', '/dm/catalog/encounters'] as $path) {
+        foreach (['/dm', '/dm/rules', '/dm/lore', '/dm/styleguide', '/dm/catalog/items', '/dm/catalog/bestiary', '/dm/catalog/encounters'] as $path) {
             $response = $this->request('GET', $path);
             self::assertSame(200, $response->getStatusCode(), $path);
             $this->assertCleanBody($response, $path);

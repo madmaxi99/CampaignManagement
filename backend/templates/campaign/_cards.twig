@@ -78,22 +78,3 @@
         {% if item.text_de %}<div class="book-text pre-wrap">{{ item.text_de }}</div>{% endif %}
     </div>
 {% endmacro %}
-
-{% macro encounter_table(table, entityRegistry) %}
-    <div class="event-table" data-event-table>
-        <div class="ui-row" style="justify-content: space-between">
-            <h3 style="margin: 0">{{ table.name_de }}</h3>
-            <span class="ui-row">
-                <label class="ui-row ui-muted">Wurf am Tisch <input class="ui-input event-roll-input" type="number" min="1" inputmode="numeric" data-roll-input></label>
-            </span>
-        </div>
-        <ul class="event-table-list">
-            {% for entry in table.entries %}
-                <li class="event-entry" data-min="{{ entry.min_roll }}" data-max="{{ entry.max_roll ?? entry.min_roll }}" data-open-ended="{{ entry.max_roll is null ? '1' : '0' }}">
-                    <span class="event-roll">{{ entry.max_roll is null ? entry.min_roll ~ '+' : (entry.min_roll == entry.max_roll ? entry.min_roll : entry.min_roll ~ '–' ~ entry.max_roll) }}</span>
-                    <span class="event-text">{{ entry.text_de|linkify(entityRegistry) }}</span>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-{% endmacro %}

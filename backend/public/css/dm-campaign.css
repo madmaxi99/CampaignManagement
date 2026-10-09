@@ -311,6 +311,14 @@ a.segmented__option {
     box-shadow: none;
 }
 
+.group-head {
+    justify-content: space-between;
+}
+
+.group-head .ui-card__title {
+    margin-right: auto;
+}
+
 .party-grid {
     display: grid;
     gap: var(--space-4);

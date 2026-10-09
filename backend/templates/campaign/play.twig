@@ -19,8 +19,8 @@
             </div>
 
             {% for group in [
-                {'title': 'NPCs', 'icon': 'user', 'type': 'npc', 'rows': npcs},
                 {'title': 'Orte', 'icon': 'map-pin', 'type': 'place', 'rows': placeTree},
+                {'title': 'NPCs', 'icon': 'user', 'type': 'npc', 'rows': npcs},
                 {'title': 'Items', 'icon': 'package', 'type': 'item', 'rows': items},
                 {'title': 'Monster', 'icon': 'skull', 'type': 'bestiary', 'rows': monsters}
             ] %}
@@ -45,7 +45,7 @@
             <div class="ui-tabs" role="tablist" data-ui-tabs data-ui-tabs-hash>
                 <button class="ui-tab" role="tab" id="tab-read" aria-controls="panel-read" aria-selected="true">{{ ui.icon('book-open') }} Lesen</button>
                 <button class="ui-tab" role="tab" id="tab-chronicle" aria-controls="panel-chronicle" aria-selected="false">{{ ui.icon('notebook-pen') }} Chronik</button>
-                <button class="ui-tab" role="tab" id="tab-tables" aria-controls="panel-tables" aria-selected="false">{{ ui.icon('scroll-text') }} Tabellen</button>
+                <button class="ui-tab" role="tab" id="tab-group" aria-controls="panel-group" aria-selected="false">{{ ui.icon('users') }} Gruppe</button>
             </div>
 
             {# ----- Read ----- #}
@@ -134,13 +134,9 @@
                 </div>
             </div>
 
-            {# ----- Tables ----- #}
-            <div class="ui-tabpanel ui-stack" id="panel-tables" role="tabpanel" aria-labelledby="tab-tables" hidden>
-                {% for table in encounterTables %}
-                    <section class="ui-card">{{ cards.encounter_table(table, entityRegistry) }}</section>
-                {% else %}
-                    <div class="ui-empty">{{ ui.icon('scroll-text') }}<strong>Keine Begegnungstabellen</strong><span>Wähle bei einem Ort im Planen-Modus eine Zufallsbegegnungs-Tabelle, dann steht sie hier.</span></div>
-                {% endfor %}
+            {# ----- Group ----- #}
+            <div class="ui-tabpanel ui-stack" id="panel-group" role="tabpanel" aria-labelledby="tab-group" hidden>
+                {% include 'campaign/_group.twig' %}
             </div>
         </section>
     </div>
@@ -170,4 +166,5 @@
 
     <script type="module" src="{{ asset('js/dm-forms.js') }}"></script>
     <script type="module" src="{{ asset('js/campaign-play.js') }}"></script>
+    <script type="module" src="{{ asset('js/party-picker.js') }}"></script>
 {% endblock %}

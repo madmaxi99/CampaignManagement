@@ -1,4 +1,4 @@
-{# Header of a campaign page: name and the switch between the two modes. #}
+{# Header of a campaign page: name and the switch between planning and playing. #}
 {% macro header(campaign, active) %}
     {% import "_ui.twig" as ui %}
     <div class="dm-page-title">
@@ -9,7 +9,6 @@
         <div class="segmented mode-switch" role="group" aria-label="Modus">
             <a class="segmented__option" href="/dm/campaign/{{ campaign.id }}"{% if active == 'plan' %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ ui.icon('pencil') }} Planen</a>
             <a class="segmented__option" href="/dm/campaign/{{ campaign.id }}/play"{% if active == 'play' %} aria-pressed="true"{% else %} aria-pressed="false"{% endif %}>{{ ui.icon('dices') }} Spielen</a>
-            <a class="segmented__option" href="/dm/party" aria-pressed="false">{{ ui.icon('users') }} Gruppe</a>
         </div>
     </div>
 {% endmacro %}

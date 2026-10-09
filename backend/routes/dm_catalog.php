@@ -13,7 +13,7 @@ use function Flyka\CampaignManagement\Http\storeUploadedImage;
 
 /**
  * DM routes of the catalog editors (items, bestiary), the read-only
- * encounter tables and the party overview. All under /dm, so DmGate guards them.
+ * encounter tables and the party endpoints. All under /dm, so DmGate guards them.
  */
 return function (App $app, CatalogEditorRepository $catalog, WorldRepository $world): void {
     $json = fn (Request $request): array => json_decode((string) $request->getBody(), true) ?? [];
@@ -192,11 +192,6 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
     ]));
 
     // ---------- party ----------
-
-    $app->get('/dm/party', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/party.twig', [
-        'members' => $catalog->party(),
-        'candidates' => $catalog->partyCandidates(),
-    ]));
 
     $app->post('/dm/party', fn (Request $request, Response $response) => $guard($response, function () use ($catalog, $json, $request, $response): Response {
         $catalog->addToParty((int) ($json($request)['character_id'] ?? 0));

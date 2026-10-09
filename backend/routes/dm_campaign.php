@@ -9,6 +9,7 @@ use Flyka\CampaignManagement\Repository\CampaignNpcRepository;
 use Flyka\CampaignManagement\Repository\CampaignPlaceRepository;
 use Flyka\CampaignManagement\Repository\CampaignRepository;
 use Flyka\CampaignManagement\Repository\CampaignStandRepository;
+use Flyka\CampaignManagement\Repository\CatalogEditorRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
@@ -28,7 +29,8 @@ return function (
     CampaignPlaceRepository $places,
     CampaignItemRepository $items,
     CampaignMonsterRepository $monsters,
-    CampaignStandRepository $stand
+    CampaignStandRepository $stand,
+    CatalogEditorRepository $catalog
 ): void {
     $json = fn (Request $request): array => json_decode((string) $request->getBody(), true) ?? [];
 
@@ -183,8 +185,46 @@ return function (
 
     $app->get('/dm/campaign/{id:[0-9]+}/play', $withCampaign(fn (Request $request, Response $response, array $args, array $campaign): Response => Twig::fromRequest($request)->render($response, 'campaign/play.twig', $pageData($campaign) + [
         'chronicle' => $stand->chronicle((int) $campaign['id']),
-        'encounterTables' => $places->encounterTables((int) $campaign['id']),
+        'members' => $catalog->party(),
+        'candidates' => $catalog->partyCandidates(),
+        'foes' => $monsters->foes((int) $campaign['id']),
+        'foeOptions' => $monsters->bestiaryOptions(),
     ])));
+
+    // ---------- foes of the current fight ----------
+
+    $app->post('/dm/campaign/{id:[0-9]+}/foes', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, function () use ($monsters, $json, $request, $response, $args): Response {
+        $data = $json($request);
+        $monsters->addFoe((int) $args['id'], (int) ($data['bestiary_id'] ?? 0), (int) ($data['count'] ?? 1));
+
+        return jsonResponse($response, [
+            'added' => true,
+        ], 201);
+    })));
+
+    $app->post('/dm/campaign/{id:[0-9]+}/foes/{foeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters, $json): Response {
+        $monsters->setFoeHp((int) $args['id'], (int) $args['foeId'], (int) ($json($request)['hp_current'] ?? 0));
+
+        return jsonResponse($response, [
+            'saved' => true,
+        ]);
+    }));
+
+    $app->delete('/dm/campaign/{id:[0-9]+}/foes/{foeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters): Response {
+        $monsters->removeFoe((int) $args['id'], (int) $args['foeId']);
+
+        return jsonResponse($response, [
+            'removed' => true,
+        ]);
+    }));
+
+    $app->delete('/dm/campaign/{id:[0-9]+}/foes', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters): Response {
+        $monsters->clearFoes((int) $args['id']);
+
+        return jsonResponse($response, [
+            'cleared' => true,
+        ]);
+    }));
 
     // ---------- chapters ----------
 

@@ -146,4 +146,75 @@ final readonly class CampaignMonsterRepository
                 'bestiary_id' => $bestiaryId,
             ]);
     }
+
+    /**
+     * Foes of the current fight with the stat block and attacks of their template.
+     *
+     * @return list<array<string, mixed>>
+     */
+    public function foes(int $campaignId): array
+    {
+        $stmt = $this->db->prepare(<<<SQL
+            SELECT f.id AS foe_id, f.hp_current, b.id, b.name_de, b.category_de, b.hp, b.grimmigkeit_de, b.size_de,
+                   b.movement, b.armor_de, b.resistances_de, b.immunities_de, b.traits_de, b.kit_de, b.image_path
+            FROM campaign_foes f
+            JOIN catalog_bestiary b ON b.id = f.bestiary_id
+            WHERE f.campaign_id = :campaign_id
+            ORDER BY f.id
+            SQL);
+        $stmt->execute([
+            'campaign_id' => $campaignId,
+        ]);
+
+        return $this->withAttacks($stmt->fetchAll());
+    }
+
+    /**
+     * @throws InvalidArgumentException when the stat block does not exist
+     */
+    public function addFoe(int $campaignId, int $bestiaryId, int $count = 1): void
+    {
+        $stmt = $this->db->prepare('SELECT hp FROM catalog_bestiary WHERE id = ?');
+        $stmt->execute([$bestiaryId]);
+        $hp = $stmt->fetchColumn();
+        if ($hp === false) {
+            throw new InvalidArgumentException('Unbekannte Kampfvorlage.');
+        }
+        $insert = $this->db->prepare('INSERT INTO campaign_foes (campaign_id, bestiary_id, hp_current) VALUES (:campaign_id, :bestiary_id, :hp)');
+        foreach (range(1, max(1, min(20, $count))) as $ignored) {
+            $insert->execute([
+                'campaign_id' => $campaignId,
+                'bestiary_id' => $bestiaryId,
+                'hp' => (int) $hp,
+            ]);
+        }
+    }
+
+    public function setFoeHp(int $campaignId, int $foeId, int $hp): void
+    {
+        $this->db->prepare(<<<SQL
+            UPDATE campaign_foes f JOIN catalog_bestiary b ON b.id = f.bestiary_id
+            SET f.hp_current = GREATEST(0, LEAST(:hp, b.hp))
+            WHERE f.id = :id AND f.campaign_id = :campaign_id
+            SQL)->execute([
+            'hp' => $hp,
+            'id' => $foeId,
+            'campaign_id' => $campaignId,
+        ]);
+    }
+
+    public function removeFoe(int $campaignId, int $foeId): void
+    {
+        $this->db->prepare('DELETE FROM campaign_foes WHERE id = :id AND campaign_id = :campaign_id')
+            ->execute([
+                'id' => $foeId,
+                'campaign_id' => $campaignId,
+            ]);
+    }
+
+    public function clearFoes(int $campaignId): void
+    {
+        $this->db->prepare('DELETE FROM campaign_foes WHERE campaign_id = ?')
+            ->execute([$campaignId]);
+    }
 }
