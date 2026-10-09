@@ -1,0 +1,5 @@
+{# Fragment: one DM lore chapter, loaded into the lookup reader. #}
+<article class="lore-chapter ui-card ui-stack">
+    <h2>{% if number %}{{ number }}. {% endif %}{{ chapter.title }}</h2>
+    {% include 'lore/chapters/' ~ chapter.slug ~ '.twig' with {lore_dm: true} %}
+</article>

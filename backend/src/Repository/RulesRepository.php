@@ -223,7 +223,7 @@ final readonly class RulesRepository
      *
      * @return array<string, list<array<string, mixed>>>
      */
-    private function rollTables(): array
+    public function rollTables(): array
     {
         $tables = $this->db->query(
             'SELECT code, group_de, title_de, die_de, headers_de, intro_de FROM catalog_roll_tables ORDER BY display_order, title_de'

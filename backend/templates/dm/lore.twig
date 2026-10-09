@@ -3,37 +3,29 @@
 
 {% block title %}Lore: {{ chapter.title }}{% endblock %}
 
-{% macro outline_link(href, active, text, num) %}
-    <a class="outline__item{{ active ? ' is-active' : '' }}" href="{{ href }}"{% if active %} aria-current="page"{% endif %}>
-        {% if num is not null %}<span class="outline__num">{{ num }}</span>{% endif %}
-        <span class="outline__text">{{ text }}</span>
-    </a>
-{% endmacro %}
-
-{% import _self as o %}
-
 {% block content %}
     <div class="dm-page-title">
         <h1>Lore</h1>
-        <span class="ui-muted">Chronik von Weidenmark</span>
+        <span class="ui-muted">Chronik von Weidenmark, mit dem, was nur die Spielleitung weiß</span>
     </div>
 
     <div class="plan-workspace">
         <nav class="outline ui-card" aria-label="Kapitel">
             <div class="outline__head"><span>Kapitel</span></div>
             {% for c in chapters %}
-                {{ o.outline_link('/dm/lore?k=' ~ c.slug, c.slug == chapter.slug, c.title, loop.first ? null : loop.index0) }}
+                <a class="outline__item{{ c.slug == chapter.slug ? ' is-active' : '' }}" href="/dm/lore?k={{ c.slug }}"{% if c.slug == chapter.slug %} aria-current="page"{% endif %}>
+                    {% if not loop.first %}<span class="outline__num">{{ loop.index0 }}</span>{% endif %}
+                    <span class="outline__text">{{ c.title }}</span>
+                </a>
             {% endfor %}
         </nav>
 
-        <article class="lore-chapter ui-card">
-            <h2>{% if number %}{{ number }}. {% endif %}{{ chapter.title }}</h2>
-            {% include 'lore/chapters/' ~ chapter.slug ~ '.twig' with {lore_dm: true} %}
-
+        <div class="ui-stack">
+            {% include 'dm/chapters/lore.twig' %}
             <nav class="lore-pager" aria-label="Kapitelwechsel">
                 {% if prev %}<a class="ui-btn ui-btn--ghost" href="/dm/lore?k={{ prev.slug }}">{{ ui.icon('arrow-left') }} {{ prev.title }}</a>{% else %}<span></span>{% endif %}
                 {% if next %}<a class="ui-btn ui-btn--ghost" href="/dm/lore?k={{ next.slug }}">{{ next.title }} {{ ui.icon('arrow-right') }}</a>{% endif %}
             </nav>
-        </article>
+        </div>
     </div>
 {% endblock %}

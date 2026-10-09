@@ -1,0 +1,7 @@
+{# Fragment: the random encounter tables, loaded into the lookup reader. #}
+{% import "dm/_tables.twig" as t %}
+<article class="lore-chapter ui-card ui-stack">
+    <h2>Zufallsbegegnungen</h2>
+    <p class="ui-muted">Die Tabellen, aus denen Orte in der Kampagne wählen. Gewürfelt wird am Tisch.</p>
+    {% for table in encounterTables %}{{ t.encounter(table, true) }}{% endfor %}
+</article>

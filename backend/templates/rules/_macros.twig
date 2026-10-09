@@ -20,9 +20,9 @@
 
 {% macro roll(min, max) %}{{ min == max ? min : min ~ '–' ~ max }}{% endmacro %}
 
-{% macro rolltable(t) %}
+{% macro rolltable(t, open = false) %}
     {% import _self as s %}
-    <details class="ui-details" data-search="{{ (t.title_de ~ ' ' ~ t.group_de)|lower }}">
+    <details class="ui-details" data-search="{{ (t.title_de ~ ' ' ~ t.group_de)|lower }}"{{ open ? ' open' : '' }}>
         <summary><span class="ui-details__title">{{ t.title_de }}</span><span class="ui-details__badges"><span class="ui-badge">{{ t.die_de }}</span></span></summary>
         <div class="ui-details__body">
             {% if t.intro_de %}<p class="ui-muted">{{ t.intro_de }}</p>{% endif %}

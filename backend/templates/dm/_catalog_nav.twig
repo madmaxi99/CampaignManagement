@@ -1,0 +1,24 @@
+{# The one catalog menu: groups with their categories and how many entries each has. #}
+{% import "_ui.twig" as ui %}
+{% set kindLabels = {weapon: 'Waffen', armor: 'Rüstungen', misc: 'Sonstiges'} %}
+<nav class="catalog-nav" aria-label="Katalog">
+    <h1 class="catalog-nav__title">Katalog</h1>
+
+    <span class="catalog-nav__label">{{ ui.icon('skull') }} Monster</span>
+    {% for name, count in catalogNav.bestiary %}
+        <a class="catalog-nav__item" href="/dm/catalog/bestiary?k={{ name|url_encode }}"{% if section == 'bestiary' and name == group %} aria-current="page"{% endif %}>
+            <span>{{ name }}</span><span class="catalog-nav__count">{{ count }}</span>
+        </a>
+    {% endfor %}
+
+    <span class="catalog-nav__label">{{ ui.icon('swords') }} Items</span>
+    {% for key, count in catalogNav.items %}
+        <a class="catalog-nav__item" href="/dm/catalog/items?k={{ key }}"{% if section == 'items' and key == kind %} aria-current="page"{% endif %}>
+            <span>{{ kindLabels[key]|default(key) }}</span><span class="catalog-nav__count">{{ count }}</span>
+        </a>
+    {% endfor %}
+
+    <a class="catalog-nav__label catalog-nav__link" href="/dm/catalog/encounters"{% if section == 'encounters' %} aria-current="page"{% endif %}>
+        <span>{{ ui.icon('dices') }} Begegnungen</span><span class="catalog-nav__count">{{ catalogNav.encounters }}</span>
+    </a>
+</nav>

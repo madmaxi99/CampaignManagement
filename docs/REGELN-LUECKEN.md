@@ -3,8 +3,9 @@
 Abgleich der gesammelten Stichworte gegen die App (Regelwerk-Seiten `/rules` (Spieler) und `/dm/rules` (SL), Katalog in `database/02_catalog.sql`,
 Charakterbogen, DM-Bereich). Stand nach den Screenshots des Grundregelwerks in `docs/bilder`.
 
-**Grundsatz:** Die App würfelt nie, auch nicht für den DM. Gewürfelt wird am Tisch, die App zeigt Text und nimmt
-Ergebnisse als Eingabe entgegen.
+**Grundsatz:** Die App würfelt keine Proben, Rasten oder Regelergebnisse, auch nicht für den DM. Gewürfelt wird am
+Tisch, die App zeigt Text und nimmt Ergebnisse als Eingabe entgegen. Einzige Ausnahme: DM-Generatoren (NSC,
+Begegnung, Zufallsereignis) dürfen einen Vorschlag zufällig aus einer Tabelle wählen (siehe `docs/PLAN.md`).
 
 **Quellen:** Schnellstarter 2.0 (`docs/DB_DE_Schnellstarter_2-0_web-2njzid.pdf`) und die Screenshots des englischen
 Grundregelwerks. Die deutschen Texte aus dem Grundregelwerk sind eigene Übersetzungen mit den Begriffen des

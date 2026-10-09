@@ -17,27 +17,34 @@
 
 {% import _self as b %}
 
+{% block main_class %} dm-main--fill{% endblock %}
+
 {% block content %}
-    {% include 'dm/_catalog_tabs.twig' with {section: 'bestiary'} %}
+    <div class="catalog-workspace">
+        <div class="catalog-browser ui-card">
+            {% include 'dm/_catalog_nav.twig' with {section: 'bestiary'} %}
 
-    <div class="plan-workspace">
-        <nav class="outline ui-card" aria-label="Bestiary">
-            <div class="outline__head">
-                <span>{{ creatures|length }} Vorlagen</span>
-                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="/dm/catalog/bestiary?e=new" aria-label="Neue Vorlage">{{ ui.icon('plus') }}</a>
-            </div>
-            {% set groups = {} %}
-            {% for c in creatures %}
-                {% if loop.first or c.category_de != creatures[loop.index0 - 1].category_de %}
-                    <div class="outline__head"><span>{{ c.category_de ?? 'Ohne Kategorie' }}</span></div>
-                {% endif %}
-                <a class="outline__item{{ entity and entity.id == c.id ? ' is-active' : '' }}" href="/dm/catalog/bestiary?e={{ c.id }}"{% if entity and entity.id == c.id %} aria-current="page"{% endif %}>
-                    <span class="outline__text">{{ c.name_de }}{% if c.is_unique %} ★{% endif %}</span>
-                </a>
-            {% endfor %}
-        </nav>
+            <section class="catalog-list" aria-label="{{ group }}">
+                <header class="catalog-list__head">
+                    <h2>{{ group }} <span class="catalog-nav__count">{{ creatures|length }}</span></h2>
+                    <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="/dm/catalog/bestiary?e=new&amp;k={{ group|url_encode }}" aria-label="Neue Vorlage">{{ ui.icon('plus') }}</a>
+                </header>
+                <div class="ui-search">
+                    {{ ui.icon('search') }}
+                    <input class="ui-input" type="search" data-catalog-filter placeholder="Filtern …" aria-label="Liste filtern" autocomplete="off">
+                </div>
+                <div class="catalog-list__items" data-catalog-items>
+                    {% for c in creatures %}
+                        <a class="outline__item{{ entity and entity.id == c.id ? ' is-active' : '' }}" href="/dm/catalog/bestiary?e={{ c.id }}&amp;k={{ group|url_encode }}"{% if entity and entity.id == c.id %} aria-current="page"{% endif %}>
+                            <span class="outline__text">{{ c.name_de }}{% if c.is_unique %} ★{% endif %}</span>
+                        </a>
+                    {% endfor %}
+                    <p class="outline__empty" data-catalog-empty hidden>Nichts gefunden.</p>
+                </div>
+            </section>
+        </div>
 
-        <section class="plan-editor">
+        <section class="catalog-editor">
             {% if entity or creating %}
                 <form class="ui-card ui-stack" data-dm-form
                       data-action="{{ entity ? '/dm/catalog/bestiary/' ~ entity.id : '/dm/catalog/bestiary' }}"
@@ -107,4 +114,5 @@
     </div>
 
     <script type="module" src="{{ asset('js/dm-forms.js') }}"></script>
+    <script type="module" src="{{ asset('js/catalog-filter.js') }}"></script>
 {% endblock %}

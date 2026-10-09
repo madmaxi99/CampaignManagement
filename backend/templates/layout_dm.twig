@@ -11,15 +11,11 @@
 
             <nav class="dm-nav" aria-label="DM-Navigation">
                 <span class="dm-nav__label">Spielleitung</span>
-                <a href="/dm"{% if path == '/dm' or path starts with '/dm/campaign' %} aria-current="page"{% endif %}>{{ ui.icon('castle') }} Kampagnen</a>
-                <a href="/dm/party"{% if path == '/dm/party' %} aria-current="page"{% endif %}>{{ ui.icon('users') }} Gruppe</a>
+                <a href="/dm"{% if path == '/dm' or path starts with '/dm/campaign' or path == '/dm/party' %} aria-current="page"{% endif %}>{{ ui.icon('castle') }} Kampagnen</a>
                 <a href="/dm/catalog"{% if path starts with '/dm/catalog' %} aria-current="page"{% endif %}>{{ ui.icon('skull') }} Katalog</a>
+                <a href="/dm/rules"{% if path starts with '/dm/rules' %} aria-current="page"{% endif %}>{{ ui.icon('book-open') }} Regeln</a>
                 <a href="/dm/lore"{% if path starts with '/dm/lore' %} aria-current="page"{% endif %}>{{ ui.icon('scroll-text') }} Lore</a>
-                <a href="/dm/rules"{% if path starts with '/dm/rules' %} aria-current="page"{% endif %}>{{ ui.icon('book-open') }} SL-Regeln</a>
-                <span class="dm-nav__label">Spielersicht</span>
-                <a href="/characters">{{ ui.icon('users') }} Charaktere</a>
-                <a href="/lore">{{ ui.icon('scroll-text') }} Lore</a>
-                <a href="/rules">{{ ui.icon('book-open') }} Regeln</a>
+                <a href="/characters">{{ ui.icon('users') }} Spielersicht</a>
                 <span class="dm-nav__label">Entwicklung</span>
                 <a href="/dm/styleguide"{% if path == '/dm/styleguide' %} aria-current="page"{% endif %}>{{ ui.icon('feather') }} Styleguide</a>
             </nav>
@@ -32,7 +28,7 @@
             </div>
         </aside>
 
-        <div class="dm-main">
+        <div class="dm-main{% block main_class %}{% endblock %}">
             <div class="ui-banner">{{ ui.icon('lock') }} Nur für den DM – Spieler sehen diese Seiten nicht.</div>
             <main class="dm-content">
                 {% block content %}{% endblock %}

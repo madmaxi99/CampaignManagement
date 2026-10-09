@@ -35,7 +35,33 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
 
     // ---------- items ----------
 
-    $app->get('/dm/catalog/items', function (Request $request, Response $response) use ($catalog, $redirect) {
+    /**
+     * Splits a long catalog list into categories so a page only shows one of them: the requested
+     * category, else the one of the opened entry, else the first. "counts" lists every category.
+     *
+     * @param list<array<string, mixed>> $rows
+     * @return array{selected: string, counts: array<string, int>, rows: list<array<string, mixed>>}
+     */
+    $byCategory = function (array $rows, string $field, string $requested, ?string $entityCategory): array {
+        $counts = [];
+        foreach ($rows as $row) {
+            $key = (string) ($row[$field] ?? 'Ohne Kategorie');
+            $counts[$key] = ($counts[$key] ?? 0) + 1;
+        }
+        $selected = match (true) {
+            isset($counts[$requested]) => $requested,
+            $entityCategory !== null && isset($counts[$entityCategory]) => $entityCategory,
+            default => (string) array_key_first($counts),
+        };
+
+        return [
+            'selected' => $selected,
+            'counts' => $counts,
+            'rows' => array_values(array_filter($rows, fn (array $row): bool => (string) ($row[$field] ?? 'Ohne Kategorie') === $selected)),
+        ];
+    };
+
+    $app->get('/dm/catalog/items', function (Request $request, Response $response) use ($catalog, $redirect, $byCategory) {
         $selection = (string) ($request->getQueryParams()['e'] ?? '');
         $item = null;
         if (preg_match('/^\d+$/', $selection) === 1) {
@@ -45,8 +71,14 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
             }
         }
 
+        $list = $byCategory($catalog->itemList(), 'kind', (string) ($request->getQueryParams()['k'] ?? ''), $item['kind'] ?? null);
+
         return Twig::fromRequest($request)->render($response, 'dm/catalog_items.twig', [
-            'items' => $catalog->itemList(),
+            'catalogNav' => $catalog->navCounts(),
+            'items' => $list['rows'],
+            'kinds' => $list['counts'],
+            'kind' => $list['selected'],
+            'itemCount' => array_sum($list['counts']),
             'entity' => $item,
             'creating' => $selection === 'new',
         ]);
@@ -82,7 +114,7 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
 
     // ---------- bestiary ----------
 
-    $app->get('/dm/catalog/bestiary', function (Request $request, Response $response) use ($catalog, $redirect) {
+    $app->get('/dm/catalog/bestiary', function (Request $request, Response $response) use ($catalog, $redirect, $byCategory) {
         $selection = (string) ($request->getQueryParams()['e'] ?? '');
         $creature = null;
         if (preg_match('/^\d+$/', $selection) === 1) {
@@ -92,8 +124,14 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
             }
         }
 
+        $list = $byCategory($catalog->bestiaryList(), 'category_de', (string) ($request->getQueryParams()['k'] ?? ''), $creature['category_de'] ?? null);
+
         return Twig::fromRequest($request)->render($response, 'dm/catalog_bestiary.twig', [
-            'creatures' => $catalog->bestiaryList(),
+            'catalogNav' => $catalog->navCounts(),
+            'creatures' => $list['rows'],
+            'groups' => $list['counts'],
+            'group' => $list['selected'],
+            'creatureCount' => array_sum($list['counts']),
             'entity' => $creature,
             'creating' => $selection === 'new',
             'categories' => $catalog->categories(),
@@ -149,6 +187,7 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
     // ---------- encounter tables (read-only) ----------
 
     $app->get('/dm/catalog/encounters', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/catalog_encounters.twig', [
+        'catalogNav' => $catalog->navCounts(),
         'encounterTables' => $world->encounterTables(),
     ]));
 

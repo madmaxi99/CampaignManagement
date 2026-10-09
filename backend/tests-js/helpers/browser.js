@@ -43,6 +43,9 @@ export async function loadPage(
         fetch,
         FormData: win.FormData,
         File: win.File,
+        DOMParser: win.DOMParser,
+        HTMLElement: win.HTMLElement,
+        Element: win.Element,
     });
 
     await import(`${pathToFileURL(path.join(PUBLIC_JS, file)).href}?load=${(loadCounter += 1)}`);
@@ -70,6 +73,7 @@ export function fakeFetch(routes = {}) {
             ok: status >= 200 && status < 300,
             status,
             json: async () => result.json ?? result,
+            text: async () => result.text ?? '',
         };
     };
     fetch.calls = calls;

@@ -41,11 +41,11 @@ function init(root) {
         if (!link) {
             return;
         }
-        event.preventDefault();
         const template = document.getElementById('tpl-' + link.dataset.entityType + '-' + link.dataset.entityId);
         if (!template) {
             return;
         }
+        event.preventDefault();
         sheetBody.replaceChildren(template.content.cloneNode(true));
         sheetBody.querySelectorAll('[data-event-table]').forEach(wireTable);
         if (!sheet.open) {

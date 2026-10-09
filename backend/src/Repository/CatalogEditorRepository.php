@@ -27,6 +27,44 @@ final readonly class CatalogEditorRepository
     ) {
     }
 
+    /**
+     * How many entries every category of the catalog areas has, for the catalog menu. The keys
+     * are the categories as the list pages use them (item kind codes, bestiary category names).
+     *
+     * @return array{bestiary: array<string, int>, items: array<string, int>, encounters: int}
+     */
+    public function navCounts(): array
+    {
+        $bestiary = $this->db->query(<<<SQL
+            SELECT COALESCE(category_de, 'Ohne Kategorie') AS category, COUNT(*) AS total
+            FROM catalog_bestiary
+            GROUP BY category_de
+            ORDER BY category_de IS NULL, category_de
+            SQL)->fetchAll(PDO::FETCH_KEY_PAIR);
+        $items = $this->db->query(<<<SQL
+            SELECT kind, COUNT(*) AS total
+            FROM catalog_items
+            GROUP BY kind
+            ORDER BY FIELD(kind, 'weapon', 'armor', 'misc')
+            SQL)->fetchAll(PDO::FETCH_KEY_PAIR);
+
+        $counts = static function (array $rows): array {
+            $counts = [];
+            foreach ($rows as $name => $total) {
+                $counts[(string) $name] = (int) $total;
+            }
+
+            return $counts;
+        };
+
+        return [
+            'bestiary' => $counts($bestiary),
+            'items' => $counts($items),
+            'encounters' => (int) $this->db->query('SELECT COUNT(*) FROM catalog_encounter_tables')
+                ->fetchColumn(),
+        ];
+    }
+
     // ---------- items ----------
 
     /**

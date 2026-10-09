@@ -2,63 +2,18 @@
 
 declare(strict_types=1);
 
+use Flyka\CampaignManagement\Service\DmChapters;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Views\Twig;
 
 /**
- * DM lore: the chronicle of Weidenmark as chapters, picked with ?k=<slug>.
- * The content lives in templates/lore/chapters/<slug>.twig and ships with the deploy.
+ * DM lore: the player lore plus what only the game master knows, one chapter per page.
  * The path is under /dm, so DmGate already guards it.
  */
 return function (App $app): void {
-    $chapters = [
-        [
-            'slug' => 'uebersicht',
-            'title' => 'Übersicht',
-        ],
-        [
-            'slug' => 'korvanis',
-            'title' => 'Korvanis',
-        ],
-        [
-            'slug' => 'beifall',
-            'title' => 'Der Beifall',
-        ],
-        [
-            'slug' => 'ruhige-jahre',
-            'title' => 'Die ruhigen Jahre',
-        ],
-        [
-            'slug' => 'heute',
-            'title' => 'Weidenmark heute',
-        ],
-        [
-            'slug' => 'voelker',
-            'title' => 'Völker',
-        ],
-        [
-            'slug' => 'land',
-            'title' => 'Das Land',
-        ],
-        [
-            'slug' => 'orte',
-            'title' => 'Städte und Orte',
-        ],
-        [
-            'slug' => 'schauplaetze',
-            'title' => 'Schauplätze',
-        ],
-        [
-            'slug' => 'haeuser',
-            'title' => 'Häuser und Gilden',
-        ],
-        [
-            'slug' => 'personen',
-            'title' => 'Personen',
-        ],
-    ];
+    $chapters = DmChapters::lore();
 
     $app->get('/dm/lore', function (Request $request, Response $response) use ($chapters): Response {
         $slug = (string) ($request->getQueryParams()['k'] ?? $chapters[0]['slug']);
@@ -67,7 +22,7 @@ return function (App $app): void {
             return $response->withStatus(404);
         }
 
-        return Twig::fromRequest($request)->render($response, 'lore/dm.twig', [
+        return Twig::fromRequest($request)->render($response, 'dm/lore.twig', [
             'chapters' => $chapters,
             'chapter' => $chapters[$index],
             'number' => $index === 0 ? null : $index,

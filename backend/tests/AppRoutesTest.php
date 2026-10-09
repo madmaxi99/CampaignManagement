@@ -19,6 +19,91 @@ final class AppRoutesTest extends AppTestCase
         parent::tearDown();
     }
 
+    public function testRulesAndLoreAreAreasOfTheirOwn(): void
+    {
+        self::assertSame(302, $this->request('GET', '/dm/rules')->getStatusCode());
+        self::assertSame(302, $this->request('GET', '/dm/lore')->getStatusCode());
+
+        $this->loginAsDm();
+        $expected = [
+            '/dm/rules?k=spielleitung' => 'Gefolge',
+            '/dm/rules?k=kampf' => 'Improvisierte Waffen: Gasthaus',
+            '/dm/rules?k=monster' => 'Grimmigkeit',
+            '/dm/rules?k=reise' => 'Reise-Missgeschicke',
+            '/dm/rules?k=nsc' => 'Eigenart',
+            '/dm/rules?k=zufallsbegegnungen' => 'Zufallsbegegnungen',
+            '/dm/lore?k=orte' => 'Hohenfurt',
+        ];
+        foreach ($expected as $path => $text) {
+            $response = $this->request('GET', $path);
+            self::assertSame(200, $response->getStatusCode(), $path);
+            self::assertStringContainsString($text, (string) $response->getBody(), $path);
+            $this->assertCleanBody($response, $path);
+        }
+        self::assertStringContainsString(' open>', (string) $this->request('GET', '/dm/rules?k=reise')->getBody(), 'tables are open');
+        self::assertSame(200, $this->request('GET', '/dm/rules')->getStatusCode(), 'the first chapter is the default');
+        self::assertSame(200, $this->request('GET', '/dm/lore')->getStatusCode());
+        self::assertSame(404, $this->request('GET', '/dm/rules?k=beispiele')->getStatusCode());
+        self::assertSame(404, $this->request('GET', '/dm/lore?k=gibtesnicht')->getStatusCode());
+        self::assertStringNotContainsString('Grimmigkeit', (string) $this->request('GET', '/rules')->getBody());
+
+        $page = (string) $this->request('GET', '/dm/rules')
+            ->getBody();
+        foreach (['/dm', '/dm/catalog', '/dm/rules', '/dm/lore'] as $target) {
+            self::assertStringContainsString('href="' . $target . '"', $page, 'the navigation links ' . $target);
+        }
+        self::assertStringNotContainsString('href="/dm/party"', $page, 'the group belongs to the campaign');
+    }
+
+    public function testCatalogHasOneMenuAndSplitsLongLists(): void
+    {
+        $this->loginAsDm();
+
+        $items = (string) $this->request('GET', '/dm/catalog/items?k=armor')
+            ->getBody();
+        self::assertStringContainsString('class="catalog-nav"', $items);
+        self::assertStringContainsString('class="catalog-browser ui-card"', $items, 'menu and list are one card');
+        self::assertStringContainsString('Rüstungen', $items);
+        self::assertStringContainsString('Sonstiges', $items, 'every category is in the menu');
+        self::assertStringContainsString('dm-main--fill', $items);
+        self::assertStringNotContainsString('Kurzschwert', $items, 'a weapon is not listed under armor');
+        self::assertStringNotContainsString('catalog-groups', $items, 'no second category menu');
+        self::assertStringNotContainsString('aria-label="Katalog"><a', $items);
+
+        $creatures = (string) $this->request('GET', '/dm/catalog/bestiary?k=Untot')
+            ->getBody();
+        self::assertStringContainsString('Alltagsvolk', $creatures);
+        self::assertMatchesRegularExpression('/aria-current="page">\s*<span>Untot<\/span>/', $creatures, 'the open category is marked');
+
+        $first = (int) $this->db->query("SELECT id FROM catalog_bestiary WHERE category_de = 'Tier' ORDER BY name_de LIMIT 1")
+            ->fetchColumn();
+        $opened = (string) $this->request('GET', '/dm/catalog/bestiary?e=' . $first)
+            ->getBody();
+        self::assertMatchesRegularExpression('/aria-current="page">\s*<span>Tier<\/span>/', $opened, 'an opened entry selects its own category');
+
+        $encounters = (string) $this->request('GET', '/dm/catalog/encounters')
+            ->getBody();
+        self::assertStringContainsString('catalog-workspace--two', $encounters);
+        self::assertStringContainsString('href="/dm/catalog/encounters" aria-current="page"', $encounters, 'the open group is marked');
+    }
+
+    public function testSearchIsOnlyForTheDm(): void
+    {
+        self::assertSame(302, $this->request('GET', '/dm/search?q=spinne')->getStatusCode());
+
+        $this->loginAsDm();
+        $monsters = $this->json($this->request('GET', '/dm/search?q=spinne&t=monster'), 200)['results'];
+        self::assertSame('Riesenspinne', $monsters[0]['title']);
+        self::assertSame('bestiary', $monsters[0]['entity']);
+
+        $spells = $this->json($this->request('GET', '/dm/search?q=Kerze'), 200)['results'];
+        self::assertContains('Entzünden', array_column($spells, 'title'));
+
+        self::assertSame([], $this->json($this->request('GET', '/dm/search?q='), 200)['results'], 'no query, no results');
+        self::assertSame([], $this->json($this->request('GET', '/dm/search?q=50%25_%5C'), 200)['results'], 'wildcards are escaped');
+        self::assertNotSame([], $this->json($this->request('GET', '/dm/search?t=spell'), 200)['results'], 'a category lists without a query');
+    }
+
     public function testPublicPages(): void
     {
         foreach (['/characters', '/rules', '/lore', '/character/create', '/dm/login'] as $path) {
@@ -75,29 +160,6 @@ final class AppRoutesTest extends AppTestCase
         ])->getStatusCode());
     }
 
-    public function testGameMasterRulesAreOnlyForTheDm(): void
-    {
-        self::assertSame(302, $this->request('GET', '/dm/rules')->getStatusCode());
-
-        $this->loginAsDm();
-        $expected = [
-            'spielleitung' => 'Gefolge',
-            'kampf' => 'NSC bei null TP',
-            'monster' => 'Grimmigkeit',
-            'reise' => 'Reise-Missgeschicke',
-            'nsc' => 'Eigenart',
-            'beispiele' => 'Improvisierte Waffen: Gasthaus',
-        ];
-        foreach ($expected as $slug => $text) {
-            $response = $this->request('GET', '/dm/rules?k=' . $slug);
-            self::assertSame(200, $response->getStatusCode(), $slug);
-            self::assertStringContainsString($text, (string) $response->getBody(), $slug);
-        }
-
-        self::assertSame(404, $this->request('GET', '/dm/rules?k=gibtesnicht')->getStatusCode());
-        self::assertStringNotContainsString('Grimmigkeit', (string) $this->request('GET', '/rules')->getBody());
-    }
-
     public function testWrongPasswordIsRejected(): void
     {
         $this->request('GET', '/dm/login');
@@ -113,7 +175,7 @@ final class AppRoutesTest extends AppTestCase
     {
         $this->loginAsDm();
 
-        foreach (['/dm', '/dm/lore', '/dm/party', '/dm/styleguide', '/dm/catalog/items', '/dm/catalog/bestiary', '/dm/catalog/encounters'] as $path) {
+        foreach (['/dm', '/dm/rules', '/dm/lore', '/dm/party', '/dm/styleguide', '/dm/catalog/items', '/dm/catalog/bestiary', '/dm/catalog/encounters'] as $path) {
             $response = $this->request('GET', $path);
             self::assertSame(200, $response->getStatusCode(), $path);
             $this->assertCleanBody($response, $path);
