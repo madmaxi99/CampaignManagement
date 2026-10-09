@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Flyka\CampaignManagement\Tests;
 
+use Psr\Http\Message\ResponseInterface;
+
 /**
  * Public pages, DM login and the campaign workflow, driven as a visitor or DM.
  */
@@ -129,23 +131,41 @@ final class AppRoutesTest extends AppTestCase
         self::assertSame(200, $this->request('GET', '/api/character-creation/catalog')->getStatusCode());
     }
 
+    /**
+     * The play page of a campaign: /play leads on to the page of the current chapter.
+     */
+    private function playPage(int $campaignId): ResponseInterface
+    {
+        $response = $this->request('GET', "/dm/campaign/{$campaignId}/play");
+        if ($response->getStatusCode() === 302) {
+            return $this->request('GET', $response->getHeaderLine('Location'));
+        }
+
+        return $response;
+    }
+
     public function testExampleCampaignsCanBePlannedAndPlayed(): void
     {
         $this->loginAsDm();
 
         foreach ([1, 2, 3, 4] as $id) {
-            foreach (['', '/play'] as $suffix) {
-                $path = "/dm/campaign/{$id}{$suffix}";
-                $response = $this->request('GET', $path);
-                self::assertSame(200, $response->getStatusCode(), $path);
-                $this->assertCleanBody($response, $path);
-            }
+            $path = "/dm/campaign/{$id}";
+            $response = $this->request('GET', $path);
+            self::assertSame(200, $response->getStatusCode(), $path);
+            $this->assertCleanBody($response, $path);
+
+            $response = $this->playPage($id);
+            self::assertSame(200, $response->getStatusCode(), $path . '/play');
+            $this->assertCleanBody($response, $path . '/play');
+            self::assertStringContainsString('class="chapter-tab"', (string) $response->getBody(), 'even a single chapter keeps its tab');
         }
 
-        $play = (string) $this->request('GET', '/dm/campaign/4/play')
+        $play = (string) $this->playPage(4)
             ->getBody();
         self::assertStringNotContainsString('Wurf am Tisch', $play, 'tables live under Regeln');
-        self::assertStringContainsString('Gruppe', $play);
+        foreach (['aria-label="Index"', 'aria-label="Gruppe"', 'id="foes"', 'id="tools"', 'id="play-data"'] as $part) {
+            self::assertStringContainsString($part, $play);
+        }
         self::assertStringNotContainsString('data-die', $play, 'the app never rolls dice');
         self::assertStringContainsString('Jaldo', $play);
     }
@@ -250,12 +270,33 @@ final class AppRoutesTest extends AppTestCase
         }
 
         // plan and play pages render with all that data
-        foreach ([$base, $base . '/play'] as $path) {
+        foreach ([$base, $base . '/play/chapter/' . $chapter] as $path) {
             $response = $this->request('GET', $path);
             self::assertSame(200, $response->getStatusCode(), $path);
             $this->assertCleanBody($response, $path);
             self::assertStringContainsString('Alberta II', (string) $response->getBody());
         }
+
+        // chapters of the play view: /play leads to the first chapter, the group moves with the place
+        $redirect = $this->request('GET', $base . '/play');
+        self::assertSame(302, $redirect->getStatusCode());
+        self::assertSame($base . '/play/chapter/' . $second, $redirect->getHeaderLine('Location'), 'the moved chapter comes first');
+        self::assertSame(200, $this->request('GET', $base . '/play/chapter/' . $chapter)->getStatusCode());
+        self::assertSame(404, $this->request('GET', $base . '/play/chapter/999999')->getStatusCode());
+
+        $this->json($this->request('POST', $base . '/current', [
+            'place_id' => $place,
+            'note' => true,
+        ]), 200);
+        self::assertSame($base . '/play/chapter/' . $chapter, $this->request('GET', $base . '/play')->getHeaderLine('Location'), 'the place moved the group to its chapter');
+        $page = (string) $this->request('GET', $base . '/play/chapter/' . $chapter)
+            ->getBody();
+        self::assertStringContainsString('Gruppe ist hier', $page);
+        self::assertStringContainsString('Die Gruppe wechselt zu: Turm neu.', $page, 'the move is noted in the chronicle');
+        $this->json($this->request('POST', $base . '/current', [
+            'place_id' => 999999,
+        ]), 422);
+        $this->json($this->request('POST', $base . '/current', []), 422);
 
         // validation errors become 422
         self::assertSame(422, $this->request('POST', $base . '/npcs', [

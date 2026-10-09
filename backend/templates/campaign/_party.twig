@@ -1,0 +1,68 @@
+{# Gruppe column of the play view: the party of the day. #}
+{% import "_ui.twig" as ui %}
+
+<div class="ui-row group-head">
+    <h2 class="ui-card__title">{{ ui.icon('users') }} Gruppe</h2>
+    <button type="button" class="ui-btn ui-btn--gold ui-btn--small" data-open-picker>{{ ui.icon('plus') }} Charakter</button>
+</div>
+
+{% for m in members %}
+    <article class="ui-card party-card">
+        <a class="party-card__head" href="/character/{{ m.id }}">
+            <span class="ui-avatar">{% if m.portrait_path %}<img src="/{{ m.portrait_path }}" alt="" loading="lazy">{% else %}{{ ui.icon('user') }}{% endif %}</span>
+            <span>
+                <strong class="party-card__name">{{ m.name_de }}</strong>
+                <span class="ui-muted">{{ m.kin_de }} · {{ m.profession_de }}</span>
+            </span>
+        </a>
+        <div class="ui-bar ui-bar--hp" role="meter" aria-label="Trefferpunkte" aria-valuemin="0" aria-valuemax="{{ m.hp_max }}" aria-valuenow="{{ m.hp_current }}">
+            <div class="ui-bar__fill" style="width: {{ m.hp_max > 0 ? (m.hp_current / m.hp_max * 100)|round : 0 }}%"></div>
+            <span class="ui-bar__label">TP {{ m.hp_current }}/{{ m.hp_max }}</span>
+        </div>
+        <div class="ui-bar ui-bar--wp" role="meter" aria-label="Willenskraft" aria-valuemin="0" aria-valuemax="{{ m.wp_max }}" aria-valuenow="{{ m.wp_current }}">
+            <div class="ui-bar__fill" style="width: {{ m.wp_max > 0 ? (m.wp_current / m.wp_max * 100)|round : 0 }}%"></div>
+            <span class="ui-bar__label">WP {{ m.wp_current }}/{{ m.wp_max }}</span>
+        </div>
+        <div class="ui-row">
+            <span class="ui-badge">{{ ui.icon('shield') }} Rüstung {{ m.armor_total }}</span>
+            {% for c in m.conditions %}<span class="ui-badge ui-badge--berry">{{ c }}</span>{% endfor %}
+        </div>
+        <div><button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-delete data-url="/dm/party/{{ m.id }}" data-confirm="{{ m.name_de }} aus der Gruppe nehmen?" data-after="reload">{{ ui.icon('x') }} Aus Gruppe nehmen</button></div>
+    </article>
+{% else %}
+    <div class="ui-empty">
+        {{ ui.icon('users') }}
+        <strong>Noch niemand in der Gruppe</strong>
+        <span>Füge die Charaktere hinzu, die heute am Tisch sitzen.</span>
+    </div>
+{% endfor %}
+
+<p class="ui-muted">Die Spieler pflegen ihre Werte selbst, hier siehst du den Stand beim Neuladen.</p>
+<div class="ui-row">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-post data-url="/dm/party/session-end" data-after="toast" title="Alle Mementos sind wieder benutzbar">{{ ui.icon('flame') }} Sitzung beendet</button>
+    {% if members %}
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-delete data-url="/dm/party" data-confirm="Die ganze Gruppe leeren? Die Charaktere bleiben erhalten." data-after="reload">Gruppe leeren</button>
+    {% endif %}
+</div>
+
+<dialog class="ui-sheet" id="party-picker" aria-labelledby="party-picker-title">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <div class="ui-stack">
+        <h2 id="party-picker-title">Charakter hinzufügen</h2>
+        <div class="ui-search">
+            {{ ui.icon('search') }}
+            <input class="ui-input" type="search" id="party-search" placeholder="Name, Volk oder Beruf …" autocomplete="off" aria-label="Charaktere suchen">
+        </div>
+        <div class="party-candidates">
+            {% for c in candidates %}
+                <button type="button" class="party-candidate" data-dm-post data-url="/dm/party" data-body='{"character_id": {{ c.id }}}' data-after="reload"
+                        data-search="{{ [c.name_de, c.kin_de, c.profession_de]|join(' ')|lower }}">
+                    <strong>{{ c.name_de }}</strong> <span class="ui-muted">{{ c.kin_de }} · {{ c.profession_de }}</span>
+                </button>
+            {% else %}
+                <p class="ui-muted">Alle Charaktere sind schon in der Gruppe.</p>
+            {% endfor %}
+        </div>
+        <div><button type="button" class="ui-btn ui-btn--ghost" data-close-picker>Schließen</button></div>
+    </div>
+</dialog>

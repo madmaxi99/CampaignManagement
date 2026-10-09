@@ -1,0 +1,84 @@
+{# Tools drawer of the play view: chronicle, suggestions from tables, reminders. #}
+{% import "_ui.twig" as ui %}
+
+<aside class="drawer" id="tools" aria-label="Werkzeuge" hidden>
+    <div class="drawer__head">
+        <h2 class="ui-card__title">{{ ui.icon('wand-sparkles') }} Werkzeuge</h2>
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon" data-tools-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    </div>
+
+    <section class="ui-card ui-stack">
+        <h3 class="ui-card__title">{{ ui.icon('notebook-pen') }} Chronik</h3>
+        <form class="ui-stack" data-chronicle-form>
+            <div class="ui-field"><label class="visually-hidden" for="chr-title">Überschrift</label><input class="ui-input" id="chr-title" name="title_de" maxlength="100" placeholder="Überschrift, z. B. Session 4 (optional)"></div>
+            <div class="ui-field"><label class="visually-hidden" for="chr-text">Text</label><textarea class="ui-textarea" id="chr-text" name="text_de" rows="3" required placeholder="Alberta hat geholfen, Krakul ist gefallen …"></textarea></div>
+            <div><button type="submit" class="ui-btn">{{ ui.icon('check') }} Eintragen</button></div>
+        </form>
+        {% for entry in chronicle %}
+            <article class="chronicle-entry" data-entry-id="{{ entry.id }}" data-entry-title="{{ entry.title_de }}" data-entry-text="{{ entry.text_de }}">
+                <div class="ui-row" style="justify-content: space-between">
+                    <strong>{{ entry.title_de ?? entry.created_at|date('d.m.Y') }}</strong>
+                    <span class="ui-row">
+                        <span class="ui-muted">{{ entry.created_at|date('d.m.Y H:i') }}</span>
+                        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-entry-edit aria-label="Eintrag bearbeiten">{{ ui.icon('pencil') }}</button>
+                        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-entry-delete aria-label="Eintrag löschen">{{ ui.icon('trash-2') }}</button>
+                    </span>
+                </div>
+                <p class="pre-wrap">{{ entry.text_de }}</p>
+            </article>
+        {% else %}
+            <p class="ui-muted">Die Chronik ist leer. Alles, was am Tisch passiert, kommt hier hinein.</p>
+        {% endfor %}
+    </section>
+
+    <section class="ui-card ui-stack" data-suggest>
+        <h3 class="ui-card__title">{{ ui.icon('dices') }} Zufallsvorschlag</h3>
+        <p class="ui-muted">Die App schlägt eine Zeile aus einer Tabelle vor. Du nimmst sie an oder verwirfst sie.</p>
+        <div class="ui-field">
+            <label for="suggest-table">Tabelle</label>
+            <select class="ui-select" id="suggest-table" data-suggest-table>
+                {% if currentPlace and currentPlace.encounter_table_id %}<option value="enc-{{ currentPlace.encounter_table_id }}">Zufallsbegegnung: {{ currentPlace.name_de }}</option>{% endif %}
+                {% for t in tools.tables %}<option value="{{ t.code }}">{{ t.title }} ({{ t.die }})</option>{% endfor %}
+            </select>
+        </div>
+        <div class="ui-row"><button type="button" class="ui-btn ui-btn--gold ui-btn--small" data-suggest-go>Vorschlag ziehen</button></div>
+        <div class="suggest" data-suggest-result hidden>
+            <p data-suggest-text></p>
+            <div class="ui-row">
+                <button type="button" class="ui-btn ui-btn--small" data-suggest-take>In die Chronik</button>
+                <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-suggest-drop>Verwerfen</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="ui-card ui-stack" data-npc-generator>
+        <h3 class="ui-card__title">{{ ui.icon('user') }} NSC-Vorschlag</h3>
+        <p class="ui-muted">Zieht aus den Tabellen „NSC erschaffen“ je eine Zeile.</p>
+        <div class="ui-row"><button type="button" class="ui-btn ui-btn--gold ui-btn--small" data-npc-go>NSC vorschlagen</button></div>
+        <div class="suggest" data-npc-result hidden>
+            <div class="ui-stack">
+                <input class="ui-input" data-npc-name aria-label="Name" placeholder="Name">
+                <textarea class="ui-textarea" rows="3" data-npc-description aria-label="Beschreibung"></textarea>
+            </div>
+            <div class="ui-row">
+                <button type="button" class="ui-btn ui-btn--small" data-npc-save data-url="{{ base }}/npcs">Als NSC speichern</button>
+                <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-npc-drop>Verwerfen</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="ui-card ui-stack">
+        <h3 class="ui-card__title">{{ ui.icon('bookmark') }} Erinnerungen</h3>
+        {% for r in ['Rast: Tagesabschnitt vorbei?', 'Hunger und Durst', 'Kälte', 'Dunkelheit, Fackeln'] %}
+            <label class="ui-check"><input type="checkbox"> {{ r }}</label>
+        {% endfor %}
+    </section>
+
+    <section class="ui-card ui-stack">
+        <h3 class="ui-card__title">{{ ui.icon('book-open') }} Regeln</h3>
+        <p><a href="/dm/rules?k=kampf" target="_blank" rel="noopener">Kampf</a> · <a href="/dm/rules?k=reise" target="_blank" rel="noopener">Reise</a> · <a href="/dm/rules?k=nsc" target="_blank" rel="noopener">NSC</a></p>
+        <div><button type="button" class="ui-btn ui-btn--danger ui-btn--small" data-dm-post data-url="{{ base }}/restart" data-after="reload" data-confirm="Chronik, Gegner und NPC-Notizen löschen? Der Inhalt der Kampagne bleibt." data-confirm-label="Ja, neu starten">{{ ui.icon('flame') }} Kampagne neu starten</button></div>
+    </section>
+
+    <script type="application/json" id="play-data">{{ {'tables': tools.tables, 'npc': tools.npc, 'encounters': tools.encounters}|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }}</script>
+</aside>

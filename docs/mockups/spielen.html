@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup: Kampagne spielen</title>
+<style>
+@font-face { font-family: 'Almendra'; font-weight: 700; src: url('../../backend/public/fonts/almendra-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Alegreya'; font-weight: 400 800; src: url('../../backend/public/fonts/alegreya-latin-wght-normal.woff2') format('woff2'); }
+
+:root {
+    --paper: #fbf4e2; --paper-deep: #f3e6c4; --card: #fffbf0; --card-edge: #e6d4a6;
+    --ink: #3a2c1d; --ink-soft: #6a5a45; --hint: #75654d;
+    --forest: #3a7349; --forest-dark: #2b5937; --forest-light: #dcebd9;
+    --honey: #e6a93a; --honey-dark: #9a6208; --honey-light: #fbe9bf;
+    --berry: #b84a42; --berry-dark: #8f352f; --berry-light: #f6d9d5;
+    --sky: #3f7fa3; --sky-light: #d9eaf3;
+    --shadow-1: 0 1px 2px rgb(86 60 20 / 12%), 0 2px 8px rgb(86 60 20 / 8%);
+    --shadow-2: 0 4px 10px rgb(86 60 20 / 14%), 0 12px 28px rgb(86 60 20 / 12%);
+    --radius-s: 8px; --radius-m: 14px;
+    --border: 2px solid var(--card-edge);
+    --font-display: 'Almendra', Georgia, serif;
+    --font-body: 'Alegreya', Georgia, serif;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { font-family: var(--font-body); font-size: 1.05rem; color: var(--ink); background: var(--paper); display: grid; grid-template-rows: auto auto auto auto minmax(0, 1fr); overflow: hidden; }
+h1, h2, h3 { font-family: var(--font-display); color: var(--forest-dark); margin: 0; line-height: 1.2; }
+h2 { font-size: 1.35rem; } h3 { font-size: 1.1rem; }
+p { margin: 0 0 .6em; }
+button, input { font: inherit; color: inherit; }
+button { cursor: pointer; }
+.muted { color: var(--ink-soft); }
+.small { font-size: .9rem; }
+
+.banner { background: var(--honey-light); border-bottom: var(--border); padding: 4px 16px; font-size: .9rem; color: var(--honey-dark); text-align: center; }
+
+.btn { min-height: 36px; padding: 4px 14px; border: var(--border); border-radius: var(--radius-s); background: var(--card); }
+.btn:hover { background: var(--honey-light); }
+.btn--gold { background: var(--honey); border-color: var(--honey); font-weight: 700; }
+.btn--gold:hover { background: #f0b84f; }
+.btn--berry { background: var(--berry); border-color: var(--berry); color: #fff; }
+.btn--small { min-height: 28px; padding: 0 10px; font-size: .9rem; }
+.badge { display: inline-block; padding: 1px 9px; border-radius: 99px; font-size: .85rem; background: var(--paper-deep); border: 1px solid var(--card-edge); }
+.badge--berry { background: var(--berry-light); border-color: var(--berry); color: var(--berry-dark); }
+.badge--forest { background: var(--forest-light); border-color: var(--forest); color: var(--forest-dark); }
+.badge--sky { background: var(--sky-light); border-color: var(--sky); }
+.badge--gold { background: var(--honey-light); border-color: var(--honey); color: var(--honey-dark); }
+.card { background: var(--card); border: var(--border); border-radius: var(--radius-m); box-shadow: var(--shadow-1); padding: 12px 14px; }
+
+/* header */
+.top { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 16px 6px; flex-wrap: wrap; }
+.top h1 { font-size: 1.7rem; }
+.top__left a { color: var(--ink-soft); text-decoration: none; font-size: .95rem; }
+.top__right { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.segmented { display: inline-flex; border: var(--border); border-radius: var(--radius-s); overflow: hidden; }
+.segmented a { padding: 5px 16px; text-decoration: none; color: var(--ink); background: var(--card); }
+.segmented a[aria-pressed="true"] { background: var(--forest); color: #fff; }
+
+.chapters { display: flex; align-items: center; gap: 6px; padding: 0 16px 8px; border-bottom: var(--border); flex-wrap: wrap; }
+.chapters button { padding: 6px 16px; border: var(--border); border-bottom: 0; border-radius: var(--radius-s) var(--radius-s) 0 0; background: var(--paper-deep); margin-bottom: -10px; padding-bottom: 14px; }
+.chapters button[aria-selected="true"] { background: var(--card); font-weight: 700; color: var(--forest-dark); }
+body.single [data-chapter="2"], body.single [data-chapter-go] { display: none !important; }
+body.single .entry small, body.single .also { display: none; }
+.chapters .now { color: var(--honey-dark); font-size: .8rem; margin-left: 6px; }
+.chapters__hint { margin-left: auto; font-size: .9rem; color: var(--ink-soft); }
+
+/* current place bar */
+.here { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 8px 16px; background: var(--forest-light); border-bottom: var(--border); }
+.here strong { font-family: var(--font-display); color: var(--forest-dark); }
+.here .chip { padding: 1px 10px; border-radius: 99px; background: var(--card); border: 1px solid var(--forest); cursor: pointer; font-size: .9rem; }
+.here .chip:hover { background: var(--honey-light); }
+.here__exits { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+
+/* 3 columns */
+.work { display: grid; grid-template-columns: 260px minmax(0, 1fr) 290px; min-height: 0; }
+.col { min-height: 0; overflow-y: auto; padding: 12px; }
+.col--index { background: var(--paper-deep); border-right: var(--border); }
+.col--read { padding: 16px 28px 80px; }
+.col--group { background: var(--paper-deep); border-left: var(--border); display: grid; gap: 10px; align-content: start; }
+
+/* index */
+.search { width: 100%; padding: 7px 10px; border: var(--border); border-radius: var(--radius-s); background: var(--card); }
+.group h3 { font-size: 1rem; margin: 14px 0 4px; display: flex; justify-content: space-between; }
+.group h3 span { font-family: var(--font-body); font-weight: 400; color: var(--hint); font-size: .85rem; }
+.group ul { list-style: none; padding: 0; margin: 0; }
+.entry { display: flex; justify-content: space-between; gap: 6px; width: 100%; text-align: left; padding: 5px 8px; border: 0; border-radius: var(--radius-s); background: transparent; }
+.entry:hover { background: var(--honey-light); }
+.entry.is-active { background: var(--card); box-shadow: inset 4px 0 0 var(--honey); font-weight: 700; }
+.entry small { color: var(--hint); white-space: nowrap; }
+.entry.is-other { opacity: .6; }
+.empty { color: var(--hint); font-size: .9rem; padding: 6px 8px; }
+
+/* read */
+.chapter[hidden] { display: none; }
+.chapter > header { margin-bottom: 14px; }
+.chapter > header p { color: var(--ink-soft); }
+.place { margin: 0 0 22px; scroll-margin-top: 12px; padding-bottom: 6px; }
+.place h2 { display: flex; gap: 10px; align-items: baseline; }
+.place__num { font-family: var(--font-body); color: var(--honey-dark); font-weight: 700; font-size: 1rem; }
+.place.is-current h2::after { content: 'hier'; font: 700 .75rem var(--font-body); color: #fff; background: var(--forest); border-radius: 99px; padding: 1px 9px; }
+.read-aloud { border-left: 5px solid var(--honey); background: var(--honey-light); padding: 8px 14px; border-radius: 0 var(--radius-s) var(--radius-s) 0; font-style: italic; }
+.dm-text { border-left: 5px solid var(--sky); background: var(--sky-light); padding: 8px 14px; border-radius: 0 var(--radius-s) var(--radius-s) 0; }
+.place .also { font-size: .9rem; color: var(--ink-soft); }
+.entity { color: var(--sky); text-decoration: underline dotted; cursor: pointer; background: none; border: 0; padding: 0; }
+.pager { display: flex; justify-content: space-between; margin-top: 24px; }
+.flash { animation: flash 1.2s ease-out; }
+@keyframes flash { from { background: var(--honey-light); } to { background: transparent; } }
+@media (prefers-reduced-motion: reduce) { .flash { animation: none; } }
+
+/* group */
+.pc { display: grid; gap: 6px; }
+.pc__head { display: flex; justify-content: space-between; align-items: baseline; }
+.pc__head strong { font-family: var(--font-display); color: var(--forest-dark); font-size: 1.1rem; }
+.bar { position: relative; height: 22px; border-radius: 99px; background: var(--paper-deep); border: 1px solid var(--card-edge); overflow: hidden; }
+.bar__fill { height: 100%; }
+.bar--hp .bar__fill { background: #d9776f; }
+.bar--wp .bar__fill { background: #7fb3cf; }
+.bar__label { position: absolute; inset: 0; display: grid; place-items: center; font-size: .85rem; font-weight: 700; }
+.row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+/* drawers */
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--card); border-left: var(--border); box-shadow: var(--shadow-2); padding: 16px; overflow-y: auto; z-index: 30; transform: translateX(105%); transition: transform .18s ease-out; }
+.drawer.is-open { transform: none; }
+@media (prefers-reduced-motion: reduce) { .drawer, .combat { transition: none; } }
+.drawer__close { float: right; }
+.tool { margin: 0 0 12px; }
+.tool .suggest { margin: 8px 0; padding: 8px 12px; border: 2px dashed var(--honey); border-radius: var(--radius-s); background: var(--honey-light); }
+.tool .suggest[hidden] { display: none; }
+.check { display: flex; gap: 8px; align-items: center; padding: 3px 0; }
+.check input { width: 18px; height: 18px; accent-color: var(--forest); }
+
+/* combat */
+.combat { position: fixed; left: 0; right: 290px; bottom: 0; height: 46vh; background: var(--card); border-top: 4px solid var(--berry); box-shadow: 0 -8px 24px rgb(86 60 20 / 18%); z-index: 20; display: grid; grid-template-rows: auto minmax(0, 1fr); transform: translateY(105%); transition: transform .18s ease-out; }
+.combat.is-open { transform: none; }
+.combat__bar { display: flex; align-items: center; gap: 12px; padding: 6px 16px; background: var(--berry-light); border-bottom: var(--border); }
+.combat__bar h2 { color: var(--berry-dark); }
+.combat__body { display: grid; grid-template-columns: minmax(0, 2.4fr) minmax(0, 1fr); min-height: 0; }
+.foegrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; align-items: start; }
+.foegrid .foe { margin: 0; }
+.combat__body > section { min-height: 0; overflow-y: auto; padding: 12px; border-right: var(--border); }
+.combat__body > section:last-child { border-right: 0; }
+.combat__body h3 { margin-bottom: 8px; }
+.foe { margin-bottom: 10px; }
+.foe__head { display: flex; justify-content: space-between; align-items: baseline; }
+.foe ul { margin: 6px 0 0; padding-left: 18px; font-size: .95rem; }
+.hpcounter { display: flex; align-items: center; gap: 4px; }
+.hpcounter output { min-width: 4.2em; text-align: center; font-weight: 700; }
+.foe.is-down { opacity: .5; }
+.foe.is-down h3::after { content: ' besiegt'; font: .8rem var(--font-body); color: var(--berry-dark); }
+.picker { margin-top: 8px; }
+.picker ul { list-style: none; margin: 6px 0 0; padding: 0; max-height: 150px; overflow-y: auto; }
+</style>
+</head>
+<body>
+
+<div class="banner">Mockup · Beispielwerte, nichts wird gespeichert. Gewürfelt wird am Tisch. <button class="btn btn--small" id="single-toggle" style="margin-left:12px">Ansicht: Kampagne mit 1 Kapitel</button></div>
+
+<header class="top">
+    <div class="top__left">
+        <a href="#">‹ Kampagnen</a>
+        <h1>Die Burg des Raubritters</h1>
+    </div>
+    <div class="top__right">
+        <button class="btn btn--berry" id="combat-open">Gegner</button>
+        <button class="btn" id="tools-open">Werkzeuge</button>
+        <div class="segmented" role="group" aria-label="Modus">
+            <a href="#" aria-pressed="false">Planen</a>
+            <a href="#" aria-pressed="true">Spielen</a>
+        </div>
+    </div>
+</header>
+
+<nav class="chapters" aria-label="Kapitel" id="chapter-tabs">
+    <button type="button" data-chapter="1" aria-selected="true">Kapitel 1: Ankunft an der Ruine <span class="now">aktuell</span></button>
+    <button type="button" data-chapter="2" aria-selected="false">Kapitel 2: In der Burg</button>
+    <span class="chapters__hint" id="url-hint">/dm/campaign/4/play/chapter/1</span>
+</nav>
+
+<div class="here" id="here">
+    <span class="muted">Ort der Gruppe:</span> <strong id="here-name">Alte Straße</strong>
+    <span class="muted">Hier sind:</span><span id="here-chips"></span>
+    <span class="here__exits"><span class="muted">Weiter nach</span><span id="here-exits"></span></span>
+</div>
+
+<div class="work">
+
+    <!-- ===== Index ===== -->
+    <aside class="col col--index" aria-label="Index">
+        <input class="search" id="index-search" type="search" placeholder="Index durchsuchen …" autocomplete="off" aria-label="Index durchsuchen">
+        <div id="index"></div>
+        <p class="empty" id="index-empty" hidden>Nichts gefunden.</p>
+    </aside>
+
+    <!-- ===== Reading ===== -->
+    <main class="col col--read" id="read">
+
+        <section class="chapter" id="chapter-1" data-chapter="1">
+            <header>
+                <h2 style="font-size:1.7rem">Kapitel 1: Ankunft an der Ruine</h2>
+                <p>Die Gruppe folgt dem Gerücht über einen Raubritter und steht vor der verfallenen Burg. Ziel des Kapitels: die Falle am Tor bemerken oder auslösen und den Hinterhalt im Burghof überstehen.</p>
+            </header>
+
+            <article class="place" id="p-1-strasse" data-place="strasse">
+                <h2><span class="place__num">#1</span>Alte Straße</h2>
+                <p class="read-aloud">Kaum erkennbar unter Gestrüpp und Unkraut windet sich eine alte Pflasterstraße den Hügel hinauf. An ihrem Ende ragt eine dunkle, verfallene Burgruine auf. Irgendwo in der Nähe krächzt ein Rabe.</p>
+                <p class="dm-text">Das Gestrüpp: Die Straße ist seit langem nicht benutzt. <button class="entity" data-card="goblins">Die Goblins</button> bevorzugen einen schmalen Pfad, der parallel verläuft. Wer die Gegend untersucht, entdeckt ihn. Der Helm: Auf halbem Weg liegt ein <button class="entity" data-card="helm">alter Helm</button> (Rüstungswert +1, Nachteil auf Wahrnehmung).</p>
+            </article>
+
+            <article class="place" id="p-1-torhaus" data-place="torhaus">
+                <h2><span class="place__num">#2</span>Torhaus</h2>
+                <p class="read-aloud">Am Ende der Straße erhebt sich eine alte Burg, jetzt eine heruntergekommene Ruine. Vor euch liegt ein verfallenes Tor aus verkohltem, morschem Holz. Der Wind heult leise in den Burghof.</p>
+                <p class="dm-text">Die Stolperschnur: Wer das Tor untersucht, kann eine Entdecken-Probe ablegen. Bei Erfolg findet er die Schnur, die mit Glocken verbunden ist. Sonst löst sie aus, und die Goblins locken die Gruppe in den Hinterhalt (<a href="#" class="entity" data-goto="burghof">#3 Burghof</a>). Das Loch: Direkt hinter dem Eingang klafft ein Loch, vier Meter tief, Akrobatik-Probe zum Überqueren.</p>
+                <p class="also">Kommt auch in Kapitel 2 vor (nach dem Hinterhalt).</p>
+            </article>
+
+            <article class="place" id="p-1-burghof" data-place="burghof">
+                <h2><span class="place__num">#3</span>Burghof</h2>
+                <p class="read-aloud">Zerbrochene Mauern umrahmen einen mit Schutt übersäten Hof. Mitten darin streckt eine knorrige alte Eiche ihre Äste in den Himmel. Im Osten liegt eine hölzerne Luke im Boden.</p>
+                <p class="dm-text">Die versteckten Goblins: Wurde die Falle ausgelöst, stürzen sie sich von den Ästen. Wahrnehmung-Probe: Wer scheitert, ist überrascht und handelt in der ersten Runde zuletzt. <button class="entity" data-card="goblins">Die Goblins</button> handeln gemeinsam und teilen sich eine Initiativkarte.</p>
+                <p class="also">Kommt auch in Kapitel 2 vor (bei Nacht).</p>
+            </article>
+
+            <div class="pager"><span></span><button class="btn" data-chapter-go="2">Weiter zu Kapitel 2 ›</button></div>
+        </section>
+
+        <section class="chapter" id="chapter-2" data-chapter="2" hidden>
+            <header>
+                <h2 style="font-size:1.7rem">Kapitel 2: In der Burg</h2>
+                <p>Die Goblins sind besiegt oder geflohen. Die Gruppe erkundet Halle und Keller, befreit Grunta und findet die Spur zum Wiedergänger des Raubritters.</p>
+            </header>
+
+            <article class="place" id="p-2-torhaus" data-place="torhaus">
+                <h2><span class="place__num">#2</span>Torhaus <span class="badge badge--gold">verändert</span></h2>
+                <p class="read-aloud">Die Glocken am Tor hängen schief, die Schnur liegt durchtrennt am Boden. Hinter dem Tor liegt der Hof still da.</p>
+                <p class="dm-text">Die Falle ist erledigt. Das Brett über dem Loch dient jetzt als Brücke, ohne Probe. Von hier gelangt die Gruppe in den <a href="#" class="entity" data-goto="burghof">Burghof</a>.</p>
+                <p class="also">Erster Besuch in Kapitel 1.</p>
+            </article>
+
+            <article class="place" id="p-2-burghof" data-place="burghof">
+                <h2><span class="place__num">#3</span>Burghof <span class="badge badge--gold">verändert</span></h2>
+                <p class="read-aloud">Die Eiche wirft lange Schatten. Aus der offenen Tür im Westen fällt flackerndes Licht, und im Boden steht die Luke einen Spalt offen.</p>
+                <p class="dm-text">Es ist früher Abend. <button class="entity" data-card="grunta">Grunta</button> wird in der Großen Halle gefangen gehalten. Die Luke führt in den <a href="#" class="entity" data-goto="keller">Keller</a>.</p>
+                <p class="also">Erster Besuch in Kapitel 1.</p>
+            </article>
+
+            <article class="place" id="p-2-halle" data-place="halle">
+                <h2><span class="place__num">#4</span>Große Halle</h2>
+                <p class="read-aloud">Ein trauriges Durcheinander aus halb verrotteten Dachbalken und zerbrochenem Geschirr. Die Raummitte beherrscht ein langer Eichentisch, an der Nordwand hängt ein großes Gemälde schief. Aus einem Schrank in der Ecke hört ihr ein leises Gluckern.</p>
+                <p class="dm-text">Der Eichentisch: Die Essensreste sind frisch, die Scherben halblingischen Ursprungs (Handwerk-Probe). <button class="entity" data-card="jaldo">Jaldo</button> schläft im Eckschrank. Das Gemälde verbirgt eine Geheimtür zum <a href="#" class="entity" data-goto="keller">Keller</a>.</p>
+            </article>
+
+            <article class="place" id="p-2-keller" data-place="keller">
+                <h2><span class="place__num">#5</span>Keller</h2>
+                <p class="read-aloud">Kalte, feuchte Luft schlägt euch entgegen. Der Boden ist uneben, überall liegt Geröll, und irgendwo tropft Wasser.</p>
+                <p class="dm-text">Unwegsames Gelände: Akrobatik-Probe bei jeder Bewegung. Am Ende des Gangs wartet der <button class="entity" data-card="wiedergaenger">Wiedergänger des Raubritters</button>.</p>
+            </article>
+
+            <div class="pager"><button class="btn" data-chapter-go="1">‹ Zurück zu Kapitel 1</button><span></span></div>
+        </section>
+    </main>
+
+    <!-- ===== Group ===== -->
+    <aside class="col col--group" aria-label="Gruppe">
+        <div class="row" style="justify-content:space-between"><h2>Gruppe</h2><button class="btn btn--small">+ Charakter</button></div>
+
+        <article class="card pc">
+            <div class="pc__head"><strong>Aodhan</strong><span class="muted small">Mensch · Krieger</span></div>
+            <div class="bar bar--hp"><div class="bar__fill" style="width:100%"></div><span class="bar__label">TP 14/14</span></div>
+            <div class="bar bar--wp"><div class="bar__fill" style="width:70%"></div><span class="bar__label">WP 7/10</span></div>
+            <div class="row"><span class="badge">Rüstung 3</span><span class="badge badge--forest">Memento bereit</span></div>
+        </article>
+        <article class="card pc">
+            <div class="pc__head"><strong>Alberta</strong><span class="muted small">Halbling · Magierin</span></div>
+            <div class="bar bar--hp"><div class="bar__fill" style="width:50%"></div><span class="bar__label">TP 5/10</span></div>
+            <div class="bar bar--wp"><div class="bar__fill" style="width:40%"></div><span class="bar__label">WP 6/15</span></div>
+            <div class="row"><span class="badge">Rüstung 0</span><span class="badge badge--berry">Erschöpft</span><span class="badge">Memento benutzt</span></div>
+        </article>
+        <article class="card pc">
+            <div class="pc__head"><strong>Brenna</strong><span class="muted small">Elf · Jägerin</span></div>
+            <div class="bar bar--hp"><div class="bar__fill" style="width:90%"></div><span class="bar__label">TP 9/10</span></div>
+            <div class="bar bar--wp"><div class="bar__fill" style="width:100%"></div><span class="bar__label">WP 12/12</span></div>
+            <div class="row"><span class="badge">Rüstung 1</span><span class="badge badge--forest">Memento bereit</span></div>
+        </article>
+        <article class="card pc">
+            <div class="pc__head"><strong>Torvald</strong><span class="muted small">Zwerg · Schmied</span></div>
+            <div class="bar bar--hp"><div class="bar__fill" style="width:0%"></div><span class="bar__label">TP 0/16</span></div>
+            <div class="bar bar--wp"><div class="bar__fill" style="width:75%"></div><span class="bar__label">WP 6/8</span></div>
+            <div class="row"><span class="badge">Rüstung 4</span><span class="badge badge--berry">Todeswürfe 1 ✓ 2 ✗</span><span class="badge badge--berry">Schwer verletzt</span></div>
+        </article>
+        <p class="muted small">Die Spieler pflegen ihre Werte selbst, hier siehst du nur den Stand. Aktualisiert sich beim Neuladen.</p>
+        <button class="btn btn--small">Sitzung beendet (Mementos zurück)</button>
+    </aside>
+</div>
+
+<!-- ===== Entity card drawer ===== -->
+<aside class="drawer" id="card-drawer" aria-label="Karte">
+    <button class="btn btn--small drawer__close" data-close="card-drawer">Schließen ✕</button>
+    <div id="card-body"></div>
+</aside>
+
+<!-- ===== Tools drawer ===== -->
+<aside class="drawer" id="tools-drawer" aria-label="Werkzeuge">
+    <button class="btn btn--small drawer__close" data-close="tools-drawer">Schließen ✕</button>
+    <h2 style="margin-bottom:10px">Werkzeuge</h2>
+
+    <section class="card tool">
+        <h3>Chronik</h3>
+        <input class="search" id="chronicle-input" placeholder="Was ist passiert? Enter speichert" style="margin:8px 0">
+        <ul id="chronicle-list" style="margin:0;padding-left:18px">
+            <li>Sitzung 4: Die Gruppe erreicht das Torhaus.</li>
+            <li>Alberta bemerkt die Stolperschnur nicht.</li>
+        </ul>
+        <textarea class="search" rows="2" placeholder="Sitzungsnotizen …" style="margin-top:8px"></textarea>
+    </section>
+
+    <section class="card tool" data-suggest>
+        <h3>Zufallsbegegnung (aktueller Ort)</h3>
+        <p class="muted small">Tabelle "Zufällige Ereignisse: Burg des Raubritters". Die App schlägt vor, du entscheidest.</p>
+        <button class="btn btn--gold btn--small" data-suggest-go="Zwei Goblin-Späher huschen durch den Burghof und schlagen Alarm.">Vorschlag ziehen</button>
+        <div class="suggest" hidden><span class="text"></span>
+            <div class="row" style="margin-top:6px"><button class="btn btn--small btn--gold" data-suggest-take>In die Chronik</button><button class="btn btn--small" data-suggest-drop>Verwerfen</button></div></div>
+    </section>
+
+    <section class="card tool" data-suggest>
+        <h3>Reise-Missgeschick</h3>
+        <button class="btn btn--gold btn--small" data-suggest-go="Ein Rad bricht, die Gruppe verliert einen halben Tag.">Vorschlag ziehen</button>
+        <div class="suggest" hidden><span class="text"></span>
+            <div class="row" style="margin-top:6px"><button class="btn btn--small btn--gold" data-suggest-take>In die Chronik</button><button class="btn btn--small" data-suggest-drop>Verwerfen</button></div></div>
+    </section>
+
+    <section class="card tool" data-suggest>
+        <h3>NSC und Name</h3>
+        <div class="row" style="margin-bottom:6px"><span class="badge">Volk: beliebig</span><span class="badge">Rolle: beliebig</span></div>
+        <button class="btn btn--gold btn--small" data-suggest-go="Hilda Brandtner, Halblingsköchin. Aussehen: rundlich, Mehl im Haar. Motivation: ihre Schenke retten. Geheimnis: schuldet dem Raubritter Geld.">NSC vorschlagen</button>
+        <div class="suggest" hidden><span class="text"></span>
+            <div class="row" style="margin-top:6px"><button class="btn btn--small btn--gold" data-suggest-take>Als NSC speichern</button><button class="btn btn--small" data-suggest-drop>Verwerfen</button></div></div>
+    </section>
+
+    <section class="card tool">
+        <h3>Erinnerungen</h3>
+        <label class="check"><input type="checkbox"> Rast (Tagesabschnitt vorbei?)</label>
+        <label class="check"><input type="checkbox"> Hunger und Durst</label>
+        <label class="check"><input type="checkbox"> Kälte</label>
+        <label class="check"><input type="checkbox"> Dunkelheit, Fackeln</label>
+    </section>
+
+    <section class="card tool">
+        <h3>Improvisierte Waffen (Ort: Burghof)</h3>
+        <ul class="small" style="margin:0;padding-left:18px">
+            <li>Dachbalken: Wucht, Schaden W6, beide Hände.</li>
+            <li>Tonscherbe: Stich, Schaden W4.</li>
+            <li>Brennender Ast: Wucht W6, Nachteil.</li>
+        </ul>
+        <p class="muted small" style="margin:6px 0 0">Beispielwerte, die echten stehen in den Regeln.</p>
+    </section>
+
+    <section class="card tool">
+        <h3>Wetter und Tageszeit</h3>
+        <div class="row"><span class="badge badge--sky">Früher Abend</span><span class="badge">Bewölkt, windig</span></div>
+    </section>
+</aside>
+
+<!-- ===== Combat menu ===== -->
+<section class="combat" id="combat" aria-label="Gegner im Kampf">
+    <div class="combat__bar">
+        <h2>Gegner</h2>
+        <span class="muted small">Trefferpunkte trägst du nach, Würfe und Initiative laufen am Tisch</span>
+        <span style="margin-left:auto"></span>
+        <button class="btn btn--small" id="combat-end">Alle entfernen</button>
+        <button class="btn btn--small" id="combat-close">Zuklappen ▾</button>
+    </div>
+    <div class="combat__body">
+        <section aria-label="Gegner"><div id="foes" class="foegrid"></div></section>
+        <section aria-label="Gegner hinzufügen">
+            <h3>Gegner hinzufügen</h3>
+            <input class="search" id="foe-search" placeholder="Tippen, um die Liste zu kürzen …" autocomplete="off">
+            <ul id="foe-list" style="list-style:none;margin:8px 0 0;padding:0"></ul>
+            <p class="empty" id="foe-empty" hidden>Kein Monster gefunden.</p>
+        </section>
+    </div>
+</section>
+
+<script>
+(function () {
+    'use strict';
+
+    // ---------- sample data ----------
+    var PLACES = {
+        strasse: { name: 'Alte Straße', num: '#1', chapters: [1], exits: ['torhaus'], here: [] },
+        torhaus: { name: 'Torhaus', num: '#2', chapters: [1, 2], exits: ['burghof'], here: [] },
+        burghof: { name: 'Burghof', num: '#3', chapters: [1, 2], exits: ['torhaus', 'halle', 'keller'], here: ['goblins', 'grunta'] },
+        halle: { name: 'Große Halle', num: '#4', chapters: [2], exits: ['burghof', 'keller'], here: ['jaldo'] },
+        keller: { name: 'Keller', num: '#5', chapters: [2], exits: ['burghof', 'halle'], here: ['wiedergaenger'] }
+    };
+    var CARDS = {
+        goblins: { kind: 'npc', name: 'Die Goblins', chapters: [1], text: 'Burgplünderer, die der Gruppe im Burghof auflauern. Sie handeln gemeinsam und teilen sich eine Initiativkarte.', stats: 'TP 9 · Bewegung 10 · Rüstung Lederrüstung (1)', attacks: ['Kurzbogen: Fertigkeitswert 12, Schaden W10', 'Kurzschwert: Fertigkeitswert 10, Schaden W10'] },
+        grunta: { kind: 'npc', name: 'Grunta', chapters: [2], text: 'Orkin ohne Heim, Gefangene der Goblins. Ihre Begleiterin ist das Schwein Merle.', stats: 'TP 12 · Bewegung 10 · Rüstung —', attacks: [] },
+        jaldo: { kind: 'npc', name: 'Jaldo', chapters: [2], text: 'Schläft zu Spielbeginn im Eckschrank der Großen Halle. Erzählt die Jammergeschichte.', stats: 'TP 10 · Bewegung 10 · Rüstung Beschlagenes Leder (2), offener Helm (+1)', attacks: ['Krummsäbel: Fertigkeitswert 12, Schaden 2W6'] },
+        wiedergaenger: { kind: 'monster', name: 'Wiedergänger des Raubritters', chapters: [2], text: 'Der Raubritter, der keine Ruhe findet.', stats: 'TP 20 · Grimmigkeit 2 · Rüstung Kettenhemd (3)', attacks: ['Hieb: Schaden 2W6, kann pariert werden', 'Schrecken: Furchtangriff'] },
+        helm: { kind: 'item', name: 'Verkohlter Helm', chapters: [1], text: 'Von Orks geschmiedet, spitze Stacheln. Rüstungswert +1, Nachteil auf Wahrnehmung-Proben.', stats: '', attacks: [] }
+    };
+    var MONSTERS = [
+        { id: 'goblin', name: 'Goblin – Burgplünderer', cat: 'Alltagsvolk', hp: 9, armor: 'Lederrüstung (1)', attacks: ['Kurzbogen: Fertigkeitswert 12, Schaden W10', 'Kurzschwert: Fertigkeitswert 10, Schaden W10'] },
+        { id: 'wolf', name: 'Wolf', cat: 'Tier', hp: 9, armor: '—', attacks: ['Biss: W6 und umwerfen'] },
+        { id: 'wolfsrudel', name: 'Wolfsrudelführer', cat: 'Tier', hp: 14, armor: '—', attacks: ['Biss: W8', 'Heulen: Furchtangriff'] },
+        { id: 'baer', name: 'Bär', cat: 'Tier', hp: 20, armor: '—', attacks: ['Prankenhieb: W10', 'Umklammern: W6 pro Runde'] },
+        { id: 'skelett', name: 'Skelett', cat: 'Untot', hp: 10, armor: '—', attacks: ['Rostiges Schwert: W8'] },
+        { id: 'wiedergaenger', name: 'Wiedergänger des Raubritters', cat: 'Untot', hp: 20, armor: 'Kettenhemd (3)', attacks: ['Hieb: 2W6', 'Schrecken: Furchtangriff'] },
+        { id: 'ork', name: 'Ork-Krieger', cat: 'Alltagsvolk', hp: 14, armor: 'Beschlagenes Leder (2)', attacks: ['Krummsäbel: 2W6'] },
+        { id: 'schwein', name: 'Hausschwein', cat: 'Tier', hp: 6, armor: '—', attacks: ['Biss: W4'] }
+    ];
+    var CHAPTER_NAMES = { 1: 'Kapitel 1', 2: 'Kapitel 2' };
+
+    var state = { single: false, chapter: 1, place: 'strasse', foes: [] };
+
+    function $(s, r) { return (r || document).querySelector(s); }
+    function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+    function inChapter(item) { return item.chapters.indexOf(state.chapter) !== -1; }
+
+    // ---------- chapters ----------
+    function setChapter(n) {
+        state.chapter = n;
+        $$('.chapter').forEach(function (s) { s.hidden = Number(s.dataset.chapter) !== n; });
+        $$('#chapter-tabs button').forEach(function (b) { b.setAttribute('aria-selected', String(Number(b.dataset.chapter) === n)); });
+        $('#url-hint').textContent = '/dm/campaign/4/play/chapter/' + n;
+        if (PLACES[state.place].chapters.indexOf(n) === -1) {
+            state.place = n === 1 ? 'strasse' : 'torhaus';
+        }
+        renderHere();
+        renderIndex();
+        $('#read').scrollTop = 0;
+    }
+    $$('#chapter-tabs button').forEach(function (b) { b.addEventListener('click', function () { setChapter(Number(b.dataset.chapter)); }); });
+    $$('[data-chapter-go]').forEach(function (b) { b.addEventListener('click', function () { setChapter(Number(b.dataset.chapterGo)); }); });
+
+    // ---------- places ----------
+    function jump(place, makeCurrent) {
+        var chapters = PLACES[place].chapters;
+        if (chapters.indexOf(state.chapter) === -1) { setChapter(chapters[0]); }
+        if (makeCurrent) { state.place = place; renderHere(); renderIndex(); }
+        var el = $('#p-' + state.chapter + '-' + place);
+        if (el) {
+            el.scrollIntoView({ block: 'start' });
+            el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+        }
+    }
+    $$('[data-goto]').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); jump(a.dataset.goto, false); }); });
+
+    function renderHere() {
+        var p = PLACES[state.place];
+        $('#here-name').textContent = p.num + ' ' + p.name;
+        $$('.place').forEach(function (el) { el.classList.toggle('is-current', el.dataset.place === state.place); });
+        var chips = $('#here-chips'); chips.innerHTML = '';
+        if (!p.here.length) { chips.textContent = ' niemand'; chips.className = 'muted'; } else { chips.className = ''; }
+        p.here.forEach(function (id) {
+            var b = document.createElement('button'); b.className = 'chip'; b.textContent = CARDS[id].name;
+            b.addEventListener('click', function () { openCard(id); }); chips.appendChild(b);
+        });
+        var ex = $('#here-exits'); ex.innerHTML = '';
+        p.exits.forEach(function (id) {
+            var b = document.createElement('button'); b.className = 'chip'; b.textContent = PLACES[id].name;
+            b.title = 'Ortswechsel (optional in die Chronik)';
+            b.addEventListener('click', function () {
+                if (PLACES[id].chapters.indexOf(state.chapter) === -1) { setChapter(PLACES[id].chapters[0]); }
+                jump(id, true);
+                addChronicle('Die Gruppe wechselt zu: ' + PLACES[id].name + '.');
+            });
+            ex.appendChild(b);
+        });
+    }
+
+    // ---------- index ----------
+    function renderIndex() {
+        var q = $('#index-search').value.trim().toLowerCase();
+        var root = $('#index'); root.innerHTML = '';
+        var shown = 0;
+        var groups = [
+            { title: 'Orte', rows: Object.keys(PLACES).map(function (id) { var p = PLACES[id]; return { id: id, label: p.name, num: p.num, chapters: p.chapters, type: 'place' }; }) },
+            { title: 'NSC', rows: Object.keys(CARDS).filter(function (id) { return CARDS[id].kind === 'npc'; }).map(function (id) { return { id: id, label: CARDS[id].name, chapters: CARDS[id].chapters, type: 'card' }; }) },
+            { title: 'Monster', rows: Object.keys(CARDS).filter(function (id) { return CARDS[id].kind === 'monster'; }).map(function (id) { return { id: id, label: CARDS[id].name, chapters: CARDS[id].chapters, type: 'card' }; }) },
+            { title: 'Items', rows: Object.keys(CARDS).filter(function (id) { return CARDS[id].kind === 'item'; }).map(function (id) { return { id: id, label: CARDS[id].name, chapters: CARDS[id].chapters, type: 'card' }; }) }
+        ];
+        groups.forEach(function (g) {
+            var rows = g.rows.filter(function (r) { return (!state.single || r.chapters.indexOf(1) !== -1) && (q === '' || r.label.toLowerCase().indexOf(q) !== -1); });
+            shown += rows.length;
+            if (!rows.length) { return; }
+            var sec = document.createElement('div'); sec.className = 'group';
+            sec.innerHTML = '<h3>' + g.title + '<span>' + rows.length + '</span></h3><ul></ul>';
+            rows.forEach(function (r) {
+                var li = document.createElement('li'); var b = document.createElement('button');
+                var here = r.chapters.indexOf(state.chapter) !== -1;
+                b.className = 'entry' + (here ? '' : ' is-other') + (r.type === 'place' && r.id === state.place ? ' is-active' : '');
+                var tag = r.chapters.map(function (c) { return 'K' + c; }).join(' ');
+                b.innerHTML = '<span></span><small>' + tag + '</small>';
+                b.firstChild.textContent = (r.num ? r.num + ' ' : '') + r.label;
+                b.addEventListener('click', function () { if (r.type === 'place') { jump(r.id, false); } else { openCard(r.id); } });
+                li.appendChild(b); sec.lastChild.appendChild(li);
+            });
+            root.appendChild(sec);
+        });
+        $('#index-empty').hidden = shown > 0;
+    }
+    $('#index-search').addEventListener('input', renderIndex);
+
+    // ---------- drawers ----------
+    function openDrawer(id) { $$('.drawer').forEach(function (d) { d.classList.toggle('is-open', d.id === id); }); }
+    $$('[data-close]').forEach(function (b) { b.addEventListener('click', function () { document.getElementById(b.dataset.close).classList.remove('is-open'); }); });
+    $('#tools-open').addEventListener('click', function () { openDrawer('tools-drawer'); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { $$('.drawer').forEach(function (d) { d.classList.remove('is-open'); }); } });
+
+    function openCard(id) {
+        var c = CARDS[id]; var body = $('#card-body');
+        var kind = { npc: 'NSC', monster: 'Monster', item: 'Item' }[c.kind];
+        body.innerHTML = '<span class="badge badge--sky">' + kind + '</span><h2 style="margin:6px 0 8px"></h2><p></p><p class="muted small stats"></p><ul class="atk" style="padding-left:18px"></ul>' +
+            '<div class="row"><button class="btn btn--small btn--gold" data-to-combat>In den Kampf</button></div>';
+        $('h2', body).textContent = c.name; $('p', body).textContent = c.text; $('.stats', body).textContent = c.stats;
+        c.attacks.forEach(function (a) { var li = document.createElement('li'); li.textContent = a; $('.atk', body).appendChild(li); });
+        var go = $('[data-to-combat]', body);
+        if (c.kind === 'item') { go.remove(); } else {
+            go.addEventListener('click', function () {
+                var m = MONSTERS.filter(function (x) { return x.id === id || x.name.indexOf(c.name) === 0; })[0] || MONSTERS[0];
+                addFoe(m.id); openDrawer(''); openCombat();
+            });
+        }
+        openDrawer('card-drawer');
+    }
+    $$('[data-card]').forEach(function (b) { b.addEventListener('click', function () { openCard(b.dataset.card); }); });
+
+    // ---------- tools ----------
+    function addChronicle(text) {
+        var li = document.createElement('li'); li.textContent = text; var ul = $('#chronicle-list'); ul.insertBefore(li, ul.firstChild);
+    }
+    $('#chronicle-input').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && this.value.trim()) { addChronicle(this.value.trim()); this.value = ''; }
+    });
+    $$('[data-suggest]').forEach(function (box) {
+        var out = $('.suggest', box);
+        $('[data-suggest-go]', box).addEventListener('click', function () { $('.text', out).textContent = this.dataset.suggestGo; out.hidden = false; });
+        $('[data-suggest-drop]', box).addEventListener('click', function () { out.hidden = true; });
+        $('[data-suggest-take]', box).addEventListener('click', function () { addChronicle($('.text', out).textContent); out.hidden = true; });
+    });
+
+    // ---------- combat ----------
+    function openCombat() { $('#combat').classList.add('is-open'); }
+    $('#combat-open').addEventListener('click', openCombat);
+    $('#combat-close').addEventListener('click', function () { $('#combat').classList.remove('is-open'); });
+    $('#combat-end').addEventListener('click', function () { state.foes = []; renderFoes(); });
+
+    function addFoe(id) {
+        var m = MONSTERS.filter(function (x) { return x.id === id; })[0];
+        var n = state.foes.filter(function (f) { return f.m.id === id; }).length + 1;
+        state.foes.push({ m: m, n: n, hp: m.hp });
+        renderFoes();
+    }
+    function renderFoes() {
+        var root = $('#foes'); root.innerHTML = '';
+        if (!state.foes.length) { root.innerHTML = '<p class="empty">Noch kein Gegner. Unten suchen und hinzufügen, oder in einer Monsterkarte "In den Kampf".</p>'; return; }
+        state.foes.forEach(function (f) {
+            var d = document.createElement('article'); d.className = 'card foe' + (f.hp === 0 ? ' is-down' : '');
+            d.innerHTML = '<div class="foe__head"><h3></h3><div class="hpcounter"><button class="btn btn--small" data-d="-1">−1</button><output></output><button class="btn btn--small" data-d="1">+1</button><button class="btn btn--small" data-rm title="Entfernen">✕</button></div></div>' +
+                '<div class="bar bar--hp" style="margin-top:6px"><div class="bar__fill"></div><span class="bar__label"></span></div>' +
+                '<div class="row" style="margin-top:6px"><span class="badge">Rüstung </span><span class="badge badge--sky"></span></div><strong class="small">Fertigkeiten und Angriffe</strong><ul></ul>';
+            $('h3', d).textContent = f.m.name + ' ' + f.n;
+            $('output', d).textContent = 'TP ' + f.hp;
+            $('.bar__fill', d).style.width = Math.round(f.hp / f.m.hp * 100) + '%';
+            $('.bar__label', d).textContent = 'TP ' + f.hp + '/' + f.m.hp;
+            $('.badge', d).textContent = 'Rüstung ' + f.m.armor; $('.badge--sky', d).textContent = f.m.cat;
+            f.m.attacks.forEach(function (a) { var li = document.createElement('li'); li.textContent = a; $('ul', d).appendChild(li); });
+            $$('[data-d]', d).forEach(function (b) { b.addEventListener('click', function () { f.hp = Math.max(0, Math.min(f.m.hp, f.hp + Number(b.dataset.d))); renderFoes(); }); });
+            $('[data-rm]', d).addEventListener('click', function () { state.foes.splice(state.foes.indexOf(f), 1); renderFoes(); });
+            root.appendChild(d);
+        });
+    }
+    function renderFoeList() {
+        var q = $('#foe-search').value.trim().toLowerCase().split(/\s+/).filter(Boolean);
+        var ul = $('#foe-list'); ul.innerHTML = ''; var shown = 0;
+        MONSTERS.forEach(function (m) {
+            var hay = (m.name + ' ' + m.cat).toLowerCase();
+            if (!q.every(function (t) { return hay.indexOf(t) !== -1; })) { return; }
+            shown++;
+            var li = document.createElement('li'); var b = document.createElement('button'); b.className = 'entry';
+            b.innerHTML = '<span></span><small></small>'; b.firstChild.textContent = m.name; b.lastChild.textContent = m.cat + ' · TP ' + m.hp;
+            b.addEventListener('click', function () { addFoe(m.id); }); li.appendChild(b); ul.appendChild(li);
+        });
+        $('#foe-empty').hidden = shown > 0;
+    }
+    $('#foe-search').addEventListener('input', renderFoeList);
+
+    $('#single-toggle').addEventListener('click', function () {
+        state.single = !state.single; document.body.classList.toggle('single', state.single);
+        this.textContent = state.single ? 'Ansicht: Kampagne mit 2 Kapiteln' : 'Ansicht: Kampagne mit 1 Kapitel';
+        setChapter(1);
+    });
+
+    // ---------- start ----------
+    renderHere(); renderIndex(); renderFoes(); renderFoeList();
+})();
+</script>
+</body>
+</html>

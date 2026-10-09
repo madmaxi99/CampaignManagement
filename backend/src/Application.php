@@ -93,7 +93,8 @@ final class Application
             $itemRepository,
             $monsterRepository,
             $standRepository,
-            $catalogEditor
+            $catalogEditor,
+            $rulesRepository
         );
         (require $backendDir . '/routes/dm_catalog.php')($app, $catalogEditor, $worldRepository);
         (require $backendDir . '/routes/dm_rules.php')($app, $rulesRepository, $worldRepository);

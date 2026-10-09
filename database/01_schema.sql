@@ -389,6 +389,14 @@ CREATE TABLE campaign_places (
     FOREIGN KEY (encounter_table_id) REFERENCES catalog_encounter_tables(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Where the group is: current chapter and place of the play view (set after
+-- both tables exist, so the foreign keys come as ALTER).
+ALTER TABLE campaigns
+    ADD COLUMN current_chapter_id INT NULL,
+    ADD COLUMN current_place_id INT NULL,
+    ADD CONSTRAINT fk_campaign_current_chapter FOREIGN KEY (current_chapter_id) REFERENCES campaign_chapters(id) ON DELETE SET NULL,
+    ADD CONSTRAINT fk_campaign_current_place FOREIGN KEY (current_place_id) REFERENCES campaign_places(id) ON DELETE SET NULL;
+
 -- Story items of one campaign: books, letters, quest items, the odd bottle of
 -- wine. Rule items (swords, potions) stay in catalog_items. text_de is the
 -- text of a book/letter. Found at place_id and/or found_hint_de.

@@ -113,7 +113,66 @@ final readonly class CampaignRepository
     }
 
     /**
-     * New group: clears the chronicle and the play notes of the NPCs. Content and catalog stay.
+     * Moves the group to a chapter and/or a place of this campaign. A place also
+     * moves the group to the chapter of that place. Optionally the move is noted in the chronicle.
+     *
+     * @throws InvalidArgumentException when chapter or place do not belong to the campaign
+     */
+    public function setCurrent(int $campaignId, ?int $chapterId, ?int $placeId, bool $note = false): void
+    {
+        $place = null;
+        if ($placeId !== null) {
+            $stmt = $this->db->prepare('SELECT name_de, chapter_id FROM campaign_places WHERE id = :id AND campaign_id = :campaign_id');
+            $stmt->execute([
+                'id' => $placeId,
+                'campaign_id' => $campaignId,
+            ]);
+            $place = $stmt->fetch();
+            if ($place === false) {
+                throw new InvalidArgumentException('Unbekannter Ort.');
+            }
+            $chapterId ??= $place['chapter_id'] === null ? null : (int) $place['chapter_id'];
+        }
+        if ($chapterId !== null) {
+            $stmt = $this->db->prepare('SELECT 1 FROM campaign_chapters WHERE id = :id AND campaign_id = :campaign_id');
+            $stmt->execute([
+                'id' => $chapterId,
+                'campaign_id' => $campaignId,
+            ]);
+            if ($stmt->fetchColumn() === false) {
+                throw new InvalidArgumentException('Unbekanntes Kapitel.');
+            }
+        }
+
+        $assignments = [];
+        $params = [
+            'campaign_id' => $campaignId,
+        ];
+        if ($chapterId !== null) {
+            $assignments[] = 'current_chapter_id = :chapter_id';
+            $params['chapter_id'] = $chapterId;
+        }
+        if ($placeId !== null) {
+            $assignments[] = 'current_place_id = :place_id';
+            $params['place_id'] = $placeId;
+        }
+        if ($assignments === []) {
+            throw new InvalidArgumentException('Kapitel oder Ort fehlt.');
+        }
+        $this->db->prepare('UPDATE campaigns SET ' . implode(', ', $assignments) . ' WHERE id = :campaign_id')
+            ->execute($params);
+
+        if ($note && $place !== null) {
+            $this->db->prepare('INSERT INTO campaign_chronicle (campaign_id, text_de) VALUES (:campaign_id, :text_de)')
+                ->execute([
+                    'campaign_id' => $campaignId,
+                    'text_de' => 'Die Gruppe wechselt zu: ' . $place['name_de'] . '.',
+                ]);
+        }
+    }
+
+    /**
+     * New group: clears the chronicle, the foes and the play notes of the NPCs. Content and catalog stay.
      */
     public function restart(int $campaignId): void
     {
@@ -122,6 +181,7 @@ final readonly class CampaignRepository
             foreach ([
                 'DELETE FROM campaign_chronicle WHERE campaign_id = :campaign_id',
                 'UPDATE campaign_npcs SET notes_de = NULL WHERE campaign_id = :campaign_id',
+                'DELETE FROM campaign_foes WHERE campaign_id = :campaign_id',
             ] as $sql) {
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([
