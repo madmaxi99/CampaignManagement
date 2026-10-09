@@ -1,0 +1,37 @@
+{# Chronicle drawer of the play view: everything that happens at the table. #}
+{% import "_ui.twig" as ui %}
+
+<dialog class="ui-sheet ui-sheet--wide" id="chronicle" aria-labelledby="chronicle-title">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <div class="ui-stack">
+    <h2 class="ui-card__title" id="chronicle-title">{{ ui.icon('notebook-pen') }} Chronik</h2>
+
+    <form class="ui-card ui-stack" data-chronicle-form>
+        <div class="ui-field"><label class="visually-hidden" for="chr-title">Überschrift</label><input class="ui-input" id="chr-title" name="title_de" maxlength="100" placeholder="Überschrift, z. B. Session 4 (optional)"></div>
+        <div class="ui-field"><label class="visually-hidden" for="chr-text">Text</label><textarea class="ui-textarea" id="chr-text" name="text_de" rows="3" required placeholder="Alberta hat geholfen, Krakul ist gefallen …"></textarea></div>
+        <div><button type="submit" class="ui-btn">{{ ui.icon('check') }} Eintragen</button></div>
+    </form>
+
+    {% for entry in chronicle %}
+        <article class="ui-card chronicle-entry" data-entry-id="{{ entry.id }}" data-entry-title="{{ entry.title_de }}" data-entry-text="{{ entry.text_de }}">
+            <div class="ui-row" style="justify-content: space-between">
+                <strong>{{ entry.title_de ?? entry.created_at|date('d.m.Y') }}</strong>
+                <span class="ui-row">
+                    <span class="ui-muted">{{ entry.created_at|date('d.m.Y H:i') }}</span>
+                    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-entry-edit aria-label="Eintrag bearbeiten">{{ ui.icon('pencil') }}</button>
+                    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-btn--small" data-entry-delete aria-label="Eintrag löschen">{{ ui.icon('trash-2') }}</button>
+                </span>
+            </div>
+            <p class="pre-wrap">{{ entry.text_de }}</p>
+        </article>
+    {% else %}
+        <div class="ui-empty">{{ ui.icon('notebook-pen') }}<strong>Die Chronik ist leer</strong><span>Alles, was am Tisch passiert, kommt hier hinein.</span></div>
+    {% endfor %}
+
+    <div class="ui-card ui-stack">
+        <h3 class="ui-card__title">{{ ui.icon('triangle-alert') }} Neustart</h3>
+        <p class="ui-muted">Eine neue Gruppe soll die Kampagne spielen? Das leert die Chronik, die Gegner und die Notizen bei den NPCs. Inhalt und Katalog bleiben.</p>
+        <div><button type="button" class="ui-btn ui-btn--danger" data-dm-post data-url="{{ base }}/restart" data-after="reload" data-confirm="Chronik, Gegner und NPC-Notizen löschen? Der Inhalt der Kampagne bleibt." data-confirm-label="Ja, neu starten">{{ ui.icon('flame') }} Kampagne neu starten</button></div>
+    </div>
+    </div>
+</dialog>

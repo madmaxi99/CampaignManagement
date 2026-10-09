@@ -3,27 +3,35 @@
 
 {% block title %}Katalog: Items{% endblock %}
 
+{% block main_class %} dm-main--fill{% endblock %}
+
 {% block content %}
-    {% include 'dm/_catalog_tabs.twig' with {section: 'items'} %}
-
     {% set kindLabels = {weapon: 'Waffen', armor: 'Rüstungen', misc: 'Sonstiges'} %}
-    <div class="plan-workspace">
-        <nav class="outline ui-card" aria-label="Items">
-            <div class="outline__head">
-                <span>{{ items|length }} Items</span>
-                <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="/dm/catalog/items?e=new" aria-label="Neues Item">{{ ui.icon('plus') }}</a>
-            </div>
-            {% for kind, label in kindLabels %}
-                <div class="outline__head"><span>{{ label }}</span></div>
-                {% for i in items|filter(x => x.kind == kind) %}
-                    <a class="outline__item{{ entity and entity.id == i.id ? ' is-active' : '' }}" href="/dm/catalog/items?e={{ i.id }}"{% if entity and entity.id == i.id %} aria-current="page"{% endif %}>
-                        <span class="outline__text">{{ i.name_de }}</span>
-                    </a>
-                {% endfor %}
-            {% endfor %}
-        </nav>
+    <div class="catalog-workspace">
+        <div class="catalog-browser ui-card">
+            {% include 'dm/_catalog_nav.twig' with {section: 'items'} %}
 
-        <section class="plan-editor">
+            <section class="catalog-list" aria-label="{{ kindLabels[kind]|default(kind) }}">
+                <header class="catalog-list__head">
+                    <h2>{{ kindLabels[kind]|default(kind) }} <span class="catalog-nav__count">{{ items|length }}</span></h2>
+                    <a class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" href="/dm/catalog/items?e=new&amp;k={{ kind }}" aria-label="Neues Item">{{ ui.icon('plus') }}</a>
+                </header>
+                <div class="ui-search">
+                    {{ ui.icon('search') }}
+                    <input class="ui-input" type="search" data-catalog-filter placeholder="Filtern …" aria-label="Liste filtern" autocomplete="off">
+                </div>
+                <div class="catalog-list__items" data-catalog-items>
+                    {% for i in items %}
+                        <a class="outline__item{{ entity and entity.id == i.id ? ' is-active' : '' }}" href="/dm/catalog/items?e={{ i.id }}&amp;k={{ kind }}"{% if entity and entity.id == i.id %} aria-current="page"{% endif %}>
+                            <span class="outline__text">{{ i.name_de }}</span>
+                        </a>
+                    {% endfor %}
+                    <p class="outline__empty" data-catalog-empty hidden>Nichts gefunden.</p>
+                </div>
+            </section>
+        </div>
+
+        <section class="catalog-editor">
             {% if entity or creating %}
                 <form class="ui-card ui-stack" data-dm-form
                       data-action="{{ entity ? '/dm/catalog/items/' ~ entity.id : '/dm/catalog/items' }}"
@@ -111,5 +119,6 @@
         </section>
     </div>
 
-    <script src="{{ asset('js/dm-forms.js') }}"></script>
+    <script type="module" src="{{ asset('js/dm-forms.js') }}"></script>
+    <script type="module" src="{{ asset('js/catalog-filter.js') }}"></script>
 {% endblock %}

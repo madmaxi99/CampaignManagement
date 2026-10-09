@@ -820,6 +820,156 @@ Außerdem musst du im Wasser nach jedem Viertel eine Schwimmen-Probe ablegen, um
     ('sturzschaden', 'Sturzschaden', 'Ein Sturz auf eine harte Oberfläche verursacht Wuchtschaden in Höhe einer Anzahl von W6 gleich der halben, abgerundeten Sturzhöhe in Metern. Ein Sturz aus weniger als 2 Metern verursacht keinen Schaden. Eine gelungene Akrobatik-Probe senkt die Anzahl der W6 um die Hälfte (aufgerundet). Rüstungen schützen nicht gegen Sturzschaden.');
 
 -- ============================================================
+-- Wurftabellen, Dienste und Gewichte (Grundregelwerk)
+-- ============================================================
+
+-- catalog_roll_tables
+INSERT INTO catalog_roll_tables (code, group_de, title_de, die_de, headers_de, intro_de, display_order) VALUES
+    ('reise_missgeschicke', 'Reise & Wildnis', 'Reise-Missgeschicke', 'W12', 'Missgeschick|Wirkung', 'Würfle am Tisch, wenn dem Wegführer einer Gruppe auf Reisen die Wildnisleben-Probe misslingt.', 10),
+    ('jagd', 'Reise & Wildnis', 'Jagd', 'W6', 'Tier|Voraussetzung|Rationen', 'Erst gelingt die Jagen-&-Fischen-Probe, dann wird gewürfelt, welches Tier es ist. Das Töten erfordert einen zweiten Wurf (Waffe oder Jagen & Fischen bei einer Falle). * Wildschweine greifen an, wenn der Jagdwurf misslingt.', 20),
+    ('abenteuerort_verlassen', 'Reise & Wildnis', 'Den Abenteuerort verlassen', 'W6', 'Folge|Wirkung', 'Einen gefährlichen Ort voller Feinde (etwa eine Höhle) zu verlassen, um zu lagern oder eine Rast einzulegen, kann riskant sein. Würfle am Tisch, wenn die Charaktere den Ort für mindestens einen Tagesabschnitt verlassen. Ignoriere das Ergebnis, wenn es offensichtlich keinen Sinn ergibt.', 30),
+    ('improvisiert_gasthaus', 'Improvisierte Waffen', 'Improvisierte Waffen: Gasthaus', 'W6', 'Waffe|Wirkung', 'Zu Kampfbeginn kann die Spielleitung W3 improvisierte Waffen auswürfeln oder festlegen. Jede wird nur einmal benutzt und dann verbraucht. Die Nutzung ist eine Aktion und kann mit Bewegung kombiniert werden.', 40),
+    ('improvisiert_hoehle', 'Improvisierte Waffen', 'Improvisierte Waffen: Höhle', 'W6', 'Waffe|Wirkung', 'Zu Kampfbeginn kann die Spielleitung W3 improvisierte Waffen auswürfeln oder festlegen. Jede wird nur einmal benutzt und dann verbraucht. Die Nutzung ist eine Aktion und kann mit Bewegung kombiniert werden.', 41),
+    ('improvisiert_wald', 'Improvisierte Waffen', 'Improvisierte Waffen: Wald', 'W6', 'Waffe|Wirkung', 'Zu Kampfbeginn kann die Spielleitung W3 improvisierte Waffen auswürfeln oder festlegen. Jede wird nur einmal benutzt und dann verbraucht. Die Nutzung ist eine Aktion und kann mit Bewegung kombiniert werden.', 42),
+    ('nsc_haltung', 'NSC erschaffen', 'Haltung', 'W4', 'Ergebnis', 'Würfle je einen Würfel jeder Art am Tisch, um einen zufälligen NSC zu erschaffen. Die Tabellen sind Anregungen, Änderungen sind erlaubt.', 60),
+    ('nsc_volk', 'NSC erschaffen', 'Volk', 'W6', 'Ergebnis', NULL, 61),
+    ('nsc_motivation', 'NSC erschaffen', 'Motivation', 'W8', 'Ergebnis', NULL, 62),
+    ('nsc_beruf', 'NSC erschaffen', 'Beruf', 'W10', 'Ergebnis', NULL, 63),
+    ('nsc_eigenart', 'NSC erschaffen', 'Eigenart', 'W12', 'Ergebnis', NULL, 64),
+    ('nsc_name', 'NSC erschaffen', 'Name (einen wählen)', 'W20', 'Ergebnis', NULL, 65);
+
+-- catalog_roll_table_rows
+INSERT INTO catalog_roll_table_rows (table_code, roll_min, roll_max, name_de, effect_de, extra_de) VALUES
+    ('reise_missgeschicke', 1, 1, 'Nebel', 'Die Gruppe wird von dichtem Nebel überrascht. Die in diesem Tagesabschnitt zurückgelegte Strecke wird halbiert.', NULL),
+    ('reise_missgeschicke', 2, 2, 'Versperrtes Gelände', 'Felsen, umgestürzte Bäume, dichtes Gestrüpp oder Hochwasser versperren den Weg. Jeder Spielercharakter muss eine Akrobatik-Probe ablegen, um weiterzukommen. Wer besteht, kann den anderen helfen. Wer scheitert, macht in diesem Tagesabschnitt keinen Fortschritt.', NULL),
+    ('reise_missgeschicke', 3, 3, 'Zerrissene Kleidung', 'Der Wegführer führt die Gruppe in ein Dornendickicht, eine felsige Schlucht oder einen Sumpf. Die Kleidung eines zufälligen Spielercharakters wird beschädigt und zählt nun als Lumpen.', NULL),
+    ('reise_missgeschicke', 4, 4, 'Verirrt', 'Die Charaktere merken, dass sie im Kreis laufen, und kommen in diesem Tagesabschnitt auf der Karte nicht voran. Der Wegführer muss außerdem eine Wildnisleben-Probe ablegen, um den richtigen Weg wiederzufinden. Andere können nicht helfen.', NULL),
+    ('reise_missgeschicke', 5, 5, 'Gegenstand verloren', 'Ein zufälliger Spielercharakter lässt einen Gegenstand nach Wahl der Spielleitung fallen oder zerbricht ihn.', NULL),
+    ('reise_missgeschicke', 6, 6, 'Mückenschwarm', 'Ein großer Schwarm Mücken oder Gnitzen greift die Gruppe an und macht alle mit Stichen und Gesumm verrückt. Alle Spielercharaktere ohne Umhang werden Wütend.', NULL),
+    ('reise_missgeschicke', 7, 7, 'Verstauchter Knöchel', 'Ein zufälliger Spielercharakter stürzt oder tritt fehl und erleidet W6 Schaden. Rüstung hat keine Wirkung, Stiefel verringern den Schaden um zwei.', NULL),
+    ('reise_missgeschicke', 8, 8, 'Wolkenbruch', 'Ein gewaltiger Regenguss oder Schneesturm (je nach Jahreszeit) überrascht die Gruppe. Alle Spielercharaktere ohne Umhang müssen eine Probe ablegen, um der Kälte zu widerstehen (siehe Kälte). Sie müssen außerdem Schutz suchen, bis der Sturm vorüber ist, und kommen in diesem Tagesabschnitt auf der Karte nicht voran.', NULL),
+    ('reise_missgeschicke', 9, 9, 'Wespen', 'Der Wegführer tritt mitten in ein Wespennest. Ein Schwarm wütender Wespen greift die ganze Gruppe an. Alle Spielercharaktere müssen eine Ausweichen-Probe ablegen. Wer scheitert, erleidet W6 Schaden und einen Zustand nach Wahl.', NULL),
+    ('reise_missgeschicke', 10, 10, 'Erdrutsch', 'Die Gruppe geht durch unwegsames Gelände, als plötzlich der Boden unter den Füßen nachgibt. Alle müssen eine Ausweichen-Probe ablegen. Wer scheitert, erleidet W10 Schaden.', NULL),
+    ('reise_missgeschicke', 11, 11, 'Wildes Tier', 'Ein Wolf, Bär oder anderes wildes Tier fühlt sich bedroht und greift die Abenteurer an. Wähle ein Tier aus dem Bestiarium (Kategorie Tier).', NULL),
+    ('reise_missgeschicke', 12, 12, 'Treibsand', 'Der Boden bricht ein! Jeder Spielercharakter muss eine Wildnisleben-Probe ablegen. Wer scheitert, erleidet einen Zustand und muss erneut würfeln. Ein Charakter, der bereits alle Zustände hat und die Probe nicht schafft, wird vom Treibsand verschluckt und verschwindet für immer. Wer frei ist, kann den Festsitzenden helfen.', NULL),
+    ('jagd', 1, 1, 'Eichhörnchen', 'Waffe oder Falle', '1'),
+    ('jagd', 2, 2, 'Krähe', 'Waffe', '1'),
+    ('jagd', 3, 3, 'Kaninchen', 'Waffe oder Falle', 'W3'),
+    ('jagd', 4, 4, 'Fuchs', 'Waffe oder Falle', 'W4'),
+    ('jagd', 5, 5, 'Wildschwein *', 'Waffe', '2W6'),
+    ('jagd', 6, 6, 'Hirsch', 'Waffe', '2W8'),
+    ('abenteuerort_verlassen', 1, 1, 'Verfolger', 'Gegner vom Abenteuerort folgen der Gruppe und greifen im ungünstigsten Moment an.', NULL),
+    ('abenteuerort_verlassen', 2, 2, 'Verstärkung', 'Die Gegner am Abenteuerort erhalten Verstärkung. Gefallene Gegner werden doppelt ersetzt.', NULL),
+    ('abenteuerort_verlassen', 3, 3, 'Beute weg', 'Jemand anderes erreicht den Abenteuerort und räumt ihn aus, bevor die Charaktere zurückkehren.', NULL),
+    ('abenteuerort_verlassen', 4, 6, 'Nichts', 'Nichts passiert.', NULL),
+    ('improvisiert_gasthaus', 1, 1, 'Kochender Kessel', 'Schütte das kochende Wasser in einem Kegel, 4 Meter lang und breit. Alle im Kegel erleiden 2W6 Schaden. Der Angriff kann ausgewichen, aber nicht pariert werden. Rüstung hat keine Wirkung.', NULL),
+    ('improvisiert_gasthaus', 2, 2, 'Eimer Seifenwasser', 'Schütte das Seifenwasser in einem Kegel, 4 Meter lang und breit. Alle im Kegel stürzen zu Boden. Der Angriff kann ausgewichen, aber nicht pariert werden.', NULL),
+    ('improvisiert_gasthaus', 3, 3, 'Brennendes Brennholz', 'Schlage einen Feind innerhalb von 2 Metern mit dem Holzscheit. Erfordert eine freie Hand. Der Angriff trifft automatisch und verursacht 2W6 Feuerschaden plus Schadensbonus. Er kann ausgewichen oder pariert werden. Das Holzscheit kann danach als Fackel dienen.', NULL),
+    ('improvisiert_gasthaus', 4, 4, 'Wühlendes Schwein', 'Lege eine Wildnisleben-Probe ab, um das Schwein aufzuscheuchen, damit es einen Feind deiner Wahl innerhalb von 10 Metern angreift. Der Angriff trifft automatisch und verursacht 3W6 Wuchtschaden. Er kann ausgewichen, aber nicht pariert werden. Danach stürmt das Schwein davon.', NULL),
+    ('improvisiert_gasthaus', 5, 5, 'Weinflasche', 'Schlage einen Feind innerhalb von 2 Metern mit der Flasche. Erfordert eine freie Hand. Der Angriff trifft automatisch und verursacht 2W6 Wuchtschaden plus Schadensbonus. Er kann ausgewichen oder pariert werden. Dem Feind spritzt Wein in die Augen und brennt so stark, dass er bis zu deinem nächsten Zug einen Nachteil auf alle Aktionen hat.', NULL),
+    ('improvisiert_gasthaus', 6, 6, 'Kronleuchter', 'Schwinge dich vom Kronleuchter und führe einen Nahkampfangriff aus. Du kannst eine normale Bewegung ausführen, ohne freie Angriffe auszulösen. Der Nahkampfangriff muss unbewaffnet sein, kann aber weder ausgewichen noch pariert werden. Misslingt der Angriff, stürzt du zu Boden und erleidest W6 Wuchtschaden.', NULL),
+    ('improvisiert_hoehle', 1, 1, 'Stalaktit', 'Stoße einen Feind innerhalb von 2 Metern in die scharfen Felsformationen an der Decke. Der Angriff trifft automatisch und verursacht 2W6 Stichschaden plus Schadensbonus. Er kann ausgewichen, aber nicht pariert werden. Rüstung hat keine Wirkung, außer Helmen.', NULL),
+    ('improvisiert_hoehle', 2, 2, 'Fackel', 'Nimm eine Fackel von der Wand und schlage einen Feind innerhalb von 2 Metern. Erfordert eine freie Hand. Der Angriff trifft automatisch und verursacht 2W6 Feuerschaden plus Schadensbonus. Er kann ausgewichen oder pariert werden. Du kannst die Fackel danach behalten.', NULL),
+    ('improvisiert_hoehle', 3, 3, 'Stalagmit', 'Stoße einen Feind innerhalb von 2 Metern gegen eine hohe Felsformation am Höhlenboden. Der Angriff trifft automatisch und verursacht W6 Wuchtschaden plus Schadensbonus und wirft den Feind zu Boden. Er kann ausgewichen, aber nicht pariert werden.', NULL),
+    ('improvisiert_hoehle', 4, 4, 'Pfütze', 'Versuche, den Feind zu Fall zu bringen (siehe Besondere Nahkampfangriffe). Gelingt es, muss der Feind eine Aktion aufwenden und eine Akrobatik-Probe ablegen, um wieder aufzustehen.', NULL),
+    ('improvisiert_hoehle', 5, 5, 'Spalte', 'Versuche, den Feind zu Fall zu bringen. Gelingt es, stürzt der Feind in eine 2W6 Meter tiefe Spalte und erleidet Sturzschaden. Das Hinausklettern erfordert eine Akrobatik-Probe.', NULL),
+    ('improvisiert_hoehle', 6, 6, 'Fledermäuse', 'Lege eine Wildnisleben-Probe ab, um die Fledermäuse aufzuscheuchen, damit sie einen Feind innerhalb von 10 Metern angreifen. Werte siehe Bestiarium. Die Fledermäuse greifen den Feind W3 Runden lang an. Misslingt die Probe, greifen sie dich an.', NULL),
+    ('improvisiert_wald', 1, 1, 'Tiefer Ast', 'Schwinge dich vom Ast und führe einen Nahkampfangriff aus. Du kannst eine normale Bewegung ausführen, ohne freie Angriffe auszulösen. Der Nahkampfangriff muss unbewaffnet sein, kann aber weder ausgewichen noch pariert werden. Misslingt der Angriff, stürzt du zu Boden und erleidest W6 Wuchtschaden.', NULL),
+    ('improvisiert_wald', 2, 2, 'Wespennest', 'Lege eine Wildnisleben-Probe ab, um das Wespennest aufzuheben und auf einen Feind innerhalb von 10 Metern zu schleudern. Der Feind wird übel gestochen: 2W6 Schaden und ein Nachteil auf alle Aktionen für einen Tagesabschnitt. Der Angriff kann ausgewichen, aber nicht pariert werden. Rüstung hat keine Wirkung. Misslingt die Probe, stechen dich die Wespen.', NULL),
+    ('improvisiert_wald', 3, 3, 'Knorrige Wurzeln', 'Versuche, den Feind zu Fall zu bringen. Gelingt es, muss der Feind eine Aktion aufwenden und eine Akrobatik-Probe ablegen, um wieder aufzustehen.', NULL),
+    ('improvisiert_wald', 4, 4, 'Felsbrocken', 'Lege eine Akrobatik-Probe ab, um auf den Felsbrocken zu springen und dich auf einen Feind innerhalb von 2 Metern zu stürzen. Der Angriff verursacht 2W6 Wuchtschaden plus Schadensbonus und kann weder ausgewichen noch pariert werden. Gelingt er, fallen du und der Feind zu Boden. Misslingt die Probe, stürzt nur du und erleidest W6 Schaden.', NULL),
+    ('improvisiert_wald', 5, 5, 'Viper', 'Lege eine Wildnisleben-Probe ab, um die Schlange aufzuheben und auf einen Feind innerhalb von 10 Metern zu werfen. Der Feind wird gebissen und erleidet W6 Schaden sowie ein tödliches Gift mit Wirkstärke 12, falls der Biss die Rüstung durchdringt. Der Angriff kann ausgewichen, aber nicht pariert werden. Misslingt die Probe, beißt dich die Schlange.', NULL),
+    ('improvisiert_wald', 6, 6, 'Dreckklumpen', 'Wirf Dreck in die Augen eines Feindes innerhalb von 10 Metern. Der Feind erleidet W6 Schaden (Rüstung hat keine Wirkung) und hat für den Rest des Kampfes einen Nachteil auf alle Aktionen. Der Angriff kann ausgewichen, aber nicht pariert werden.', NULL),
+    ('nsc_haltung', 1, 1, 'Feindselig', NULL, NULL),
+    ('nsc_haltung', 2, 2, 'Ausweichend', NULL, NULL),
+    ('nsc_haltung', 3, 3, 'Gleichgültig', NULL, NULL),
+    ('nsc_haltung', 4, 4, 'Freundlich', NULL, NULL),
+    ('nsc_volk', 1, 1, 'Mensch', NULL, NULL),
+    ('nsc_volk', 2, 2, 'Zwerg', NULL, NULL),
+    ('nsc_volk', 3, 3, 'Elf', NULL, NULL),
+    ('nsc_volk', 4, 4, 'Halbling', NULL, NULL),
+    ('nsc_volk', 5, 5, 'Wolfsmensch', NULL, NULL),
+    ('nsc_volk', 6, 6, 'Ente', NULL, NULL),
+    ('nsc_motivation', 1, 1, 'Süßes, glitzerndes Gold', NULL, NULL),
+    ('nsc_motivation', 2, 2, 'Wissen über die Welt', NULL, NULL),
+    ('nsc_motivation', 3, 3, 'Tiefe, ewige Liebe', NULL, NULL),
+    ('nsc_motivation', 4, 4, 'Ein lebenslanger Eid', NULL, NULL),
+    ('nsc_motivation', 5, 5, 'Ein Unrecht, das Vergeltung verlangt', NULL, NULL),
+    ('nsc_motivation', 6, 6, 'Ein Leben voller Freude und Gesang', NULL, NULL),
+    ('nsc_motivation', 7, 7, 'Blutsbande, die nie gelöst werden können', NULL, NULL),
+    ('nsc_motivation', 8, 8, 'Flucht vor einer dunklen Vergangenheit', NULL, NULL),
+    ('nsc_beruf', 1, 1, 'Barde', NULL, NULL),
+    ('nsc_beruf', 2, 2, 'Handwerker', NULL, NULL),
+    ('nsc_beruf', 3, 3, 'Jäger', NULL, NULL),
+    ('nsc_beruf', 4, 4, 'Kämpfer', NULL, NULL),
+    ('nsc_beruf', 5, 5, 'Gelehrter', NULL, NULL),
+    ('nsc_beruf', 6, 6, 'Magier', NULL, NULL),
+    ('nsc_beruf', 7, 7, 'Händler', NULL, NULL),
+    ('nsc_beruf', 8, 8, 'Ritter', NULL, NULL),
+    ('nsc_beruf', 9, 9, 'Seefahrerin', NULL, NULL),
+    ('nsc_beruf', 10, 10, 'Dieb', NULL, NULL),
+    ('nsc_eigenart', 1, 1, 'Redet zu viel', NULL, NULL),
+    ('nsc_eigenart', 2, 2, 'Seltsame Kleidung', NULL, NULL),
+    ('nsc_eigenart', 3, 3, 'Wilder Blick', NULL, NULL),
+    ('nsc_eigenart', 4, 4, 'Riecht schlecht', NULL, NULL),
+    ('nsc_eigenart', 5, 5, 'Scherzbold', NULL, NULL),
+    ('nsc_eigenart', 6, 6, 'Kultist', NULL, NULL),
+    ('nsc_eigenart', 7, 7, 'Ein bisschen kindisch', NULL, NULL),
+    ('nsc_eigenart', 8, 8, 'Ruhig und schwierig', NULL, NULL),
+    ('nsc_eigenart', 9, 9, 'Dämonenanbeter', NULL, NULL),
+    ('nsc_eigenart', 10, 10, 'Starrsinnig', NULL, NULL),
+    ('nsc_eigenart', 11, 11, 'Sehr empfindlich', NULL, NULL),
+    ('nsc_eigenart', 12, 12, 'Äußerst romantisch', NULL, NULL),
+    ('nsc_name', 1, 1, 'Agnar, Jorid, Dareios', NULL, NULL),
+    ('nsc_name', 2, 2, 'Ragnfast, Ask, Euanthe', NULL, NULL),
+    ('nsc_name', 3, 3, 'Arnulf, Tyra, Xanthos', NULL, NULL),
+    ('nsc_name', 4, 4, 'Atle, Liv, Athalia', NULL, NULL),
+    ('nsc_name', 5, 5, 'Guthorm, Embla, Kleitos', NULL, NULL),
+    ('nsc_name', 6, 6, 'Botvid, Ragna, Astara', NULL, NULL),
+    ('nsc_name', 7, 7, 'Kale, Turid, Priamus', NULL, NULL),
+    ('nsc_name', 8, 8, 'Egil, Jorunn, Galyna', NULL, NULL),
+    ('nsc_name', 9, 9, 'Ingemund, Borghild, Taras', NULL, NULL),
+    ('nsc_name', 10, 10, 'Gudmund, Gylla, Zenais', NULL, NULL),
+    ('nsc_name', 11, 11, 'Grim, Tora, Hesiod', NULL, NULL),
+    ('nsc_name', 12, 12, 'Brand, Edda, Liene', NULL, NULL),
+    ('nsc_name', 13, 13, 'Folkvid, Sigrun, Eupraxia', NULL, NULL),
+    ('nsc_name', 14, 14, 'Germund, Dagrun, Taras', NULL, NULL),
+    ('nsc_name', 15, 15, 'Algot, Bolla, Lysandra', NULL, NULL),
+    ('nsc_name', 16, 16, 'Tolir, Yrsa, Kallias', NULL, NULL),
+    ('nsc_name', 17, 17, 'Hjorvald, Estrid, Isidora', NULL, NULL),
+    ('nsc_name', 18, 18, 'Ambjörn, Signe, Athos', NULL, NULL),
+    ('nsc_name', 19, 19, 'Grunn, Tilde, Larysa', NULL, NULL),
+    ('nsc_name', 20, 20, 'Olgrid, Idun, Nikias', NULL, NULL);
+
+-- catalog_services
+INSERT INTO catalog_services (name_de, rarity, price_gold, price_silver, price_copper, unit_de, effect_de) VALUES
+    ('Bad im Gasthaus', 'gewöhnlich', 0, 0, 6, NULL, 'Heilt einen Zustand deiner Wahl in einem Viertel. Nur ein Bad pro Tag hat diese Wirkung.'),
+    ('Leibwächter', 'ungewöhnlich', 2, 0, 0, 'pro Tag', 'Werte wie die Wache unter Typische NSC im Bestiarium.'),
+    ('Schüssel Eintopf', 'gewöhnlich', 0, 0, 5, NULL, 'Deckt den täglichen Nahrungsbedarf.'),
+    ('Kleiderreparatur', 'gewöhnlich', 0, 5, 0, NULL, 'Hebt die Wirkung zerrissener Kleidung auf (siehe Reise-Missgeschicke).'),
+    ('Bote', 'gewöhnlich', 0, 1, 0, 'pro Kilometer', 'Überbringt eine Nachricht an den Empfänger.'),
+    ('Festmahl', 'ungewöhnlich', 2, 0, 0, NULL, 'Deckt den täglichen Nahrungsbedarf.'),
+    ('Becher Wein', 'ungewöhnlich', 0, 2, 0, NULL, 'Nach zwei Bechern in einem Tagesabschnitt verursacht jeder weitere einen Zustand deiner Wahl.'),
+    ('Haarschnitt', 'gewöhnlich', 0, 2, 0, NULL, 'Heilt einen gewählten Zustand in einem Viertel. Nur einmal pro Woche möglich.'),
+    ('Heilung', 'ungewöhnlich', 5, 0, 0, NULL, 'Heilkunde-Proben gelingen automatisch.'),
+    ('Unterkunft im Gasthaus, Einzelzimmer', 'gewöhnlich', 0, 5, 0, NULL, 'Eine Rast über einen Tagesabschnitt ist ohne Wildnisleben-Probe möglich.'),
+    ('Unterkunft im Gasthaus, Schlafsaal', 'gewöhnlich', 0, 1, 0, NULL, 'Eine Rast über einen Tagesabschnitt ist ohne Wildnisleben-Probe möglich, aber würfle in jedem Tagesabschnitt einen W4. Bei einer 1 hindert jemandes Schnarchen alle anderen im Raum am Schlafen.'),
+    ('Unterkunft im Gasthaus, Luxussuite', 'ungewöhnlich', 2, 0, 0, NULL, 'Eine Rast über einen Tagesabschnitt ist ohne Wildnisleben-Probe möglich.'),
+    ('Mahlzeit im Gasthaus', 'gewöhnlich', 0, 3, 0, NULL, 'Deckt den täglichen Nahrungsbedarf.'),
+    ('Wegzoll', 'gewöhnlich', 0, 0, 2, NULL, 'Erlaubt die Durchreise.'),
+    ('Postkutsche', 'gewöhnlich', 0, 0, 3, 'pro Kilometer', 'Beförderung zu einem bestimmten Ziel.'),
+    ('Humpen Met', 'gewöhnlich', 0, 0, 4, NULL, 'Nach drei Humpen in einem Tagesabschnitt verursacht jeder weitere einen Zustand deiner Wahl.'),
+    ('Lehrer', 'ungewöhnlich', 5, 0, 0, 'pro Tagesabschnitt, oder mehr', 'Ein Tagesabschnitt Unterricht gewährt einen zusätzlichen Steigerungswurf (siehe Erfahrung).');
+
+-- Gewichte (Traglast): Standard ist 1; Kleinkram 0; schwere Gegenstände 2 bis 4
+UPDATE catalog_items SET weight = 0 WHERE name_de IN ('Feuerstein & Zunder', 'Talgkerze', 'Rucksack', 'Nadel & Faden', 'Würfel', 'Karte', 'Vorhängeschloss', 'Spielkarten', 'Seil (Seide), 10m', 'Satteltasche', 'Pfeife (Signalpfeife)', 'Amulett', 'Brosche', 'Kreide', 'Papier (Blatt)', 'Pergament (Blatt)');
+UPDATE catalog_items SET weight = 0.25 WHERE name_de = 'Tagesration';
+UPDATE catalog_items SET weight = 2 WHERE name_de IN ('Fass', 'Feldküche', 'Vorschlaghammer', 'Zelt, klein', 'Fischernetz');
+UPDATE catalog_items SET weight = 3 WHERE name_de = 'Truhe';
+UPDATE catalog_items SET weight = 4 WHERE name_de = 'Zelt, groß';
+
+
+-- ============================================================
 -- Bestiary und Begegnungstabellen
 -- ============================================================
 
@@ -899,6 +1049,41 @@ Trupp: Drei Kämpfer sind für drei Spielercharaktere leicht fordernd, für Nich
 Im Trupp zählt ein Zauberkundiger ungefähr wie ein Kämpfer. Allein ist er harmlos.', 'Fertigkeiten: Zauberschule 12 · WP: 8
 Zauber: Feuerball oder Blitzschlag (je 2 WP, 2W6 Schaden), danach Stab
 Typische Waffe: Stab (Fertigkeitswert 8, Schaden W6)', NULL);
+
+-- Typische NSC und die Figuren der Burg des Raubritters
+INSERT INTO catalog_bestiary (id, name_de, category_de, is_unique, hp, grimmigkeit_de, size_de, movement, armor_de, resistances_de, immunities_de, traits_de, kit_de, image_path) VALUES
+    (41, 'Wache', 'Alltagsvolk', 0, 12, '—', 'Normal', 10, 'Beschlagenes Leder (2)', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Wahrnehmung 10, Schwerter 12 · Schadensbonus STÄ +W4', 'Breitschwert, beschlagenes Leder', NULL),
+    (42, 'Kultist', 'Alltagsvolk', 0, 12, '—', 'Normal', 10, '—', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Ausweichen 14, Messer 14 · Schadensbonus GEW +W4', 'Dolch', NULL),
+    (43, 'Dieb', 'Alltagsvolk', 0, 10, '—', 'Normal', 10, '—', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Ausweichen 12, Messer 12 · Schadensbonus GEW +W4', 'Messer', NULL),
+    (44, 'Dorfbewohner', 'Alltagsvolk', 0, 8, '—', 'Normal', 10, '—', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Prügelei 8', 'Holzknüppel', NULL),
+    (45, 'Jäger', 'Alltagsvolk', 0, 13, '—', 'Normal', 10, 'Lederrüstung (1)', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Wahrnehmung 12, Bögen 13 · Schadensbonus GEW +W4', 'Langbogen, Lederrüstung', NULL),
+    (46, 'Bandit', 'Alltagsvolk', 0, 12, '—', 'Normal', 10, '—', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Bögen 12, Ausweichen 10, Schwerter 12', 'Kurzschwert, Kurzbogen', NULL),
+    (47, 'Abenteurer', 'Alltagsvolk', 0, 13, '—', 'Normal', 10, 'Beschlagenes Leder (2)', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Wahrnehmung 10, Schwerter 12 · Schadensbonus STÄ +W4', 'Breitschwert, beschlagenes Leder', NULL),
+    (48, 'Gelehrter', 'Alltagsvolk', 0, 7, '—', 'Normal', 10, '—', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Fremdsprachen 13, Mythen & Legenden 13, Stäbe 8', 'Ein gutes Buch', NULL),
+    (49, 'Banditenanführer', 'Alltagsvolk', 0, 30, '—', 'Normal', 10, 'Kettenpanzer, offener Helm', NULL, NULL, 'Boss: zieht eine eigene Initiativkarte und hat WP sowie Heldentalente.
+Fertigkeiten: Wahrnehmung 12, Prügelei 15, Hämmer 15 · WP: 16 · Schadensbonus STÄ +W6
+Heldentalente: Berserker, Robust ×6, Veteran', 'Schwerer Kriegshammer, Kettenpanzer, offener Helm', NULL),
+    (50, 'Ritter-Champion', 'Alltagsvolk', 0, 28, '—', 'Normal', 10, 'Plattenpanzer, Großhelm', NULL, NULL, 'Boss: zieht eine eigene Initiativkarte und hat WP sowie Heldentalente.
+Fertigkeiten: Prügelei 14, Schwerter 16 · WP: 26 · Schadensbonus STÄ +W6
+Heldentalente: Defensiv, Doppelhieb, Fokussiert ×6, Robust ×6', 'Langschwert, großer Schild, Plattenpanzer, Großhelm, kampfgeschultes Pferd', NULL),
+    (51, 'Erzmagier', 'Alltagsvolk', 0, 22, '—', 'Normal', 10, '—', NULL, NULL, 'Boss: zieht eine eigene Initiativkarte und hat WP sowie Heldentalente.
+Fertigkeiten: Zauberschule 15, Stäbe 13 · WP: 30
+Heldentalente: Fokussiert ×6, Meister-Zauberer, Robust ×4', 'Stab, Grimoire', NULL),
+    (52, 'Jaldo', 'Humanoid', 1, 10, '—', 'Klein', 10, 'Beschlagenes Leder (2), offener Helm (+1)', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Wahrnehmung 12, Ausweichen 10, Heimlichkeit 12 · Schadensbonus —', 'Krummsäbel (Fertigkeitswert 12, Schaden 2W6)', NULL),
+    (53, 'Grunta', 'Humanoid', 1, 12, '—', 'Normal', 10, '—', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Wahrnehmung 14, Ausweichen 10 · Schadensbonus STÄ +W4', 'Kleine Holzkeule (Fertigkeitswert 12, Schaden W8)', NULL),
+    (54, 'Goblin – Burgplünderer', 'Humanoid', 0, 9, '—', 'Klein', 10, 'Lederrüstung (1)', NULL, NULL, 'Kein Monster: zählt im Kampf als gewöhnlicher NSC.
+Fertigkeiten: Wahrnehmung 10, Ausweichen 10, Heimlichkeit 12 · Schadensbonus —', 'Kurzbogen (Fertigkeitswert 12, Schaden W10), Kurzschwert (Fertigkeitswert 10, Schaden W10)', NULL),
+    (55, 'Der Raubritter', 'Untot', 1, 38, 'Zahl der SC − 1', 'Normal', 10, '8', 'Erleidet halben Schaden durch nicht-magische Waffen; Feuer verursacht jedoch normalen Schaden.', NULL, 'Ein Wiedergänger, der wie ein Monster behandelt wird. Er steht nach etwa einem Tagesabschnitt (rund sechs Stunden) wieder auf, wenn er im Kampf besiegt wird.', 'Morgenstern (Wuchtschaden 2W8)', NULL);
 
 -- catalog_bestiary_attacks
 INSERT INTO catalog_bestiary_attacks (id, bestiary_id, roll_de, title_de, effect_de) VALUES
@@ -1019,6 +1204,15 @@ INSERT INTO catalog_bestiary_attacks (id, bestiary_id, roll_de, title_de, effect
     (109, 36, '—', 'Biss', 'Fertigkeitswert 14, Schaden 2W6'),
     (110, 37, '—', 'Biss', 'Fertigkeitswert 12, Schaden 2W8');
 
+-- Angriffstabelle des Raubritters
+INSERT INTO catalog_bestiary_attacks (id, bestiary_id, roll_de, title_de, effect_de) VALUES
+    (111, 55, '1', 'Unheiliges Gebrüll!', 'Ein grauenhafter Schrei dringt aus dem kopflosen Hals des Wiedergängers und schneidet wie eine rostige Klinge durch die Seelen der Charaktere. Alle innerhalb von 10 Metern erleiden einen Furchtangriff.'),
+    (112, 55, '2', 'Grauenvolle Drohungen!', 'Der Wiedergänger wendet sich einem unglücklichen Charakter innerhalb von 10 Metern zu und flüstert grässliche Drohungen aus seiner Kehle. Das Opfer wird Verängstigt, erleidet einen Furchtangriff und hat einen Nachteil auf seine WIL-Probe.'),
+    (113, 55, '3', 'Hand der Toten!', 'Der Wiedergänger hebt die Hand und deutet auf einen Charakter innerhalb von 10 Metern. Dieser wird 2W4 Meter weit geschleudert und landet am Boden. Der Angriff verursacht Wuchtschaden in Höhe der Zahl der geschleuderten Meter und kann nicht ausgewichen werden.'),
+    (114, 55, '4', 'Fegender Angriff!', 'Mit überraschender Geschwindigkeit führt der Wiedergänger seinen Morgenstern in einem tödlichen Hieb. Alle Charaktere innerhalb von 2 Metern erleiden 2W8 Wuchtschaden. Der Angriff kann pariert werden.'),
+    (115, 55, '5', 'Lähmende Kälte!', 'Der Wiedergänger packt einen unglücklichen Charakter, der die Kälte des Todes durch seinen Körper strömen spürt. Das Opfer erleidet W6 Schaden (Rüstung hat keine Wirkung) und muss in seinem nächsten Zug eine Ausweichen-Probe ablegen (keine Aktion), um überhaupt handeln zu können. Misslingt sie, darf im nächsten Zug ein neuer Versuch unternommen werden. Das Opfer ist außerdem unterkühlt und kann bis zum Aufwärmen weder TP noch WP heilen.'),
+    (116, 55, '6', 'Mächtiger Angriff!', 'Mit knarrenden Gelenken schwingt der Wiedergänger den Morgenstern in einem kraftvollen Angriff gegen einen Charakter. Das Opfer erleidet 4W8 Wuchtschaden und wird zu Boden geworfen. Der Angriff kann pariert werden.');
+
 -- catalog_encounter_tables
 INSERT INTO catalog_encounter_tables (id, name_de) VALUES
     (1, 'Wald'),
@@ -1043,3 +1237,15 @@ INSERT INTO catalog_encounter_table_entries (id, table_id, min_roll, max_roll, b
     (14, 3, 4, 4, 10, '1', NULL),
     (15, 3, 5, 5, 21, 'W6', 'Plünderer.'),
     (16, 3, 6, NULL, 9, '1', NULL);
+
+-- Zufällige Ereignisse der Burg des Raubritters (W6, pro Viertel in der Burg)
+INSERT INTO catalog_encounter_tables (id, name_de) VALUES
+    (4, 'Zufällige Ereignisse: Burg des Raubritters');
+
+INSERT INTO catalog_encounter_table_entries (id, table_id, min_roll, max_roll, bestiary_id, quantity_de, text_de) VALUES
+    (17, 4, 1, 1, 54, '2', 'Goblins. Zwei Goblins tauchen auf, ziehen nach kurzer Verwirrung ihre Kurzschwerter und greifen mit einem Kreischen an.'),
+    (18, 4, 2, 2, NULL, NULL, 'Wühlendes Schwein. Merle grunzt zufrieden in einer Ecke. Bemerkt sie die Charaktere, erstarrt sie, quiekt und flüchtet. Wer sie verletzt, macht sich die Orkin Grunta zur Feindin.'),
+    (19, 4, 3, 3, NULL, NULL, 'Böse Geister. Die Luft vibriert, ein kalter Wirbelwind kreist, die Umrisse dreier toter Krieger greifen nach den Charakteren. Alle: WIL-Probe gegen Furcht, dann verschwinden die Geister.'),
+    (20, 4, 4, 4, NULL, NULL, 'Sturm. Dunkle Wolken ziehen auf, es regnet in Strömen und donnert. Für den Rest des Abenteuers erhalten alle Fernkampfangriffe im Freien einen Nachteil.'),
+    (21, 4, 5, 5, NULL, NULL, 'Raben. Ein Schwarm bricht aus einer Spalte hervor und stürzt auf die Charaktere zu. Alle: Ausweichen-Probe; wer scheitert, erleidet W3 Stichschaden. Dann fliegt der Schwarm zum Turm.'),
+    (22, 4, 6, 6, NULL, NULL, 'Falle! Die Goblins haben einen aufgehängten Kriegshammer aufgestellt, der auslöst, wenn der Charakter mit der niedrigsten GEW auf einen losen Stein tritt. Ausweichen-Probe, sonst 2W6 Wuchtschaden.');

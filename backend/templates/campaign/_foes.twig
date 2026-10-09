@@ -1,0 +1,65 @@
+{# Foe tracker of the play view: hit points and skills of the monsters of the current fight. #}
+{% import "_ui.twig" as ui %}
+
+<dialog class="ui-sheet ui-sheet--xl" id="foes" aria-labelledby="foes-title">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <div class="combat__bar">
+        <h2 class="ui-card__title" id="foes-title">{{ ui.icon('skull') }} Gegner</h2>
+        <span class="ui-muted">Trage die Trefferpunkte nach dem Schaden ein.</span>
+        {% if foes %}<button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-dm-delete data-url="{{ base }}/foes" data-confirm="Alle Gegner entfernen?" data-after="reload">Alle entfernen</button>{% endif %}
+    </div>
+    <div class="combat__body">
+        <div class="foe-grid">
+            {% for f in foes %}
+                <article class="ui-card foe{{ f.hp_current == 0 ? ' is-down' : '' }}" data-foe data-foe-id="{{ f.foe_id }}" data-foe-max="{{ f.hp }}">
+                    <div class="foe__head">
+                        <strong class="foe__name">{{ f.name_de }}</strong>
+                        <span class="ui-row">
+                            <label class="ui-row foe__hp">TP <input class="ui-input foe-hp" type="number" min="0" max="{{ f.hp }}" value="{{ f.hp_current }}" data-foe-hp-input aria-label="Aktuelle Trefferpunkte von {{ f.name_de }}"> / {{ f.hp }}</label>
+                            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small ui-btn--icon" data-dm-delete data-url="{{ base }}/foes/{{ f.foe_id }}" data-after="reload" aria-label="{{ f.name_de }} entfernen">{{ ui.icon('x') }}</button>
+                        </span>
+                    </div>
+                    <div class="ui-bar ui-bar--hp" role="meter" aria-label="Trefferpunkte" aria-valuemin="0" aria-valuemax="{{ f.hp }}" aria-valuenow="{{ f.hp_current }}" data-foe-bar data-hp="{{ f.hp_current }}">
+                        <div class="ui-bar__fill" style="width: {{ f.hp > 0 ? (f.hp_current / f.hp * 100)|round : 0 }}%"></div>
+                        <span class="ui-bar__label">TP {{ f.hp_current }}/{{ f.hp }}</span>
+                    </div>
+                    <div class="ui-row">
+                        <span class="ui-badge">{{ ui.icon('shield') }} Rüstung {{ f.armor_de }}</span>
+                        <span class="ui-badge ui-badge--sky">Größe {{ f.size_de }}</span>
+                        <span class="ui-badge ui-badge--gold">Bewegung {{ f.movement }}</span>
+                        <span class="ui-badge ui-badge--berry" data-foe-down{% if f.hp_current > 0 %} hidden{% endif %}>Besiegt</span>
+                    </div>
+                    {% if f.kit_de %}<p class="pre-wrap"><strong>Fertigkeiten und Profil:</strong> {{ f.kit_de }}</p>{% endif %}
+                    {% if f.attacks %}
+                        <ul class="plain-list">
+                            {% for a in f.attacks %}<li><strong>{{ a.roll_de }} {{ a.title_de }}:</strong> {{ a.effect_de }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                    {% if f.traits_de %}<p class="ui-muted pre-wrap">{{ f.traits_de }}</p>{% endif %}
+                </article>
+            {% else %}
+                <div class="ui-empty">
+                    {{ ui.icon('skull') }}
+                    <strong>Kein Kampf läuft</strong>
+                    <span>Suche rechts ein Monster oder wähle in einer Karte „In den Kampf“.</span>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="foe-picker">
+            <h3>Gegner hinzufügen</h3>
+            <div class="ui-search">
+                {{ ui.icon('search') }}
+                <input class="ui-input" type="search" id="foe-search" placeholder="Tippen, um die Liste zu kürzen …" autocomplete="off" aria-label="Monster suchen">
+            </div>
+            <label class="ui-row ui-muted" for="foe-count">Anzahl <input class="ui-input foe-count" id="foe-count" type="number" min="1" max="20" value="1"></label>
+            <div class="party-candidates" id="foe-list" data-url="{{ base }}/foes">
+                {% for o in foeOptions %}
+                    <button type="button" class="party-candidate" data-id="{{ o.id }}" data-search="{{ [o.name_de, o.category_de]|join(' ')|lower }}">
+                        <strong>{{ o.name_de }}</strong>{% if o.category_de %} <span class="ui-muted">{{ o.category_de }}</span>{% endif %}
+                    </button>
+                {% endfor %}
+                <p class="ui-muted" id="foe-empty" hidden>Kein Monster gefunden.</p>
+            </div>
+        </div>
+    </div>
+</dialog>

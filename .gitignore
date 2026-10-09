@@ -1,6 +1,9 @@
 /.env
 /.idea/
 /backend/vendor/
-/backend/var/data/*.sqlite
+/backend/var/
+/backend/.phpunit.cache/
+/backend/.php-cs-fixer.cache
 /backend/public/uploads/*
 !/backend/public/uploads/.gitkeep
+/backend/node_modules/

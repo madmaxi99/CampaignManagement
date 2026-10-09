@@ -3,41 +3,23 @@
  * coins, "Gedächtnis" and the detail sheet. Edits save immediately (toast),
  * only adding or removing a row reloads the page.
  */
-(function () {
-    'use strict';
+import { sendJson, toastError } from './lib/http.js';
+import { forget } from './lib/my-characters.js';
 
-    const sheet = document.querySelector('.sheet');
-    if (!sheet) {
-        return;
-    }
+const page = document.querySelector('.sheet');
+if (page) {
+    init(page);
+}
 
+function init(sheet) {
     const id = sheet.dataset.id;
-
-    function request(method, path, body) {
-        const options = { method: method };
-        if (body !== undefined) {
-            options.headers = { 'Content-Type': 'application/json' };
-            options.body = JSON.stringify(body);
-        }
-
-        return fetch(path, options).then(function (response) {
-            if (!response.ok) {
-                throw new Error('Speichern fehlgeschlagen.');
-            }
-
-            return response.status === 204 ? {} : response.json().catch(function () { return {}; });
-        });
-    }
 
     function saved() {
         window.ui.toast('Gespeichert');
     }
 
-    function failed(error) {
-        window.ui.toast(error && error.message ? error.message : 'Das hat nicht geklappt.', 'error');
-    }
-
     // ---- Vitals: − / + around a bar
+    const renderVital = {};
     document.querySelectorAll('[data-vital]').forEach(function (vital) {
         const key = vital.dataset.vital;
         const bar = vital.querySelector('.ui-bar');
@@ -47,10 +29,12 @@
 
         function render(current) {
             vital.dataset.current = String(current);
-            fill.style.width = (max > 0 ? Math.round(current / max * 100) : 0) + '%';
+            fill.style.width = (max > 0 ? Math.round((current / max) * 100) : 0) + '%';
             label.textContent = current + ' / ' + max;
             bar.setAttribute('aria-valuenow', String(current));
         }
+
+        renderVital[key] = render;
 
         vital.querySelectorAll('[data-vital-step]').forEach(function (button) {
             button.addEventListener('click', function () {
@@ -60,27 +44,193 @@
                     return;
                 }
                 render(next); // optimistic, corrected by the server answer
-                request('POST', '/character/' + id + '/' + key, { value: next })
-                    .then(function (data) { render(data[key + '_current']); })
-                    .catch(function (error) { render(current); failed(error); });
+                if (key === 'hp') {
+                    hpChanged(next, true);
+                }
+                sendJson('POST', '/character/' + id + '/' + key, { value: next })
+                    .then(function (data) {
+                        render(data[key + '_current']);
+                        if (key === 'hp') {
+                            setDeath(data.death_successes, data.death_failures);
+                            hpChanged(data.hp_current, false);
+                        }
+                    })
+                    .catch(function (error) {
+                        render(current);
+                        if (key === 'hp') {
+                            hpChanged(current, false);
+                        }
+                        toastError(error);
+                    });
             });
+        });
+    });
+
+    // ---- Death rolls at 0 HP: the KON rolls happen at the table, the results are clicked in
+    const deathSheet = document.querySelector('[data-death-sheet]');
+    const deathOpen = document.querySelector('[data-death-open]');
+    let death = deathSheet
+        ? {
+              successes: parseInt(deathSheet.dataset.successes, 10) || 0,
+              failures: parseInt(deathSheet.dataset.failures, 10) || 0,
+          }
+        : { successes: 0, failures: 0 };
+
+    function renderDeath() {
+        if (!deathSheet) {
+            return;
+        }
+        deathSheet.querySelector('[data-death-count="successes"]').textContent = String(death.successes);
+        deathSheet.querySelector('[data-death-count="failures"]').textContent = String(death.failures);
+        deathSheet.querySelector('[data-death-survive]').hidden = death.successes < 3;
+        deathSheet.querySelector('[data-death-dead]').hidden = death.failures < 3;
+        deathSheet.querySelector('[data-death-buttons]').hidden = death.successes >= 3;
+    }
+
+    function setDeath(successes, failures) {
+        death = { successes: successes || 0, failures: failures || 0 };
+        renderDeath();
+    }
+
+    // The dialog opens by itself when the HP drop to 0 and closes again above 0.
+    function hpChanged(current, opening) {
+        if (!deathSheet) {
+            return;
+        }
+        deathOpen.hidden = current > 0;
+        if (current > 0) {
+            setDeath(0, 0);
+            if (typeof deathSheet.close === 'function' && deathSheet.open) {
+                deathSheet.close();
+            }
+        } else if (opening && typeof deathSheet.showModal === 'function' && !deathSheet.open) {
+            deathSheet.showModal();
+        }
+    }
+
+    if (deathSheet) {
+        renderDeath();
+        deathSheet.querySelectorAll('[data-death]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                sendJson('POST', '/character/' + id + '/death-rolls', { result: button.dataset.death })
+                    .then(function (data) {
+                        setDeath(data.death_successes, data.death_failures);
+                    })
+                    .catch(toastError);
+            });
+        });
+        deathSheet.querySelector('[data-death-survive-confirm]').addEventListener('click', function () {
+            const injury = deathSheet.querySelector('input[name="death-injury"]:checked');
+            sendJson('POST', '/character/' + id + '/death-rolls/survive', {
+                hp_roll: parseInt(deathSheet.querySelector('[data-death-hp]').value, 10),
+                injury_id: injury ? injury.value : '',
+            })
+                .then(function (data) {
+                    renderVital.hp(data.hp_current);
+                    hpChanged(data.hp_current, false);
+                    if (data.injury) {
+                        window.location.reload(); // shows the new injury on the sheet
+                    } else {
+                        window.ui.toast('Du lebst: ' + data.hp_current + ' TP');
+                    }
+                })
+                .catch(toastError);
+        });
+    }
+
+    // ---- Injuries: "Geheilt" removes one
+    document.querySelectorAll('[data-injury-remove]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            sendJson('DELETE', '/character/' + id + '/injuries/' + button.dataset.injuryRemove)
+                .then(function () {
+                    const row = button.closest('[data-injury]');
+                    if (row) {
+                        row.remove();
+                    }
+                    saved();
+                })
+                .catch(toastError);
         });
     });
 
     // ---- Conditions
     document.querySelectorAll('[data-condition]').forEach(function (chip) {
         chip.addEventListener('click', function () {
-            request('POST', '/character/' + id + '/conditions/' + chip.dataset.condition + '/toggle', {})
-                .then(function (data) { chip.setAttribute('aria-pressed', data.active ? 'true' : 'false'); })
-                .catch(failed);
+            sendJson('POST', '/character/' + id + '/conditions/' + chip.dataset.condition + '/toggle', {})
+                .then(function (data) {
+                    chip.setAttribute('aria-pressed', data.active ? 'true' : 'false');
+                })
+                .catch(toastError);
         });
     });
+
+    // ---- Rest: the dice are rolled at the table, the results are typed in
+    const restSheet = document.querySelector('[data-rest-sheet]');
+    if (restSheet) {
+        restSheet.querySelectorAll('[data-rest]').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const type = button.dataset.rest;
+                const body = { type };
+                const wp = restSheet.querySelector('[data-rest-wp="' + type + '"]');
+                const hp = restSheet.querySelector('[data-rest-hp="' + type + '"]');
+                if (wp) {
+                    body.wp_roll = parseInt(wp.value, 10);
+                }
+                if (hp) {
+                    body.hp_roll = parseInt(hp.value, 10);
+                }
+                if (type === 'short') {
+                    body.tended = restSheet.querySelector('[data-rest-tended]').checked;
+                    body.condition = restSheet.querySelector('[data-rest-condition]').value;
+                    const memento = restSheet.querySelector('[data-rest-memento]');
+                    if (memento) {
+                        body.memento_condition = memento.value;
+                    }
+                }
+                sendJson('POST', '/character/' + id + '/rest', body)
+                    .then(function (data) {
+                        ['hp', 'wp'].forEach(function (key) {
+                            renderVital[key](data[key + '_current']);
+                        });
+                        hpChanged(data.hp_current, false);
+                        if (data.memento_used) {
+                            const mementoField = restSheet.querySelector('[data-rest-memento]');
+                            if (mementoField) {
+                                mementoField.closest('.ui-field').remove();
+                            }
+                        }
+                        data.cleared.forEach(function (code) {
+                            const chip = document.querySelector('[data-condition="' + code + '"]');
+                            if (chip) {
+                                chip.setAttribute('aria-pressed', 'false');
+                            }
+                        });
+                        if (typeof restSheet.close === 'function') {
+                            restSheet.close();
+                        }
+                        window.ui.toast(
+                            '+' +
+                                data.hp_gain +
+                                ' TP, +' +
+                                data.wp_gain +
+                                ' WP' +
+                                (data.cleared.length > 0 ? ', ' + data.cleared.length + ' Zustand geheilt' : '')
+                        );
+                    })
+                    .catch(toastError);
+            });
+        });
+    }
 
     // ---- Skill advancement marks
     document.querySelectorAll('[data-skill-mark]').forEach(function (box) {
         box.addEventListener('change', function () {
-            request('POST', '/character/' + id + '/skills/' + box.dataset.skillMark + '/mark', { marked: box.checked })
-                .catch(function (error) { box.checked = !box.checked; failed(error); });
+            sendJson('POST', '/character/' + id + '/skills/' + box.dataset.skillMark + '/mark', {
+                marked: box.checked,
+            }).catch(function (error) {
+                box.checked = !box.checked;
+                toastError(error);
+            });
         });
     });
 
@@ -111,8 +261,13 @@
     function showDetail(detail) {
         detailBody.replaceChildren(node('h2', detail.name));
         if (detail.type === 'spell') {
-            [['Vorgabe', detail.components], ['Zauberdauer', detail.castingTime], ['Reichweite', detail.range],
-                ['Wirkungsdauer', detail.duration], ['Kosten', detail.wpNote]].forEach(function (pair) {
+            [
+                ['Vorgabe', detail.components],
+                ['Zauberdauer', detail.castingTime],
+                ['Reichweite', detail.range],
+                ['Wirkungsdauer', detail.duration],
+                ['Kosten', detail.wpNote],
+            ].forEach(function (pair) {
                 if (pair[1]) {
                     detailBody.appendChild(fact(pair[0], pair[1]));
                 }
@@ -127,7 +282,9 @@
     }
 
     document.querySelectorAll('[data-detail]').forEach(function (button) {
-        button.addEventListener('click', function () { showDetail(JSON.parse(button.dataset.detail)); });
+        button.addEventListener('click', function () {
+            showDetail(JSON.parse(button.dataset.detail));
+        });
     });
 
     // ---- Free-text gear fields (weapons, armor, inventory): save on change
@@ -141,35 +298,45 @@
             } else {
                 value = input.value;
             }
-            const url = input.dataset.segment === 'armor'
-                ? '/character/' + id + '/armor/' + input.dataset.slot
-                : '/character/' + id + '/' + input.dataset.segment + '/' + input.dataset.rowId;
+            const url =
+                input.dataset.segment === 'armor'
+                    ? '/character/' + id + '/armor/' + input.dataset.slot
+                    : '/character/' + id + '/' + input.dataset.segment + '/' + input.dataset.rowId;
 
             const body = {};
             body[input.dataset.field] = value;
-            request('POST', url, body).then(saved).catch(failed);
+            sendJson('POST', url, body).then(saved).catch(toastError);
 
-            // Keep the collapsed row's title in step with the name field.
+            // Keep the collapsed row's title in step with the name and quantity fields.
             const entry = input.closest('.gear-entry');
-            if (entry && input.dataset.field === 'name_de' && input.dataset.segment !== 'armor') {
-                entry.querySelector('.ui-details__title').textContent = value;
+            if (entry && input.dataset.segment !== 'armor') {
+                if (input.dataset.field === 'name_de') {
+                    (entry.querySelector('.gear-name') ?? entry.querySelector('.ui-details__title')).textContent =
+                        value;
+                } else if (input.dataset.field === 'quantity') {
+                    entry.querySelector('.gear-qty').textContent = (value ?? 0) + '×';
+                }
             }
         });
     });
 
     document.querySelectorAll('[data-add]').forEach(function (button) {
         button.addEventListener('click', function () {
-            request('POST', '/character/' + id + '/' + button.dataset.add, {})
-                .then(function () { window.location.reload(); })
-                .catch(failed);
+            sendJson('POST', '/character/' + id + '/' + button.dataset.add, {})
+                .then(function () {
+                    window.location.reload();
+                })
+                .catch(toastError);
         });
     });
 
     document.querySelectorAll('[data-remove]').forEach(function (button) {
         button.addEventListener('click', function () {
-            request('DELETE', '/character/' + id + '/' + button.dataset.remove + '/' + button.dataset.rowId)
-                .then(function () { window.location.reload(); })
-                .catch(failed);
+            sendJson('DELETE', '/character/' + id + '/' + button.dataset.remove + '/' + button.dataset.rowId)
+                .then(function () {
+                    window.location.reload();
+                })
+                .catch(toastError);
         });
     });
 
@@ -182,7 +349,9 @@
                 silver: parseInt(document.getElementById('coins-silver').value, 10) || 0,
                 copper: parseInt(document.getElementById('coins-copper').value, 10) || 0,
             };
-            request('POST', '/character/' + id + '/currency', body).then(saved).catch(failed);
+            sendJson('POST', '/character/' + id + '/currency', body)
+                .then(saved)
+                .catch(toastError);
         });
     });
 
@@ -196,14 +365,14 @@
         function saveMemory() {
             const text = memory.value;
             memoryStatus.textContent = 'Speichert …';
-            request('POST', '/character/' + id + '/memory', { text: text })
+            sendJson('POST', '/character/' + id + '/memory', { text: text })
                 .then(function () {
                     lastSaved = text;
                     memoryStatus.textContent = 'Alles gespeichert.';
                 })
                 .catch(function (error) {
                     memoryStatus.textContent = 'Noch nicht gespeichert – wird erneut versucht.';
-                    failed(error);
+                    toastError(error);
                 });
         }
 
@@ -235,17 +404,20 @@
             }
             const data = new FormData();
             data.append('portrait', portraitInput.files[0]);
-            window.fetch('/character/' + id + '/portrait', { method: 'POST', body: data })
-                .then(function (response) { return response.json(); })
+            window
+                .fetch('/character/' + id + '/portrait', { method: 'POST', body: data })
+                .then(function (response) {
+                    return response.json();
+                })
                 .then(function (result) {
                     if (result.error) {
-                        failed(new Error(result.error));
+                        toastError(new Error(result.error));
 
                         return;
                     }
                     window.location.reload();
                 })
-                .catch(failed);
+                .catch(toastError);
         });
     }
 
@@ -253,17 +425,12 @@
     const deleteConfirm = document.querySelector('[data-delete-confirm]');
     if (deleteConfirm) {
         deleteConfirm.addEventListener('click', function () {
-            request('DELETE', '/character/' + id)
+            sendJson('DELETE', '/character/' + id)
                 .then(function () {
-                    try {
-                        const mine = JSON.parse(window.localStorage.getItem('trpg.myCharacters') || '[]');
-                        window.localStorage.setItem('trpg.myCharacters', JSON.stringify(mine.filter(function (other) { return String(other) !== String(id); })));
-                    } catch (error) {
-                        // ignore: nothing to clean up
-                    }
+                    forget(id);
                     window.location.href = '/characters';
                 })
-                .catch(failed);
+                .catch(toastError);
         });
     }
-}());
+}

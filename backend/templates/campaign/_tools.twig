@@ -1,0 +1,64 @@
+{# Dialogs of the tools menu: every roll table on its own, and the NPC suggestion. #}
+{% import "_ui.twig" as ui %}
+{% import "rules/_macros.twig" as r %}
+
+{% for group, tables in tableGroups %}
+    {% for table in tables %}
+        <dialog class="ui-sheet ui-sheet--wide" id="table-{{ table.code }}" aria-labelledby="table-{{ table.code }}-title">
+            <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+            <div class="ui-stack">
+                <h2 id="table-{{ table.code }}-title">{{ table.title_de }} <span class="ui-badge">{{ table.die_de }}</span></h2>
+                {% if table.intro_de %}<p class="ui-muted">{{ table.intro_de }}</p>{% endif %}
+                <table class="ui-table ui-table--cards">
+                    <thead><tr><th>Wurf</th>{% for h in table.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for row in table.rows %}
+                            <tr>
+                                <td data-label="Wurf"><strong>{{ r.roll(row.roll_min, row.roll_max) }}</strong></td>
+                                <td data-label="{{ table.headers[0] }}"><strong>{{ row.name_de }}</strong></td>
+                                {% if table.headers|length > 1 %}<td data-label="{{ table.headers[1] }}">{{ row.effect_de }}</td>{% endif %}
+                                {% if table.headers|length > 2 %}<td data-label="{{ table.headers[2] }}">{{ row.extra_de }}</td>{% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </dialog>
+    {% endfor %}
+{% endfor %}
+
+{% for table in encounterTables %}
+    <dialog class="ui-sheet ui-sheet--wide" id="encounter-{{ table.id }}" aria-label="{{ table.name_de }}">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <h2>{{ table.name_de }}</h2>
+        <p class="ui-muted">Zufallsbegegnungen. Gewürfelt wird am Tisch.</p>
+        <table class="ui-table">
+            <tbody>
+                {% for e in table.entries %}
+                    <tr><td><strong>{{ e.max_roll is null ? e.min_roll ~ '+' : (e.min_roll == e.max_roll ? e.min_roll : e.min_roll ~ '–' ~ e.max_roll) }}</strong></td><td>{{ e.text_de }}</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </dialog>
+{% endfor %}
+
+<dialog class="ui-sheet ui-sheet--wide" id="npc-suggestion" aria-labelledby="npc-title" data-npc-generator>
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <div class="ui-stack">
+        <h2 id="npc-title">{{ ui.icon('user') }} NSC-Vorschlag</h2>
+        <p class="ui-muted">Zieht aus den Tabellen „NSC erschaffen“ je eine Zeile. Du kannst den Text ändern und den NSC in der Kampagne speichern.</p>
+        <div class="ui-row"><button type="button" class="ui-btn ui-btn--gold" data-npc-go>NSC vorschlagen</button></div>
+        <div class="suggest" data-npc-result hidden>
+            <div class="ui-stack">
+                <input class="ui-input" data-npc-name aria-label="Name" placeholder="Name">
+                <textarea class="ui-textarea" rows="5" data-npc-description aria-label="Beschreibung"></textarea>
+            </div>
+            <div class="ui-row">
+                <button type="button" class="ui-btn" data-npc-save>Als NSC speichern</button>
+                <button type="button" class="ui-btn ui-btn--ghost" data-npc-drop>Verwerfen</button>
+            </div>
+        </div>
+    </div>
+</dialog>
+
+<script type="application/json" id="play-data">{{ {'npc': npcTables}|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP'))|raw }}</script>

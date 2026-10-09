@@ -1,0 +1,30 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+{% import "rules/_macros.twig" as r %}
+
+{% block title %}Regeln: {{ chapter.title }}{% endblock %}
+
+{% block content %}
+    <div class="dm-page-title">
+        <h1>Regeln</h1>
+        <span class="ui-muted">Alles, was nur die Spielleitung braucht. Spielerregeln: <a href="/rules">Regeln</a></span>
+    </div>
+
+    <div class="plan-workspace">
+        <nav class="outline ui-card" aria-label="Kapitel">
+            <div class="outline__head"><span>Kapitel</span></div>
+            {% for c in chapters %}
+                <a class="outline__item{{ c.slug == chapter.slug ? ' is-active' : '' }}" href="/dm/rules?k={{ c.slug }}"{% if c.slug == chapter.slug %} aria-current="page"{% endif %}>
+                    <span class="outline__num">{{ loop.index }}</span>
+                    <span class="outline__text">{{ c.title }}</span>
+                </a>
+            {% endfor %}
+        </nav>
+
+        {% if chapter.slug == 'zufallsbegegnungen' %}
+            {% include 'dm/chapters/encounters.twig' %}
+        {% else %}
+            {% include 'dm/chapters/rules.twig' %}
+        {% endif %}
+    </div>
+{% endblock %}

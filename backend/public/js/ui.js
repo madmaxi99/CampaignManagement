@@ -44,7 +44,9 @@
         node.className = 'ui-toast' + (type === 'error' ? ' ui-toast--error' : '');
         node.textContent = message;
         host.appendChild(node);
-        window.setTimeout(function () { node.remove(); }, 3500);
+        window.setTimeout(function () {
+            node.remove();
+        }, 3500);
     }
 
     // ---- Sheets (<dialog class="ui-sheet">): data-ui-open="#id", data-ui-close
@@ -95,7 +97,9 @@
         }
 
         tabs.forEach(function (tab) {
-            tab.addEventListener('click', function () { select(tab, true); });
+            tab.addEventListener('click', function () {
+                select(tab, true);
+            });
         });
 
         if (useHash && window.location.hash) {
@@ -141,4 +145,4 @@
     }
 
     window.ui = { toast: toast, confirm: confirmDialog };
-}());
+})();

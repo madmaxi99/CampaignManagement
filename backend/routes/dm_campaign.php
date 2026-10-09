@@ -2,16 +2,39 @@
 
 declare(strict_types=1);
 
+use Flyka\CampaignManagement\Repository\CampaignChapterRepository;
+use Flyka\CampaignManagement\Repository\CampaignItemRepository;
+use Flyka\CampaignManagement\Repository\CampaignMonsterRepository;
+use Flyka\CampaignManagement\Repository\CampaignNpcRepository;
+use Flyka\CampaignManagement\Repository\CampaignPlaceRepository;
+use Flyka\CampaignManagement\Repository\CampaignRepository;
+use Flyka\CampaignManagement\Repository\CampaignStandRepository;
+use Flyka\CampaignManagement\Repository\CatalogEditorRepository;
+use Flyka\CampaignManagement\Repository\RulesRepository;
+use Flyka\CampaignManagement\Service\PlayTools;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
 use Slim\Views\Twig;
+use function Flyka\CampaignManagement\Http\jsonResponse;
+use function Flyka\CampaignManagement\Http\storeUploadedImage;
 
 /**
  * DM routes of the campaigns: list, plan, play and every write endpoint.
  * All paths live under /dm, so DmGate already guards them (login + CSRF).
  */
-return function (App $app, CampaignRepository $campaigns, CampaignStandRepository $stand): void {
+return function (
+    App $app,
+    CampaignRepository $campaigns,
+    CampaignChapterRepository $chapters,
+    CampaignNpcRepository $npcs,
+    CampaignPlaceRepository $places,
+    CampaignItemRepository $items,
+    CampaignMonsterRepository $monsters,
+    CampaignStandRepository $stand,
+    CatalogEditorRepository $catalog,
+    RulesRepository $rules
+): void {
     $json = fn (Request $request): array => json_decode((string) $request->getBody(), true) ?? [];
 
     /** Runs $action; an invalid input becomes a 422 with the message. */
@@ -19,87 +42,105 @@ return function (App $app, CampaignRepository $campaigns, CampaignStandRepositor
         try {
             return $action();
         } catch (InvalidArgumentException $e) {
-            return jsonResponse($response, ['error' => $e->getMessage()], 422);
+            return jsonResponse($response, [
+                'error' => $e->getMessage(),
+            ], 422);
         }
     };
 
     /** Only calls the handler when {id} is an existing campaign, else 404. */
-    $withCampaign = fn (callable $handler) => function (Request $request, Response $response, array $args) use ($campaigns, $handler) {
+    $withCampaign = fn (callable $handler): Closure => function (Request $request, Response $response, array $args) use ($campaigns, $handler) {
         $campaign = $campaigns->find((int) $args['id']);
 
         return $campaign === null ? $response->withStatus(404) : $handler($request, $response, $args, $campaign);
     };
 
     /** The view of the campaign entity a page (plan/play) works with. */
-    $pageData = function (array $campaign) use ($campaigns): array {
+    $pageData = function (array $campaign) use ($chapters, $npcs, $places, $items, $monsters): array {
         $id = (int) $campaign['id'];
-        $npcs = $campaigns->npcs($id);
-        $monsters = $campaigns->bestiary($id);
-        $places = $campaigns->places($id);
+        $campaignNpcs = $npcs->npcs($id);
+        $campaignMonsters = $monsters->bestiary($id);
+        $campaignPlaces = $places->places($id);
 
         $registry = [];
-        foreach ($places as $place) {
+        foreach ($campaignPlaces as $place) {
             if ($place['number_label'] !== null) {
-                $registry[] = ['match' => '#' . $place['number_label'], 'type' => 'location', 'id' => (int) $place['id']];
+                $registry[] = [
+                    'match' => '#' . $place['number_label'],
+                    'type' => 'location',
+                    'id' => (int) $place['id'],
+                ];
             }
         }
-        foreach ($monsters as $monster) {
-            $registry[] = ['match' => $monster['name_de'], 'type' => 'bestiary', 'id' => (int) $monster['id']];
+        foreach ($campaignMonsters as $monster) {
+            $registry[] = [
+                'match' => $monster['name_de'],
+                'type' => 'bestiary',
+                'id' => (int) $monster['id'],
+            ];
         }
-        foreach ($npcs as $npc) {
-            $registry[] = ['match' => $npc['name_de'], 'type' => 'npc', 'id' => (int) $npc['id']];
+        foreach ($campaignNpcs as $npc) {
+            $registry[] = [
+                'match' => $npc['name_de'],
+                'type' => 'npc',
+                'id' => (int) $npc['id'],
+            ];
         }
 
         return [
             'campaign' => $campaign,
-            'chapters' => $campaigns->chapters($id),
-            'places' => $places,
-            'placeTree' => $campaigns->placeTree($id),
-            'npcs' => $npcs,
-            'items' => $campaigns->items($id),
-            'monsters' => $monsters,
+            'chapters' => $chapters->chapters($id),
+            'places' => $campaignPlaces,
+            'placeTree' => $places->placeTree($id),
+            'npcs' => $campaignNpcs,
+            'items' => $items->items($id),
+            'monsters' => $campaignMonsters,
             'entityRegistry' => $registry,
         ];
     };
 
     // ---------- list and campaign CRUD ----------
 
-    $app->get('/dm', function (Request $request, Response $response) use ($campaigns) {
+    $app->get('/dm', function (Request $request, Response $response) use ($campaigns): Response {
         $all = $campaigns->listAll();
 
         return Twig::fromRequest($request)->render($response, 'campaign/list.twig', [
-            'defaultCampaigns' => array_values(array_filter($all, fn (array $c) => (bool) $c['is_default'])),
-            'customCampaigns' => array_values(array_filter($all, fn (array $c) => !$c['is_default'])),
+            'defaultCampaigns' => array_values(array_filter($all, fn (array $c): bool => (bool) $c['is_default'])),
+            'customCampaigns' => array_values(array_filter($all, fn (array $c): bool => ! $c['is_default'])),
         ]);
     });
 
-    $app->post('/dm/campaigns', function (Request $request, Response $response) use ($campaigns, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $campaigns->create($json($request))], 201));
-    });
+    $app->post('/dm/campaigns', fn (Request $request, Response $response) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $campaigns->create($json($request)),
+    ], 201)));
 
-    $app->post('/dm/campaign/{id:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        return $guard($response, function () use ($campaigns, $json, $request, $response, $args) {
-            $campaigns->update((int) $args['id'], $json($request));
+    $app->post('/dm/campaign/{id:[0-9]+}', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, function () use ($campaigns, $json, $request, $response, $args): Response {
+        $campaigns->update((int) $args['id'], $json($request));
 
-            return jsonResponse($response, ['updated' => true]);
-        });
-    }));
+        return jsonResponse($response, [
+            'updated' => true,
+        ]);
+    })));
 
-    $app->delete('/dm/campaign/{id:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
-        return $campaigns->delete((int) $args['id'])
-            ? jsonResponse($response, ['deleted' => true])
-            : jsonResponse($response, ['error' => 'Standard-Abenteuer lassen sich nicht löschen, nur neu starten.'], 409);
-    }));
+    $app->delete('/dm/campaign/{id:[0-9]+}', $withCampaign(fn (Request $request, Response $response, array $args): Response => $campaigns->delete((int) $args['id'])
+        ? jsonResponse($response, [
+            'deleted' => true,
+        ])
+        : jsonResponse($response, [
+            'error' => 'Standard-Abenteuer lassen sich nicht löschen, nur neu starten.',
+        ], 409)));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/restart', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
+    $app->post('/dm/campaign/{id:[0-9]+}/restart', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns): Response {
         $campaigns->restart((int) $args['id']);
 
-        return jsonResponse($response, ['restarted' => true]);
+        return jsonResponse($response, [
+            'restarted' => true,
+        ]);
     }));
 
     // ---------- plan (edit) ----------
 
-    $app->get('/dm/campaign/{id:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args, array $campaign) use ($campaigns, $pageData) {
+    $app->get('/dm/campaign/{id:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args, array $campaign) use ($places, $monsters, $pageData) {
         $data = $pageData($campaign);
 
         $selection = (string) ($request->getQueryParams()['e'] ?? 'overview');
@@ -112,10 +153,15 @@ return function (App $app, CampaignRepository $campaigns, CampaignStandRepositor
             $type = 'monsters';
         }
 
-        $collections = ['chapter' => $data['chapters'], 'place' => $data['places'], 'npc' => $data['npcs'], 'item' => $data['items']];
+        $collections = [
+            'chapter' => $data['chapters'],
+            'place' => $data['places'],
+            'npc' => $data['npcs'],
+            'item' => $data['items'],
+        ];
         $entity = null;
         if ($entityId !== null) {
-            $found = array_values(array_filter($collections[$type] ?? [], fn (array $row) => (int) $row['id'] === $entityId));
+            $found = array_values(array_filter($collections[$type], fn (array $row): bool => (int) $row['id'] === $entityId));
             if ($found === []) {
                 return $response->withHeader('Location', '/dm/campaign/' . $campaign['id'])->withStatus(302);
             }
@@ -127,227 +173,334 @@ return function (App $app, CampaignRepository $campaigns, CampaignStandRepositor
         return Twig::fromRequest($request)->render($response, 'campaign/plan.twig', $data + [
             'editorType' => $type,
             'entity' => $entity,
-            'preset' => ['parent_id' => $query['parent'] ?? null, 'chapter_id' => $query['chapter'] ?? null, 'place_id' => $query['place'] ?? null],
-            'monsterOptions' => $campaigns->monsterOptions((int) $campaign['id']),
-            'bestiaryOptions' => $campaigns->bestiaryOptions(),
-            'encounterTableOptions' => $campaigns->encounterTableOptions(),
+            'preset' => [
+                'parent_id' => $query['parent'] ?? null,
+                'chapter_id' => $query['chapter'] ?? null,
+                'place_id' => $query['place'] ?? null,
+            ],
+            'monsterOptions' => $monsters->monsterOptions((int) $campaign['id']),
+            'bestiaryOptions' => $monsters->bestiaryOptions(),
+            'encounterTableOptions' => $places->encounterTableOptions(),
         ]);
     }));
 
     // ---------- play ----------
 
-    $app->get('/dm/campaign/{id:[0-9]+}/play', $withCampaign(function (Request $request, Response $response, array $args, array $campaign) use ($campaigns, $stand, $pageData) {
-        return Twig::fromRequest($request)->render($response, 'campaign/play.twig', $pageData($campaign) + [
-            'chronicle' => $stand->chronicle((int) $campaign['id']),
-            'encounterTables' => $campaigns->encounterTables((int) $campaign['id']),
+    /** Everything the play page of one chapter needs. */
+    $playPage = function (Response $response, Request $request, array $campaign, ?array $chapter) use ($pageData, $stand, $monsters, $catalog, $places, $rules): Response {
+        $data = $pageData($campaign);
+        $campaignId = (int) $campaign['id'];
+        $groups = $rules->rollTables();
+
+        return Twig::fromRequest($request)->render($response, 'campaign/play.twig', $data + [
+            'chapter' => $chapter,
+            'chronicle' => $stand->chronicle($campaignId),
+            'members' => $catalog->party(),
+            'candidates' => $catalog->partyCandidates(),
+            'foes' => $monsters->foes($campaignId),
+            'foeOptions' => $monsters->bestiaryOptions(),
+            'tableGroups' => array_intersect_key($groups, array_flip(['Reise & Wildnis', 'Improvisierte Waffen'])),
+            'encounterTables' => $places->encounterTables($campaignId),
+            'npcTables' => PlayTools::npcTables($groups),
+        ]);
+    };
+
+    $app->get('/dm/campaign/{id:[0-9]+}/play', $withCampaign(function (Request $request, Response $response, array $args, array $campaign) use ($chapters, $playPage): Response {
+        $all = $chapters->chapters((int) $campaign['id']);
+        if ($all === []) {
+            return $playPage($response, $request, $campaign, null);
+        }
+
+        return $response->withHeader('Location', '/dm/campaign/' . $campaign['id'] . '/play/chapter/' . $all[0]['id'])
+            ->withStatus(302);
+    }));
+
+    $app->get('/dm/campaign/{id:[0-9]+}/play/chapter/{chapterId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args, array $campaign) use ($chapters, $playPage): Response {
+        foreach ($chapters->chapters((int) $campaign['id']) as $chapter) {
+            if ($chapter['id'] === (int) $args['chapterId']) {
+                return $playPage($response, $request, $campaign, $chapter);
+            }
+        }
+
+        return $response->withStatus(404);
+    }));
+
+    // ---------- foes of the current fight ----------
+
+    $app->post('/dm/campaign/{id:[0-9]+}/foes', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, function () use ($monsters, $json, $request, $response, $args): Response {
+        $data = $json($request);
+        $monsters->addFoe((int) $args['id'], (int) ($data['bestiary_id'] ?? 0), (int) ($data['count'] ?? 1));
+
+        return jsonResponse($response, [
+            'added' => true,
+        ], 201);
+    })));
+
+    $app->post('/dm/campaign/{id:[0-9]+}/foes/{foeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters, $json): Response {
+        $monsters->setFoeHp((int) $args['id'], (int) $args['foeId'], (int) ($json($request)['hp_current'] ?? 0));
+
+        return jsonResponse($response, [
+            'saved' => true,
+        ]);
+    }));
+
+    $app->delete('/dm/campaign/{id:[0-9]+}/foes/{foeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters): Response {
+        $monsters->removeFoe((int) $args['id'], (int) $args['foeId']);
+
+        return jsonResponse($response, [
+            'removed' => true,
+        ]);
+    }));
+
+    $app->delete('/dm/campaign/{id:[0-9]+}/foes', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters): Response {
+        $monsters->clearFoes((int) $args['id']);
+
+        return jsonResponse($response, [
+            'cleared' => true,
         ]);
     }));
 
     // ---------- chapters ----------
 
-    $app->post('/dm/campaign/{id:[0-9]+}/chapters', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $campaigns->createChapter((int) $args['id'], $json($request))], 201));
-    }));
+    $app->post('/dm/campaign/{id:[0-9]+}/chapters', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $chapters->createChapter((int) $args['id'], $json($request)),
+    ], 201))));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/chapters/{chapterId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        if (!$campaigns->chapterInCampaign((int) $args['id'], (int) $args['chapterId'])) {
+    $app->post('/dm/campaign/{id:[0-9]+}/chapters/{chapterId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($chapters, $json, $guard) {
+        if (! $chapters->chapterInCampaign((int) $args['id'], (int) $args['chapterId'])) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($campaigns, $json, $request, $response, $args) {
-            $campaigns->updateChapter((int) $args['id'], (int) $args['chapterId'], $json($request));
+        return $guard($response, function () use ($chapters, $json, $request, $response, $args): Response {
+            $chapters->updateChapter((int) $args['id'], (int) $args['chapterId'], $json($request));
 
-            return jsonResponse($response, ['updated' => true]);
+            return jsonResponse($response, [
+                'updated' => true,
+            ]);
         });
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/chapters/{chapterId:[0-9]+}/move', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json) {
+    $app->post('/dm/campaign/{id:[0-9]+}/chapters/{chapterId:[0-9]+}/move', $withCampaign(function (Request $request, Response $response, array $args) use ($chapters, $json): Response {
         $direction = ($json($request)['direction'] ?? '') === 'up' ? 'up' : 'down';
-        $campaigns->moveChapter((int) $args['id'], (int) $args['chapterId'], $direction);
+        $chapters->moveChapter((int) $args['id'], (int) $args['chapterId'], $direction);
 
-        return jsonResponse($response, ['moved' => true]);
+        return jsonResponse($response, [
+            'moved' => true,
+        ]);
     }));
 
-    $app->delete('/dm/campaign/{id:[0-9]+}/chapters/{chapterId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
-        $campaigns->deleteChapter((int) $args['id'], (int) $args['chapterId']);
+    $app->delete('/dm/campaign/{id:[0-9]+}/chapters/{chapterId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($chapters): Response {
+        $chapters->deleteChapter((int) $args['id'], (int) $args['chapterId']);
 
-        return jsonResponse($response, ['deleted' => true]);
+        return jsonResponse($response, [
+            'deleted' => true,
+        ]);
     }));
 
     // ---------- places ----------
 
-    $app->post('/dm/campaign/{id:[0-9]+}/places', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $campaigns->createPlace((int) $args['id'], $json($request))], 201));
-    }));
+    $app->post('/dm/campaign/{id:[0-9]+}/places', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $places->createPlace((int) $args['id'], $json($request)),
+    ], 201))));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        if (!$campaigns->placeInCampaign((int) $args['id'], (int) $args['placeId'])) {
+    $app->post('/dm/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($places, $json, $guard) {
+        if (! $places->placeInCampaign((int) $args['id'], (int) $args['placeId'])) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($campaigns, $json, $request, $response, $args) {
-            $campaigns->updatePlace((int) $args['id'], (int) $args['placeId'], $json($request));
+        return $guard($response, function () use ($places, $json, $request, $response, $args): Response {
+            $places->updatePlace((int) $args['id'], (int) $args['placeId'], $json($request));
 
-            return jsonResponse($response, ['updated' => true]);
+            return jsonResponse($response, [
+                'updated' => true,
+            ]);
         });
     }));
 
-    $app->delete('/dm/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $guard) {
-        if (!$campaigns->placeInCampaign((int) $args['id'], (int) $args['placeId'])) {
+    $app->delete('/dm/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($places, $guard) {
+        if (! $places->placeInCampaign((int) $args['id'], (int) $args['placeId'])) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($campaigns, $response, $args) {
-            $campaigns->deletePlace((int) $args['id'], (int) $args['placeId']);
+        return $guard($response, function () use ($places, $response, $args): Response {
+            $places->deletePlace((int) $args['id'], (int) $args['placeId']);
 
-            return jsonResponse($response, ['deleted' => true]);
+            return jsonResponse($response, [
+                'deleted' => true,
+            ]);
         });
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}/image', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
+    $app->post('/dm/campaign/{id:[0-9]+}/places/{placeId:[0-9]+}/image', $withCampaign(function (Request $request, Response $response, array $args) use ($places): Response {
         $placeId = (int) $args['placeId'];
-        if (!$campaigns->placeInCampaign((int) $args['id'], $placeId)) {
+        if (! $places->placeInCampaign((int) $args['id'], $placeId)) {
             return $response->withStatus(404);
         }
         $stored = storeUploadedImage($request->getUploadedFiles()['image'] ?? null, 'images/places', $placeId);
         if (isset($stored['error'])) {
-            return jsonResponse($response, ['error' => $stored['error']], 422);
+            return jsonResponse($response, [
+                'error' => $stored['error'],
+            ], 422);
         }
-        $campaigns->setPlaceImage($placeId, $stored['path']);
+        $places->setPlaceImage($placeId, $stored['path']);
 
-        return jsonResponse($response, ['image_path' => $stored['path']]);
+        return jsonResponse($response, [
+            'image_path' => $stored['path'],
+        ]);
     }));
 
     // ---------- NPCs ----------
 
-    $app->post('/dm/campaign/{id:[0-9]+}/npcs', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $campaigns->createNpc((int) $args['id'], $json($request))], 201));
-    }));
+    $app->post('/dm/campaign/{id:[0-9]+}/npcs', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $npcs->createNpc((int) $args['id'], $json($request)),
+    ], 201))));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        if (!$campaigns->npcInCampaign((int) $args['id'], (int) $args['npcId'])) {
+    $app->post('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($npcs, $json, $guard) {
+        if (! $npcs->npcInCampaign((int) $args['id'], (int) $args['npcId'])) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($campaigns, $json, $request, $response, $args) {
-            $campaigns->updateNpc((int) $args['id'], (int) $args['npcId'], $json($request));
+        return $guard($response, function () use ($npcs, $json, $request, $response, $args): Response {
+            $npcs->updateNpc((int) $args['id'], (int) $args['npcId'], $json($request));
 
-            return jsonResponse($response, ['updated' => true]);
+            return jsonResponse($response, [
+                'updated' => true,
+            ]);
         });
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}/notes', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json) {
-        if (!$campaigns->npcInCampaign((int) $args['id'], (int) $args['npcId'])) {
+    $app->post('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}/notes', $withCampaign(function (Request $request, Response $response, array $args) use ($npcs, $json): Response {
+        if (! $npcs->npcInCampaign((int) $args['id'], (int) $args['npcId'])) {
             return $response->withStatus(404);
         }
-        $campaigns->setNpcNotes((int) $args['id'], (int) $args['npcId'], (string) ($json($request)['notes_de'] ?? ''));
+        $npcs->setNpcNotes((int) $args['id'], (int) $args['npcId'], (string) ($json($request)['notes_de'] ?? ''));
 
-        return jsonResponse($response, ['saved' => true]);
+        return jsonResponse($response, [
+            'saved' => true,
+        ]);
     }));
 
-    $app->delete('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
-        if (!$campaigns->npcInCampaign((int) $args['id'], (int) $args['npcId'])) {
+    $app->delete('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($npcs): Response {
+        if (! $npcs->npcInCampaign((int) $args['id'], (int) $args['npcId'])) {
             return $response->withStatus(404);
         }
-        $campaigns->deleteNpc((int) $args['id'], (int) $args['npcId']);
+        $npcs->deleteNpc((int) $args['id'], (int) $args['npcId']);
 
-        return jsonResponse($response, ['deleted' => true]);
+        return jsonResponse($response, [
+            'deleted' => true,
+        ]);
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}/portrait', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
+    $app->post('/dm/campaign/{id:[0-9]+}/npcs/{npcId:[0-9]+}/portrait', $withCampaign(function (Request $request, Response $response, array $args) use ($npcs): Response {
         $npcId = (int) $args['npcId'];
-        if (!$campaigns->npcInCampaign((int) $args['id'], $npcId)) {
+        if (! $npcs->npcInCampaign((int) $args['id'], $npcId)) {
             return $response->withStatus(404);
         }
         $stored = storeUploadedImage($request->getUploadedFiles()['portrait'] ?? null, 'images/npcs', $npcId);
         if (isset($stored['error'])) {
-            return jsonResponse($response, ['error' => $stored['error']], 422);
+            return jsonResponse($response, [
+                'error' => $stored['error'],
+            ], 422);
         }
-        $campaigns->setNpcPortrait($npcId, $stored['path']);
+        $npcs->setNpcPortrait($npcId, $stored['path']);
 
-        return jsonResponse($response, ['portrait_path' => $stored['path']]);
+        return jsonResponse($response, [
+            'portrait_path' => $stored['path'],
+        ]);
     }));
 
     // ---------- items ----------
 
-    $app->post('/dm/campaign/{id:[0-9]+}/items', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $campaigns->createItem((int) $args['id'], $json($request))], 201));
-    }));
+    $app->post('/dm/campaign/{id:[0-9]+}/items', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $items->createItem((int) $args['id'], $json($request)),
+    ], 201))));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/items/{itemId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        if (!$campaigns->itemInCampaign((int) $args['id'], (int) $args['itemId'])) {
+    $app->post('/dm/campaign/{id:[0-9]+}/items/{itemId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($items, $json, $guard) {
+        if (! $items->itemInCampaign((int) $args['id'], (int) $args['itemId'])) {
             return $response->withStatus(404);
         }
 
-        return $guard($response, function () use ($campaigns, $json, $request, $response, $args) {
-            $campaigns->updateItem((int) $args['id'], (int) $args['itemId'], $json($request));
+        return $guard($response, function () use ($items, $json, $request, $response, $args): Response {
+            $items->updateItem((int) $args['id'], (int) $args['itemId'], $json($request));
 
-            return jsonResponse($response, ['updated' => true]);
+            return jsonResponse($response, [
+                'updated' => true,
+            ]);
         });
     }));
 
-    $app->delete('/dm/campaign/{id:[0-9]+}/items/{itemId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
-        if (!$campaigns->itemInCampaign((int) $args['id'], (int) $args['itemId'])) {
+    $app->delete('/dm/campaign/{id:[0-9]+}/items/{itemId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($items): Response {
+        if (! $items->itemInCampaign((int) $args['id'], (int) $args['itemId'])) {
             return $response->withStatus(404);
         }
-        $campaigns->deleteItem((int) $args['id'], (int) $args['itemId']);
+        $items->deleteItem((int) $args['id'], (int) $args['itemId']);
 
-        return jsonResponse($response, ['deleted' => true]);
+        return jsonResponse($response, [
+            'deleted' => true,
+        ]);
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/items/{itemId:[0-9]+}/image', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
+    $app->post('/dm/campaign/{id:[0-9]+}/items/{itemId:[0-9]+}/image', $withCampaign(function (Request $request, Response $response, array $args) use ($items): Response {
         $itemId = (int) $args['itemId'];
-        if (!$campaigns->itemInCampaign((int) $args['id'], $itemId)) {
+        if (! $items->itemInCampaign((int) $args['id'], $itemId)) {
             return $response->withStatus(404);
         }
         $stored = storeUploadedImage($request->getUploadedFiles()['image'] ?? null, 'images/items', $itemId);
         if (isset($stored['error'])) {
-            return jsonResponse($response, ['error' => $stored['error']], 422);
+            return jsonResponse($response, [
+                'error' => $stored['error'],
+            ], 422);
         }
-        $campaigns->setItemImage($itemId, $stored['path']);
+        $items->setItemImage($itemId, $stored['path']);
 
-        return jsonResponse($response, ['image_path' => $stored['path']]);
+        return jsonResponse($response, [
+            'image_path' => $stored['path'],
+        ]);
     }));
 
     // ---------- monsters of the campaign ----------
 
-    $app->post('/dm/campaign/{id:[0-9]+}/monsters', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json, $guard) {
-        return $guard($response, function () use ($campaigns, $json, $request, $response, $args) {
-            $campaigns->addMonster((int) $args['id'], (int) ($json($request)['bestiary_id'] ?? 0));
+    $app->post('/dm/campaign/{id:[0-9]+}/monsters', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, function () use ($monsters, $json, $request, $response, $args): Response {
+        $monsters->addMonster((int) $args['id'], (int) ($json($request)['bestiary_id'] ?? 0));
 
-            return jsonResponse($response, ['added' => true], 201);
-        });
+        return jsonResponse($response, [
+            'added' => true,
+        ], 201);
+    })));
+
+    $app->post('/dm/campaign/{id:[0-9]+}/monsters/{bestiaryId:[0-9]+}/notes', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters, $json): Response {
+        $monsters->setMonsterNotes((int) $args['id'], (int) $args['bestiaryId'], (string) ($json($request)['notes_de'] ?? ''));
+
+        return jsonResponse($response, [
+            'saved' => true,
+        ]);
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/monsters/{bestiaryId:[0-9]+}/notes', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns, $json) {
-        $campaigns->setMonsterNotes((int) $args['id'], (int) $args['bestiaryId'], (string) ($json($request)['notes_de'] ?? ''));
+    $app->delete('/dm/campaign/{id:[0-9]+}/monsters/{bestiaryId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($monsters): Response {
+        $monsters->removeMonster((int) $args['id'], (int) $args['bestiaryId']);
 
-        return jsonResponse($response, ['saved' => true]);
-    }));
-
-    $app->delete('/dm/campaign/{id:[0-9]+}/monsters/{bestiaryId:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args) use ($campaigns) {
-        $campaigns->removeMonster((int) $args['id'], (int) $args['bestiaryId']);
-
-        return jsonResponse($response, ['deleted' => true]);
+        return jsonResponse($response, [
+            'deleted' => true,
+        ]);
     }));
 
     // ---------- chronicle ----------
 
-    $app->post('/dm/campaign/{id:[0-9]+}/chronicle', $withCampaign(function (Request $request, Response $response, array $args) use ($stand, $json, $guard) {
-        return $guard($response, fn () => jsonResponse($response, ['id' => $stand->addChronicleEntry((int) $args['id'], $json($request))], 201));
+    $app->post('/dm/campaign/{id:[0-9]+}/chronicle', $withCampaign(fn (Request $request, Response $response, array $args) => $guard($response, fn (): Response => jsonResponse($response, [
+        'id' => $stand->addChronicleEntry((int) $args['id'], $json($request)),
+    ], 201))));
+
+    $app->post('/dm/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', fn (Request $request, Response $response, array $args) => $guard($response, function () use ($stand, $json, $request, $response, $args): Response {
+        $found = $stand->updateChronicleEntry((int) $args['id'], (int) $args['entryId'], $json($request));
+
+        return $found ? jsonResponse($response, [
+            'updated' => true,
+        ]) : $response->withStatus(404);
     }));
 
-    $app->post('/dm/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', function (Request $request, Response $response, array $args) use ($stand, $json, $guard) {
-        return $guard($response, function () use ($stand, $json, $request, $response, $args) {
-            $found = $stand->updateChronicleEntry((int) $args['id'], (int) $args['entryId'], $json($request));
-
-            return $found ? jsonResponse($response, ['updated' => true]) : $response->withStatus(404);
-        });
-    });
-
-    $app->delete('/dm/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', function (Request $request, Response $response, array $args) use ($stand) {
-        return $stand->deleteChronicleEntry((int) $args['id'], (int) $args['entryId'])
-            ? jsonResponse($response, ['deleted' => true])
-            : $response->withStatus(404);
-    });
+    $app->delete('/dm/campaign/{id:[0-9]+}/chronicle/{entryId:[0-9]+}', fn (Request $request, Response $response, array $args): Response => $stand->deleteChronicleEntry((int) $args['id'], (int) $args['entryId'])
+        ? jsonResponse($response, [
+            'deleted' => true,
+        ])
+        : $response->withStatus(404));
 };

@@ -1,9 +1,0 @@
-{% import "_ui.twig" as ui %}
-<div class="dm-page-title">
-    <h1>Katalog</h1>
-    <nav class="ui-tabs" aria-label="Katalog">
-        <a class="ui-tab" href="/dm/catalog/items" aria-selected="{{ section == 'items' ? 'true' : 'false' }}">{{ ui.icon('swords') }} Items</a>
-        <a class="ui-tab" href="/dm/catalog/bestiary" aria-selected="{{ section == 'bestiary' ? 'true' : 'false' }}">{{ ui.icon('skull') }} Bestiary</a>
-        <a class="ui-tab" href="/dm/catalog/encounters" aria-selected="{{ section == 'encounters' ? 'true' : 'false' }}">{{ ui.icon('dices') }} Begegnungen</a>
-    </nav>
-</div>

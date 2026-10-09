@@ -25,6 +25,10 @@ Regel: Der Katalog enthält nur Regelwerk und bleibt statisch. Was zu einer Kamp
 - **`catalog_items`** (mit `catalog_item_weapons`, `catalog_item_armor`): nur Regel-Items. Keine DM-Texte, keine Story-Items.
 - **`catalog_bestiary`** und **`catalog_bestiary_attacks`:** Kampfwerte-Vorlagen. `is_unique` markiert einmalige Endbosse (Krakul, der Gruftschrecken von Ridderhöhe).
 - **`catalog_encounter_tables`** und **`catalog_encounter_table_entries`:** Zufallsbegegnungen nach Umgebung (Wald, Straße, Ruine). Ein Eintrag hat einen Würfelbereich (`min_roll`, `max_roll`, NULL = offen nach oben), optional `bestiary_id` mit `quantity_de` ("W3") und optional einen Text.
+- **`catalog_items.weight`:** Traglast-Gewicht (Standard 1, 0 = Kleinkram, 0,25 = Tagesration, bis 4 für schwere Gegenstände).
+- **`catalog_roll_tables`** und **`catalog_roll_table_rows`:** allgemeine Wurftabellen des Regelwerks (Reise-Missgeschicke, Jagd, improvisierte Waffen, Schätze, NSC erschaffen). `group_de` gruppiert auf `/rules`, `headers_de` enthält die Spaltenköpfe (Trenner `|`). Die App würfelt nie, die Tabellen werden nur angezeigt.
+- **`characters.death_successes`, `death_failures`, `memento_used`:** Todeswürfe bei 0 TP (zurückgesetzt, sobald TP > 0) und "Memento in dieser Sitzung benutzt" (Reset durch die SL, `POST /dm/party/session-end`). **`character_injuries`:** Verletzungen am Charakter, aus `catalog_injuries` gewählt (nicht gewürfelt), "Geheilt" löscht die Zeile.
+- **`catalog_services`:** Dienstleistungen (Bad, Unterkunft, Leibwächter) mit Preis und Einheit. Tiere stehen als Items (Reittiere, Lasttiere) und im Bestiarium (Kategorie Tier).
 - Alles Übrige (Skills, Berufe, Kins, Zauber, Wounded table `catalog_injuries` usw.) ist unverändert.
 - Entfallen: `catalog_locations` (Orte gehören der Kampagne), `catalog_items.dm_text_de`.
 
@@ -49,15 +53,15 @@ Keine Verbindung. Ein gefundenes Item wird später als Text (Name, Beschreibung)
 
 ## Seeds
 
-Es gibt keine Migration: Die DB wird neu aufgesetzt (`provisioning/docker-compose.yml` lädt die drei Dateien in Reihenfolge).
+Die drei Dateien sind der vollständige Stand für Neuinstallationen und Tests (`provisioning/docker-compose.yml` lädt sie in Reihenfolge auf ein leeres Volume). **Die App ist in Produktion, es wird nicht neu geseedet:** jede Änderung kommt zusätzlich als Migration nach `database/migrations/NNNN_name.sql`. `bin/migrate.php` (läuft im Deploy) wendet offene Dateien an und führt sie in `schema_migrations`. Header `-- skip-if:` (Änderung steckt schon in der DB, z. B. frische Installation) und `-- abort-if:` (vorhandene Zeilen kollidieren mit den Ids) schützen davor. Vor einer Migration in Produktion ein DB-Backup ziehen, MariaDB committet DDL implizit.
 
 - `01_schema.sql`: alle Tabellen.
 - `02_catalog.sql`: Katalog (alle `catalog_*`-Tabellen): Regelwerk, Items, Bestiary inkl. Abenteuer-Monster, Begegnungstabellen. Id 3 in `catalog_bestiary` bleibt bewusst frei (Portrait `images/creatures/3.jpg` der Dame des Hügels, die den allgemeinen Geist nutzt).
-- `03_examples.sql`: Beispiel-Charaktere (Aodhan, 7 Quickstart-Pregens) und Beispiel-Kampagnen. Ridderhöhe und Der Versinkende Turm: Die Räume sind Orte unter einem Hauptort (Ridderhöhe, Magdalas Turm), die Turm-Stockwerke haben ihr Bild. Die zwei Zufallsereignis-Tabellen von Ridderhöhe stehen als Text in den DM-Beschreibungen der Orte #1 und #4. Der Gruftschrecken und Krakul sind als `is_unique` markiert. Der Hundekampfring: Beispielkampagne mit geschachtelten Orten, drei Items, zwei NPCs.
+- `03_examples.sql`: Beispiel-Charaktere (Aodhan, 7 Quickstart-Pregens) und Beispiel-Kampagnen. Ridderhöhe und Der Versinkende Turm: Die Räume sind Orte unter einem Hauptort (Ridderhöhe, Magdalas Turm), die Turm-Stockwerke haben ihr Bild. Die zwei Zufallsereignis-Tabellen von Ridderhöhe stehen als Text in den DM-Beschreibungen der Orte #1 und #4. Der Gruftschrecken und Krakul sind als `is_unique` markiert. Der Hundekampfring: Beispielkampagne mit geschachtelten Orten, drei Items, zwei NPCs. Die Burg des Raubritters (Id 4, Standardkampagne): sieben Orte mit Karte und Zufallsereignis-Tabelle, fünf Items, fünf NSC.
 
 ## Auswirkungen auf den Code
 
-- `backend/src/CampaignRepository.php`: Orte (`places`, `createPlace`, `updatePlace`, `locations` = nummerierte Orte der Kapitel), `items`, `encounterTables`, NPC-CRUD, `restart()`.
+- `backend/src/Repository/CampaignPlaceRepository.php`: Orte (`places`, `createPlace`, `updatePlace`, `locations` = nummerierte Orte der Kapitel), `items`, `encounterTables`, NPC-CRUD, `restart()`.
 - `backend/src/RulesRepository.php` und `backend/templates/rules.twig`: Seite `/rules`, das Regelwerk zum Nachschlagen für Spieler (Items, Fertigkeiten, Zauber, Berufe, Völker, Heldenfähigkeiten, Tabellen). Ohne Bestiary und Begegnungstabellen.
 - `backend/src/WorldRepository.php` und `backend/templates/dm/catalog.twig`: Seite `/dm/catalog` (nur DM) mit Bestiary und Zufallsbegegnungen. Der DM-Bereich liegt komplett unter `/dm` und ist per DM-Passwort gesperrt (`DmAuth`, `DmGate`, siehe `docs/UX-KONZEPT.md`); die alten URLs `/campaign` und `/world` leiten dorthin um.
 - `backend/routes/dm_campaign.php`: alle DM-Routen der Kampagnen (Liste, Planen, Spielen, Anlegen/Ändern/Löschen von Kampagne, Kapiteln, Orten, NPCs, Items, Monstern und Chronik, Neustart). Alles unter `/dm`, also hinter `DmGate`.

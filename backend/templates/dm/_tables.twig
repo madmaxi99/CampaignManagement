@@ -1,0 +1,19 @@
+{# One random encounter table of the catalog, read-only. Searchable like a rules entry. #}
+{% macro encounter(table, open = false) %}
+    {% set rows = [] %}
+    {% for e in table.entries %}
+        {% set rows = rows|merge([[e.max_roll is null ? e.min_roll ~ '+' : (e.min_roll == e.max_roll ? e.min_roll : e.min_roll ~ '–' ~ e.max_roll), [e.creature_de ? (e.quantity_de ? e.quantity_de ~ ' × ' ~ e.creature_de : e.creature_de), e.text_de]|filter(v => v)|join(' – ')]]) %}
+    {% endfor %}
+    <details class="ui-details" data-search="{{ (table.name_de ~ ' zufallsbegegnung ' ~ rows|map(r => r[1])|join(' '))|lower }}"{{ open ? ' open' : '' }}>
+        <summary><span class="ui-details__title">{{ table.name_de }}</span></summary>
+        <div class="ui-details__body">
+            <table class="ui-table">
+                <tbody>
+                    {% for row in rows %}
+                        <tr><td><strong>{{ row[0] }}</strong></td><td>{{ row[1] }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+{% endmacro %}
