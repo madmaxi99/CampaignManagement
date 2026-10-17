@@ -10,7 +10,7 @@ use function Flyka\CampaignManagement\Http\jsonResponse;
 
 /**
  * JSON search over the campaign and the catalog. Parked: no page uses it right now,
- * the search comes back per area (see docs/PLAN.md). Under /dm, so DmGate guards it.
+ * the search comes back per area. Under /dm, so DmGate guards it.
  */
 return function (App $app, SearchRepository $search): void {
     $app->get('/dm/search', function (Request $request, Response $response) use ($search): Response {

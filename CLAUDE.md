@@ -4,22 +4,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-Dragonbane-based TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only. Players need no login; the DM area is locked by a single DM password (`DM_PASSWORD` in `.env`, plain text, LAN only; see `docs/UX-KONZEPT.md`). The app is live (PHP 8.3 / Slim 4 / Twig / MariaDB, Docker). The concept is in `docs/CONCEPT.md` (catalog, character, campaign), the DB schema in `docs/SCHEMA.md`.
+Dragonbane-based TRPG (tabletop RPG) management system for a Dungeon Master and players, LAN-only. Players need no login; the DM area is locked by a single DM password (`DM_PASSWORD` in `.env`, plain text, LAN only). The app is live (PHP 8.3 / Slim 4 / Twig / MariaDB, Docker). The DB schema is `database/migrations/0001_schema.sql`.
 
 ## Repository layout
 
 - **`backend/`** — the app. `public/index.php` (entry point, wiring, player routes), `routes/dm_*.php` (DM route groups), `src/` (PSR-4 namespace `Flyka\CampaignManagement`, sorted by layer: `Auth/` DM login, gate and session, `Database/` connection and config, `Http/` input and route helpers, `Repository/` all SQL, `Service/` pure rules; `Application` wires everything), `templates/` (Twig), `public/{css,js,fonts,icons,images}` (static assets). `tests/` (PHPUnit; unit tests plus DB-backed tests and `AppRoutesTest`, which drives the whole app as DM against the test DB).
 - **`database/migrations/`** — the whole database as numbered files, applied in order by `rphp bin/migrate.php` (which `deploy.sh` runs; tracked in `schema_migrations`). `0001_schema.sql` (all tables), `0002_catalog.sql` (rules catalog incl. all rule texts of `/rules` and `/dm/rules` in `catalog_rules` + sections/placements, and the roll tables), `0003_default_characters.sql`, `0004_default_campaigns.sql` build an empty database completely (baseline of 2026-10-17, production was set up from it). Everything after that is a new `NNNN_name.sql` with only the change; the baseline files are never edited again. Headers `-- skip-if:` / `-- abort-if:` guard id collisions. Tests build their database from all migration files.
-- Rule texts live only in the database (`catalog_rules`, see `docs/SCHEMA.md`, "Zentrale Regeltexte"): never write rule prose into a template, change the row (as a new migration) instead.
+- Rule texts live only in the database (`catalog_rules`): never write rule prose into a template, change the row (as a new migration) instead.
 - **`provisioning/`** — `docker-compose.yml` (nginx, php-fpm, mariadb, phpmyadmin) plus `backend/` (Dockerfile, nginx.conf, php.ini).
 - **`alias.sh`**, **`deploy.sh`** — local Docker aliases (`dc`, `dcud`, `dcv`, `rcomposer`, `rphp`; source `alias.sh` under zsh) and the VPS deploy script.
 - **`docs/lore/`**, **`Story/`** — in-world campaign content (world, NPCs, locations, per-chapter prose). Not rules, not code.
-- **`docs/ruleset-comparison/`** — research on off-the-shelf rulesets; reasoning for choosing Dragonbane (the rules source is `docs/DB_DE_Schnellstarter_2-0_web-2njzid.pdf`).
+- **`docs/`** — the rules source is `docs/DB_DE_Schnellstarter_2-0_web-2njzid.pdf`; `docs/dump.md` documents the production-only player characters. The schema reference is `database/migrations/0001_schema.sql`.
 
 ## Working here
 
 - Run the app: `source alias.sh && dcud`, then `rphp bin/migrate.php` once (an empty database is built by the migrations), served at `http://127.0.0.1:8070` (phpMyAdmin on 8071). Config comes from `.env` (copy `.env.example`); the DB is named `campaign-management`. phpMyAdmin requires a login with the DB credentials.
-- The app never rolls dice for checks, rests, hazards or any rule outcome (players or DM): rules are shown as text and results are typed in; dice are rolled at the table. The only exception is DM generators (NPC, encounter, random event): they may pick a random entry from a catalog table as a suggestion that the DM accepts or discards (decided 2026-10-08, see `docs/PLAN.md`).
+- The app never rolls dice for checks, rests, hazards or any rule outcome (players or DM): rules are shown as text and results are typed in; dice are rolled at the table. The only exception is DM generators (NPC, encounter, random event): they may pick a random entry from a catalog table as a suggestion that the DM accepts or discards (decided 2026-10-08).
 - UI copy and in-world content are German; code identifiers and comments are English.
 - QA (run in the php-fpm container): `rcomposer qa` = ECS (`ecs`, fix with `ecs:fix`), Rector (`rector`, apply with `rector:fix`), PHPStan level 8 without baseline (`stan`), PHPUnit (`test`). DB tests rebuild `campaign-management_test` from `database/01_schema.sql` + `02_catalog.sql` + `03_examples.sql` using the root credentials from `.env`; without a configured server they are skipped (CI sets `TEST_DB_HOST`/`TEST_DB_PASSWORD`).
 - Frontend QA (in `backend/`, needs Node): `npm run lint` = ESLint (`lint:js`), Stylelint (`lint:css`), Prettier check (`format:check`); apply formatting with `npm run format`. JS tests (`npm test`, node:test + jsdom) live in `backend/tests-js/`; they load the page scripts from `public/js` into a jsdom page with a fake `fetch`. CI (`.github/workflows/ci.yml`) runs everything on pushes to `develop` and on every pull request.
