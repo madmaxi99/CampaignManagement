@@ -32,6 +32,23 @@ final class CentralRulesTest extends AppTestCase
         self::assertStringContainsString($rule('session_end_questions', 'body_de'), $page('/dm/rules?k=spielleitung'));
     }
 
+    public function testNoRuleTextIsWrittenIntoTheRuleTemplates(): void
+    {
+        foreach (['templates/rules.twig', 'templates/dm/chapters/rules.twig'] as $file) {
+            $template = (string) file_get_contents(__DIR__ . '/../' . $file);
+
+            self::assertDoesNotMatchRegularExpression('/r\.(quick|dm)\(/', $template, $file);
+        }
+    }
+
+    public function testEverySectionAndPlacementPointsAtExistingRules(): void
+    {
+        $orphans = (int) $this->db->query('SELECT COUNT(*) FROM catalog_rules r WHERE NOT EXISTS (SELECT 1 FROM catalog_rule_placements p WHERE p.rule_code = r.code)')
+            ->fetchColumn();
+
+        self::assertSame(0, $orphans, 'every rule is shown somewhere');
+    }
+
     public function testRuleTextMentionsMarksOnlyForDragonDemonAndTheSessionQuestions(): void
     {
         $summary = (string) $this->db->query("SELECT summary_de FROM catalog_rules WHERE code = 'skill_marks'")

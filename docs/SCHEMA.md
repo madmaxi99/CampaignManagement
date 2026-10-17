@@ -64,7 +64,13 @@ Stand 2026-10-17: Die Produktion wurde neu aufgesetzt, die Baseline sind vier Da
 
 ### Zentrale Regeltexte
 
-`catalog_rules` hält jede Regel genau einmal (`code`, `title_de`, `badge_de`, `summary_de`, `body_de`). Templates laden sie über `rule(code)` und `rule_summary(code)` (Twig-Funktionen in `Application`) oder die Macros `quick_rule`/`dm_rule` in `templates/rules/_macros.twig`. Bisher zentral: Drache, Dämon, Todeswürfe, Steigerungsmarken, Sitzungsende-Fragen, Steigerungswürfe. Die Hinweise am Charakterbogen und im Level-up nutzen die Kurzfassung derselben Regel. `CentralRulesTest` prüft, dass alle Seiten den Text aus der Datenbank zeigen. Die übrigen Regeln stehen noch fest in `rules.twig` und `dm/chapters/rules.twig` und sollen schrittweise folgen.
+Alle Regeltexte stehen in der Datenbank, nicht in den Templates:
+
+- `catalog_rules`: jede Regel genau einmal (`code`, `title_de`, `badge_de`, `badge_style`, `search_de`, `summary_de`, `body_de`). `body_de` ist HTML, `[[NAME]]` sind Platzhalter, die die Seite füllt (z. B. die Waffenfertigkeiten beim Schadensbonus). `summary_de` ist die Kurzfassung für Hinweise am Bogen.
+- `catalog_rule_sections`: Abschnitte mit Überschrift und optionalem Einleitungstext (`/rules`: Tabs Grundregeln, Kampf, Magie, Charakter; SL-Regeln: ein Abschnitt je Kapitel `dm_<kapitel>`, ohne Überschrift).
+- `catalog_rule_placements`: welche Regel in welchem Abschnitt an welcher Position steht und wie sie erscheint (`quick` = Regel, `dm` = nur für die SL, `entry` = Eintrag mit eigener Suche). Eine Regel kann an mehreren Stellen stehen, etwa die Sitzungsende-Fragen unter `/rules` und in den SL-Regeln.
+
+Die Templates holen sie mit dem Macro `r.section('<abschnitt>')` (`templates/rules/_macros.twig`, Twig-Funktion `rule_section` in `Application`) oder mit `rule_summary('<code>')` für Kurztexte am Charakterbogen und im Level-up. Was aus anderen Tabellen kommt (Rasten, Gefahren, Zauberliste, Völker, Berufe, Fertigkeiten, Ausrüstung, Wurftabellen), bleibt dynamisch im Template. Eine Regel ändern heißt: die Zeile in `catalog_rules` ändern, alle Seiten folgen. `CentralRulesTest` sorgt dafür, dass kein Regeltext mehr in `rules.twig` oder `dm/chapters/rules.twig` steht und alle Seiten den Text aus der Datenbank zeigen.
 
 ## Auswirkungen auf den Code
 

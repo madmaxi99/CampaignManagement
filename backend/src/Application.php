@@ -113,17 +113,31 @@ final class Application
         $environment->addFilter(new TwigFilter('linkify', EntityLinker::linkify(...), [
             'is_safe' => ['html'],
         ]));
-        // rule('skill_marks') -> the central rule (title, badge, summary, body); the table is read once per request.
+        // The central rule texts (catalog_rules), read once per request. rule_summary('skill_marks') is the
+        // short text of one rule; rule_section('nahkampf', {NAME: 'x'}) a section with its rules, [[NAME]] filled in.
         $rules = null;
-        $lookup = static function (string $code) use (&$rules, $rulesRepository): array {
+        $sections = null;
+        $environment->addFunction(new TwigFunction('rule_summary', static function (string $code) use (&$rules, $rulesRepository): string {
             $rules ??= $rulesRepository->rules();
 
-            return $rules[$code] ?? throw new RuntimeException(sprintf('Unknown rule "%s".', $code));
-        };
-        $environment->addFunction(new TwigFunction('rule', $lookup));
-        $environment->addFunction(new TwigFunction('rule_summary', static fn (string $code): string => (string) $lookup($code)['summary_de'], [
+            return (string) ($rules[$code] ?? throw new RuntimeException(sprintf('Unknown rule "%s".', $code)))['summary_de'];
+        }, [
             'is_safe' => ['html'],
         ]));
+        $environment->addFunction(new TwigFunction('rule_section', static function (string $code, array $replacements = []) use (&$sections, $rulesRepository): array {
+            $sections ??= $rulesRepository->ruleSections();
+            $section = $sections[$code] ?? throw new RuntimeException(sprintf('Unknown rule section "%s".', $code));
+
+            $placeholders = [];
+            foreach ($replacements as $name => $value) {
+                $placeholders['[[' . $name . ']]'] = htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            }
+            foreach ($section['rules'] as $index => $rule) {
+                $section['rules'][$index]['body_de'] = strtr((string) $rule['body_de'], $placeholders);
+            }
+
+            return $section;
+        }));
         // asset('css/x.css') -> /css/x.css?v=<mtime>, so browsers pick up changes.
         $environment->addFunction(new TwigFunction('asset', static function (string $path) use ($publicDir): string {
             $file = $publicDir . '/' . $path;

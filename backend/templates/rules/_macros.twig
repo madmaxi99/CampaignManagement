@@ -18,17 +18,22 @@
     {{ s.entry(title, title ~ ' spielleitung sl ' ~ body|striptags, '<span class="ui-badge ui-badge--berry">SL</span><span class="ui-badge">' ~ badge ~ '</span>', body) }}
 {% endmacro %}
 
-{# The same entries, but loaded from the central rule texts (catalog_rules) by code. #}
-{% macro quick_rule(code) %}
+{# One section of the central rule texts (catalog_rules): heading, intro and its rules in order. vars fills the [[NAME]] placeholders of the texts. #}
+{% macro section(code, vars = {}) %}
     {% import _self as s %}
-    {% set text = rule(code) %}
-    {{ s.quick(text.title_de, text.badge_de, text.body_de) }}
-{% endmacro %}
-
-{% macro dm_rule(code) %}
-    {% import _self as s %}
-    {% set text = rule(code) %}
-    {{ s.dm(text.title_de, text.badge_de, text.body_de) }}
+    {% set sec = rule_section(code, vars) %}
+    {% if sec.title_de %}<h2>{{ sec.title_de }} <span class="ui-badge rules-kind">{{ sec.badge_de }}</span></h2>{% endif %}
+    {% if sec.intro_de %}<p class="ui-muted">{{ sec.intro_de|raw }}</p>{% endif %}
+    {% for rule in sec.rules %}
+        {% if rule.kind == 'dm' %}
+            {{ s.dm(rule.title_de, rule.badge_de, rule.body_de) }}
+        {% elseif rule.kind == 'entry' %}
+            {% set badges %}<span class="ui-badge{{ rule.badge_style ? ' ui-badge--' ~ rule.badge_style : '' }}">{{ rule.badge_de }}</span>{% endset %}
+            {{ s.entry(rule.title_de, rule.search_de, badges, rule.body_de) }}
+        {% else %}
+            {{ s.quick(rule.title_de, rule.badge_de, rule.body_de) }}
+        {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 {% macro roll(min, max) %}{{ min == max ? min : min ~ '–' ~ max }}{% endmacro %}

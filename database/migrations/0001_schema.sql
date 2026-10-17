@@ -695,15 +695,38 @@ CREATE TABLE catalog_roll_table_rows (
     FOREIGN KEY (table_code) REFERENCES catalog_roll_tables(code) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Zentrale Regeltexte: jede Regel steht genau einmal hier und wird an allen Stellen
--- (/rules, SL-Regeln, Charakterbogen, Level-up) über ihren code geladen. body_de ist
--- der Volltext (HTML), summary_de die Kurzfassung für Hinweise am Bogen (HTML, optional).
+-- Zentrale Regeltexte: jede Regel steht genau einmal in catalog_rules und wird an allen Stellen
+-- (/rules, SL-Regeln, Charakterbogen, Level-up) über ihren code geladen. Abschnitte
+-- (catalog_rule_sections) gruppieren Regeln unter einer Überschrift ("Zustände"); catalog_rule_placements
+-- legt fest, welche Regel in welchem Abschnitt in welcher Reihenfolge steht (eine Regel kann an mehreren
+-- Stellen stehen). kind: quick = Regel, dm = Regel nur für die SL, entry = Eintrag mit eigener Suche
+-- (search_de) und Abzeichen-Farbe (badge_style). body_de ist der Volltext (HTML, [[NAME]] sind Platzhalter,
+-- die die Seite füllt), summary_de die Kurzfassung für Hinweise am Bogen (HTML, optional).
 CREATE TABLE catalog_rules (
-    code VARCHAR(40) PRIMARY KEY,
+    code VARCHAR(60) PRIMARY KEY,
     title_de VARCHAR(100) NOT NULL,
     badge_de VARCHAR(40) NOT NULL,
+    badge_style VARCHAR(20) NULL,
+    search_de VARCHAR(255) NULL,
     summary_de TEXT NULL,
     body_de TEXT NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE catalog_rule_sections (
+    code VARCHAR(50) PRIMARY KEY,
+    title_de VARCHAR(100) NULL,
+    badge_de VARCHAR(40) NULL,
+    intro_de TEXT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE catalog_rule_placements (
+    section_code VARCHAR(50) NOT NULL,
+    rule_code VARCHAR(60) NOT NULL,
+    position INT NOT NULL,
+    kind ENUM('quick', 'dm', 'entry') NOT NULL DEFAULT 'quick',
+    PRIMARY KEY (section_code, rule_code),
+    FOREIGN KEY (section_code) REFERENCES catalog_rule_sections(code),
+    FOREIGN KEY (rule_code) REFERENCES catalog_rules(code)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dienstleistungen (Bad, Unterkunft, Leibwächter ...). Eigene Tabelle, weil es

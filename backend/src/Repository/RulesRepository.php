@@ -218,18 +218,41 @@ final readonly class RulesRepository
     }
 
     /**
-     * Every central rule text, keyed by its code (see catalog_rules).
+     * Every central rule text (catalog_rules), keyed by its code.
      *
-     * @return array<string, array{code: string, title_de: string, badge_de: string, summary_de: ?string, body_de: string}>
+     * @return array<string, array<string, mixed>>
      */
     public function rules(): array
     {
         $rules = [];
-        foreach ($this->db->query('SELECT code, title_de, badge_de, summary_de, body_de FROM catalog_rules')->fetchAll() as $row) {
+        foreach ($this->db->query('SELECT * FROM catalog_rules')->fetchAll() as $row) {
             $rules[(string) $row['code']] = $row;
         }
 
         return $rules;
+    }
+
+    /**
+     * The sections of the central rule texts with their rules in order (each rule row carries the
+     * placement's kind), keyed by section code.
+     *
+     * @return array<string, array<string, mixed>>
+     */
+    public function ruleSections(): array
+    {
+        $sections = [];
+        foreach ($this->db->query('SELECT code, title_de, badge_de, intro_de FROM catalog_rule_sections')->fetchAll() as $row) {
+            $row['rules'] = [];
+            $sections[(string) $row['code']] = $row;
+        }
+        $rules = $this->rules();
+        foreach ($this->db->query('SELECT section_code, rule_code, kind FROM catalog_rule_placements ORDER BY position')->fetchAll() as $placement) {
+            $sections[(string) $placement['section_code']]['rules'][] = [
+                'kind' => $placement['kind'],
+            ] + $rules[(string) $placement['rule_code']];
+        }
+
+        return $sections;
     }
 
     /**
