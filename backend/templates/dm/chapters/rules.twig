@@ -11,7 +11,7 @@
     {{ r.dm('Attribute für NSC', 'NSC', '<p>In Abenteuern stehen für NSC keine Attributswerte, weil sie sehr selten gebraucht werden. Musst du doch einmal gegen einen genauen Attributswert würfeln, nutze diese Richtlinien:</p><ul><li><strong>STÄ &amp; GEW:</strong> Nimm den Schadensbonus. Bei +W6 würfelst du gegen einen Wert von 17, bei +W4 gegen 14, ohne Bonus gegen 10.</li><li><strong>KON:</strong> Würfle gegen die maximalen TP, verringert um 2 je Stufe der Heldenfähigkeit Robust.</li><li><strong>WIL:</strong> Würfle gegen die maximalen WP, falls angegeben, verringert um 2 je Stufe der Heldenfähigkeit Fokussiert. Sind keine WP angegeben, würfle gegen 10.</li><li><strong>INT &amp; CHA:</strong> Würfle gegen 10.</li></ul>') }}
     {{ r.dm('Typische NSC', 'Bestiarium', '<p>Werte für typische NSC (Wache, Kultist, Dieb, Dorfbewohner, Jäger, Bandit, Abenteurer, Gelehrter sowie die Bosse Banditenanführer, Ritter-Champion und Erzmagier) stehen im Bestiarium des DM-Bereichs in der Kategorie Alltagsvolk.</p>') }}
     {{ r.dm('NSC erschaffen', 'Tabellen', '<p>Mit den Tabellen weiter unten, NSC erschaffen, entsteht schnell ein einzigartiger NSC: Am Tisch würfelst du je einen Würfel jeder Art (W4 Haltung, W6 Volk, W8 Motivation, W10 Beruf, W12 Eigenart, W20 Name, bei dem du einen der drei Namen wählst).</p>') }}
-    {{ r.dm('Sitzungsende: Steigerungsmarken', 'Regel', '<p>Am Ende der Spielsitzung stellst du den Spielern die folgenden Fragen. Antwortet ein Spieler mit „Ja“ und kann es begründen, darf er eine weitere Steigerungsmarke bei einer unmarkierten Fertigkeit seiner Wahl setzen. Du hast das letzte Wort, solltest aber großzügig sein. (Marken, die schon im Spiel durch einen Drachen oder Dämon entstanden sind, kommen dazu.)</p><ul><li>Hast du an der Spielsitzung teilgenommen?</li><li>Hast du einen neuen Ort erkundet?</li><li>Hast du einen oder mehrere gefährliche Gegner besiegt?</li><li>Hast du ein Hindernis ohne Gewalt überwunden?</li><li>Hast du deiner Schwäche nachgegeben (optionale Regel)?</li></ul>') }}
+    {{ r.dm_rule('session_end_questions') }}
     {% elseif chapter.slug == 'kampf' %}
     {{ r.dm('NSC-Initiative', 'Initiative', '<p>Um große Kämpfe zu vereinfachen, kann die Spielleitung eine einzige Karte für eine ganze NSC-Gruppe ziehen. Alle handeln dann im selben Zug, die Reihenfolge untereinander legt die Spielleitung fest. Monster haben oft mehrere Züge pro Runde und ziehen entsprechend mehrere Karten. Bei Überraschung wählt die Spielleitung, ob ein Angriff als überraschend gilt.</p>') }}
     {{ r.dm('NSC bei besonderen Angriffen', 'Vergleichend', '<p>Würfelt die Spielleitung für einen NSC, der die betreffende Fertigkeit nicht hat, würfelt sie gegen den Standardwert 5.</p>') }}
@@ -41,5 +41,7 @@
     {% for t in tables.roll_tables['Reise & Wildnis']|default([])|filter(t => t.code != 'jagd') %}{{ r.rolltable(t, true) }}{% endfor %}
     {% elseif chapter.slug == 'nsc' %}
     {% for t in tables.roll_tables['NSC erschaffen']|default([])|filter(t => t.code != 'jagd') %}{{ r.rolltable(t, true) }}{% endfor %}
+    {% elseif chapter.slug == 'schaetze' %}
+    {% for t in tables.roll_tables['Schätze']|default([]) %}{{ r.rolltable(t, true) }}{% endfor %}
     {% endif %}
 </article>

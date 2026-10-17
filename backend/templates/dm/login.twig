@@ -10,7 +10,7 @@
             <h1 class="ui-card__title" style="font-size: var(--fs-h2)">{{ ui.icon('lock') }} Nur für den DM</h1>
 
             {% if not configured %}
-                <p class="ui-banner ui-banner--info">Das DM-Passwort ist noch nicht eingerichtet. Der DM-Bereich bleibt gesperrt, bis in der <code>.env</code> ein <code>DM_PASSWORD_HASH</code> steht (siehe <code>backend/bin/hash-dm-password.php</code>).</p>
+                <p class="ui-banner ui-banner--info">Das DM-Passwort ist noch nicht eingerichtet. Der DM-Bereich bleibt gesperrt, bis in der <code>.env</code> ein <code>DM_PASSWORD</code> steht.</p>
             {% else %}
                 {% if error %}
                     <p class="ui-banner" role="alert" style="background: var(--berry-light); color: var(--berry-dark); border-color: var(--berry)">{{ error }}</p>

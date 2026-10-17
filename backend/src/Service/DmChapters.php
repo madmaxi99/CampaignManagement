@@ -37,6 +37,10 @@ final class DmChapters
                 'title' => 'NSC erschaffen',
             ],
             [
+                'slug' => 'schaetze',
+                'title' => 'Schätze',
+            ],
+            [
                 'slug' => 'zufallsbegegnungen',
                 'title' => 'Zufallsbegegnungen',
             ],

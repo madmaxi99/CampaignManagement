@@ -15,9 +15,9 @@
     <section class="ui-card">
         <h2 class="ui-card__title">{{ ui.icon('swords') }} Fertigkeiten</h2>
         {% if markedSkills is empty %}
-            <p class="ui-muted">Keine markierten Fertigkeiten. Markiere am Bogen Fertigkeiten, bei denen du einen Drachen oder Dämon gewürfelt hast (oder die du nach den Fragen am Sitzungsende markieren darfst).</p>
+            <p class="ui-muted">Keine markierten Fertigkeiten. {{ rule_summary('skill_marks') }}</p>
         {% else %}
-            <p class="ui-muted">Würfle am Tisch für jede Marke einen W20. Liegt das Ergebnis <strong>über</strong> dem aktuellen Fertigkeitswert, steigt die Fertigkeit um eins (höchstens bis 18): dann „Steigern“, sonst „Verwerfen“. Die Marke ist danach in beiden Fällen gelöscht.</p>
+            <p class="ui-muted">{{ rule_summary('advancement_roll') }}</p>
             <ul class="levelup-list">
                 {% for skill in markedSkills %}
                     <li class="levelup-item" data-skill-id="{{ skill.id }}">

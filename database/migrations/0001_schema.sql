@@ -1,3 +1,6 @@
+-- abort-if: SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = 'characters'
+-- Schema: alle Tabellen (Katalog, Charaktere, Kampagnen). Zusammen mit 0002 bis 0004 baut es eine leere Datenbank vollständig auf.
+
 SET NAMES utf8mb4;
 
 -- Catalogs (Dragonbane rules reference data, see docs/bilder/ screenshots of
@@ -690,6 +693,17 @@ CREATE TABLE catalog_roll_table_rows (
     effect_de TEXT NULL,
     extra_de VARCHAR(100) NULL,
     FOREIGN KEY (table_code) REFERENCES catalog_roll_tables(code) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Zentrale Regeltexte: jede Regel steht genau einmal hier und wird an allen Stellen
+-- (/rules, SL-Regeln, Charakterbogen, Level-up) über ihren code geladen. body_de ist
+-- der Volltext (HTML), summary_de die Kurzfassung für Hinweise am Bogen (HTML, optional).
+CREATE TABLE catalog_rules (
+    code VARCHAR(40) PRIMARY KEY,
+    title_de VARCHAR(100) NOT NULL,
+    badge_de VARCHAR(40) NOT NULL,
+    summary_de TEXT NULL,
+    body_de TEXT NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dienstleistungen (Bad, Unterkunft, Leibwächter ...). Eigene Tabelle, weil es

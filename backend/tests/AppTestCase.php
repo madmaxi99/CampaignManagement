@@ -25,7 +25,7 @@ abstract class AppTestCase extends DatabaseTestCase
     {
         parent::setUp();
         $this->useTestDatabaseInApp();
-        putenv('DM_PASSWORD_HASH=' . password_hash(self::PASSWORD, PASSWORD_DEFAULT));
+        putenv('DM_PASSWORD=' . self::PASSWORD);
 
         // The session must work without cookies/headers inside the CLI test run.
         ini_set('session.use_cookies', '0');
@@ -49,7 +49,7 @@ abstract class AppTestCase extends DatabaseTestCase
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
-        putenv('DM_PASSWORD_HASH');
+        putenv('DM_PASSWORD');
         restore_error_handler();
     }
 

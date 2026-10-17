@@ -1,6 +1,6 @@
 # Spieler-Charaktere aus der Produktion
 
-Stand 2026-10-17, gelesen aus der Produktions-DB (`amt-solo-vps`). Die Charaktere 1–8 sind die Beispiele aus `03_examples.sql`, hier stehen nur die drei neuen (IDs 9–11). Alle Werte sind die tatsächlichen Werte auf dem Bogen. Fertigkeiten ab 10 sind gelernt, alle anderen stehen auf dem Grundwert. Markierte Fertigkeiten gibt es bei keinem der drei.
+Stand 2026-10-17, gelesen aus der Produktions-DB (`amt-solo-vps`). Die Charaktere 1–8 sind die Beispiele aus `0003_default_characters.sql`, hier stehen nur die drei neuen (IDs 9–11). Alle Werte sind die tatsächlichen Werte auf dem Bogen. Fertigkeiten ab 10 sind gelernt, alle anderen stehen auf dem Grundwert. Markierte Fertigkeiten gibt es bei keinem der drei.
 
 ## Faela Mondschatten (ID 9)
 

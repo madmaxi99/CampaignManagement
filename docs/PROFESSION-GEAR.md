@@ -90,9 +90,9 @@ Quelle: Dragonbane Schnellstarter (Kapitel 2, „Your Player Character", S. 14�
 
 ---
 
-## Abweichungen im Katalog (Stand vor Migration 0009, inzwischen behoben)
+## Abweichungen im Katalog (Stand vor der Korrektur, inzwischen behoben)
 
-Vergleich mit `database/02_catalog.sql` (`catalog_profession_gear_options` mit der `extra_de`-Freitextspalte und `catalog_profession_gear_option_items`). Vorab: `catalog_profession_gear_option_items` nutzt nur Items bis ID 34; die später ergänzten Items (ID 111–136: Messer, Dolch, Köcher, Seil, Laterne, Lampenöl, Kettenpanzer …) hängen an **keiner** Option.
+Vergleich mit `database/migrations/0002_catalog.sql` (`catalog_profession_gear_options` mit der `extra_de`-Freitextspalte und `catalog_profession_gear_option_items`). Vorab: `catalog_profession_gear_option_items` nutzt nur Items bis ID 34; die später ergänzten Items (ID 111–136: Messer, Dolch, Köcher, Seil, Laterne, Lampenöl, Kettenpanzer …) hängen an **keiner** Option.
 
 „Fehlt" = weder als verknüpftes Item noch im Freitext vorhanden. „Nur Freitext" = steht in `extra_de`, ist aber kein Katalog-Item der Option (Fackel, Feuerstein & Zunder, Schlafpelz usw. sind überall nur Freitext und hier nicht einzeln aufgeführt).
 
@@ -162,9 +162,9 @@ Vollständig (nur Verbrauchsgüter im Freitext): Handwerker A, Gelehrter A, Magi
 
 ---
 
-## Umsetzung (Migration 0009)
+## Umsetzung
 
-`database/migrations/0009_profession_gear.sql` und `database/02_catalog.sql` (gleicher Stand, per Dump-Vergleich geprüft).
+`database/migrations/0001_schema.sql` (Spalte `choice_group`) und `database/migrations/0002_catalog.sql` (Gear-Optionen), seit der Baseline vom 2026-10-17 in diesen Dateien enthalten (vorher Migration 0009).
 
 - Alle 30 Optionen verknüpfen jetzt jeden Gegenstand aus den Tabellen oben (inklusive Fackel, Feuerstein & Zunder, Seil, Lampenöl usw.). In `extra_de` steht nur noch `W6/W8 Tagesrationen`, weil die Menge ein Wurf ist.
 - Rationen- und Silber-Würfel stehen jetzt wie im Buch (Jäger W8/W8, Gelehrter W6 Rationen und W10 Silber, Dieb W6 Rationen usw.).

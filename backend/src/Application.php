@@ -28,6 +28,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use RuntimeException;
 use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Psr7\Factory\ResponseFactory;
@@ -61,7 +62,7 @@ final class Application
         $rulesRepository = new RulesRepository($db);
         $catalogEditor = new CatalogEditorRepository($db);
         $searchRepository = new SearchRepository($db);
-        $dmAuth = new DmAuth(getenv('DM_PASSWORD_HASH') ?: null, sys_get_temp_dir());
+        $dmAuth = new DmAuth(getenv('DM_PASSWORD') ?: null, sys_get_temp_dir());
 
         $app = AppFactory::create();
         $twig = Twig::create($backendDir . '/templates', [
@@ -80,7 +81,7 @@ final class Application
         $app->add(new DmGate($dmAuth, new ResponseFactory()));
         $app->add(new SessionMiddleware());
 
-        self::configureTwig($twig, $backendDir . '/public');
+        self::configureTwig($twig, $backendDir . '/public', $rulesRepository);
 
         (require $backendDir . '/routes/character.php')($app, $characterRepository, $characterCreationRepository);
         (require $backendDir . '/routes/public.php')($app, $rulesRepository, $dmAuth);
@@ -104,12 +105,23 @@ final class Application
         return $app;
     }
 
-    private static function configureTwig(Twig $twig, string $publicDir): void
+    private static function configureTwig(Twig $twig, string $publicDir, RulesRepository $rulesRepository): void
     {
         $environment = $twig->getEnvironment();
         $environment->addGlobal('app_name', 'Abenteuerbuch');
         $environment->addFilter(new TwigFilter('repeat', fn (string $text, int $times): string => str_repeat($text, max(0, $times))));
         $environment->addFilter(new TwigFilter('linkify', EntityLinker::linkify(...), [
+            'is_safe' => ['html'],
+        ]));
+        // rule('skill_marks') -> the central rule (title, badge, summary, body); the table is read once per request.
+        $rules = null;
+        $lookup = static function (string $code) use (&$rules, $rulesRepository): array {
+            $rules ??= $rulesRepository->rules();
+
+            return $rules[$code] ?? throw new RuntimeException(sprintf('Unknown rule "%s".', $code));
+        };
+        $environment->addFunction(new TwigFunction('rule', $lookup));
+        $environment->addFunction(new TwigFunction('rule_summary', static fn (string $code): string => (string) $lookup($code)['summary_de'], [
             'is_safe' => ['html'],
         ]));
         // asset('css/x.css') -> /css/x.css?v=<mtime>, so browsers pick up changes.

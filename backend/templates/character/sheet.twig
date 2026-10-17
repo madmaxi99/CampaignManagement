@@ -7,7 +7,7 @@
     <ul class="entry-list">
         {% for skill in skills %}
             <li class="entry-row">
-                <label class="mark-toggle" title="Markieren bei einem Drachen oder Dämon (Steigerung beim Level-up)">
+                <label class="mark-toggle" title="{{ rule_summary('skill_marks')|striptags|e('html_attr') }}">
                     <input type="checkbox" data-skill-mark="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
                     <span class="mark-toggle__box" aria-hidden="true"></span>
                     <span class="visually-hidden">{{ skill.name_de }} für Steigerung markieren</span>
@@ -138,7 +138,7 @@
     <div class="ui-tabpanel ui-stack" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
         <section class="ui-card">
             <h2 class="ui-card__title">{{ ui.icon('swords') }} Fertigkeiten</h2>
-            <p class="ui-field__hint">Das Kästchen markierst du, wenn du bei der Fertigkeit einen Drachen (1) oder Dämon (20) gewürfelt hast, oder nach den Fragen am Sitzungsende. Beim Level-up darfst du markierte Fertigkeiten steigern.</p>
+            <p class="ui-field__hint">{{ rule_summary('skill_marks') }}</p>
             {{ sheet_macros.skill_list(regularSkills, 'regular') }}
             <h3>Kampf</h3>
             {{ sheet_macros.skill_list(combatSkills, 'combat') }}

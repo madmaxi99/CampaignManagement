@@ -1,6 +1,6 @@
 # Ausrüstungslisten im Buch vs. Katalog
 
-Quelle: Dragonbane Schnellstarter, Ausrüstungskapitel (Screenshots in `docs/bilder/`). Verglichen mit `database/02_catalog.sql` (`catalog_items`, `catalog_item_weapons`, `catalog_item_armor`, `catalog_services`).
+Quelle: Dragonbane Schnellstarter, Ausrüstungskapitel (Screenshots in `docs/bilder/`). Verglichen mit `database/migrations/0002_catalog.sql` (`catalog_items`, `catalog_item_weapons`, `catalog_item_armor`, `catalog_services`).
 
 Verglichen wurden Name, Preis, Supply (= `rarity`), Gewicht und bei Waffen/Rüstungen die Werte (Grip, STR, Range, Damage, Durability, Features bzw. Rüstungswert und Bane). **Nicht** verglichen: die Effekt-Texte.
 
@@ -378,7 +378,7 @@ Siehe die vorige Tabelle in diesem Abschnitt, unverändert:
 
 ### Umsetzung (Effekt-Texte)
 
-84 Items haben jetzt den Effekt-Text wörtlich aus dem Buch (`database/02_catalog.sql` und `database/migrations/0007_item_effect_texts.sql`, per `UPDATE ... WHERE name_de`).
+84 Items haben jetzt den Effekt-Text wörtlich aus dem Buch (in `database/migrations/0002_catalog.sql`, vorher Migration 0007).
 
 - Begriffe: Boon/Bane = Vorteil/Nachteil, Bushcraft = Wildnisleben, Sleight of Hand = Fingerfertigkeit, Spot Hidden = Entdecken, Crafting = Handwerk, Healing = Heilkunde, Stretch = Viertel, Shift = Tagesabschnitt, weight units = Gewichtseinheiten.
 - Seitenverweise des Buchs (S. 34, 54, 102, 103) sind weggelassen, weil die App diese Seiten nicht hat.
@@ -390,12 +390,16 @@ Siehe die vorige Tabelle in diesem Abschnitt, unverändert:
 
 ### Umsetzung (Namen, Werte, fehlende Items)
 
-`database/migrations/0008_item_names_values_missing.sql` und `database/02_catalog.sql` (gleicher Stand, per Dump-Vergleich geprüft).
+`database/migrations/0002_catalog.sql` (vorher Migration 0008, per Dump-Vergleich geprüft).
 
 - **Umbenannt:** Keule → **Streitkolben** (Mace), Feder → **Feder & Tinte**, Falle/Schlinge, groß → **Bärenfalle**, Köcher → **Köcher, Holzspitzen**.
 - **Werte:** Breitschwert Durability 15, Karte 5 Gold, Harfe Gewicht 2, Schild, groß Supply gewöhnlich.
 - **Supply:** 17 Items auf ungewöhnlich (Langschwert, Krummsäbel, Streitaxt, Dreschflegel, Kriegshammer klein, Dreizack, Langbogen, Leichte Armbrust, Offener Helm, Leier, Amulett, Buch, Feder & Tinte, Zauberstab, Schmiede-/Zimmermanns-/Gerberwerkzeug), 2 auf selten (Lanze, Großhelm).
 - **Neu:** Stumpfer Gegenstand (leicht / schwer), Zweihandschwert (Greatsword), Holzkeule (klein / groß), Köcher, Eisenspitzen. Die deutschen Namen sind mein Vorschlag, das Buch liefert sie nicht; „Zweihandschwert" folgt dem vorhandenen „Zweihandaxt".
 - **Unverändert:** Wurfhaken (so heißt er auch im deutschen Schnellstarter, die Gear-Texte der Professionen müssen auf „Wurfhaken" statt „Enterhaken" angepasst werden), Handaxe = Beil, Battleaxe = Streitaxt.
-- Die neuen Items bekommen in der Migration ihre IDs per AUTO_INCREMENT (die SL kann im Katalog-Editor schon eigene angelegt haben); `abort-if` bricht ab, wenn einer der neuen Namen schon existiert. In `02_catalog.sql` sind es die IDs 137–142.
+- Die neuen Items bekommen in der Migration ihre IDs per AUTO_INCREMENT (die SL kann im Katalog-Editor schon eigene angelegt haben); `abort-if` bricht ab, wenn einer der neuen Namen schon existiert. In `0002_catalog.sql` sind es die IDs 137–142.
 - Charakter-Inventare und Beispielcharaktere speichern ihre Items als Kopie mit eigenem Namen, die Umbenennung ändert dort nichts.
+
+## Schatztabellen
+
+Die zwei Schatztabellen des Grundregelwerks (je W20, vorher in keiner Tabelle des Katalogs) stehen als Wurftabellen `schatz_1` und `schatz_2` in `catalog_roll_tables`/`catalog_roll_table_rows` (Migration `0002_catalog.sql`, Gruppe „Schätze") und erscheinen in den SL-Regeln im Kapitel „Schätze". Je 20 Zeilen, gegen die Buchseiten gelesen. Unterwürfe (Edelstein, Waffen, Grimoire, Flasche, Buch, Instrument, Handelswaren) stehen wörtlich in der Wirkungsspalte, Gegenstandsnamen sind die Katalognamen (Scimitar = Krummsäbel, Handaxe = Beil, Heavy/Light Warhammer = Kriegshammer, schwer/klein, Potency = Wirkstärke, Pelz = Pelzumhang). Buchtitel sind übersetzt.

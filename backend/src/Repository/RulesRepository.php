@@ -218,6 +218,21 @@ final readonly class RulesRepository
     }
 
     /**
+     * Every central rule text, keyed by its code (see catalog_rules).
+     *
+     * @return array<string, array{code: string, title_de: string, badge_de: string, summary_de: ?string, body_de: string}>
+     */
+    public function rules(): array
+    {
+        $rules = [];
+        foreach ($this->db->query('SELECT code, title_de, badge_de, summary_de, body_de FROM catalog_rules')->fetchAll() as $row) {
+            $rules[(string) $row['code']] = $row;
+        }
+
+        return $rules;
+    }
+
+    /**
      * The generic roll tables, grouped by their group ("Reise & Wildnis" ...).
      * Only displayed: the app never rolls.
      *

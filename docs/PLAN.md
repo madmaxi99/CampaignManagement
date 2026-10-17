@@ -93,7 +93,7 @@ Bewusst nicht: Handouts, Soundboard (Entscheidung E).
 
 - **Tablet:** große Touch-Flächen im Cockpit, kein Fokus auf Handy.
 - **Suche:** ohne Seitenneuladen, Ergebnisse sofort.
-- **Daten:** Änderungen kommen als Migration in `database/migrations/`, die Datenbank wird nie neu aufgesetzt. Neue
+- **Daten:** Änderungen kommen als neue Migration in `database/migrations/` (Baseline `0001`–`0004` vom 2026-10-17), die Datenbank wird nie neu aufgesetzt. Neue
   Tabellen voraussichtlich für Sitzungsnotizen, Gerüchte, Uhren und Anpinnen. Generierte NSC nutzen die vorhandene
   NSC-Tabelle der Kampagne.
 - **Tests:** `AppRoutesTest` und JS-Tests in `backend/tests-js` je neuem Werkzeug.

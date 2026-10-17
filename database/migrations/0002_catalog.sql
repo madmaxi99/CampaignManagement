@@ -1,10 +1,11 @@
+-- Katalog: Regelwerk-Referenzdaten. Setzt 0001_schema.sql voraus.
+
 SET NAMES utf8mb4;
 
 -- Katalog: Regelwerk-Referenzdaten (alle catalog_*-Tabellen), Endstand.
 -- Pro Tabelle genau ein INSERT, in Abhängigkeitsreihenfolge. Die Ids sind fest
 -- vergeben, weil Verweise (und Portrait-Dateien unter images/creatures/<id>.jpg)
 -- an ihnen hängen; Lücken in den Ids sind Absicht (z. B. catalog_bestiary 3).
--- Wird nach 01_schema.sql geladen, vor 03_examples.sql.
 
 -- ============================================================
 -- Grundlagen: Attribute, Zustände, Altersstufen, Zeit, Zauberdauer und Wirkzeiten
@@ -989,7 +990,9 @@ INSERT INTO catalog_roll_tables (code, group_de, title_de, die_de, headers_de, i
     ('nsc_motivation', 'NSC erschaffen', 'Motivation', 'W8', 'Ergebnis', NULL, 62),
     ('nsc_beruf', 'NSC erschaffen', 'Beruf', 'W10', 'Ergebnis', NULL, 63),
     ('nsc_eigenart', 'NSC erschaffen', 'Eigenart', 'W12', 'Ergebnis', NULL, 64),
-    ('nsc_name', 'NSC erschaffen', 'Name (einen wählen)', 'W20', 'Ergebnis', NULL, 65);
+    ('nsc_name', 'NSC erschaffen', 'Name (einen wählen)', 'W20', 'Ergebnis', NULL, 65),
+    ('schatz_1', 'Schätze', 'Schatztabelle 1', 'W20', 'Schatz|Wert', 'Würfle W6, um die Tabelle zu bestimmen: 1–3: Schatztabelle 1, 4–6: Schatztabelle 2.', 70),
+    ('schatz_2', 'Schätze', 'Schatztabelle 2', 'W20', 'Schatz|Wert, Gegenstand oder Wirkung', 'Würfle W6, um die Tabelle zu bestimmen: 1–3: Schatztabelle 1, 4–6: Schatztabelle 2.', 71);
 
 -- catalog_roll_table_rows
 INSERT INTO catalog_roll_table_rows (table_code, roll_min, roll_max, name_de, effect_de, extra_de) VALUES
@@ -1092,7 +1095,56 @@ INSERT INTO catalog_roll_table_rows (table_code, roll_min, roll_max, name_de, ef
     ('nsc_name', 17, 17, 'Hjorvald, Estrid, Isidora', NULL, NULL),
     ('nsc_name', 18, 18, 'Ambjörn, Signe, Athos', NULL, NULL),
     ('nsc_name', 19, 19, 'Grunn, Tilde, Larysa', NULL, NULL),
-    ('nsc_name', 20, 20, 'Olgrid, Idun, Nikias', NULL, NULL);
+    ('nsc_name', 20, 20, 'Olgrid, Idun, Nikias', NULL, NULL),
+    ('schatz_1', 1, 1, 'Kupfermünzen', 'W6 Kupfermünzen', NULL),
+    ('schatz_1', 2, 2, 'Kupfermünzen', '2W6 Kupfermünzen', NULL),
+    ('schatz_1', 3, 3, 'Kupfermünzen', '4W6 Kupfermünzen', NULL),
+    ('schatz_1', 4, 4, 'Kupfermünzen', '2W6 × 10 Kupfermünzen', NULL),
+    ('schatz_1', 5, 5, 'Kupfermünzen', '4W6 × 10 Kupfermünzen', NULL),
+    ('schatz_1', 6, 6, 'Silbermünzen', 'W6 Silbermünzen', NULL),
+    ('schatz_1', 7, 7, 'Silbermünzen', '3W6 Silbermünzen', NULL),
+    ('schatz_1', 8, 8, 'Silbermünzen', 'W6 × 5 Silbermünzen', NULL),
+    ('schatz_1', 9, 9, 'Silbermünzen', 'W6 × 10 Silbermünzen', NULL),
+    ('schatz_1', 10, 10, 'Silbermünzen', '2W6 × 10 Silbermünzen', NULL),
+    ('schatz_1', 11, 11, 'Silbermünzen', '3W6 × 10 Silbermünzen', NULL),
+    ('schatz_1', 12, 12, 'Goldmünzen', 'W6 Goldmünzen', NULL),
+    ('schatz_1', 13, 13, 'Goldmünzen', '2W6 Goldmünzen', NULL),
+    ('schatz_1', 14, 14, 'Goldmünzen', '4W6 Goldmünzen', NULL),
+    ('schatz_1', 15, 15, 'Goldmünzen', 'W6 × 10 Goldmünzen', NULL),
+    ('schatz_1', 16, 16, 'Goldmünzen', '2W6 × 10 Goldmünzen', NULL),
+    ('schatz_1', 17, 17, 'Kelch', '2W6 × 5 Goldmünzen', NULL),
+    ('schatz_1', 18, 18, 'Silberarmband', '2W6 × 10 Silbermünzen', NULL),
+    ('schatz_1', 19, 19, 'Goldarmband', '2W6 × 10 Goldmünzen', NULL),
+    ('schatz_1', 20, 20, 'Silberkette', '2W6 × 5 Silbermünzen', NULL),
+    ('schatz_2', 1, 1, 'Goldkette', '2W6 Goldmünzen', NULL),
+    ('schatz_2', 2, 2, 'Silberring', '2W6 Silbermünzen', NULL),
+    ('schatz_2', 3, 3, 'Goldring', '4W6 Goldmünzen', NULL),
+    ('schatz_2', 4, 4, 'Silberbrosche', '2W6 × 5 Silbermünzen', NULL),
+    ('schatz_2', 5, 5, 'Goldamulett', '2W6 × 5 Goldmünzen', NULL),
+    ('schatz_2', 6, 6, 'Edelstein', 'Würfle W6. 1: Glas (Wert 2 Kupfer), 2: Kristall (Wert 10 Silber), 3: Smaragd (Wert 10 Gold), 4: Saphir (Wert 15 Gold), 5: Rubin (Wert 25 Gold), 6: Diamant (Wert 100 Gold).', NULL),
+    ('schatz_2', 7, 7, 'Kleidung', 'Würfle W3. 1: Stiefel, 2: Umhang, 3: Pelzumhang.', NULL),
+    ('schatz_2', 8, 8, 'Nahkampfwaffe', 'Würfle W6. 1: Dolch, 2: Kurzschwert, 3: Kurzspeer, 4: Breitschwert, 5: Langspeer, 6: Langschwert.', NULL),
+    ('schatz_2', 9, 9, 'Nahkampfwaffe', 'Würfle W6. 1: Beil, 2: Krummsäbel, 3: Morgenstern, 4: Parierdolch, 5: Kriegshammer, klein, 6: Dreschflegel.', NULL),
+    ('schatz_2', 10, 10, 'Fernkampfwaffe', 'Würfle W6. 1: Schleuder, 2: Kurzbogen, 3: Langbogen, 4: Leichte Armbrust, 5: Schwere Armbrust, 6: Handarmbrust.', NULL),
+    ('schatz_2', 11, 11, 'Meisterwerk-Waffe', 'Würfle W6. 1: Dolch, 2: Kurzschwert, 3: Streitaxt, 4: Breitschwert, 5: Kriegshammer, schwer, 6: Langschwert.', NULL),
+    ('schatz_2', 12, 12, 'Rüstung/Schild', 'Würfle W6. 1: Schild, klein, 2: Schild, groß, 3: Offener Helm, 4: Großhelm, 5: Beschlagenes Leder, 6: Kettenpanzer.', NULL),
+    ('schatz_2', 13, 13, 'Giftdolch', 'Würfle auf Ausweichen. Misslingt der Wurf, schneidest du dich und leidest unter einem Gift der Wirkstärke 12. Würfle W3 für die Art. 1: tödlich, 2: lähmend, 3: einschläfernd.', NULL),
+    ('schatz_2', 14, 14, 'Rostiger Nagel', 'Würfle auf Ausweichen. Misslingt der Wurf, erleidest du W6 Schaden. Rüstung hat keine Wirkung.', NULL),
+    ('schatz_2', 15, 15, 'Grimoire', 'Würfle W4 für die Schule. 1: Animismus, 2: Elementarismus, 3: Mentalismus, 4: allgemeine Magie. Würfle W4−1 für den Zaubergrad (0 bedeutet Zaubertricks) und W4 für die Nummer. Die Spielleitung wählt die genauen Zauber oder würfelt sie aus.', NULL),
+    ('schatz_2', 16, 16, 'Flasche', 'Eine Heilkunde-Probe enthüllt den Inhalt. Bei einem Fehlschlag würfelt die Spielleitung im Geheimen. Würfle W6. 1: tödliches Gift (Wirkstärke 12), 2: Schlafgift (Wirkstärke 14), 3: Schnaps, 4: Kräutersud, 5: Heiltrank (2W6 TP), 6: Heiltrank (3W6 TP).', NULL),
+    ('schatz_2', 17, 17, 'Buch', 'Würfle W6 für den Titel. 1: Essen oder gegessen werden – Pflanzen des Waldes, 2: Grammatik der Drachensprache, 3: Uralte Helden und Schurken, 4: Handbuch des Meister-Zimmermanns, 5: Bestien der Höhle – Eine Enzyklopädie, 6: Blut, Schleim und Galle – Beherrsche deine Körpersäfte.', NULL),
+    ('schatz_2', 18, 18, 'Instrument', 'Würfle W6. 1: Horn, 2: Flöte, 3: Harfe, 4: Leier, 5: Dudelsack, 6: Trommel.', NULL),
+    ('schatz_2', 19, 19, 'Handelswaren', 'Würfle W6. 1: Lupe, 2: Fernrohr, 3: Parfüm, 4: Schachspiel, 5: Spielkarten, 6: Murmeln.', NULL),
+    ('schatz_2', 20, 20, 'Ratte', 'Würfle auf Ausweichen. Misslingt der Wurf, erleidest du W4 Schaden. Rüstung hat keine Wirkung.', NULL);
+
+-- catalog_rules
+INSERT INTO catalog_rules (code, title_de, badge_de, summary_de, body_de) VALUES
+    ('dragon', 'Drache', 'Wurf 1', NULL, '<p>Eine 1 auf dem W20 ist besonders erfolgreich. Im Kampf hat ein Drache bestimmte Auswirkungen, er erhöht zum Beispiel den Schaden eines Angriffs. Außerhalb des Kampfes entscheidet die SL über den Effekt, etwa: Du beeindruckst alle um dich herum, du erreichst mehr als beabsichtigt oder die Aktion wird schneller als gewöhnlich ausgeführt.</p><p>Ein Drache auf einer Fertigkeit gibt dir eine Steigerungsmarke (siehe Heldenfähigkeiten, Erfahrung).</p>'),
+    ('demon', 'Dämon', 'Wurf 20', NULL, '<p>Eine 20 auf dem W20 schlägt immer fehl, unabhängig von deinem Fertigkeitswert und anderen Umständen. Ein Dämon lässt sich nicht strapazieren. Im Kampf kann er zusätzliche Effekte haben, außerhalb davon kann die SL ihn mit Effekten versehen, etwa: Du schädigst dich selbst, einen anderen oder einen Gegenstand, du machst dich vor allen lächerlich oder du machst eine Menge Lärm.</p><p>Ein Dämon auf einer Fertigkeit gibt dir ebenfalls eine Steigerungsmarke.</p>'),
+    ('death_rolls', 'Sterben & Todeswürfe', 'KON', NULL, '<p>Sinken deine TP auf null, fällst du zu Boden und riskierst zu sterben. Du kannst dich nicht bewegen und nur versuchen, dich aufzurappeln.</p><p><strong>Todeswurf:</strong> In jeder folgenden Runde musst du in deinem Zug eine Probe auf <strong>KON</strong> ablegen. Sie kann nicht strapaziert werden, auch nicht mit der optionalen Regel. Trage die Ergebnisse auf dem Charakterbogen ein. Nach drei gelungenen Würfen erhältst du W6 TP zurück und musst nicht mehr würfeln. Nach drei Fehlschlägen stirbt dein Charakter. Ein Drache zählt als zwei Erfolge, ein Dämon als zwei Fehlschläge. Nach dem Kampf zählst du weiter die Runden, bis alle Todeswürfe gemacht sind. Gescheiterte Todeswürfe werden zurückgesetzt, wenn du überlebst.</p><p><strong>Weiterer Schaden:</strong> Erleidest du bei null TP zusätzlichen Schaden, zählt das automatisch als gescheiterter Todeswurf.</p>'),
+    ('skill_marks', 'Steigerungsmarken', 'Fertigkeit', 'Das Kästchen markierst du, wenn du bei der Fertigkeit einen Drachen (1) oder Dämon (20) gewürfelt hast, oder nach den Fragen am Sitzungsende. Beim Level-up darfst du markierte Fertigkeiten steigern.', '<p>Hast du beim Einsatz einer Fertigkeit einen <strong>Drachen</strong> (1) oder <strong>Dämon</strong> (20) gewürfelt, hake das Kästchen neben der Fertigkeit ab. Weitere Marken gibt es nach den Fragen am Sitzungsende. Nur markierte Fertigkeiten dürfen gesteigert werden.</p>'),
+    ('session_end_questions', 'Sitzungsende: Steigerungsmarken', 'Regel', NULL, '<p>Am Ende der Spielsitzung stellt die Spielleitung die folgenden Fragen. Antwortet ein Spieler mit „Ja“ und kann es begründen, darf er eine weitere Marke bei einer unmarkierten Fertigkeit seiner Wahl setzen. Die Spielleitung hat das letzte Wort, sollte aber großzügig sein. (Marken, die schon im Spiel durch einen Drachen oder Dämon entstanden sind, kommen dazu.)</p><ul><li>Hast du an der Spielsitzung teilgenommen?</li><li>Hast du einen neuen Ort erkundet?</li><li>Hast du einen oder mehrere gefährliche Gegner besiegt?</li><li>Hast du ein Hindernis ohne Gewalt überwunden?</li><li>Hast du deiner Schwäche nachgegeben (optionale Regel)?</li></ul>'),
+    ('advancement_roll', 'Steigerungswürfe', 'Fertigkeit', 'Würfle am Tisch für jede Marke einen W20. Liegt das Ergebnis <strong>über</strong> dem aktuellen Fertigkeitswert, steigt die Fertigkeit um eins (höchstens bis 18): dann „Steigern“, sonst „Verwerfen“. Die Marke ist danach in beiden Fällen gelöscht.', '<p>Nach dem Setzen der Marken würfelst du für jede Marke einen W20. Liegt das Ergebnis <strong>über</strong> deinem aktuellen Fertigkeitswert, steigt die Fertigkeit um eins, bis höchstens 18. Danach löschst du die Marken und beginnst in der nächsten Spielsitzung neu.</p>');
 
 -- catalog_services
 INSERT INTO catalog_services (name_de, rarity, price_gold, price_silver, price_copper, unit_de, effect_de) VALUES
