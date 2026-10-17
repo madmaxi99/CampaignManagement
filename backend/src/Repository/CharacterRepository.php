@@ -126,7 +126,7 @@ final readonly class CharacterRepository
     public function skillsByCategory(int $characterId, string $category): array
     {
         $stmt = $this->db->prepare(<<<SQL
-            SELECT sk.id, sk.name_de, sk.attribute_code, sk.category, cs.value, cs.marked_for_advancement
+            SELECT sk.id, sk.name_de, sk.attribute_code, sk.category, sk.description_de, cs.value, cs.marked_for_advancement
             FROM character_skills cs
             JOIN catalog_skills sk ON sk.id = cs.skill_id
             WHERE cs.character_id = :character_id AND sk.category = :category

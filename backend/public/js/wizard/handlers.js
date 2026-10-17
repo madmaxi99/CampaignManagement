@@ -1,7 +1,7 @@
 /* Event wiring of the wizard: reads the controls of the rendered step into the state. */
 import { AGE_TABLE, MAGIC_PICK_COUNT, POOL_PICK_COUNT } from './config.js';
 import { ATTRIBUTE_ERROR_TEXT, attributeModifierText } from './steps.js';
-import { canContinue, isTooHigh } from './rules.js';
+import { canContinue, gearChoiceGroups, isTooHigh } from './rules.js';
 
 /**
  * @param {HTMLElement} root the wizard element
@@ -82,6 +82,7 @@ export function attachHandlers(root, { state, catalog, render, goRelative, submi
             professionHeroicAbilityId: null,
             poolPicks: [],
             gearOptionId: null,
+            gearChoices: {},
             rolledSilver: null,
             magicSchoolId: null,
             trickPicks: [],
@@ -116,8 +117,14 @@ export function attachHandlers(root, { state, catalog, render, goRelative, submi
     });
     onRadio('gear', (id) => {
         state.gearOptionId = integer(id);
+        state.gearChoices = {};
         state.rolledSilver = null;
     });
+    if (state.step === 3.5) {
+        gearChoiceGroups(state, catalog).forEach(({ group }) => {
+            onRadio(`gear-choice-${group}`, (itemId) => (state.gearChoices[group] = integer(itemId)));
+        });
+    }
     onText('rolled-silver-input', (value) => (state.rolledSilver = value === '' ? null : integer(value)), {
         revalidate: true,
     });

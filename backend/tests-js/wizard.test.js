@@ -43,6 +43,8 @@ async function fillUpToAppearance(root, { age = 'erwachsen', attribute = '10' } 
     [1, 2, 3, 4, 5, 6].forEach((id) => change(root.querySelector(`.pool-pick[value="${id}"]`)));
     type(root.querySelector('#rolled-silver-input'), '1');
     await advance(root);
+    pick(root, 'input[name="gear-choice-1"]', '102');
+    await advance(root);
 
     const extra = age === 'jung' ? [9, 10] : [9, 10, 11, 12];
     extra.forEach((id) => change(root.querySelector(`.extra-pick[value="${id}"]`)));
@@ -128,6 +130,10 @@ test('walks through all steps and submits the character', async () => {
     assert.equal(next(root).disabled, false);
     await advance(root);
 
+    // step 3.5: the weapon of the gear option
+    pick(root, 'input[name="gear-choice-1"]', '102');
+    await advance(root);
+
     // step 4: two extra skills for a young character
     [9, 10].forEach((id) => change(root.querySelector(`.extra-pick[value="${id}"]`)));
     await advance(root);
@@ -161,6 +167,7 @@ test('walks through all steps and submits the character', async () => {
             heroic_ability_choice: 'profession',
             flaw_roll: 2,
             gear_option_id: 11,
+            gear_choices: { 1: 102 },
             rolled_silver: 4,
             magic_school_id: null,
             known_trick_ids: [],
@@ -181,6 +188,29 @@ test('remembers the new character as one of mine', async () => {
     await flush();
 
     assert.deepEqual(JSON.parse(window.localStorage.getItem('trpg.myCharacters')), ['3', '7']);
+});
+
+test('a gear option with a choice gets its own step that needs one pick', async () => {
+    const { root } = await openWizard();
+    await chooseKinAndProfession(root, 'fighter');
+    await advance(root);
+
+    type(root.querySelector('#name-input'), 'A');
+    pick(root, 'input[name="age"]', 'jung');
+    [1, 2, 3, 4, 5, 6].forEach((id) => change(root.querySelector(`.pool-pick[value="${id}"]`)));
+    type(root.querySelector('#rolled-silver-input'), '1');
+    assert.match(root.textContent, /Breitschwert \/ Streitaxt/);
+    assert.equal(next(root).disabled, false);
+    await advance(root);
+
+    assert.match(progress(root), /^Schritt 4 von 9 · Ausrüstung wählen/);
+    assert.equal(next(root).disabled, true, 'weapon not chosen yet');
+
+    pick(root, 'input[name="gear-choice-1"]', '101');
+    assert.equal(next(root).disabled, false);
+    assert.equal(root.querySelector('input[name="gear-choice-1"][value="101"]').checked, true);
+    await advance(root);
+    assert.match(progress(root), /^Schritt 5 von 9 · Weitere Fertigkeiten/);
 });
 
 test('refuses a seventh pool skill', async () => {

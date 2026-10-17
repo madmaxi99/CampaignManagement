@@ -14,6 +14,7 @@ export function createState() {
         ageCode: null,
         poolPicks: [],
         gearOptionId: null,
+        gearChoices: {},
         rolledSilver: null,
         extraPicks: [],
         magicSchoolId: null,
@@ -78,7 +79,11 @@ export function applyDefaults(state, catalog) {
 /** The step sequence depends on the profession: the magic step is only for casters. */
 export function visibleSteps(state, catalog) {
     const profession = selectedProfession(state, catalog);
-    const steps = [1, 2, 3, 4];
+    const steps = [1, 2, 3];
+    if (profession && gearChoiceGroups(state, catalog).length > 0) {
+        steps.push(3.5);
+    }
+    steps.push(4);
     if (profession && profession.grants_magic) {
         steps.push(5);
     }
@@ -89,7 +94,12 @@ export function visibleSteps(state, catalog) {
 export function currentGearOption(state, catalog) {
     const profession = selectedProfession(state, catalog);
 
-    return profession.gearOptions.find((option) => option.gearOptionId === state.gearOptionId) || null;
+    return profession?.gearOptions.find((option) => option.gearOptionId === state.gearOptionId) ?? null;
+}
+
+/** The one-of-several item groups of the current gear option (weapon choices); none for most options. */
+export function gearChoiceGroups(state, catalog) {
+    return currentGearOption(state, catalog)?.choices ?? [];
 }
 
 export function silverMax(state, catalog) {
@@ -137,6 +147,8 @@ export function canContinue(state, catalog) {
             return professionStepValid(state, catalog);
         case 3:
             return nameSkillsGearStepValid(state, catalog);
+        case 3.5:
+            return gearChoiceGroups(state, catalog).every((choice) => state.gearChoices[choice.group] !== undefined);
         case 4:
             return state.extraPicks.length === AGE_TABLE[state.ageCode].extra;
         case 5:
@@ -169,6 +181,7 @@ export function buildPayload(state, catalog) {
         heroic_ability_choice: state.heroicAbilityChoice,
         flaw_roll: state.flawRoll,
         gear_option_id: state.gearOptionId,
+        gear_choices: state.gearChoices,
         rolled_silver: state.rolledSilver,
         magic_school_id: caster ? state.magicSchoolId : null,
         known_trick_ids: caster ? state.trickPicks : [],

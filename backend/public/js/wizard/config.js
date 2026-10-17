@@ -25,6 +25,7 @@ export const STEP_TITLES = {
     1: 'Volk',
     2: 'Beruf',
     3: 'Name, Alter, Fertigkeiten & Ausrüstung',
+    3.5: 'Ausrüstung wählen',
     4: 'Weitere Fertigkeiten',
     5: 'Magie',
     6: 'Attribute',

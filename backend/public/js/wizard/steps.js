@@ -12,6 +12,7 @@ import {
     ageModifier,
     canContinue,
     currentGearOption,
+    gearChoiceGroups,
     finalAttribute,
     isTooHigh,
     selectedKin,
@@ -19,18 +20,18 @@ import {
     silverMax,
 } from './rules.js';
 
-const renderers = [
-    null,
-    kinStep,
-    professionStep,
-    nameSkillsGearStep,
-    extraSkillsStep,
-    magicStep,
-    attributesStep,
-    flawStep,
-    mementoStep,
-    appearanceStep,
-];
+const renderers = {
+    1: kinStep,
+    2: professionStep,
+    3: nameSkillsGearStep,
+    3.5: gearChoiceStep,
+    4: extraSkillsStep,
+    5: magicStep,
+    6: attributesStep,
+    7: flawStep,
+    8: mementoStep,
+    9: appearanceStep,
+};
 
 export function renderStep(state, catalog) {
     return renderers[state.step](state, catalog);
@@ -127,7 +128,7 @@ function heroicAbilitySection(state, catalog, profession) {
 
         return `
             <div class="wizard-ability">
-                <strong>Kein Berufs-Talent — dafür Magie. Wähle deine Zauberschule:</strong>
+                <strong>Keine Heldenfähigkeit — dafür Magie. Wähle deine Zauberschule:</strong>
                 <div class="wizard-choice-grid">${schoolRows}</div>
             </div>
         `;
@@ -138,9 +139,9 @@ function heroicAbilitySection(state, catalog, profession) {
 
         return `
             <div class="wizard-ability">
-                <strong>Heroisches Talent: ${ability.name_de}</strong>
+                <strong>Heldenfähigkeit: ${ability.name_de}</strong>
                 <p>${ability.description_de}</p>
-                <p class="wizard-note">Dieses Talent bekommst du bei der Erstellung automatisch — eine Wahl gibt es dabei nicht.</p>
+                <p class="wizard-note">Diese Heldenfähigkeit bekommst du bei der Erstellung automatisch — eine Wahl gibt es dabei nicht.</p>
             </div>
         `;
     }
@@ -159,7 +160,7 @@ function heroicAbilitySection(state, catalog, profession) {
 
     return `
         <div class="wizard-ability">
-            <strong>Heroisches Talent — wähle eines:</strong>
+            <strong>Heldenfähigkeit — wähle eine:</strong>
             <div class="wizard-choice-grid">${choiceRows}</div>
         </div>
     `;
@@ -200,6 +201,39 @@ function professionStep(state, catalog) {
                <strong>Mentalismus</strong> (Kontrolle über den eigenen und fremde Geister durch Fokussierung),
                dazu Allgemeine Magie (schulunabhängige Zaubertricks/Zauber).</p>
         </div>
+        ${nav(state, catalog)}
+    `;
+}
+
+/** Step 3.5, only for gear options with a one-of-several item (e.g. the weapon of a fighter). */
+function gearChoiceStep(state, catalog) {
+    const option = currentGearOption(state, catalog);
+    const groups = option.choices
+        .map(
+            (choice) => `
+                <div class="wizard-choice-list">
+                    ${choice.items
+                        .map((item) =>
+                            choiceCard({
+                                name: `gear-choice-${choice.group}`,
+                                value: item.itemId,
+                                selected: state.gearChoices[choice.group] === item.itemId,
+                                compact: true,
+                                content: `${choiceHead(item.name, item.stats ?? '')}`,
+                            })
+                        )
+                        .join('')}
+                </div>
+            `
+        )
+        .join('');
+    const fixed = option.items.map((item) => (item.quantity > 1 ? `${item.quantity}× ${item.name}` : item.name));
+
+    return `
+        <h2>Ausrüstung wählen</h2>
+        <p class="wizard-intro">Option ${option.label} enthält eine Wahl. Nimm einen der Gegenstände:</p>
+        ${groups}
+        <p class="wizard-note">Dazu bekommst du: ${fixed.join(', ')}${option.extra_de ? `, ${option.extra_de}` : ''}.</p>
         ${nav(state, catalog)}
     `;
 }
@@ -246,8 +280,9 @@ function nameSkillsGearStep(state, catalog) {
 
     const gearRows = profession.gearOptions
         .map((option) => {
-            const items = option.items.map((item) =>
-                item.quantity > 1 ? `${item.quantity}× ${item.name}` : item.name
+            const choices = (option.choices ?? []).map((choice) => choice.items.map((item) => item.name).join(' / '));
+            const items = choices.concat(
+                option.items.map((item) => (item.quantity > 1 ? `${item.quantity}× ${item.name}` : item.name))
             );
 
             return choiceCard({
@@ -284,6 +319,7 @@ function nameSkillsGearStep(state, catalog) {
         <h3>Ausrüstung</h3>
         ${profession.gearOptions.length > 1 ? '<p class="wizard-intro">W6 am Tisch würfeln oder direkt eine Option wählen:</p>' : ''}
         <div class="wizard-choice-list">${gearRows}</div>
+        ${gearChoiceGroups(state, catalog).length > 0 ? '<p class="wizard-note">Bei dieser Option wählst du im nächsten Schritt deine Ausrüstung aus.</p>' : ''}
         ${silverField}
         <p class="wizard-note">Währung: 100 Kupfer = 10 Silber = 1 Gold. Anpassbar im fertigen Charakterbogen.</p>
 

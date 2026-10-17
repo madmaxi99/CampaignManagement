@@ -13,7 +13,16 @@ const gearOption = {
     label: 'A',
     silverDice: 'W6',
     extra_de: null,
-    items: [{ name: 'Schwert', quantity: 1 }],
+    items: [{ itemId: 100, name: 'Schild', quantity: 1 }],
+    choices: [
+        {
+            group: 1,
+            items: [
+                { itemId: 101, name: 'Breitschwert', quantity: 1 },
+                { itemId: 102, name: 'Streitaxt', quantity: 1 },
+            ],
+        },
+    ],
 };
 
 /** A small but complete creation catalog: a fighter, a mage, one kin that fits both. */
@@ -46,7 +55,7 @@ export const catalog = {
             key_attribute_code: 'INT',
             skillPool: skills.slice(8, 15),
             heroicAbilities: [],
-            gearOptions: [{ ...gearOption, gearOptionId: 21, silverDice: null }],
+            gearOptions: [{ ...gearOption, gearOptionId: 21, silverDice: null, choices: [] }],
         },
     ],
     skills,

@@ -573,6 +573,10 @@ CREATE TABLE catalog_profession_gear_option_items (
     gear_option_id INT NOT NULL,
     item_id INT NOT NULL,
     quantity INT NOT NULL DEFAULT 1,
+    -- NULL = fester Gegenstand der Option. Gleicher Wert innerhalb einer Option =
+    -- Wahl-Gruppe: der Spieler nimmt genau einen davon (z.B. Kämpfer A:
+    -- Breitschwert / Streitaxt / Morgenstern).
+    choice_group TINYINT NULL,
     FOREIGN KEY (gear_option_id) REFERENCES catalog_profession_gear_options(id) ON DELETE CASCADE,
     FOREIGN KEY (item_id) REFERENCES catalog_items(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
