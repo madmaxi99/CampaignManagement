@@ -309,6 +309,36 @@ final class CharacterRoutesTest extends AppTestCase
         }
     }
 
+    public function testWizardGivesFixedGearOnePickPerChoiceAndRepeatedItems(): void
+    {
+        $itemId = fn (string $name): int => (int) $this->db->query('SELECT id FROM catalog_items WHERE name_de = ' . $this->db->quote($name))
+            ->fetchColumn();
+        $names = fn (int $id, string $table): array => $this->db->query("SELECT name_de FROM {$table} WHERE character_id = {$id} ORDER BY position")
+            ->fetchAll(PDO::FETCH_COLUMN);
+
+        $knight = $this->wizardPayload('kaempfer', 1);
+
+        self::assertSame(422, $this->request('POST', '/characters', $knight)->getStatusCode(), 'pick missing');
+        self::assertSame(422, $this->request('POST', '/characters', [
+            'gear_choices' => [
+                1 => $itemId('Langspeer'),
+            ],
+        ] + $knight)->getStatusCode(), 'pick from another option');
+
+        $id = (int) $this->json($this->request('POST', '/characters', [
+            'gear_choices' => [
+                1 => $itemId('Streitaxt'),
+            ],
+        ] + $knight), 200)['id'];
+        self::assertSame(['Streitaxt', 'Schild, klein'], $names($id, 'character_weapons'));
+        self::assertContains('Fackel', $names($id, 'character_inventory'));
+        self::assertSame('Kettenpanzer', $this->db->query("SELECT name_de FROM character_armor WHERE character_id = {$id} AND slot = 'body'")->fetchColumn());
+
+        $thief = $this->wizardPayload('dieb', 18);
+        $id = (int) $this->json($this->request('POST', '/characters', $thief), 200)['id'];
+        self::assertSame(['Dolch', 'Dolch'], $names($id, 'character_weapons'));
+    }
+
     public function testDefaultCharactersCannotBeDeleted(): void
     {
         $id = (int) $this->json($this->request('POST', '/characters', $this->wizardPayload()), 200)['id'];

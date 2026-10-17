@@ -7,12 +7,12 @@
     <ul class="entry-list">
         {% for skill in skills %}
             <li class="entry-row">
-                <label class="mark-toggle" title="Markieren, wenn die Probe nicht bestanden wurde (Steigerung beim Level-up)">
+                <label class="mark-toggle" title="{{ rule_summary('skill_marks')|striptags|e('html_attr') }}">
                     <input type="checkbox" data-skill-mark="{{ skill.id }}" {% if skill.marked_for_advancement %}checked{% endif %}>
                     <span class="mark-toggle__box" aria-hidden="true"></span>
                     <span class="visually-hidden">{{ skill.name_de }} für Steigerung markieren</span>
                 </label>
-                <button type="button" class="entry-main" data-detail="{{ {'type': 'skill', 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': category, 'value': skill.value}|json_encode|e('html_attr') }}">
+                <button type="button" class="entry-main" data-detail="{{ {'type': 'skill', 'name': skill.name_de, 'attribute': skill.attribute_code, 'category': category, 'value': skill.value, 'description': skill.description_de}|json_encode|e('html_attr') }}">
                     <span class="entry-name">{{ skill.name_de }} <small>({{ skill.attribute_code }})</small></span>
                     <span class="ui-badge entry-value">{{ skill.value }}</span>
                 </button>
@@ -138,7 +138,7 @@
     <div class="ui-tabpanel ui-stack" id="panel-skills" role="tabpanel" aria-labelledby="tab-skills" hidden>
         <section class="ui-card">
             <h2 class="ui-card__title">{{ ui.icon('swords') }} Fertigkeiten</h2>
-            <p class="ui-field__hint">Das Kästchen markiert eine nicht bestandene Probe. Beim Level-up darfst du markierte Fertigkeiten steigern.</p>
+            <p class="ui-field__hint">{{ rule_summary('skill_marks') }}</p>
             {{ sheet_macros.skill_list(regularSkills, 'regular') }}
             <h3>Kampf</h3>
             {{ sheet_macros.skill_list(combatSkills, 'combat') }}
@@ -163,15 +163,21 @@
         {% endif %}
 
         <section class="ui-card">
-            <h2 class="ui-card__title">{{ ui.icon('crown') }} Talente</h2>
-            {% for talent in talents %}
-                <div class="talent">
-                    <strong>{{ talent.name_de }}</strong>{% if talent.wp_note_de %} <span class="ui-badge ui-badge--sky">{{ talent.wp_note_de }}</span>{% endif %}
-                    <p class="ui-muted">{{ talent.description_de }}</p>
-                </div>
+            <h2 class="ui-card__title">{{ ui.icon('crown') }} Heldenfähigkeiten</h2>
+            {% if talents is empty %}
+                <p class="ui-muted">Noch keine Heldenfähigkeiten.</p>
             {% else %}
-                <p class="ui-muted">Noch keine Talente.</p>
-            {% endfor %}
+                <ul class="entry-list">
+                    {% for talent in talents %}
+                        <li class="entry-row">
+                            <button type="button" class="entry-main" data-detail="{{ {'type': 'ability', 'name': talent.name_de, 'wpNote': talent.wp_note_de, 'description': talent.description_de}|json_encode|e('html_attr') }}">
+                                <span class="entry-name">{{ talent.name_de }}</span>
+                                {% if talent.wp_note_de %}<span class="ui-badge ui-badge--sky entry-value">{{ talent.wp_note_de }}</span>{% endif %}
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         </section>
     </div>
 

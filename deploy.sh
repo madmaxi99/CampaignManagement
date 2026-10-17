@@ -19,6 +19,9 @@ git pull
 
 . ./alias.sh
 dcud
+# nginx resolves "php-fpm" only at startup; a recreated php-fpm container gets a new IP
+# and nginx would answer 502 until it is restarted.
+dc restart nginx
 rcomposer install --no-interaction
 rphp bin/migrate.php
 

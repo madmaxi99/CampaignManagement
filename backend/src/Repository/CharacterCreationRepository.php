@@ -96,12 +96,14 @@ final readonly class CharacterCreationRepository
 
         $gearStmt = $this->db->prepare(<<<SQL
             SELECT pgo.id AS gear_option_id, pgo.option_label, pgo.extra_de, pgo.starting_silver_dice,
-                   i.id AS item_id, i.name_de, i.kind, pgoi.quantity
+                   i.id AS item_id, i.name_de, i.kind, pgoi.quantity, pgoi.choice_group,
+                   w.damage_de, w.grip_de, w.traits_de
             FROM catalog_profession_gear_options pgo
             JOIN catalog_profession_gear_option_items pgoi ON pgoi.gear_option_id = pgo.id
             JOIN catalog_items i ON i.id = pgoi.item_id
+            LEFT JOIN catalog_item_weapons w ON w.item_id = i.id
             WHERE pgo.profession_code = :profession_code
-            ORDER BY pgo.option_label, i.name_de
+            ORDER BY pgo.option_label, pgoi.choice_group, i.name_de
             SQL);
 
         foreach ($professions as &$profession) {
@@ -126,17 +128,36 @@ final readonly class CharacterCreationRepository
                 $options[$row['gear_option_id']]['label'] ??= $row['option_label'];
                 $options[$row['gear_option_id']]['extra_de'] ??= $row['extra_de'];
                 $options[$row['gear_option_id']]['silverDice'] ??= $row['starting_silver_dice'];
-                $options[$row['gear_option_id']]['items'][] = [
+                $item = [
                     'itemId' => (int) $row['item_id'],
                     'name' => $row['name_de'],
                     'kind' => $row['kind'],
                     'quantity' => (int) $row['quantity'],
+                    'stats' => $row['damage_de'] === null
+                        ? null
+                        : implode(' · ', array_filter([$row['damage_de'], $row['grip_de'], $row['traits_de']])),
                 ];
+                $options[$row['gear_option_id']]['items'] ??= [];
+                $options[$row['gear_option_id']]['choices'] ??= [];
+                if ($row['choice_group'] === null) {
+                    $options[$row['gear_option_id']]['items'][] = $item;
+                } else {
+                    $options[$row['gear_option_id']]['choices'][(int) $row['choice_group']][] = $item;
+                }
             }
             $profession['gearOptions'] = array_map(
                 fn (int $id, array $option): array => [
                     'gearOptionId' => $id,
-                ] + $option,
+                ] + array_merge($option, [
+                    'choices' => array_map(
+                        fn (int $group, array $items): array => [
+                            'group' => $group,
+                            'items' => $items,
+                        ],
+                        array_keys($option['choices']),
+                        $option['choices']
+                    ),
+                ]),
                 array_keys($options),
                 $options
             );
@@ -452,7 +473,7 @@ final readonly class CharacterCreationRepository
         }
 
         $gearItems = $this->db->prepare(<<<SQL
-            SELECT i.id AS item_id, i.name_de, i.kind
+            SELECT i.id AS item_id, i.name_de, i.kind, pgoi.quantity, pgoi.choice_group
             FROM catalog_profession_gear_option_items pgoi
             JOIN catalog_items i ON i.id = pgoi.item_id
             WHERE pgoi.gear_option_id = :gear_option_id
@@ -460,7 +481,7 @@ final readonly class CharacterCreationRepository
         $gearItems->execute([
             'gear_option_id' => $gearOptionId,
         ]);
-        $gearRows = $gearItems->fetchAll();
+        $gearRows = $this->resolveGearChoices($gearItems->fetchAll(), $input['gear_choices'] ?? []);
 
         return $this->insertCharacter(
             $name,
@@ -480,6 +501,38 @@ final readonly class CharacterCreationRepository
             $magicSchoolSkillId,
             $knownSpellIds
         );
+    }
+
+    /**
+     * Exactly one pick from every choice group of the option (first, so the main weapon comes first), then the fixed items.
+     *
+     * @param list<array<string, mixed>> $rows items of the option, choice_group NULL = fixed
+     * @return list<array<string, mixed>>
+     */
+    private function resolveGearChoices(array $rows, mixed $picks): array
+    {
+        $picks = is_array($picks) ? $picks : [];
+        $gear = [];
+        $chosen = [];
+        $groups = [];
+        foreach ($rows as $row) {
+            if ($row['choice_group'] === null) {
+                $gear[] = $row;
+            } else {
+                $groups[(int) $row['choice_group']][(int) $row['item_id']] = $row;
+            }
+        }
+        ksort($groups);
+
+        foreach ($groups as $group => $items) {
+            $picked = (int) ($picks[$group] ?? 0);
+            if (! isset($items[$picked])) {
+                throw new InvalidArgumentException('Bitte wähle bei der Ausrüstung einen der angebotenen Gegenstände.');
+            }
+            $chosen[] = $items[$picked];
+        }
+
+        return [...$chosen, ...$gear];
     }
 
     /**
@@ -684,7 +737,7 @@ final readonly class CharacterCreationRepository
             ];
             $inventoryInsert = $this->db->prepare(<<<SQL
                 INSERT INTO character_inventory (character_id, position, name_de, quantity)
-                VALUES (:character_id, :position, :name_de, 1)
+                VALUES (:character_id, :position, :name_de, :quantity)
                 SQL);
             $position = 1;
             foreach ($gearRows as $gearItem) {
@@ -695,15 +748,17 @@ final readonly class CharacterCreationRepository
                             'id' => $gearItem['item_id'],
                         ]
                     ) ?? throw new InvalidArgumentException('Ausrüstung fehlt im Katalog.');
-                    $weaponInsert->execute([
-                        'character_id' => $characterId,
-                        'position' => $position++,
-                        'name_de' => $gearItem['name_de'],
-                        'grip_de' => $stats['grip_de'],
-                        'range_de' => $stats['range_de'],
-                        'damage_de' => $stats['damage_de'],
-                        'traits_de' => $stats['traits_de'],
-                    ]);
+                    for ($copy = 0; $copy < (int) $gearItem['quantity']; ++$copy) {
+                        $weaponInsert->execute([
+                            'character_id' => $characterId,
+                            'position' => $position++,
+                            'name_de' => $gearItem['name_de'],
+                            'grip_de' => $stats['grip_de'],
+                            'range_de' => $stats['range_de'],
+                            'damage_de' => $stats['damage_de'],
+                            'traits_de' => $stats['traits_de'],
+                        ]);
+                    }
                 } elseif ($gearItem['kind'] === 'armor') {
                     $stats = $this->fetchOne(
                         'SELECT slot, armor_value, penalty_stealth, penalty_evasion, penalty_acrobatics, penalty_perception, penalty_ranged
@@ -720,6 +775,7 @@ final readonly class CharacterCreationRepository
                         'character_id' => $characterId,
                         'position' => $position++,
                         'name_de' => $gearItem['name_de'],
+                        'quantity' => (int) $gearItem['quantity'],
                     ]);
                 }
             }
@@ -755,6 +811,7 @@ final readonly class CharacterCreationRepository
                         'character_id' => $characterId,
                         'position' => $position++,
                         'name_de' => trim($piece),
+                        'quantity' => 1,
                     ]);
                 }
             }

@@ -1,6 +1,6 @@
 # Regel-Lücken: was fehlt, was haben wir, wie setzen wir es um
 
-Abgleich der gesammelten Stichworte gegen die App (Regelwerk-Seiten `/rules` (Spieler) und `/dm/rules` (SL), Katalog in `database/02_catalog.sql`,
+Abgleich der gesammelten Stichworte gegen die App (Regelwerk-Seiten `/rules` (Spieler) und `/dm/rules` (SL), Katalog in `database/migrations/0002_catalog.sql`,
 Charakterbogen, DM-Bereich). Stand nach den Screenshots des Grundregelwerks in `docs/bilder`.
 
 **Grundsatz:** Die App würfelt keine Proben, Rasten oder Regelergebnisse, auch nicht für den DM. Gewürfelt wird am

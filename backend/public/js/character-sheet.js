@@ -234,7 +234,7 @@ function init(sheet) {
         });
     });
 
-    // ---- Detail sheet (skills and spells)
+    // ---- Detail sheet (skills, spells and heroic abilities)
     const detailSheet = document.getElementById('detail-sheet');
     const detailBody = document.getElementById('detail-sheet-body');
 
@@ -273,10 +273,18 @@ function init(sheet) {
                 }
             });
             detailBody.appendChild(node('p', detail.effect));
+        } else if (detail.type === 'ability') {
+            if (detail.wpNote) {
+                detailBody.appendChild(fact('Kosten', detail.wpNote));
+            }
+            detailBody.appendChild(node('p', detail.description));
         } else {
             detailBody.appendChild(fact('Art', CATEGORIES[detail.category] || detail.category));
             detailBody.appendChild(fact('Attribut', detail.attribute));
             detailBody.appendChild(fact('Wert', String(detail.value)));
+            if (detail.description) {
+                detailBody.appendChild(node('p', detail.description));
+            }
         }
         detailSheet.showModal();
     }

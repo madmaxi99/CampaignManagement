@@ -8,7 +8,7 @@ namespace Flyka\CampaignManagement\Auth;
  * The single DM password and everything around it: login state in the PHP
  * session, CSRF token, and a brake against password guessing.
  *
- * Without a configured hash nobody can log in, so the DM area stays locked.
+ * Without a configured password nobody can log in, so the DM area stays locked.
  */
 final readonly class DmAuth
 {
@@ -17,14 +17,14 @@ final readonly class DmAuth
     private const int LOCK_SECONDS = 60;
 
     public function __construct(
-        private ?string $passwordHash,
+        private ?string $password,
         private string $stateDir
     ) {
     }
 
     public function isConfigured(): bool
     {
-        return $this->passwordHash !== null && $this->passwordHash !== '';
+        return $this->password !== null && $this->password !== '';
     }
 
     public function isLoggedIn(): bool
@@ -54,7 +54,7 @@ final readonly class DmAuth
             return 'locked';
         }
 
-        if (password_verify($password, (string) $this->passwordHash)) {
+        if (hash_equals((string) $this->password, $password)) {
             $this->writeState($clientId, []);
             session_regenerate_id(true);
             $_SESSION['dm'] = true;

@@ -25,7 +25,7 @@ abstract class AppTestCase extends DatabaseTestCase
     {
         parent::setUp();
         $this->useTestDatabaseInApp();
-        putenv('DM_PASSWORD_HASH=' . password_hash(self::PASSWORD, PASSWORD_DEFAULT));
+        putenv('DM_PASSWORD=' . self::PASSWORD);
 
         // The session must work without cookies/headers inside the CLI test run.
         ini_set('session.use_cookies', '0');
@@ -49,7 +49,7 @@ abstract class AppTestCase extends DatabaseTestCase
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_destroy();
         }
-        putenv('DM_PASSWORD_HASH');
+        putenv('DM_PASSWORD');
         restore_error_handler();
     }
 
@@ -115,13 +115,14 @@ abstract class AppTestCase extends DatabaseTestCase
     }
 
     /**
-     * A valid wizard submission for a non-magical, unrestricted profession.
+     * A valid wizard submission for a non-magical, unrestricted profession (the first one
+     * with gear unless a profession is given, then with the first gear option unless one is given).
      *
      * @return array<string, mixed>
      */
-    protected function wizardPayload(): array
+    protected function wizardPayload(?string $professionCode = null, ?int $gearOptionId = null): array
     {
-        $profession = $this->db->query(<<<SQL
+        $profession = $professionCode ?? $this->db->query(<<<SQL
             SELECT p.code FROM catalog_professions p
             WHERE p.grants_magic = 0 AND p.kin_restriction IS NULL
               AND (SELECT COUNT(*) FROM catalog_profession_key_skills k WHERE k.profession_code = p.code) >= 6
@@ -136,7 +137,7 @@ abstract class AppTestCase extends DatabaseTestCase
             ->fetchAll(PDO::FETCH_COLUMN);
         $skills = array_slice(array_values(array_unique(array_merge($pool, $others))), 0, 8);
 
-        $gear = $this->db->query("SELECT id, starting_silver_dice FROM catalog_profession_gear_options WHERE profession_code = '{$profession}' ORDER BY id LIMIT 1")
+        $gear = $this->db->query("SELECT id, starting_silver_dice FROM catalog_profession_gear_options WHERE profession_code = '{$profession}' AND id = COALESCE(" . ($gearOptionId ?? 'NULL') . ', id) ORDER BY id LIMIT 1')
             ->fetch();
 
         return [

@@ -38,7 +38,7 @@ final class DmAuthTest extends TestCase
 
     public function testWrongPasswordIsRejected(): void
     {
-        $auth = new DmAuth(password_hash('secret', PASSWORD_DEFAULT), $this->stateDir);
+        $auth = new DmAuth('secret', $this->stateDir);
 
         self::assertSame('wrong', $auth->attempt('nope', 'client'));
         self::assertFalse($auth->isLoggedIn());
@@ -46,7 +46,7 @@ final class DmAuthTest extends TestCase
 
     public function testLocksAfterFiveWrongAttempts(): void
     {
-        $auth = new DmAuth(password_hash('secret', PASSWORD_DEFAULT), $this->stateDir);
+        $auth = new DmAuth('secret', $this->stateDir);
 
         for ($i = 0; $i < 5; ++$i) {
             self::assertSame('wrong', $auth->attempt('nope', 'client'));

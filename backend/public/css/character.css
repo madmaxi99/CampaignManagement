@@ -482,14 +482,6 @@
     outline-offset: 2px;
 }
 
-.talent {
-    margin-bottom: var(--space-3);
-}
-
-.talent p {
-    margin: var(--space-1) 0 0;
-}
-
 /* Gear rows as small cards */
 .gear-card__fields {
     display: grid;

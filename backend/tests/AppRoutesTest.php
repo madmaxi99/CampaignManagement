@@ -33,6 +33,7 @@ final class AppRoutesTest extends AppTestCase
             '/dm/rules?k=monster' => 'Grimmigkeit',
             '/dm/rules?k=reise' => 'Reise-Missgeschicke',
             '/dm/rules?k=nsc' => 'Eigenart',
+            '/dm/rules?k=schaetze' => 'Schatztabelle 2',
             '/dm/rules?k=zufallsbegegnungen' => 'Zufallsbegegnungen',
             '/dm/lore?k=orte' => 'Hohenfurt',
         ];
@@ -126,7 +127,7 @@ final class AppRoutesTest extends AppTestCase
         self::assertSame(302, $this->request('GET', '/')->getStatusCode());
         self::assertSame(404, $this->request('GET', '/character/999999')->getStatusCode());
         self::assertSame('/dm', $this->request('GET', '/campaign')->getHeaderLine('Location'));
-        self::assertSame('/dm/campaign/3', $this->request('GET', '/campaign/3')->getHeaderLine('Location'));
+        self::assertSame('/dm/campaign/4', $this->request('GET', '/campaign/4')->getHeaderLine('Location'));
         self::assertSame('/dm/catalog', $this->request('GET', '/world')->getHeaderLine('Location'));
         self::assertSame(200, $this->request('GET', '/api/character-creation/catalog')->getStatusCode());
     }
@@ -148,7 +149,7 @@ final class AppRoutesTest extends AppTestCase
     {
         $this->loginAsDm();
 
-        foreach ([1, 2, 3, 4] as $id) {
+        foreach ([1, 2, 4] as $id) {
             $path = "/dm/campaign/{$id}";
             $response = $this->request('GET', $path);
             self::assertSame(200, $response->getStatusCode(), $path);

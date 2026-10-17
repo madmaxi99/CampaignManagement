@@ -55,6 +55,14 @@ test('"Weiter" depends on the step', () => {
         rolledSilver: 3,
     };
     assert.equal(canContinue(stateWith(step3), catalog), true);
+    assert.equal(canContinue(stateWith({ step: 3.5, professionCode: 'fighter', gearOptionId: 11 }), catalog), false);
+    assert.equal(
+        canContinue(
+            stateWith({ step: 3.5, professionCode: 'fighter', gearOptionId: 11, gearChoices: { 1: 101 } }),
+            catalog
+        ),
+        true
+    );
     assert.equal(canContinue(stateWith({ ...step3, rolledSilver: 7 }), catalog), false);
     assert.equal(canContinue(stateWith({ ...step3, nameDe: '  ' }), catalog), false);
     assert.equal(canContinue(stateWith({ ...step3, poolPicks: [1] }), catalog), false);
