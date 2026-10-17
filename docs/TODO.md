@@ -1,7 +1,3 @@
-- Fertigkeiten anklicken zeigt mehr als nur "Fertigkeiten", sondern was genau.
-- Die drei Produktions-Charaktere aus `docs/dump.md` (IDs 9–11) in eine neue Migration übernehmen.
-- Rules-Lücke: "Other Hazards" (Text da, keine Werkzeuge); Volltexte der einzelnen Fertigkeiten fehlen; Reise-Grundregeln (S. 100–101) fehlen.
-- Production: DB-Backup, deployen (führt `bin/migrate.php` aus), Bild-Upload testen (Faela Mondschatten); bei Fehlern php-fpm-Logs prüfen.
-- Visuell prüfen: `/rules` (alle sechs Tabs), `/dm/rules` (alle Kapitel), Kampagne 4, Todeswurf- und Rast-Dialog bei 390 px Breite.
-- Optional: Hinweis "512 × 512 px" am Upload-Feld oder automatisches Verkleinern.
 - Bild bearbeitbar machen. / Namen bearbeitbar machen.
+- DM Werkzeug Loot Tables.
+- Loot ausarbeiten
