@@ -81,10 +81,27 @@ final class CharacterRoutesTest extends AppTestCase
             'heroic_ability_id' => 0,
         ])->getStatusCode());
 
-        // portraits: no file, then a second portrait is refused
-        self::assertSame(422, $this->request('POST', $base . '/portrait')->getStatusCode());
+        // portraits: without a file the upload is refused and the existing portrait stays
         $this->db->exec("UPDATE characters SET portrait_path = 'images/characters/x.jpg' WHERE id = {$id}");
-        self::assertSame(409, $this->request('POST', $base . '/portrait')->getStatusCode());
+        self::assertSame(422, $this->request('POST', $base . '/portrait')->getStatusCode());
+        self::assertSame('images/characters/x.jpg', $this->db->query("SELECT portrait_path FROM characters WHERE id = {$id}")->fetchColumn());
+
+        // profile: name must not be empty, texts are saved, an empty story becomes NULL
+        self::assertSame(422, $this->request('POST', $base . '/profile', [
+            'name' => '  ',
+        ])->getStatusCode());
+        $this->json($this->request('POST', $base . '/profile', [
+            'name' => ' Neuer Name ',
+            'appearance' => 'Narbe am Kinn',
+            'story' => 'Ein langer Weg.',
+        ]), 200);
+        $row = $this->db->query("SELECT name_de, appearance_de, story_de FROM characters WHERE id = {$id}")
+            ->fetch();
+        self::assertSame(['Neuer Name', 'Narbe am Kinn', 'Ein langer Weg.'], array_values($row));
+        $this->json($this->request('POST', $base . '/profile', [
+            'name' => 'Neuer Name',
+        ]), 200);
+        self::assertNull($this->db->query("SELECT story_de FROM characters WHERE id = {$id}")->fetchColumn());
 
         $this->json($this->request('DELETE', $base), 200);
         self::assertSame(404, $this->request('GET', $base)->getStatusCode());

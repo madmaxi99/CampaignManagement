@@ -1,3 +1,4 @@
 - Bild bearbeitbar machen. / Namen bearbeitbar machen.
 - DM Werkzeug Loot Tables.
 - Loot ausarbeiten
+- 

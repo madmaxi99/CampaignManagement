@@ -3,8 +3,8 @@
 
 SET NAMES utf8mb4;
 
--- Catalogs (Dragonbane rules reference data, see docs/bilder/ screenshots of
--- the core rulebook). All catalog_* tables are shared reference data, never
+-- Catalogs (Dragonbane rules reference data, see the Schnellstarter PDF in docs/).
+-- All catalog_* tables are shared reference data, never
 -- campaign- or character-specific.
 
 CREATE TABLE catalog_attributes (
@@ -168,8 +168,8 @@ CREATE TABLE characters (
     memory_de TEXT NULL,
     -- Web-relative path (from the public/ root, no leading slash), e.g.
     -- 'images/characters/erzmeister_aodhan.jpg'. NULL = no portrait yet.
-    -- Once set (default roster seed data, or a player upload via the sheet),
-    -- it is permanent -- the UI never offers to replace it.
+    -- Set by the default roster seed data or a player upload via the sheet;
+    -- the player can replace it at any time.
     portrait_path VARCHAR(255) NULL,
     hp_max INT NOT NULL,
     hp_current INT NOT NULL,
@@ -284,7 +284,7 @@ CREATE TABLE character_inventory (
 
 -- The catalog holds only the ruleset (items, skills, bestiary, encounter
 -- tables, ...) and is static; campaigns own their places, items and NPCs
--- (see docs/CONCEPT.md and docs/SCHEMA.md). catalog_* rows exist exactly once.
+-- catalog_* rows exist exactly once.
 
 -- Bestiary = stat blocks, never individual creatures ("Wolf", "Goblin", or the
 -- stat block of one unique being like Krakul). Named beings are

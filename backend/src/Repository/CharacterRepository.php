@@ -65,21 +65,33 @@ final readonly class CharacterRepository
     }
 
     /**
-     * Sets the portrait once. Returns false without changing anything if the
-     * character already has one -- portraits are permanent, see the
-     * schema.sql comment on characters.portrait_path.
+     * Replaces the portrait; the player may swap it at any time.
      */
-    public function setPortraitPath(int $characterId, string $path): bool
+    public function setPortraitPath(int $characterId, string $path): void
     {
-        $stmt = $this->db->prepare(
-            'UPDATE characters SET portrait_path = :path WHERE id = :id AND portrait_path IS NULL'
-        );
+        $stmt = $this->db->prepare('UPDATE characters SET portrait_path = :path WHERE id = :id');
         $stmt->execute([
             'path' => $path,
             'id' => $characterId,
         ]);
+    }
 
-        return $stmt->rowCount() === 1;
+    /**
+     * Name, appearance and story as typed by the player. The name must not be empty
+     * (the caller validates that); empty appearance/story texts are stored as ''/NULL.
+     */
+    public function updateProfile(int $characterId, string $name, string $appearance, string $story): void
+    {
+        $story = trim($story);
+        $stmt = $this->db->prepare(
+            'UPDATE characters SET name_de = :name, appearance_de = :appearance, story_de = :story WHERE id = :id'
+        );
+        $stmt->execute([
+            'name' => $name,
+            'appearance' => trim($appearance),
+            'story' => $story === '' ? null : $story,
+            'id' => $characterId,
+        ]);
     }
 
     /**
