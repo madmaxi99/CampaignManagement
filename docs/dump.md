@@ -10,7 +10,7 @@ Stand 2026-10-17, gelesen aus der Produktions-DB (`amt-solo-vps`). Die Charakter
 | Beruf | Barde |
 | Schwäche | Anmaßend |
 | TP / WP | 13 / 12 |
-| Geld | 8 Silber |
+| Geld | 8 Kronen |
 | Attribute | STA 12, KON 13, GEW 13, INT 13, WIL 12, CHA 15 |
 | Memento | Eine Kalimba meiner Mutter |
 | Aussehen | Dunkelbraunes, flauschiges Fell, das in der Sonne rötlich schimmert. Heterochromie, wobei das linke Auge gelbgrün und das rechte Auge hellblau ist. Eher kleinere Körperstatur. |
@@ -32,7 +32,7 @@ Stand 2026-10-17, gelesen aus der Produktions-DB (`amt-solo-vps`). Die Charakter
 | Beruf | Dieb |
 | Schwäche | Voreingenommen |
 | TP / WP | 16 / 11 |
-| Geld | 9 Silber |
+| Geld | 9 Kronen |
 | Attribute | STA 7, KON 16, GEW 12, INT 13, WIL 11, CHA 13 |
 | Memento | Armband meiner Mutter |
 | Aussehen | Langes dunkel blaues Haar. Meistens im Zopf. Ohren gepierct, jede Seite drei. 1,75 groß. Ein Wolfstattoo am Bauch. |
@@ -54,7 +54,7 @@ Stand 2026-10-17, gelesen aus der Produktions-DB (`amt-solo-vps`). Die Charakter
 | Beruf | Handwerker |
 | Schwäche | Dünnhäutig |
 | TP / WP | 15 / 12 |
-| Geld | 6 Silber |
+| Geld | 6 Kronen |
 | Attribute | STA 15, KON 15, GEW 16, INT 13, WIL 12, CHA 12 |
 | Memento | Holzpferd, von meinem Vater geschnitzt |
 | Aussehen | „..." |

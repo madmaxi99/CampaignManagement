@@ -62,6 +62,11 @@ final readonly class CatalogEditorRepository
             'items' => $counts($items),
             'encounters' => (int) $this->db->query('SELECT COUNT(*) FROM catalog_encounter_tables')
                 ->fetchColumn(),
+            'treasure' => (int) $this->db->query("SELECT COUNT(*) FROM catalog_roll_tables WHERE group_de = 'Schätze'")
+                ->fetchColumn(),
+            'merchant' => (int) $this->db->query('SELECT COUNT(*) FROM catalog_items')
+                ->fetchColumn() + (int) $this->db->query('SELECT COUNT(*) FROM catalog_services')
+                ->fetchColumn(),
         ];
     }
 

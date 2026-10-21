@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Flyka\CampaignManagement\Repository;
 
 use Flyka\CampaignManagement\Database\Connection;
+use Flyka\CampaignManagement\Service\Price;
 use PDO;
 
 /**
@@ -43,7 +44,7 @@ final readonly class RulesRepository
             'misc' => [],
         ];
         foreach ($rows as $row) {
-            $row['price_de'] = $this->price($row);
+            $row['price_de'] = Price::format($row);
             $row['armor_penalties'] = $this->armorPenalties($row);
             $groups[$row['kind']][] = $row;
         }
@@ -65,7 +66,7 @@ final readonly class RulesRepository
             SQL)->fetchAll();
 
         foreach ($rows as &$row) {
-            $row['price_de'] = $this->price($row);
+            $row['price_de'] = Price::format($row);
         }
 
         return $rows;
@@ -281,25 +282,6 @@ final readonly class RulesRepository
         }
 
         return $groups;
-    }
-
-    /**
-     * @param array<string, mixed> $row
-     */
-    private function price(array $row): string
-    {
-        $parts = [];
-        foreach ([
-            'gold' => 'Gold',
-            'silver' => 'Silber',
-            'copper' => 'Kupfer',
-        ] as $key => $label) {
-            if ((int) $row['price_' . $key] > 0) {
-                $parts[] = $row['price_' . $key] . ' ' . $label;
-            }
-        }
-
-        return $parts === [] ? '–' : implode(', ', $parts);
     }
 
     /**

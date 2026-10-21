@@ -1,4 +1,4 @@
 - Bild bearbeitbar machen. / Namen bearbeitbar machen.
 - DM Werkzeug Loot Tables.
 - Loot ausarbeiten
-- 
+- Lore einmal überarbeiten: `docs/lore/` ist veraltet (Kar-Dumhad, Distelmark, Corlantis ...), maßgeblich ist die Lore in der App unter `/dm/lore` (Weidenmark, Karth, Dornmark).

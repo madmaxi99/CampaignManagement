@@ -29,6 +29,12 @@
                     <span class="menu__label">{{ group }}</span>
                     {% for table in tables %}<button type="button" role="menuitem" data-ui-open="#table-{{ table.code }}">{{ table.title_de }}</button>{% endfor %}
                 {% endfor %}
+                {% if treasureTables %}
+                    <span class="menu__label">Schätze</span>
+                    <button type="button" role="menuitem" data-ui-open="#treasure-tables">Schatztabelle</button>
+                {% endif %}
+                <span class="menu__label">Händler</span>
+                <button type="button" role="menuitem" data-ui-open="#merchant">Macken und Preislisten</button>
                 {% if encounterTables %}
                     <span class="menu__label">Zufallsbegegnungen</span>
                     {% for table in encounterTables %}<button type="button" role="menuitem" data-ui-open="#encounter-{{ table.id }}">{{ table.name_de }}</button>{% endfor %}
@@ -160,4 +166,5 @@
     <script type="module" src="{{ asset('js/dm-forms.js') }}"></script>
     <script type="module" src="{{ asset('js/campaign-play.js') }}"></script>
     <script type="module" src="{{ asset('js/party-picker.js') }}"></script>
+    <script type="module" src="{{ asset('js/merchant.js') }}"></script>
 {% endblock %}

@@ -301,7 +301,7 @@ function nameSkillsGearStep(state, catalog) {
     const silverField =
         maxSilver > 0
             ? `
-                <label class="wizard-field">Gewürfeltes Silber (${currentGearOption(state, catalog).silverDice} würfeln, 1–${maxSilver})<br>
+                <label class="wizard-field">Gewürfelte Kronen (${currentGearOption(state, catalog).silverDice} würfeln, 1–${maxSilver})<br>
                     <input type="number" id="rolled-silver-input" min="1" max="${maxSilver}" value="${state.rolledSilver ?? ''}"></label>
             `
             : '';
@@ -321,7 +321,7 @@ function nameSkillsGearStep(state, catalog) {
         <div class="wizard-choice-list">${gearRows}</div>
         ${gearChoiceGroups(state, catalog).length > 0 ? '<p class="wizard-note">Bei dieser Option wählst du im nächsten Schritt deine Ausrüstung aus.</p>' : ''}
         ${silverField}
-        <p class="wizard-note">Währung: 100 Kupfer = 10 Silber = 1 Gold. Anpassbar im fertigen Charakterbogen.</p>
+        <p class="wizard-note">Währung: 100 Heller = 10 Kronen = 1 Dukat. Anpassbar im fertigen Charakterbogen.</p>
 
         ${nav(state, catalog)}
     `;

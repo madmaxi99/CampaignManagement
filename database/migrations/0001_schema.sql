@@ -163,6 +163,8 @@ CREATE TABLE characters (
     profession_code VARCHAR(30) NOT NULL,
     flaw_id INT NOT NULL,
     appearance_de TEXT NOT NULL,
+    -- Background story, freely editable by the player on the sheet.
+    story_de TEXT NULL,
     memento_de TEXT NOT NULL,
     -- Private free text of the player ("Gedächtnis"), never shown to anyone else on purpose.
     memory_de TEXT NULL,

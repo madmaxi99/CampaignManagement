@@ -88,6 +88,33 @@ final class AppRoutesTest extends AppTestCase
             ->getBody();
         self::assertStringContainsString('catalog-workspace--two', $encounters);
         self::assertStringContainsString('href="/dm/catalog/encounters" aria-current="page"', $encounters, 'the open group is marked');
+
+        $treasure = (string) $this->request('GET', '/dm/catalog/treasure')
+            ->getBody();
+        self::assertStringContainsString('Schatztabelle 1', $treasure);
+        self::assertStringContainsString('Schatztabelle 2', $treasure);
+        self::assertStringContainsString('href="/dm/catalog/treasure" aria-current="page"', $treasure, 'the open group is marked');
+    }
+
+    public function testMerchantOverviewIsOnlyForTheDm(): void
+    {
+        self::assertSame(302, $this->request('GET', '/dm/merchant')->getStatusCode());
+        self::assertSame(302, $this->request('GET', '/dm/catalog/merchant')->getStatusCode());
+
+        $this->loginAsDm();
+        foreach (['/dm/merchant', '/dm/catalog/merchant'] as $path) {
+            $response = $this->request('GET', $path);
+            self::assertSame(200, $response->getStatusCode(), $path);
+            $this->assertCleanBody($response, $path);
+            $body = (string) $response->getBody();
+            foreach (['Macken des Ladenbesitzers', 'Jammert ununterbrochen', 'Waffen', 'Rüstungen', 'Dienste', 'Langschwert', 'Leibwächter'] as $text) {
+                self::assertStringContainsString($text, $body, $path);
+            }
+        }
+
+        $page = (string) $this->request('GET', '/dm/catalog/merchant')
+            ->getBody();
+        self::assertStringContainsString('href="/dm/catalog/merchant" aria-current="page"', $page, 'the open group is marked');
     }
 
     public function testSearchIsOnlyForTheDm(): void
@@ -117,7 +144,7 @@ final class AppRoutesTest extends AppTestCase
 
         $rules = (string) $this->request('GET', '/rules')
             ->getBody();
-        foreach (['Traglast', 'Leibwächter', 'Rasten', 'Sturzschaden', 'Jagd'] as $text) {
+        foreach (['Traglast', 'Leibwächter', 'Rasten', 'Sturzschaden', 'Jagd', 'Schatztabelle 1', 'Schatztabelle 2'] as $text) {
             self::assertStringContainsString($text, $rules);
         }
         foreach (['Improvisierte Waffen: Gasthaus', 'Grimmigkeit', 'panel-dm'] as $text) {
@@ -159,6 +186,9 @@ final class AppRoutesTest extends AppTestCase
             self::assertSame(200, $response->getStatusCode(), $path . '/play');
             $this->assertCleanBody($response, $path . '/play');
             self::assertStringContainsString('class="chapter-tab"', (string) $response->getBody(), 'even a single chapter keeps its tab');
+            self::assertStringContainsString('id="treasure-tables"', (string) $response->getBody(), 'the tools menu offers both treasure tables as one entry');
+            self::assertStringContainsString('data-merchant-src="/dm/merchant"', (string) $response->getBody(), 'the tools menu offers the merchant overview');
+            self::assertStringNotContainsString('id="table-schatz_1"', (string) $response->getBody());
         }
 
         $play = (string) $this->playPage(4)
@@ -200,7 +230,7 @@ final class AppRoutesTest extends AppTestCase
     {
         $this->loginAsDm();
 
-        foreach (['/dm', '/dm/rules', '/dm/lore', '/dm/styleguide', '/dm/catalog/items', '/dm/catalog/bestiary', '/dm/catalog/encounters'] as $path) {
+        foreach (['/dm', '/dm/rules', '/dm/lore', '/dm/styleguide', '/dm/catalog/items', '/dm/catalog/bestiary', '/dm/catalog/encounters', '/dm/catalog/treasure'] as $path) {
             $response = $this->request('GET', $path);
             self::assertSame(200, $response->getStatusCode(), $path);
             $this->assertCleanBody($response, $path);

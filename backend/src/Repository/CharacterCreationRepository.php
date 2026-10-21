@@ -468,7 +468,7 @@ final readonly class CharacterCreationRepository
             $maxSilver = (int) substr($silverDice, 1);
             $rolledSilver = (int) ($input['rolled_silver'] ?? 0);
             if ($rolledSilver < 1 || $rolledSilver > $maxSilver) {
-                throw new InvalidArgumentException("Gewürfeltes Silber muss zwischen 1 und {$maxSilver} liegen.");
+                throw new InvalidArgumentException("Gewürfelte Kronen müssen zwischen 1 und {$maxSilver} liegen.");
             }
         }
 

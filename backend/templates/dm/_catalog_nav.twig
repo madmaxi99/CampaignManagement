@@ -21,4 +21,12 @@
     <a class="catalog-nav__label catalog-nav__link" href="/dm/catalog/encounters"{% if section == 'encounters' %} aria-current="page"{% endif %}>
         <span>{{ ui.icon('dices') }} Begegnungen</span><span class="catalog-nav__count">{{ catalogNav.encounters }}</span>
     </a>
+
+    <a class="catalog-nav__label catalog-nav__link" href="/dm/catalog/merchant"{% if section == 'merchant' %} aria-current="page"{% endif %}>
+        <span>{{ ui.icon('coins') }} Händler</span><span class="catalog-nav__count">{{ catalogNav.merchant }}</span>
+    </a>
+
+    <a class="catalog-nav__label catalog-nav__link" href="/dm/catalog/treasure"{% if section == 'treasure' %} aria-current="page"{% endif %}>
+        <span>{{ ui.icon('dices') }} Schätze</span><span class="catalog-nav__count">{{ catalogNav.treasure }}</span>
+    </a>
 </nav>

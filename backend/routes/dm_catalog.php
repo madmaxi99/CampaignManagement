@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Flyka\CampaignManagement\Repository\CatalogEditorRepository;
+use Flyka\CampaignManagement\Repository\MerchantRepository;
+use Flyka\CampaignManagement\Repository\RulesRepository;
 use Flyka\CampaignManagement\Repository\WorldRepository;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -13,9 +15,9 @@ use function Flyka\CampaignManagement\Http\storeUploadedImage;
 
 /**
  * DM routes of the catalog editors (items, bestiary), the read-only
- * encounter tables and the party endpoints. All under /dm, so DmGate guards them.
+ * encounter and treasure tables, the merchant overview and the party endpoints. All under /dm, so DmGate guards them.
  */
-return function (App $app, CatalogEditorRepository $catalog, WorldRepository $world): void {
+return function (App $app, CatalogEditorRepository $catalog, WorldRepository $world, RulesRepository $rules, MerchantRepository $merchant): void {
     $json = fn (Request $request): array => json_decode((string) $request->getBody(), true) ?? [];
 
     $guard = function (Response $response, callable $action) {
@@ -189,6 +191,27 @@ return function (App $app, CatalogEditorRepository $catalog, WorldRepository $wo
     $app->get('/dm/catalog/encounters', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/catalog_encounters.twig', [
         'catalogNav' => $catalog->navCounts(),
         'encounterTables' => $world->encounterTables(),
+    ]));
+
+    // ---------- merchant: shopkeeper quirks and price lists (read-only) ----------
+
+    // The overview alone, loaded into the dialog of the play page.
+    $app->get('/dm/merchant', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/_merchant.twig', [
+        'quirks' => $merchant->quirks(),
+        'lists' => $merchant->priceLists(),
+    ]));
+
+    $app->get('/dm/catalog/merchant', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/catalog_merchant.twig', [
+        'catalogNav' => $catalog->navCounts(),
+        'quirks' => $merchant->quirks(),
+        'lists' => $merchant->priceLists(),
+    ]));
+
+    // ---------- treasure tables (read-only) ----------
+
+    $app->get('/dm/catalog/treasure', fn (Request $request, Response $response): Response => Twig::fromRequest($request)->render($response, 'dm/catalog_treasure.twig', [
+        'catalogNav' => $catalog->navCounts(),
+        'treasureTables' => $rules->rollTables()['Schätze'] ?? [],
     ]));
 
     // ---------- party ----------
