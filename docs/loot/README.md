@@ -31,5 +31,4 @@ Regeln und Richtwerte für Beute, Magie, Belohnungen und Händler. **Alles hier 
 
 ## Noch offen
 
-- **Seltenheit** im Katalog-ENUM: "einzigartig" steht noch dort, wird von der Doku nicht mehr benutzt.
 - **Preis-Anteile** (Reparatur, Hehler) als eigenes Feld statt Text, falls sie je in den Katalog kommen.

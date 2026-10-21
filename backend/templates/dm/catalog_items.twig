@@ -50,7 +50,7 @@
                         <div class="ui-field">
                             <label for="c-rarity">Seltenheit</label>
                             <select class="ui-select" id="c-rarity" name="rarity">
-                                {% for r in ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig'] %}<option value="{{ r }}" {{ (entity.rarity|default('gewöhnlich')) == r ? 'selected' }}>{{ r }}</option>{% endfor %}
+                                {% for r in ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär'] %}<option value="{{ r }}" {{ (entity.rarity|default('gewöhnlich')) == r ? 'selected' }}>{{ r }}</option>{% endfor %}
                             </select>
                         </div>
                     </div>

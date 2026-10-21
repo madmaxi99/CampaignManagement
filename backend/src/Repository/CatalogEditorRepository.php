@@ -16,7 +16,7 @@ use Throwable;
  */
 final readonly class CatalogEditorRepository
 {
-    private const array RARITIES = ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig'];
+    private const array RARITIES = ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär'];
 
     private const array KINDS = ['weapon', 'armor', 'misc'];
 

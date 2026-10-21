@@ -229,7 +229,7 @@ INSERT INTO catalog_items (id, name_de, description_de, rarity, price_gold, pric
     (28, 'Orbuculum', 'Kann als Fokus für Zauber verwendet werden.', 'ungewöhnlich', 18, 0, 0, 'misc'),
     (29, 'Zauberstab', 'Ein schlanker Stab, der als magischer Fokus dient.', 'ungewöhnlich', 10, 0, 0, 'misc'),
     (30, 'Amulett', 'Ein einfaches Amulett, das als magischer Fokus dient.', 'ungewöhnlich', 3, 0, 0, 'misc'),
-    (31, 'Grimoire', 'Ein Zauberbuch, in dem ein Magier seine bekannten Zauber festhält. Neu erschaffene Magier erhalten automatisch eines. Der Preis hängt vom Inhalt ab und kann deutlich höher sein.', 'einzigartig', 50, 0, 0, 'misc'),
+    (31, 'Grimoire', 'Ein Zauberbuch, in dem ein Magier seine bekannten Zauber festhält. Neu erschaffene Magier erhalten automatisch eines. Der Preis hängt vom Inhalt ab und kann deutlich höher sein.', 'episch', 50, 0, 0, 'misc'),
     (32, 'Leier', 'Ein kleines Saiteninstrument. Senkt die WP-Kosten der Musiker-Fähigkeit auf 1.', 'ungewöhnlich', 20, 0, 0, 'misc'),
     (33, 'Flöte', 'Eine einfache Holzflöte. Senkt die WP-Kosten der Musiker-Fähigkeit auf 2.', 'gewöhnlich', 2, 0, 0, 'misc'),
     (34, 'Horn', 'Ein Blashorn für Signale und Musik. Erhöht die Reichweite der Musiker-Fähigkeit auf 100 Meter.', 'gewöhnlich', 6, 0, 0, 'misc'),

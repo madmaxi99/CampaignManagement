@@ -103,7 +103,7 @@ CREATE TABLE catalog_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name_de VARCHAR(150) NOT NULL,
     description_de TEXT NOT NULL,
-    rarity ENUM('gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig') NOT NULL DEFAULT 'gewöhnlich',
+    rarity ENUM('gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär') NOT NULL DEFAULT 'gewöhnlich',
     price_gold INT NOT NULL DEFAULT 0,
     price_silver INT NOT NULL DEFAULT 0,
     price_copper INT NOT NULL DEFAULT 0,
@@ -736,7 +736,7 @@ CREATE TABLE catalog_rule_placements (
 CREATE TABLE catalog_services (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name_de VARCHAR(100) NOT NULL UNIQUE,
-    rarity ENUM('gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig') NOT NULL DEFAULT 'gewöhnlich',
+    rarity ENUM('gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär') NOT NULL DEFAULT 'gewöhnlich',
     price_gold INT NOT NULL DEFAULT 0,
     price_silver INT NOT NULL DEFAULT 0,
     price_copper INT NOT NULL DEFAULT 0,
