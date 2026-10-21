@@ -1,0 +1,20 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+{% import "rules/_macros.twig" as r %}
+
+{% block title %}Katalog: Schätze{% endblock %}
+
+{% block main_class %} dm-main--fill{% endblock %}
+
+{% block content %}
+    <div class="catalog-workspace catalog-workspace--two">
+        <div class="catalog-browser catalog-browser--nav ui-card">
+            {% include 'dm/_catalog_nav.twig' with {section: 'treasure'} %}
+        </div>
+
+        <section class="catalog-editor ui-stack">
+            <p class="ui-muted">Die Schatztabellen sind festes Regelwerk und hier nur zum Nachschlagen. Gewürfelt wird am Tisch.</p>
+            {% for t in treasureTables %}{{ r.rolltable(t, true) }}{% endfor %}
+        </section>
+    </div>
+{% endblock %}
