@@ -276,8 +276,31 @@
     gap: var(--space-2);
 }
 
-.sheet-portrait-upload label {
+.sheet-portrait-open {
+    padding: 0;
     cursor: pointer;
+}
+
+.sheet-portrait-full {
+    display: grid;
+    place-items: center;
+    min-height: 200px;
+    color: var(--honey-dark);
+    background: var(--honey-light);
+    border: 3px solid var(--honey);
+    border-radius: var(--radius-l);
+}
+
+.sheet-portrait-full img {
+    display: block;
+    max-width: 100%;
+    max-height: 60vh;
+    object-fit: contain;
+}
+
+.sheet-portrait-full svg {
+    width: 96px;
+    height: 96px;
 }
 
 /* TP/WP and the tabs stay together at the top while scrolling */
