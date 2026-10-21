@@ -50,7 +50,7 @@
                         <div class="ui-field">
                             <label for="c-rarity">Seltenheit</label>
                             <select class="ui-select" id="c-rarity" name="rarity">
-                                {% for r in ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig'] %}<option value="{{ r }}" {{ (entity.rarity|default('gewöhnlich')) == r ? 'selected' }}>{{ r }}</option>{% endfor %}
+                                {% for r in ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär'] %}<option value="{{ r }}" {{ (entity.rarity|default('gewöhnlich')) == r ? 'selected' }}>{{ r }}</option>{% endfor %}
                             </select>
                         </div>
                     </div>
@@ -59,9 +59,9 @@
                     <fieldset class="ui-stack" style="border: 0; padding: 0; margin: 0">
                         <legend class="ui-field__hint">Preis</legend>
                         <div class="field-pair">
-                            <div class="ui-field"><label for="c-pg">Gold</label><input class="ui-input" id="c-pg" type="number" min="0" name="price_gold" value="{{ entity.price_gold|default(0) }}"></div>
-                            <div class="ui-field"><label for="c-ps">Silber</label><input class="ui-input" id="c-ps" type="number" min="0" name="price_silver" value="{{ entity.price_silver|default(0) }}"></div>
-                            <div class="ui-field"><label for="c-pc">Kupfer</label><input class="ui-input" id="c-pc" type="number" min="0" name="price_copper" value="{{ entity.price_copper|default(0) }}"></div>
+                            <div class="ui-field"><label for="c-pg">Dukaten</label><input class="ui-input" id="c-pg" type="number" min="0" name="price_gold" value="{{ entity.price_gold|default(0) }}"></div>
+                            <div class="ui-field"><label for="c-ps">Kronen</label><input class="ui-input" id="c-ps" type="number" min="0" name="price_silver" value="{{ entity.price_silver|default(0) }}"></div>
+                            <div class="ui-field"><label for="c-pc">Heller</label><input class="ui-input" id="c-pc" type="number" min="0" name="price_copper" value="{{ entity.price_copper|default(0) }}"></div>
                         </div>
                     </fieldset>
 

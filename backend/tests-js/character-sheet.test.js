@@ -56,6 +56,11 @@ const HTML = `
     <input type="number" id="coins-silver" data-coin value="2">
     <input type="number" id="coins-copper" data-coin value="">
     <button data-delete-confirm>Löschen</button>
+    <form data-profile-form>
+        <input name="name" value="Faela">
+        <textarea name="appearance">Fell</textarea>
+        <textarea name="story">Aufgewachsen im Wald.</textarea>
+    </form>
 </div>`;
 
 async function openSheet(routes = {}) {
@@ -257,4 +262,19 @@ test('an injury can be marked as healed', async () => {
 
     assert.deepEqual(fetch.calls.at(-1), { method: 'DELETE', url: '/character/5/injuries/7', body: undefined });
     assert.equal(document.querySelector('[data-injury]'), null);
+});
+
+test('the profile form sends name, appearance and story', async () => {
+    const { document, fetch, window } = await openSheet({ 'POST /character/5/profile': { saved: true } });
+    const form = document.querySelector('[data-profile-form]');
+    form.elements.name.value = 'Faela Mondschatten';
+
+    form.dispatchEvent(new window.Event('submit', { cancelable: true, bubbles: true }));
+    await flush();
+
+    assert.deepEqual(fetch.calls.at(-1), {
+        method: 'POST',
+        url: '/character/5/profile',
+        body: { name: 'Faela Mondschatten', appearance: 'Fell', story: 'Aufgewachsen im Wald.' },
+    });
 });

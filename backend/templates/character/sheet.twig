@@ -27,14 +27,13 @@
 <div class="sheet" data-id="{{ character.id }}">
 
     <header class="sheet-hero ui-card ui-card--raised">
-        {% if character.portrait_path %}
-            <span class="ui-avatar ui-avatar--large"><img src="/{{ character.portrait_path }}" alt="{{ character.name_de }}"></span>
-        {% else %}
-            <form class="sheet-portrait-upload" data-portrait-form>
-                <label class="ui-avatar ui-avatar--large" for="portrait-input" title="Bild hinzufügen">{{ ui.icon('user') }}<span class="visually-hidden">Bild hinzufügen</span></label>
-                <input class="visually-hidden" type="file" id="portrait-input" name="portrait" accept="image/jpeg,image/png,image/webp">
-            </form>
-        {% endif %}
+        <form class="sheet-portrait-upload" data-portrait-form>
+            <label class="ui-avatar ui-avatar--large" for="portrait-input" title="Bild ändern">
+                {% if character.portrait_path %}<img src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">{% else %}{{ ui.icon('user') }}{% endif %}
+                <span class="visually-hidden">Bild ändern</span>
+            </label>
+            <input class="visually-hidden" type="file" id="portrait-input" name="portrait" accept="image/jpeg,image/png,image/webp">
+        </form>
         <div class="sheet-hero__text">
             <h1>{{ character.name_de }}</h1>
             <p class="ui-muted">{{ character.kin_de }} · {{ character.age_de }} · {{ character.profession_de }}</p>
@@ -120,10 +119,12 @@
 
         <section class="ui-card">
             <h2 class="ui-card__title">{{ ui.icon('scroll-text') }} Über {{ character.name_de }}</h2>
+            <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-ui-open="#profile-sheet">{{ ui.icon('pencil') }} Bearbeiten</button>
             <dl class="facts">
                 <div><dt>Schwäche</dt><dd>{{ character.flaw_de }}</dd></div>
                 {% if character.memento_de %}<div><dt>Memento</dt><dd>{{ character.memento_de }}</dd></div>{% endif %}
                 {% if character.appearance_de %}<div><dt>Aussehen</dt><dd>{{ character.appearance_de }}</dd></div>{% endif %}
+                {% if character.story_de %}<div><dt>Geschichte</dt><dd class="facts__story">{{ character.story_de|nl2br }}</dd></div>{% endif %}
             </dl>
         </section>
 
@@ -283,9 +284,9 @@
         <section class="ui-card">
             <h2 class="ui-card__title">{{ ui.icon('coins') }} Münzen</h2>
             <div class="currency-fields">
-                <div class="ui-field"><label for="coins-gold">Gold</label><input class="ui-input" type="number" min="0" id="coins-gold" data-coin value="{{ character.coins_gold }}"></div>
-                <div class="ui-field"><label for="coins-silver">Silber</label><input class="ui-input" type="number" min="0" id="coins-silver" data-coin value="{{ character.coins_silver }}"></div>
-                <div class="ui-field"><label for="coins-copper">Kupfer</label><input class="ui-input" type="number" min="0" id="coins-copper" data-coin value="{{ character.coins_copper }}"></div>
+                <div class="ui-field"><label for="coins-gold">Dukaten</label><input class="ui-input" type="number" min="0" id="coins-gold" data-coin value="{{ character.coins_gold }}"></div>
+                <div class="ui-field"><label for="coins-silver">Kronen</label><input class="ui-input" type="number" min="0" id="coins-silver" data-coin value="{{ character.coins_silver }}"></div>
+                <div class="ui-field"><label for="coins-copper">Heller</label><input class="ui-input" type="number" min="0" id="coins-copper" data-coin value="{{ character.coins_copper }}"></div>
             </div>
         </section>
     </div>
@@ -303,6 +304,20 @@
         </section>
     </div>
 </div>
+
+<dialog class="ui-sheet" id="profile-sheet" data-profile-sheet>
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <h2>{{ ui.icon('pencil') }} Charakter bearbeiten</h2>
+    <form class="ui-stack" data-profile-form>
+        <div class="ui-field"><label for="profile-name">Name</label><input class="ui-input" id="profile-name" name="name" type="text" maxlength="100" required value="{{ character.name_de }}"></div>
+        <div class="ui-field"><label for="profile-appearance">Aussehen</label><textarea class="ui-textarea" id="profile-appearance" name="appearance" rows="4" maxlength="5000">{{ character.appearance_de }}</textarea></div>
+        <div class="ui-field"><label for="profile-story">Geschichte</label><textarea class="ui-textarea" id="profile-story" name="story" rows="8" maxlength="20000">{{ character.story_de }}</textarea></div>
+        <div class="ui-row">
+            <button type="submit" class="ui-btn">Speichern</button>
+            <button type="button" class="ui-btn ui-btn--ghost" data-ui-close>Abbrechen</button>
+        </div>
+    </form>
+</dialog>
 
 <dialog class="ui-sheet" id="rest-sheet" data-rest-sheet>
     <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>

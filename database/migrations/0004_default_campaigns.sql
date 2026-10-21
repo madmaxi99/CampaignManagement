@@ -84,7 +84,7 @@ Tabelle „Zufällige Ereignisse" (W12 pro Viertel):
 ✦ NORD: Feuchter Erdtunnel zur Halle der Dame (#8), durch ein verschlossenes Fallgitter versperrt.
 ✦ SÜD: Feuchter Erdtunnel zu den Hügeltunneln (#4).', NULL, NULL),
     (7, 1, 1, 1, 6, '6', 'Familiengruft', 'In der finsteren Kammer sind an den Wänden sieben schlichte Steinsarkophage aufgereiht. Mehrere von ihnen sind geöffnet, und zwei Skelette liegen achtlos auf dem schmutzigen Erdboden.', '✦ Verwüstet: Drei der sieben Sarkophage wurden von den Goblins geöffnet und geplündert.
-✦ Schätze: Die vier ungeöffneten Sarkophage enthalten einzeln beigesetzte Skelette (teils in Kindergröße) in zerfallenen zeremoniellen Gewändern. Alle tragen vergoldete Stirnbänder (je 5 Goldstück) und juwelenbesetzte Ringe (je 3 Goldstück).
+✦ Schätze: Die vier ungeöffneten Sarkophage enthalten einzeln beigesetzte Skelette (teils in Kindergröße) in zerfallenen zeremoniellen Gewändern. Alle tragen vergoldete Stirnbänder (je 5 Dukaten) und juwelenbesetzte Ringe (je 3 Dukaten).
 ✦ Verschlossenes Fallgitter: Ein eisernes Fallgitter versperrt den Durchgang zur Halle der Dame (#8). Lässt sich mit einem von Grubs unbeschädigten Schlüsseln öffnen (Fingerfertigkeit-Probe nötig; bei Misserfolg bricht der Schlüssel ab). Rüstungswert 10, alternativ 30 Schadenspunkte oder ein Zauber wie Pfeiler – lockt sofort den Gruftschrecken an.
 ✦ Falle: Vor dem Fallgitter liegt unter einer dünnen Erdschicht eine versteckte Falltür (Entdecken-Probe nötig). Unentdeckt stürzt der erste Charakter, der sich nähert, in eine Grube mit Holzpflöcken (3W6 Stichschaden, bei erfolgreicher Ausweichen-Probe halbiert).
 ✦ Zufälliges Ereignis: Würfle einen W12 auf „Zufällige Ereignisse" für jedes volle Viertel hier.

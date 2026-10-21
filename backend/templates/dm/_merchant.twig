@@ -1,0 +1,49 @@
+{% import "_ui.twig" as ui %}
+{# Shop overview for the DM: the shopkeeper quirks and the price lists. Nothing is rolled or guessed. #}
+<div class="ui-stack" data-merchant>
+    <p class="ui-muted">Zwei Listen für den Laden: die <strong>Macken</strong> des Ladenbesitzers und die <strong>Preislisten</strong> mit Name, Preis und Effekt. Was gerade da ist, entscheidest du am Tisch.</p>
+    <div class="ui-search">
+        {{ ui.icon('search') }}
+        <input class="ui-input" type="search" data-merchant-search placeholder="Macke oder Ware suchen, z. B. Dolch" aria-label="Macken und Waren durchsuchen" autocomplete="off">
+    </div>
+
+    <details class="ui-details" open data-merchant-group>
+        <summary><span class="ui-details__title">Macken des Ladenbesitzers</span><span class="ui-badge">W20</span></summary>
+        <div class="ui-details__body">
+            <table class="ui-table ui-table--cards">
+                <thead><tr><th>W20</th><th>Macke</th></tr></thead>
+                <tbody>
+                    {% for quirk in quirks %}
+                        <tr data-merchant-row><td data-label="W20"><strong>{{ quirk.roll }}</strong></td><td data-label="Macke">{{ quirk.text_de }}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+
+    <div class="ui-row">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-merchant-open>Alle aufklappen</button>
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--small" data-merchant-close>Alle zuklappen</button>
+    </div>
+
+    {% for list in lists %}
+        <details class="ui-details" data-merchant-group>
+            <summary><span class="ui-details__title">{{ list.label }}</span><span class="ui-badge" data-merchant-count>{{ list.rows|length }}</span></summary>
+            <div class="ui-details__body">
+                <table class="ui-table ui-table--cards">
+                    <thead><tr><th>Name</th><th>Preis</th><th>Effekt</th></tr></thead>
+                    <tbody>
+                        {% for row in list.rows %}
+                            <tr data-merchant-row>
+                                <td data-label="Name"><strong>{{ row.name }}</strong></td>
+                                <td data-label="Preis">{{ row.price }}</td>
+                                <td data-label="Effekt">{{ row.effect }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    {% endfor %}
+    <p class="ui-muted" data-merchant-empty hidden>Nichts gefunden.</p>
+</div>

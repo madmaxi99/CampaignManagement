@@ -16,7 +16,7 @@ use Throwable;
  */
 final readonly class CatalogEditorRepository
 {
-    private const array RARITIES = ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär', 'einzigartig'];
+    private const array RARITIES = ['gewöhnlich', 'ungewöhnlich', 'selten', 'episch', 'legendär'];
 
     private const array KINDS = ['weapon', 'armor', 'misc'];
 
@@ -61,6 +61,11 @@ final readonly class CatalogEditorRepository
             'bestiary' => $counts($bestiary),
             'items' => $counts($items),
             'encounters' => (int) $this->db->query('SELECT COUNT(*) FROM catalog_encounter_tables')
+                ->fetchColumn(),
+            'treasure' => (int) $this->db->query("SELECT COUNT(*) FROM catalog_roll_tables WHERE group_de = 'Schätze'")
+                ->fetchColumn(),
+            'merchant' => (int) $this->db->query('SELECT COUNT(*) FROM catalog_items')
+                ->fetchColumn() + (int) $this->db->query('SELECT COUNT(*) FROM catalog_services')
                 ->fetchColumn(),
         ];
     }

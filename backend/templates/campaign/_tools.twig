@@ -27,6 +27,39 @@
     {% endfor %}
 {% endfor %}
 
+{% if treasureTables %}
+    <dialog class="ui-sheet ui-sheet--wide" id="treasure-tables" aria-labelledby="treasure-tables-title">
+        <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+        <div class="ui-stack">
+            <h2 id="treasure-tables-title">Schatztabelle</h2>
+            <p class="ui-muted">Würfle W6, um die Tabelle zu bestimmen: 1–3: Schatztabelle 1, 4–6: Schatztabelle 2. Gewürfelt wird am Tisch.</p>
+            {% for table in treasureTables %}
+                <h3>{{ table.title_de }} <span class="ui-badge">{{ table.die_de }}</span></h3>
+                <table class="ui-table ui-table--cards">
+                    <thead><tr><th>Wurf</th>{% for h in table.headers %}<th>{{ h }}</th>{% endfor %}</tr></thead>
+                    <tbody>
+                        {% for row in table.rows %}
+                            <tr>
+                                <td data-label="Wurf"><strong>{{ r.roll(row.roll_min, row.roll_max) }}</strong></td>
+                                <td data-label="{{ table.headers[0] }}"><strong>{{ row.name_de }}</strong></td>
+                                {% if table.headers|length > 1 %}<td data-label="{{ table.headers[1] }}">{{ row.effect_de }}</td>{% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endfor %}
+        </div>
+    </dialog>
+{% endif %}
+
+<dialog class="ui-sheet ui-sheet--wide" id="merchant" aria-labelledby="merchant-title">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <div class="ui-stack">
+        <h2 id="merchant-title">{{ ui.icon('coins') }} Händler</h2>
+        <div data-merchant-src="/dm/merchant"><p class="ui-muted">Lädt …</p></div>
+    </div>
+</dialog>
+
 {% for table in encounterTables %}
     <dialog class="ui-sheet ui-sheet--wide" id="encounter-{{ table.id }}" aria-label="{{ table.name_de }}">
         <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>

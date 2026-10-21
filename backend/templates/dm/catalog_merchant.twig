@@ -1,0 +1,20 @@
+{% extends "layout_dm.twig" %}
+{% import "_ui.twig" as ui %}
+
+{% block title %}Katalog: Händler{% endblock %}
+
+{% block main_class %} dm-main--fill{% endblock %}
+
+{% block content %}
+    <div class="catalog-workspace catalog-workspace--two">
+        <div class="catalog-browser catalog-browser--nav ui-card">
+            {% include 'dm/_catalog_nav.twig' with {section: 'merchant'} %}
+        </div>
+
+        <section class="catalog-editor">
+            {% include 'dm/_merchant.twig' %}
+        </section>
+    </div>
+
+    <script type="module" src="{{ asset('js/merchant.js') }}"></script>
+{% endblock %}

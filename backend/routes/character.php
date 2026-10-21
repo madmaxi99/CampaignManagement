@@ -190,6 +190,27 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
         ]);
     }));
 
+    $app->post('/character/{id:[0-9]+}/profile', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
+        $body = json_decode((string) $request->getBody(), true);
+        $name = trim((string) ($body['name'] ?? ''));
+        if ($name === '' || mb_strlen($name) > 100) {
+            return jsonResponse($response, [
+                'error' => 'Der Name darf nicht leer sein und höchstens 100 Zeichen haben.',
+            ], 422);
+        }
+
+        $characterRepository->updateProfile(
+            (int) $character['id'],
+            $name,
+            mb_substr((string) ($body['appearance'] ?? ''), 0, 5000),
+            mb_substr((string) ($body['story'] ?? ''), 0, 20000),
+        );
+
+        return jsonResponse($response, [
+            'saved' => true,
+        ]);
+    }));
+
     $app->post('/character/{id:[0-9]+}/memory', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
         $body = json_decode((string) $request->getBody(), true);
         $characterRepository->setMemory((int) $character['id'], (string) ($body['text'] ?? ''));
@@ -351,15 +372,8 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
         ]);
     }));
 
-    // Portraits are permanent once set (default roster seed data, or this
-    // upload) -- see the schema.sql comment on characters.portrait_path.
+    // The portrait can be replaced at any time; storeUploadedImage overwrites the old upload.
     $app->post('/character/{id:[0-9]+}/portrait', $withCharacter($characterRepository, function (Request $request, Response $response, array $args, array $character) use ($characterRepository): Response {
-        if ($character['portrait_path'] !== null) {
-            return jsonResponse($response, [
-                'error' => 'Dieser Charakter hat bereits ein Bild.',
-            ], 409);
-        }
-
         $characterId = (int) $character['id'];
         $stored = storeUploadedImage($request->getUploadedFiles()['portrait'] ?? null, 'images/characters/uploads', $characterId);
         if (isset($stored['error'])) {
@@ -369,13 +383,7 @@ return function (App $app, CharacterRepository $characterRepository, CharacterCr
         }
 
         $relativePath = $stored['path'];
-        if (! $characterRepository->setPortraitPath($characterId, $relativePath)) {
-            unlink(publicPath($relativePath));
-
-            return jsonResponse($response, [
-                'error' => 'Dieser Charakter hat bereits ein Bild.',
-            ], 409);
-        }
+        $characterRepository->setPortraitPath($characterId, $relativePath);
 
         return jsonResponse($response, [
             'portrait_path' => $relativePath,

@@ -403,7 +403,7 @@ function init(sheet) {
         });
     }
 
-    // ---- Portrait upload (only offered while there is none)
+    // ---- Portrait upload (the portrait can be replaced at any time)
     const portraitInput = document.getElementById('portrait-input');
     if (portraitInput) {
         portraitInput.addEventListener('change', function () {
@@ -423,6 +423,23 @@ function init(sheet) {
 
                         return;
                     }
+                    window.location.reload();
+                })
+                .catch(toastError);
+        });
+    }
+
+    // ---- Edit name, appearance and story
+    const profileForm = document.querySelector('[data-profile-form]');
+    if (profileForm) {
+        profileForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            sendJson('POST', '/character/' + id + '/profile', {
+                name: profileForm.elements.name.value,
+                appearance: profileForm.elements.appearance.value,
+                story: profileForm.elements.story.value,
+            })
+                .then(function () {
                     window.location.reload();
                 })
                 .catch(toastError);

@@ -200,6 +200,7 @@ return function (
             'foes' => $monsters->foes($campaignId),
             'foeOptions' => $monsters->bestiaryOptions(),
             'tableGroups' => array_intersect_key($groups, array_flip(['Reise & Wildnis', 'Improvisierte Waffen'])),
+            'treasureTables' => $groups['Schätze'] ?? [],
             'encounterTables' => $places->encounterTables($campaignId),
             'npcTables' => PlayTools::npcTables($groups),
         ]);

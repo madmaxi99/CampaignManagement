@@ -20,6 +20,7 @@ use Flyka\CampaignManagement\Repository\CampaignStandRepository;
 use Flyka\CampaignManagement\Repository\CatalogEditorRepository;
 use Flyka\CampaignManagement\Repository\CharacterCreationRepository;
 use Flyka\CampaignManagement\Repository\CharacterRepository;
+use Flyka\CampaignManagement\Repository\MerchantRepository;
 use Flyka\CampaignManagement\Repository\RulesRepository;
 use Flyka\CampaignManagement\Repository\SearchRepository;
 use Flyka\CampaignManagement\Repository\WorldRepository;
@@ -61,6 +62,7 @@ final class Application
         $characterCreationRepository = new CharacterCreationRepository($db);
         $rulesRepository = new RulesRepository($db);
         $catalogEditor = new CatalogEditorRepository($db);
+        $merchantRepository = new MerchantRepository($db);
         $searchRepository = new SearchRepository($db);
         $dmAuth = new DmAuth(getenv('DM_PASSWORD') ?: null, sys_get_temp_dir());
 
@@ -97,7 +99,7 @@ final class Application
             $catalogEditor,
             $rulesRepository
         );
-        (require $backendDir . '/routes/dm_catalog.php')($app, $catalogEditor, $worldRepository);
+        (require $backendDir . '/routes/dm_catalog.php')($app, $catalogEditor, $worldRepository, $rulesRepository, $merchantRepository);
         (require $backendDir . '/routes/dm_rules.php')($app, $rulesRepository, $worldRepository);
         (require $backendDir . '/routes/dm_lore.php')($app);
         (require $backendDir . '/routes/dm_search.php')($app, $searchRepository);

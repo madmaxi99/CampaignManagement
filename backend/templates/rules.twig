@@ -226,6 +226,7 @@
         {% for group_tables in tables.roll_tables %}
             {% for t in group_tables|filter(t => t.code == 'jagd') %}{{ r.rolltable(t) }}{% endfor %}
         {% endfor %}
+        {% for t in tables.roll_tables['Schätze']|default([]) %}{{ r.rolltable(t) }}{% endfor %}
     </div>
 
 

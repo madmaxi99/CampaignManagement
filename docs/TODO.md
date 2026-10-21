@@ -1,8 +1,4 @@
-Fertigkeiten anklicken zeigt mehr als nur "Fertigkeiten" and sondern was genau.
-
-
-DUmp von dne PC
-dann migration nochmal anpassen
-passwort anpassen
-
-Dieselben Rules Texte sollten Zentral irgendwo gespeichert werden und dann jeweils von da geladen werden.
+- Bild bearbeitbar machen. / Namen bearbeitbar machen.
+- DM Werkzeug Loot Tables.
+- Loot ausarbeiten
+- Lore einmal überarbeiten: `docs/lore/` ist veraltet (Kar-Dumhad, Distelmark, Corlantis ...), maßgeblich ist die Lore in der App unter `/dm/lore` (Weidenmark, Karth, Dornmark).
