@@ -32,6 +32,7 @@ Stand: 2026-10-05. Grundlage für den Chronisten-Text auf `/dm/lore` und später
 - **Orks:** Seit jeher verfeindete Stämme, vor wenigen Tagen von einem neuen Anführer vereint. Sie verhalten sich friedlich. *(Nutzer)*
 - **Orkanführer:** hochintelligent und charismatisch, kein Kriegstreiber. Er sieht, wie sich seine Stämme bekriegen, während im Nachbarland Frieden und Wohlstand herrschen. *(Nutzer)*
   - Er hat kaum Forderungen. Er will die Orks zu Größe bringen, ohne Krieg, und Handel treiben. *(Nutzer)*
+  - Die Orks sehen, wie Weidenmark und Dornmark aufblühen (Städte, Straßen, Handel, Fortschritt), und wollen das auch. Sie werden eine junge Nation mit Hauptstadt, Gesetzen und Handel. Weidenmark hält sie trotzdem für Barbaren. *(Nutzer)*
   - Bisher haben die Orks nicht einmal nach Handel gefragt, sie fokussieren sich auf sich selbst. Ein Diplomat wurde geschickt, hat erklärt, wer jetzt der Chef ist und dass die Stämme vereint sind. Dazu Höflichkeiten und vage Absichten, mehr nicht. Das ist schon passiert. *(Nutzer)*
   - Der König glaubt das, und etwa die Hälfte des Adels auch. Die andere Hälfte hat Angst, dass es nur ein Vorwand ist. *(Nutzer)*
   - Wie er die Stämme überzeugt hat, ist egal. Sie sind jetzt vereint. *(Nutzer)*
@@ -114,7 +115,7 @@ Es gibt weit mehr Häuser, als hier stehen. Aufgeführt sind nur die, die ein Am
 - **Haus Gerrin:** Westmark und Küste. Schützt den einzigen Hafen, stellt die Küstenwacht und sichert die Schiffe, die Salzbruck anlaufen. Stadthaus in Hohenfurt, in Salzbruck sitzt ein Amtmann des Hauses. Haupt: **Bertram Gerrin** (Mensch).
 - **Haus Lorn:** Münze und Zölle. Prägt das Geld des Königs, treibt die Zölle an Straßen und Brücken ein und hält die Handelswege mit den Zwergen in Ordnung. Stadthaus in Steinbach. Haupt: **Dorgrim Lorn** (Zwerg).
 - **Haus Kaltenbach:** Ostmark zu Dornmark. Bewacht die Grenze im Osten, hält die Straße nach Dornfeld offen und sorgt für den Marktfrieden in Lindhain, wo ein Vogt des Hauses sitzt. Stadthaus in Steinbach. Haupt: **Marta Kaltenbach** (Mensch).
-- **Haus Wieland** *(DM, Vorschlag)*: ein weiteres Haus ohne Reichsamt, das im Dornmark-Subplot (Abschnitt 11) auffällig wohlhabend wird. Stadthaus in Rotenmark.
+- **Haus Wieland** *(DM, Vorschlag)*: ein weiteres Haus ohne Reichsamt, der sichtbare Arm des Grauen Bundes im Adel (Abschnitt 11) und im Subplot ein Gegner der Krone. Stadthaus in Rotenmark.
 
 **Die Orks**
 - **Land:** Karth. Früher sieben verfeindete Stämme, jetzt „die Vereinten Stämme“. Auf der Karte stehen drei: **Stamm Ul-Dren** (Varroks eigener, Hauptlager), **Stamm Maladûk** (Nordosten, geführt von Maladûk, Orkin) und **Stamm Gorrash** (Nordwesten, Führung in Weidenmark kaum bekannt). *(Vorschlag)*
@@ -160,21 +161,20 @@ Ein Gruß ist ein Eröffnungswort und braucht keine Antwort. Danach geht es norm
 - Alltagsausdrücke, Flüche und Interjektionen („Alter“, „Scheiße“): bisher nichts, was dir gefällt.
 
 ## 11. Der Graue Bund (nur DM, nicht auf `/lore`)
-Steht nur im DM-Kapitel „Der Graue Bund“ (`/dm/lore?k=bund`). *(Nutzer: in den Kanon, nicht anzeigen; Rest Vorschlag.)*
+Steht nur im DM-Kapitel „Der Graue Bund“ (`/dm/lore?k=bund`). Der Ablauf des Subplots steht in `docs/lore/subplot.md`, die Akteure in `docs/lore/fraktionen.md`. *(Nutzer: in den Kanon, nicht anzeigen; Rest Vorschlag.)*
 
 - **Was er ist:** ein informelles Netzwerk reicher Patrizier, Gildenmeister und einzelner Beamter, Zentrum Rotenmark. Zweck: gegenseitige Absicherung, Informationen, stille Einflussnahme auf Routen, Gilden und Politik. Kein Kult, kein Verbrechersyndikat, eher ein Kartell der Privilegierten, ambivalent.
 - **Entstehung:** nach dem Beifall, als Händler sich ohne verlässliche Zentralgewalt selbst organisierten.
+- **Ziel:** Macht und Geld durch Angst vor Karth. Es gibt nur diesen einen Antrieb, keinen inneren Zirkel und kein Geld aus Dornmark. Dornmark ist ein gewöhnlicher Nachbar.
+- **Mittel:** Netzwerk in Hanse, Gilden und Beamtenschaft, graue Siegel, Mitwissen, gestreute Gerüchte. Im Adel ist Haus Wieland sein sichtbarer Arm.
 - **Erkennungszeichen:** graues, unbedrucktes Wachssiegel (statt farbiger Gildensiegel), graues Band am Handgelenk unter dem Ärmel, optional die Redewendung „Der graue Weg ist lang“.
-- **Agenda:** die Mehrheit will Selbsterhalt. Ein innerer Zirkel nimmt Geld aus Dornmark (Abschnitt unten).
+- **Im Subplot:** Der Bund nutzt die Angst der Falken und schürt Gerüchte, wenn ein Zwischenfall passiert. Bleibt er verborgen, endet der Subplot im kalten Frieden. Der Bund selbst bleibt ein offener Faden für später (Kampagne 2).
 - **Wie viel die Spieler erfahren sollen:** wenig. Sie sollen merken, dass da etwas Größeres liegt, es aber nicht auflösen. Spuren: graues Siegel, Kalendereintrag („Graues Treffen, Hansehaus-Keller, Vollmond“), graues Band.
 
-### Dornmark-Subplot *(Vorschlag, ersetzt den Sorvenne-Subplot)*
-- Der Zirkel nimmt Geld aus Dornmark, um das Gleichgewicht zwischen Adel und Hanse und die Zölle (Bruckau, Lindhain) zu seinen Gunsten zu verschieben. Er glaubt, Dornmark zu benutzen. Tatsächlich testen Dornmarker Geldgeber, wie leicht sich Weidenmark von innen fügig machen lässt. Ob der Hof von Dornfeld dahinter steht oder nur einzelne Handelshäuser, entscheidet die SL. Vogtin Hedda Aschwin weiß davon nichts.
-- **Orks:** bleiben friedlich. Der Subplot kann sie höchstens als Sündenböcke missbrauchen. Ob es zum Konflikt mit Karth kommt, entscheidet sich nur daran, ob Weidenmark provoziert oder missversteht (siehe Abschnitt 4).
-- **Eskalationsleiter:**
-  - *Grundrauschen:* Dornmarker Taler im Umlauf, Haus Wieland baut auffällig reich, Getreide- und Gewürzaufkäufe treiben Preise leicht hoch, Gildenämter gehen oft an Bund-Nahe.
-  - *Mittelfristig:* schärfere Zölle zulasten kleiner Händler, Kritiker werden eingeschüchtert, erste gezielte Morde an Leuten, die zu nah kommen (Muster wie bei Cassian), Zwischenfälle an der Nordmark, offiziell Orks, tatsächlich inszeniert.
-  - *Langfristig:* Haus Wieland drängt die Krone an den Rand, Streit zwischen den Häusern bis zur Zersplitterung, Dornmark bietet sich als Vermittler an, Karth wird in den Konflikt gezogen.
+### Subplot Karth *(Vorschlag, Details in `docs/lore/subplot.md`)*
+- Die Orks von Karth wollen Frieden und Wohlstand und werden eine junge Nation. Weidenmark hält sie für Barbaren. Dieses Missverständnis treibt den Subplot.
+- Es gibt keinen Krieg. Die Welt läuft in vier Phasen von selbst (Aufbruch, Reibung, Zerreißprobe, Ergebnis). Der Standardverlauf ohne die PCs ist der kalte Frieden.
+- Enden: A Handelsfrieden, B Kalter Frieden (Standard), C Krieg (nur bei Eskalation).
 
 ## 12. Zeit
 - Der Beifall liegt **273 Jahre** zurück, das Kampagnenjahr ist **273 n. B.** (nach dem Beifall). Die frühere Epoche („214 n.F.“, Fall von Korvanis als Jahr 0 und Dark-Kin-Invasion) ist verworfen. *(Nutzer)*

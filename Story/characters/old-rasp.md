@@ -6,20 +6,26 @@
 
 **Charakter:** heiser, theatralisch, genießt die Aufmerksamkeit. Kennt "jeden Klatsch", ohne selbst tief in irgendetwas verstrickt zu sein — ein reiner Kanal für Gerüchte, keine Quelle mit Insiderwissen.
 
-**Funktion am Tisch:** wiederkehrende, verlässliche Stimme, um das Grundrauschen des Dornmark-Subplots (siehe `secret-society.md`, `docs/lore/story.md` Abschnitt 11) dosiert einzustreuen, ohne dass ein NPC der Gruppe aktiv etwas erzählen muss. Die Orks bleiben dabei friedlich, Old Rasp erwähnt sie höchstens als Gerücht.
+**Funktion am Tisch:** wiederkehrende, verlässliche Stimme, die den Subplot Karth (`docs/lore/subplot.md`) als Hintergrundrauschen einstreut, ohne dass ein NPC der Gruppe aktiv etwas erzählen muss. Die Ausrufe folgen den vier Phasen des Subplots. Es gibt keinen Krieg: Die Orks sind eine junge Nation, die Weidenmark für Barbaren hält, und Old Rasp gibt vor allem die Stimmung der Straße wieder.
 
-## Beispiel-Ausrufe (rotierend, entlang der Eskalationsleiter)
+## Beispiel-Ausrufe (rotierend, nach Phase)
 
-**Grundrauschen**
-- "Der Brückenzoll in Bruckau steigt um einen Heller, so will es Haus Lorn! Und wer noch Dornmarker Taler in der Tasche hat — wechselt sie beim Münzer, bevor er die Nase rümpft!"
+**Phase 1 · Aufbruch**
+- "Karth hat eine Gesandte geschickt, und sie spricht besser Gemeinsprache als mancher Ratsherr! Barbaren? Fragt den Münzer, ob ihr Silber echt ist!"
+- "Die Karawanengilde meldet die ersten Wagen Richtung Karth — wer Salz übrig hat, fragt am Hansehaus!"
+- "Die Orks bauen eine Stadt, sagt man. Eine Stadt! Wo sie doch gestern noch Zelte hatten!"
+
+**Phase 2 · Reibung**
+- "Neue Kontrollstelle an der Nordstraße, verkündet vom Hof — wer nichts zu verbergen hat, hat nichts zu fürchten!"
+- "Der Brückenzoll in Bruckau steigt um einen Heller, so will es Haus Lorn! Und das Salz wird auch nicht billiger!"
 - "Haus Wieland lässt ein neues Stadthaus bauen — bei den Göttern, wovon eigentlich? Der alte Wieland hätte dafür drei Ernten gebraucht!"
-- "Die Kornherren melden: Die Speicher sind voll, und wer anderes behauptet, soll sich an der Tafel am Hansehaus überzeugen!"
 
-**Mittelfristig**
-- "Neue Zollordnung für Krämer und Kleinhändler, verkündet vom Hof — wer's nicht glauben mag, lese die Tafel am Hansehaus!"
+**Phase 3 · Zerreißprobe**
+- "Marschall Eberwein verdoppelt die Wachen an der Nordmark, heißt es — mag sein, dass es nötig ist. Mag auch sein, dass da wer Angst vor seinem eigenen Schatten hat."
+- "Händler kehren um, Wagen bleiben stehen — und niemand will sagen, warum. Ich sage nur: Fragt eure Nachbarn!"
 - "Meister Corvin, Färber in der Webergasse, ist seit drei Tagen nicht gesehen — manche sagen, er ist gereist. Manche sagen anderes."
-- "Marschall Eberwein verdoppelt die Wachen an der Nordmark, heißt es — nun, mag sein, dass die Orks wieder unruhig sind. Mag auch sein, dass da wer Angst vor was ganz anderem hat."
 
-**Langfristig** *(nur falls die Kampagne dahin eskaliert)*
-- "Der Hof tagt heute Nacht unter Ausschluss — zum ersten Mal seit Menschengedenken ohne den Marschall!"
-- "Man munkelt von Truppen — nicht in Karth, sondern an UNSERER Grenze zu Dornmark!"
+**Phase 4 · Ergebnis** *(je nach Ende)*
+- *A:* "Ein Abkommen mit Karth! Zum ersten Mal Orkhändler auf dem Krähenmarkt, und, ich schwöre, ihre Äpfel sind süß!"
+- *B:* "Der Rat tagt, die Wachen bleiben, die Preise auch. Nichts Neues, sagt der Hof. Ich sage: Es ist eben nicht nichts."
+- *C:* "Der Hof ruft die Männer zusammen — möge es niemand bereuen!"
