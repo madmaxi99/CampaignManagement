@@ -6,7 +6,7 @@ Kleinere, nicht eigenständig dateiwürdige NPCs, die in mehreren Kapiteln refer
 
 **Referenziert in:** `characters/murderer.md` (Rutgers Tat).
 
-**Rolle:** Nachtwächter am Kai unweit von Cassians Kontor in Corlantis. Von Rutger bestochen, um nach dem Mord auszusagen, er habe in der Tatnacht eine/n Fremde/n (passend zur Beschreibung der Reisegruppe) fluchtartig vom Kontor weglaufen sehen — lenkt den Verdacht gezielt von Rutger auf die PCs.
+**Rolle:** Nachtwächter im Hafenviertel unweit von Cassians Kontor in Rotenmark. Von Rutger bestochen, um nach dem Mord auszusagen, er habe in der Tatnacht eine/n Fremde/n (passend zur Beschreibung der Reisegruppe) fluchtartig vom Kontor weglaufen sehen — lenkt den Verdacht gezielt von Rutger auf die PCs.
 
 **Auftreten:** Mürrisch, wortkarg, wirkt eher wie ein zuverlässiger, wenn auch unfreundlicher Zeuge als wie ein Lügner — genau das macht seine Aussage zunächst glaubwürdig.
 

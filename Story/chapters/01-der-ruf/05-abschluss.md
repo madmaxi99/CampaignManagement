@@ -34,7 +34,7 @@ Sobald die PCs auch die zweite Aufgabe erledigt haben, kehren sie ein zweites Ma
 
 - Feste, regelmäßige Bezahlung statt Einzelaufträge — die PCs sind ab jetzt Wenzels (bzw. der dahinterstehenden Organisation) Leute.
 - Ein kleines, unauffälliges Erkennungszeichen (Siegel, Anstecker, Wort) — an sich nicht wertvoll, aber ein Türöffner für spätere Kontakte innerhalb der Organisation.
-- Konkrete Werte in **Kronen** (Dragonbane-Silber, siehe `docs/lore/world.md`, Kalender/Währung/Heraldik) — genaue Höhe der Spielleitung überlassen, aber "regelmäßiges, anständiges Auskommen" statt Reichtum.
+- Konkrete Werte in **Kronen** (Silber) — genaue Höhe der Spielleitung überlassen, aber "regelmäßiges, anständiges Auskommen" statt Reichtum.
 
 ## Cliffhanger
 

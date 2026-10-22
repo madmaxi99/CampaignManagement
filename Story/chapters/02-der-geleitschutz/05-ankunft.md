@@ -18,6 +18,6 @@ Das Hauspersonal (Verwalter/Haushälterin, noch zu benennen) nimmt die Fracht da
 
 ## Cliffhanger
 
-Cassian selbst ist noch unterwegs/beschäftigt (in Corlantis, mit dem eigentlichen Geschäft) — die Gruppe trifft ihn hier noch nicht persönlich. Das Personal verspricht, dass er sich "bald" bei ihnen melden wird.
+Cassian selbst ist noch unterwegs/beschäftigt (in Rotenmark, mit dem eigentlichen Geschäft) — die Gruppe trifft ihn hier noch nicht persönlich. Das Personal verspricht, dass er sich "bald" bei ihnen melden wird.
 
 → weiter mit Kapitel 3 (Cassian tritt persönlich auf — noch zu entwerfen).

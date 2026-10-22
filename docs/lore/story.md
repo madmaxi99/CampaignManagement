@@ -17,7 +17,7 @@ Stand: 2026-10-05. Grundlage für den Chronisten-Text auf `/dm/lore` und später
 - Er räumt auf, ersetzt die alten Leute aber durch seine eigenen, ebenso korrupten. *(Nutzer)*
 - Das fällt auf, die Opposition greift an, es kommt zum **Bürgerkrieg**. *(Nutzer)*
 - Der Konsul gewinnt, krönt sich zum **ersten König** und adelt seinen Stab aus Vertrauten. Daraus kommen die heutigen Adelshäuser. *(Nutzer)*
-- Begriffe: **Schwertadel** (Offiziere, Kriegsherren) und **Briefadel** (geadelte Verwalter und Berater). *(Vorschlag)*
+- Es gibt nur **Adel**, keine Unterteilung in Schwert- und Briefadel. Die Häuser unterscheiden sich durch ihr Amt, nicht durch ihren Stand. *(Nutzer)*
 - Ein furchtbares Ereignis mit viel Leid, aber ohne dauerhafte Verwüstung. *(Nutzer)*
 - Das ist allgemein bekannt: Das Königshaus stammt vom Konsul ab. Die Sieger haben nichts zu verbergen. *(Nutzer)*
 
@@ -81,7 +81,7 @@ Alle Namen und Himmelsrichtungen sind *(Vorschlag)*, die Rahmenbedingungen *(Nut
 
 **Städte** *(große Städte mit allem, alle Völker gemischt)*
 - **Hohenfurt** (Mitte, an der Weide): Hauptstadt und Sitz des Königshofs.
-- **Rotenmark** (Norden): Handelsstadt, Karawanen-Knotenpunkt Richtung Karth, an der Straße nach Karth. Hier sitzen die reichsten Patrizier.
+- **Rotenmark** (Norden, an einem Nebenfluss der Weide): Handelsstadt mit Flusshafen, Karawanen-Knotenpunkt Richtung Karth, an der Straße nach Karth. Hier sitzen die reichsten Patrizier.
 - **Steinbach** (Süden, am Fuß des Eisenkamms): Handel mit den Zwergen, Umschlag für Erz und Steinmetzarbeit.
 
 **Kleinstädte**
@@ -108,31 +108,40 @@ Alles *(Vorschlag)*.
 - **Aktuelle Monarchin: Königin Odela Sarn.** Alt, ruhig, diplomatisch, hat in ihrer Regierung nie einen Krieg geführt.
 
 **Die Adelshäuser** (aus dem Stab Hadriks)
-- **Haus Eberwein** (Schwertadel): Marschall des Reichs. Befehligt das Heer und hält die Nordmark am Grenzforst, damit Karawanen und Händler sicher an die Grenze und zurück kommen. Sitz: Burg Falkenhag. Haupt: Marschall **Gerhard Eberwein** (Mensch).
-- **Haus Thalheim** (Briefadel): Kanzler und Verwaltung. Führt die Kanzlei, schreibt die Gesetze nieder, führt die Archive und sorgt dafür, dass ein Befehl des Königs auch die letzte Gemeinde erreicht. Sitz in Hohenfurt. Haupt: Kanzlerin **Ysolde Thalheim** (Halb-Elfe).
-- **Haus Gerrin** (Schwertadel): Westmark und Küste. Schützt den einzigen Hafen, stellt die Küstenwacht und sichert die Schiffe, die Salzbruck anlaufen. Sitz: Salzbruck. Haupt: **Bertram Gerrin** (Mensch).
-- **Haus Lorn** (Briefadel): Münze und Zölle. Prägt das Geld des Königs, treibt die Zölle an Straßen und Brücken ein und hält die Handelswege mit den Zwergen in Ordnung. Sitz: Steinbach. Haupt: **Dorgrim Lorn** (Zwerg).
-- **Haus Kaltenbach** (Schwertadel): Ostmark zu Dornmark. Bewacht die Grenze im Osten, hält die Straße nach Dornfeld offen und sorgt für den Marktfrieden in Lindhain. Sitz: Lindhain. Haupt: **Marta Kaltenbach** (Mensch).
+Es gibt weit mehr Häuser, als hier stehen. Aufgeführt sind nur die, die ein Amt des Reichs halten. Kein Haus hat eine eigene Stadt. Der Adel hält sich in den drei großen Städten auf (Hohenfurt, Rotenmark, Steinbach), die Kleinstädte stehen unter Vögten und königlichen Beamten. *(Nutzer)*
+- **Haus Eberwein:** Marschall des Reichs. Befehligt das Heer und hält die Nordmark am Grenzforst, damit Karawanen und Händler sicher an die Grenze und zurück kommen. Burg Falkenhag am Grenzforst, Stadthaus in Rotenmark. Haupt: Marschall **Gerhard Eberwein** (Mensch).
+- **Haus Thalheim:** Kanzler und Verwaltung. Führt die Kanzlei, schreibt die Gesetze nieder, führt die Archive und sorgt dafür, dass ein Befehl des Königs auch die letzte Gemeinde erreicht. Stadthaus in Hohenfurt. Haupt: Kanzlerin **Ysolde Thalheim** (Halb-Elfe).
+- **Haus Gerrin:** Westmark und Küste. Schützt den einzigen Hafen, stellt die Küstenwacht und sichert die Schiffe, die Salzbruck anlaufen. Stadthaus in Hohenfurt, in Salzbruck sitzt ein Amtmann des Hauses. Haupt: **Bertram Gerrin** (Mensch).
+- **Haus Lorn:** Münze und Zölle. Prägt das Geld des Königs, treibt die Zölle an Straßen und Brücken ein und hält die Handelswege mit den Zwergen in Ordnung. Stadthaus in Steinbach. Haupt: **Dorgrim Lorn** (Zwerg).
+- **Haus Kaltenbach:** Ostmark zu Dornmark. Bewacht die Grenze im Osten, hält die Straße nach Dornfeld offen und sorgt für den Marktfrieden in Lindhain, wo ein Vogt des Hauses sitzt. Stadthaus in Steinbach. Haupt: **Marta Kaltenbach** (Mensch).
+- **Haus Wieland** *(DM, Vorschlag)*: ein weiteres Haus ohne Reichsamt, das im Dornmark-Subplot (Abschnitt 11) auffällig wohlhabend wird. Stadthaus in Rotenmark.
 
 **Die Orks**
 - **Land:** Karth. Früher sieben verfeindete Stämme, jetzt „die Vereinten Stämme“. Auf der Karte stehen drei: **Stamm Ul-Dren** (Varroks eigener, Hauptlager), **Stamm Maladûk** (Nordosten, geführt von Maladûk, Orkin) und **Stamm Gorrash** (Nordwesten, Führung in Weidenmark kaum bekannt). *(Vorschlag)*
 - **Anführer: Varrok Ul-Dren, genannt „der Schlichter“ (so hieß er schon vor der Einigung, weil er Streit zwischen den Stämmen schlichtete).** Klug, ruhig, gewinnend. Spricht besser Gemeinsprache, als man erwartet. Wie er die Stämme geeint hat, kann sich in Weidenmark niemand recht erklären (DM: durch Verhandlung und Beispiel, nicht mit Gewalt). Er will Größe für sein Volk, Handel und Frieden. *(Nutzer: Ziel, Rest Vorschlag)*
 
-## 8. Gilden
-Auf `/lore` (Spieler) stehen Gilden und Zünfte als Karten mit Aufgabe, die Gilden- und Zunftmeister nur im DM-Kapitel „Personen“ (`/dm/lore?k=personen`, vollständige Liste). Alles *(Vorschlag)*.
+## 8. Gilden und Zünfte
+Auf `/lore` (Spieler) stehen Gilden und Zünfte als Karten mit Aufgabe und Zunftzeichen, die Gilden- und Zunftmeister nur im DM-Kapitel „Personen“ (`/dm/lore?k=personen`, vollständige Liste). Alles *(Vorschlag)*.
 
-- **Weidenhanse:** Bund der mächtigsten Patrizier (reiche Kaufleute, vom Adel nicht anerkannt), Sitz Rotenmark. Entscheidet über Warenpreise, Karawanenrouten und Handelsabkommen, hält die Handelsgilden. Leise Spannung mit dem Adel. Vorsteherin: **Ilsabeth Brandt** (Mensch).
+**Der Unterschied**
+- **Zunft:** lokal, pro Handwerk und Stadt. Bildet aus (Lehrling, Geselle, Meister), prüft die Qualität und vergibt das **Zunftzeichen**, das jedes Stück trägt. Hält zum alten Adel.
+- **Gilde:** städteübergreifend, pro Branche. Regelt Preise, Routen und Verträge. Wer in einer Branche handeln will, braucht ihr Siegel. Steht unter der Weidenhanse.
+- **Weidenhanse:** das Dach der Patrizier. Sie entscheidet, wie die Gilden zusammenarbeiten, und spricht mit dem Hof.
+- Gildensiegel sind farbig und personalisiert. Das ist wichtig im Vergleich zum grauen, unbedruckten Wachs des Grauen Bundes (Abschnitt 11).
+- Eine Gewürz- und Duftgilde gibt es nicht. Gewürze und Düfte kommen über die Karawanengilde (Karth, Dornmark) oder die Salzgilde (See). Ein Handel mit ihnen ist ein Handelshaus innerhalb der Weidenhanse.
 
-**Handelsgilden** (städteübergreifend, pro Branche, unter der Weidenhanse)
-- **Kornherren** (Hohenfurt): Getreide des Kernlands. Sorgen für faire Brotpreise und Wintervorräte. Leitung: **Lindis Kornblum** (Halblingin).
-- **Erzgilde** (Steinbach): Handel mit den Zwergen, Erz, Eisen, Werkzeug. Leitung: **Brunhild Eisenmund** (Zwergin).
-- **Salzgilde** (Salzbruck): Salz, Fisch, Seefracht, auch für kleine Dörfer im Landesinneren. Leitung: **Aldo Rohrbach** (Mallard).
-- **Karawanengilde** (Rotenmark): Karawanen nach Karth, Führer, Wachen, Zölle und Schutz mit den Wolfkin. Leitung: **Fenja Rauh** (Halb-Orkin).
+- **Weidenhanse:** Bund der mächtigsten Patrizier (reiche Kaufleute, vom Adel nicht anerkannt), Sitz Rotenmark. Entscheidet über Warenpreise, Karawanenrouten und Handelsabkommen, hält die Handelsgilden. Leise Spannung mit dem Adel. Vorsteherin: **Ilsabeth Brandt** (Mensch). Zeichen: ein goldenes Weidenblatt über einer Waage.
 
-**Handwerkszünfte** (lokal pro Stadt, halten zum alten Adel, nicht immer gut auf die Hanse zu sprechen)
-- **Schmiedezunft:** Ausbildung und Qualität, Zunftzeichen. Zunftmeister: **Ulrich Hammerl** (Mensch).
-- **Steinmetzzunft:** Brücken, Mauern, Straßen. Zunftmeisterin: **Gimra Felsenhand** (Zwergin).
-- **Zimmerleutezunft:** Häuser, Boote, Fachwerk. Zunftmeister: **Silvanis Eichenwart** (Elf).
+**Handelsgilden**
+- **Kornherren** (Hohenfurt): Getreide des Kernlands. Sorgen für faire Brotpreise und Wintervorräte. Leitung: **Lindis Kornblum** (Halblingin). Zeichen: eine goldene Garbe auf Grün.
+- **Erzgilde** (Steinbach): Handel mit den Zwergen, Erz, Eisen, Werkzeug. Leitung: **Brunhild Eisenmund** (Zwergin). Zeichen: Schlägel und Eisen über einem Barren, grau.
+- **Salzgilde** (Salzbruck): Salz, Fisch, Seefracht, auch für kleine Dörfer im Landesinneren. Leitung: **Aldo Rohrbach** (Mallard). Zeichen: drei weiße Wellen über einem Fass, auf Blau.
+- **Karawanengilde** (Rotenmark): Karawanen nach Karth, Führer, Wachen, Zölle und Schutz mit den Wolfkin. Leitung: **Fenja Rauh** (Halb-Orkin). Zeichen: ein rotes Wagenrad auf Schwarz.
+
+**Handwerkszünfte** (lokal pro Stadt, halten zum Adel, nicht immer gut auf die Hanse zu sprechen)
+- **Schmiedezunft:** Ausbildung und Qualität. Zunftmeister: **Ulrich Hammerl** (Mensch). Zeichen: Hammer auf Amboss, als Schlagstempel ins Metall.
+- **Steinmetzzunft:** Brücken, Mauern, Straßen. Zunftmeisterin: **Gimra Felsenhand** (Zwergin). Zeichen: Winkel und Zirkel, in den Stein gemeißelt.
+- **Zimmerleutezunft:** Häuser, Boote, Fachwerk. Zunftmeister: **Silvanis Eichenwart** (Elf). Zeichen: eine Axt über einem Sparrenpaar, ins Holz gebrannt.
 
 ## 9. Grüße
 Ein Gruß ist ein Eröffnungswort und braucht keine Antwort. Danach geht es normal weiter („Awo. Was kann ich heute für euch tun?“). *(Nutzer, Wörter Vorschlag)*
@@ -149,3 +158,24 @@ Ein Gruß ist ein Eröffnungswort und braucht keine Antwort. Danach geht es norm
 ## 10. Offene Fragen
 - Welche Rolle spielt die Hauptstraße nach Karth im Alltag (Handel einzelner Händler, Karawanen)?
 - Alltagsausdrücke, Flüche und Interjektionen („Alter“, „Scheiße“): bisher nichts, was dir gefällt.
+
+## 11. Der Graue Bund (nur DM, nicht auf `/lore`)
+Steht nur im DM-Kapitel „Der Graue Bund“ (`/dm/lore?k=bund`). *(Nutzer: in den Kanon, nicht anzeigen; Rest Vorschlag.)*
+
+- **Was er ist:** ein informelles Netzwerk reicher Patrizier, Gildenmeister und einzelner Beamter, Zentrum Rotenmark. Zweck: gegenseitige Absicherung, Informationen, stille Einflussnahme auf Routen, Gilden und Politik. Kein Kult, kein Verbrechersyndikat, eher ein Kartell der Privilegierten, ambivalent.
+- **Entstehung:** nach dem Beifall, als Händler sich ohne verlässliche Zentralgewalt selbst organisierten.
+- **Erkennungszeichen:** graues, unbedrucktes Wachssiegel (statt farbiger Gildensiegel), graues Band am Handgelenk unter dem Ärmel, optional die Redewendung „Der graue Weg ist lang“.
+- **Agenda:** die Mehrheit will Selbsterhalt. Ein innerer Zirkel nimmt Geld aus Dornmark (Abschnitt unten).
+- **Wie viel die Spieler erfahren sollen:** wenig. Sie sollen merken, dass da etwas Größeres liegt, es aber nicht auflösen. Spuren: graues Siegel, Kalendereintrag („Graues Treffen, Hansehaus-Keller, Vollmond“), graues Band.
+
+### Dornmark-Subplot *(Vorschlag, ersetzt den Sorvenne-Subplot)*
+- Der Zirkel nimmt Geld aus Dornmark, um das Gleichgewicht zwischen Adel und Hanse und die Zölle (Bruckau, Lindhain) zu seinen Gunsten zu verschieben. Er glaubt, Dornmark zu benutzen. Tatsächlich testen Dornmarker Geldgeber, wie leicht sich Weidenmark von innen fügig machen lässt. Ob der Hof von Dornfeld dahinter steht oder nur einzelne Handelshäuser, entscheidet die SL. Vogtin Hedda Aschwin weiß davon nichts.
+- **Orks:** bleiben friedlich. Der Subplot kann sie höchstens als Sündenböcke missbrauchen. Ob es zum Konflikt mit Karth kommt, entscheidet sich nur daran, ob Weidenmark provoziert oder missversteht (siehe Abschnitt 4).
+- **Eskalationsleiter:**
+  - *Grundrauschen:* Dornmarker Taler im Umlauf, Haus Wieland baut auffällig reich, Getreide- und Gewürzaufkäufe treiben Preise leicht hoch, Gildenämter gehen oft an Bund-Nahe.
+  - *Mittelfristig:* schärfere Zölle zulasten kleiner Händler, Kritiker werden eingeschüchtert, erste gezielte Morde an Leuten, die zu nah kommen (Muster wie bei Cassian), Zwischenfälle an der Nordmark, offiziell Orks, tatsächlich inszeniert.
+  - *Langfristig:* Haus Wieland drängt die Krone an den Rand, Streit zwischen den Häusern bis zur Zersplitterung, Dornmark bietet sich als Vermittler an, Karth wird in den Konflikt gezogen.
+
+## 12. Zeit
+- Der Beifall liegt **273 Jahre** zurück, das Kampagnenjahr ist **273 n. B.** (nach dem Beifall). Die frühere Epoche („214 n.F.“, Fall von Korvanis als Jahr 0 und Dark-Kin-Invasion) ist verworfen. *(Nutzer)*
+- Kalender: Monatsnamen aus `world.md` bleiben (Frostmond ... Lichtkehr), Sonnwend und Lichtkehr sind neutrale Sonnenwendfeste ohne Lichtwacht. *(Vorschlag, offen)*

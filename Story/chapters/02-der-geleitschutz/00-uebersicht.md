@@ -11,7 +11,7 @@
 
 | Datei | Inhalt |
 |---|---|
-| `01-aufbruch.md` | Downtime in Corlantis, Vorbereitung, Aufbruch mit zwei Wagen und Wenzel |
+| `01-aufbruch.md` | Downtime in Rotenmark, Vorbereitung, Aufbruch mit zwei Wagen und Wenzel |
 | `02-die-reise.md` | Reise-Montage (überwiegend vorlesbarer Text), Leitplanken fürs Pacing |
 | `03-die-weggabelung.md` | Rast am Gasthaus an der Weggabelung, Entscheidung Weg A (Flut) vs. Weg B (Wald/Räuber) |
 | `04a-die-flut.md` | Weg A — reißender Fluss blockiert die Straße |
@@ -27,6 +27,6 @@
 
 ## Offene Anschlussfragen (für Kapitel 3 und danach)
 
-- Cassians Wohnsitz liegt in **Hirschau** (Grafschaft am Waldrand nahe Aelenor, siehe `docs/lore/world.md`, Geografie) — passt zur Reisebeschreibung (hügeliger, dichter werdender Wald, siehe `02-die-reise.md`) und erklärt nebenbei, warum sein Familiensitz bewusst abseits der Corlantis-Politik liegt.
+- Cassians Wohnsitz liegt in **Hirschau**, einem Landsitz-Dorf am Südrand des Grenzforsts (siehe `docs/lore/story.md`, Geografie) — passt zur Reisebeschreibung (hügeliger, dichter werdender Wald, siehe `02-die-reise.md`) und erklärt nebenbei, warum sein Familiensitz bewusst abseits der Rotenmark-Politik liegt.
 - Wie genau Cassian sich der Gruppe in Kapitel 3 persönlich vorstellt.
 - **Wichtig:** Cassians Tod (siehe `../../characters/victim.md`, `../../characters/murderer.md`) ist NICHT Teil von Kapitel 3 — er ist der Cliffhanger am Ende von Kapitel 9, mit Kapitel 10 als Auflösung. Kapitel 3–9 (Bindungsbogen zwischen Cassian und den PCs) sind grob umrissen (siehe `00-uebersicht.md` in den jeweiligen Kapitelordnern), aber noch ohne ausformulierte Szenen — die entstehen erst, wenn klar ist, dass die Kampagne tatsächlich so weit kommt.

@@ -1,6 +1,6 @@
 # Kapitel 1 — Der Ruf (Kapitel-Übersicht, Spoiler-Dokument)
 
-Dieses Kapitel ersetzt den alten `01-prolog.md`-Ansatz (Zufallsbegegnung auf dem Weg nach Corlantis). Die PCs kennen sich zu Beginn **nicht** — sie sind Fremde, die unabhängig voneinander auf denselben Anwerbungsruf reagieren.
+Dieses Kapitel ersetzt den alten `01-prolog.md`-Ansatz (Zufallsbegegnung auf dem Weg nach Rotenmark). Die PCs kennen sich zu Beginn **nicht** — sie sind Fremde, die unabhängig voneinander auf denselben Anwerbungsruf reagieren.
 
 ## Zweck
 
