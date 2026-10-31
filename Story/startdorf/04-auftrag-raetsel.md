@@ -20,8 +20,8 @@ Eine verfallene Umladestation, **etwas außerhalb** am Fluss flussabwärts vom A
 
 ## Einstiege (mehrere, alle passiv oder frei wählbar)
 1. **Die Versammlung.** Ottokar Lenz erwähnt, dass der alte Schuppen saniert werden sollte, weil man ihn als Lager nutzen könnte. Noch in der Versammlung beschuldigen sich Ruprecht und Hannes öffentlich: Ruprecht vermisst Hammer und Zange, Hannes Feile, Öl und Holzkohle. Das ist der Anlass, aber noch kein Auftrag an die Gruppe.
-2. **Die Angelstelle.** Unterhalb des Schuppens liegt die beste Angelstelle am Fluss (Borbin kennt das vom Morgen, wenn er dort geangelt hat, oder die Wirtin verrät sie). Wer dort ist, sieht den Schuppen, Rußspuren am Dach und einen Pfad.
-3. **Der Pfad.** Am Fluss entlang führt ein Trampelpfad flussabwärts zum Alten Gehölz. Wer dort spazieren geht oder etwas sucht, kommt am Schuppen vorbei.
+2. **Die Angelstelle.** Beim Schuppen liegt die beste Angelstelle am Fluss (die Wirtin verrät sie). Wer dort angelt, sieht den Schuppen, Rußspuren am Dach und eine Trittspur zur Tür.
+3. **Der Pfad.** Am Fluss entlang führt ein Trampelpfad flussabwärts zum Alten Gehölz, ein Stück vom Schuppen entfernt. Wer dort spazieren geht oder etwas sucht, sieht ihn zwischen den Büschen, geht aber nur hin, wenn er neugierig ist.
 4. **Zeichen am Abend oder in der Nacht.** Ein dünner Rauchfaden aus dem Dach, ein roter Schein durch die Ritzen, ein leises Hämmern. Wer in der Nacht am Fluss ist (Wache, Spaziergang, Heimweg), bekommt das mit.
 5. **Der Fährmann.** Jorn Teich hat Licht gesehen und für nichts Besonderes gehalten. Wer ihn fragt, bekommt es erwähnt.
 6. **Direkte Bitte (aktiver Einstieg).** Einer der beiden Streithähne kommt direkt auf die Gruppe zu und bittet sie, **Beweise gegen den anderen zu finden**. Er zahlt aus dem eigenen Beutel (etwa 8 Kronen). Wann das passiert und wer kommt, entscheidet die Spielleitung: nach der Versammlung, wenn die Gruppe im Dorf herumfragt, oder wenn sie sich beim Dorf einen Namen gemacht hat (zum Beispiel durch den Bären). Es ist kein Muss, dass der Bär gelöst ist.

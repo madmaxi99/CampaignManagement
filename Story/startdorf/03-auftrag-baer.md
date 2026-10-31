@@ -23,8 +23,8 @@ Eine Felsspalte oder ein hohler Baum am Rand des Alten Gehölzes, etwa zwei Wegs
 - **Fertigkeiten:** Wahrnehmung 10, Ausweichen 8.
 
 ## Drei Wege
-1. **Töten:** Im Kampf, mit Schleuder, Bogen, Messer oder einer Falle. Der Biss ist gefährlich, aber der Bär ist ein einzelnes Tier, der Kampf ist machbar. Als Beute bleibt ein **Bärenpelz**, den ein Gerber verwerten kann. Die Eigenschaften des Pelzes werden später festgelegt.
-2. **Weglocken:** Ein großer Fischköder oder Aas an einer Futterstelle weit weg vom Dorf, am besten flussaufwärts oder tief im Gehölz. Der Bär folgt dem Geruch und lässt das Vieh in Ruhe.
+1. **Töten:** Im Kampf, mit Schleuder, Bogen, Messer oder einer Falle. Der Biss ist gefährlich, aber der Bär ist ein einzelnes Tier, der Kampf ist machbar. Als Beute bleibt ein **Bärenpelz**, den ein Gerber verwerten kann.
+2. **Weglocken:** Ein großer Fischköder oder Aas an einer Futterstelle weit weg vom Dorf, am besten tief im Alten Gehölz, auf der anderen Seite von der Höhle aus gesehen. Der Bär folgt dem Geruch und lässt das Vieh in Ruhe.
 3. **Vertreiben:** Feuer, Lärm, Fackeln und Musik an der Stelle, wo er nachts trinkt oder aus dem Wald tritt. Er zieht ab, wenn man ihn oft genug stört.
 
 Wer aufgibt oder sich zurückzieht, dem holt der Bär weitere Tiere, und die Stimmung im Dorf wird angespannter.

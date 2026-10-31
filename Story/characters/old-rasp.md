@@ -1,6 +1,6 @@
 # NPC: Old Rasp — der Ausrufer vom Krähenmarkt
 
-> **Hinweis:** Der Start der Kampagne spielt im Dorf Altfurt (`Story/startdorf/`), nicht hier. Diese Datei ist Worldbuilding für später. Die alte Handlung liegt unter `Story/alt/`.
+> **Hinweis:** Der Start der Kampagne spielt im Dorf Binsenau (`Story/startdorf/`), nicht hier. Diese Datei ist Worldbuilding für später. Die alte Handlung liegt unter `Story/alt/`.
 
 **Ort:** Der Krähenmarkt, zentraler Platz vor dem Hansehaus in Rotenmark. Stände mit Salzfisch, Getreide, Karawanenwaren und Färberwaren; Handwerkerbuden am Rand; das Hansehaus überragt den Platz.
 

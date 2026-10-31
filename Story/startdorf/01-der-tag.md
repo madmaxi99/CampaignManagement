@@ -1,6 +1,6 @@
 # Der Tag
 
-Die Figuren aus `docs/dump.md` kommen nacheinander im Dorf an. Es gibt noch keine Aufträge, nur einen gewöhnlichen Tag, an dem man das Dorf kennenlernt. Die Aufträge sind unabhängig voneinander. Der Tag dient dazu, das Dorf kennenzulernen, und endet mit der Versammlung. Die Reihenfolge der Figuren ist ein Vorschlag.
+Die Figuren aus `docs/dump.md` kommen nacheinander im Dorf an. Es gibt noch keine Aufträge, nur einen gewöhnlichen Tag, an dem man das Dorf kennenlernt. Der Tag dient dazu, das Dorf kennenzulernen, und endet mit der Versammlung. Die Aufträge sind unabhängig voneinander. Die Reihenfolge der Figuren ist ein Vorschlag.
 
 ## Morgen: Borbin (Halbling, Gerber)
 Borbin steht im Gasthaus auf und kann den Tag so verbringen, wie er mag.
@@ -23,11 +23,11 @@ Zhalia kommt auf der Königsstraße an, wenn das Dorf auf den Beinen ist.
 ## Die Versammlung
 Der **Dorfvorsteher Ottokar Lenz** steht auf und spricht über die Probleme. Er bleibt höflich und bedächtig:
 1. **Das Vieh:** Vier Tiere sind in drei Nächten gerissen worden, und niemand weiß, was es ist. Die Leute haben Angst, nachts die Tiere zu hüten.
-2. **Der Streit:** Zwei Nachbarn beschuldigen sich gegenseitig des Diebstahls, und sie tun es noch in der Versammlung laut vor allen (Ruprecht vermisst Hammer und Zange, Hannes Feile, Öl und Holzkohle). Beiläufig erwähnt Lenz auch, dass der **alte Schuppen** am Fluss saniert werden sollte, damit die Gemeinde ihn als Lager nutzen kann. Das ist kein Auftrag, nur ein Hinweis.
+2. **Der Streit:** Zwei Nachbarn beschuldigen sich gegenseitig des Diebstahls, und sie tun es noch in der Versammlung laut vor allen (Ruprecht vermisst Hammer und Zange, Hannes Feile, Öl und Holzkohle). Beiläufig erwähnt Lenz auch, dass der **alte Schuppen** am Fluss saniert werden sollte, weil die Gemeindescheune für die Vorräte zu klein ist. Das ist kein Auftrag, nur ein Hinweis.
 
-Lenz sieht die drei Fremden und kommt auf eine Idee: „Ihr seht aus wie Leute, die mit so etwas umgehen können. Wir zahlen gut.“ Er fragt sie direkt, ob sie sich um das Vieh kümmern können, und bietet eine Belohnung an (Überzeugen und Verhandeln sind möglich). Danach ist es den Figuren überlassen. Sie können annehmen, ablehnen oder erst am nächsten Morgen entscheiden. Die Spielleitung zwingt nichts.
+Lenz sieht die drei Fremden und kommt auf eine Idee: „Ihr seid weit herumgekommen und habt sicher schon Schlimmeres gesehen. Wir haben keinen Jäger im Dorf. Wir zahlen gut.“ Er fragt sie direkt, ob sie sich um das Vieh kümmern können, und bietet eine Belohnung an (Überzeugen und Verhandeln sind möglich). Danach ist es den Figuren überlassen. Sie können annehmen, ablehnen oder erst am nächsten Morgen entscheiden. Die Spielleitung zwingt nichts.
 
 Die Reise in die Stadt (`05-auftrag-botengang.md`) wird auf der Versammlung **nicht** genannt. Sie ist unabhängig von Bär und Streit und kann jederzeit beginnen, wenn die Spielleitung es für richtig hält.
 
 ## Belohnungen *(Vorschlag, in Kronen)*
-Der Vorsteher zahlt für den Bären etwa 15 Kronen. Für das Rätsel zahlt der Bauer, der die Gruppe um Beweise bittet, etwa 8 Kronen. Die Reise in die Stadt wird mit dem Dank der Oma entlohnt, ohne feste Summe. Wer zahlt und wann, entscheidet die Spielleitung. Dazu gibt es Verpflegung im Gasthaus. Die Figuren haben zu Beginn 6 bis 9 Kronen, das sind also ordentliche Summen.
+Der Vorsteher zahlt für den Bären etwa 15 Kronen. Für das Rätsel zahlt der Bauer, der die Gruppe um Beweise bittet, etwa 8 Kronen. Die Reise in die Stadt ist ein Gefallen für die Oma und wird nicht bezahlt, es gibt nur ihren Dank und einen Beutel Kekse. Wer sonst zahlt und wann, entscheidet die Spielleitung. Dazu gibt es Verpflegung im Gasthaus. Die Figuren haben zu Beginn 6 bis 9 Kronen, das sind also ordentliche Summen.

@@ -1,6 +1,6 @@
 # Der Graue Bund
 
-> **Hinweis:** Der Start der Kampagne spielt im Dorf Altfurt (`Story/startdorf/`), nicht hier. Diese Datei ist Worldbuilding für später. Die alte Handlung liegt unter `Story/alt/`.
+> **Hinweis:** Der Start der Kampagne spielt im Dorf Binsenau (`Story/startdorf/`), nicht hier. Diese Datei ist Worldbuilding für später. Die alte Handlung liegt unter `Story/alt/`.
 
 Bewusst vage gehalten — soll über diese Kampagne hinaus Potenzial haben. Die Gruppe muss (und soll) am Ende nicht alles darüber wissen. Kanon: `docs/lore/story.md` Abschnitt 11 und das DM-Kapitel „Der Graue Bund“ der App (nicht auf `/lore`). Ablauf des Subplots: `docs/lore/subplot.md`, Akteure: `docs/lore/fraktionen.md`.
 

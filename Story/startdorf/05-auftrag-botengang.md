@@ -7,10 +7,10 @@ Er bringt die Gruppe aus dem Dorf in die Stadt. In einem kleinen Dorf gibt es nu
 - Die Reise ist kurz erzählt, die Stadt ist das Ziel. Dort geht es weiter (Worldbuilding später).
 
 ## Der Hänger: Oma Adelheid Kruse
-Adelheid Kruse ist die alte Mutter des Bäckers Wilm Kruse. Ihre Tochter **Marthe** lebt seit Jahren in **Steinbach** (zwei Tagesreisen flussaufwärts, Handelsstadt am Fuß des Eisenkamms, `docs/lore/story.md`) und hat seit Wochen nicht geschrieben. Die Oma kann nicht reisen, ihre Beine tragen sie nicht mehr, und ihr Sohn kann die Bäckerei nicht verlassen. Deshalb bittet sie die Gruppe, nach Marthe zu sehen.
-- **Was sie mitgibt:** einen Brief, ein Brot und ein Erkennungszeichen (ein kleines Tuch mit gestickten Ähren, das Marthe von ihr hat).
+Adelheid Kruse ist die alte Mutter des Bäckers Wilm Kruse. Ihre Tochter **Marthe** lebt seit Jahren in **Steinbach** (zwei Tagesreisen flussaufwärts, Handelsstadt am Fuß des Eisenkamms, `docs/lore/story.md`) und hat seit Wochen nicht geschrieben. Die Oma kann nicht reisen, ihre Beine tragen sie nicht mehr, und ihr Sohn kann die Bäckerei nicht verlassen. Sie bittet die Gruppe um einen **Gefallen**, nicht um einen Auftrag: „Ihr zieht doch sowieso in die Richtung, schaut doch bitte nach ihr.“ Es ist eine Einbahnstraße, die Gruppe muss nicht zurückkommen und nichts zurückbringen.
+- **Was sie mitgibt:** einen Brief, ein Brot, ein Erkennungszeichen (ein kleines Tuch mit gestickten Ähren, das Marthe von ihr hat) und einen **Beutel selbstgebackene Kekse** zum Naschen unterwegs (Honig und Mandeln, so gut, dass man sie bis zum ersten Nachtlager aufgegessen hat).
 - **Hinweise zu Marthe** (für die Suche in der Stadt): Sie ist mit einem **Zwergenschmied** verheiratet (Konrad Eisenhand), den sie in Steinbach kennenlernte, die Schmiede liegt in der **Gerbergasse** nahe dem Mühltor (Steinbach lebt vom Erz- und Werkzeughandel, an Schmieden fehlt es dort nicht), und sie geht jeden Markttag zum Brunnenplatz, um Gemüse zu kaufen. Die Oma kennt Marthes Gesicht und erzählt, wie sie spricht (leise, hat eine Narbe an der linken Hand).
-- **Belohnung:** Dank der Oma, Brot und Eingemachtes, und was Marthe und Konrad geben können. Keine feste Summe.
+- **Belohnung:** keine. Es ist ein Gefallen, der Dank der Oma und die Kekse sind alles. Was Marthe und Konrad später geben können, ergibt sich in der Stadt.
 
 ## Optional: Joris
 Joris kann mitkommen, wenn die Gruppe ihn kennt und es am Tisch passt (nicht, wenn er tot oder eingesperrt ist oder die Gruppe von seiner Klinge nie erfahren hat). Es ist ein Angebot, kein Muss, und die Reise funktioniert ohne ihn:
