@@ -138,6 +138,18 @@ return function (
         ]);
     }));
 
+    // ---------- export (read-only JSON) ----------
+
+    // The story content of one campaign as JSON, for scripts. Every update endpoint replaces all
+    // fields of an entry, so a script reads it here first and sends the complete entry back.
+    $app->get('/dm/campaign/{id:[0-9]+}/export', $withCampaign(fn (Request $request, Response $response, array $args, array $campaign): Response => jsonResponse($response, [
+        'campaign' => $campaign,
+        'chapters' => $chapters->chapters((int) $campaign['id']),
+        'places' => $places->places((int) $campaign['id']),
+        'npcs' => $npcs->npcs((int) $campaign['id']),
+        'items' => $items->items((int) $campaign['id']),
+    ])));
+
     // ---------- plan (edit) ----------
 
     $app->get('/dm/campaign/{id:[0-9]+}', $withCampaign(function (Request $request, Response $response, array $args, array $campaign) use ($places, $monsters, $pageData) {
