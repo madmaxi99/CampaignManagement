@@ -135,9 +135,9 @@
 <g transform="rotate(-35 115 205)"><circle cx="115" cy="205" r="8.5" fill="#fffdf6" stroke="#2b2b2b" stroke-width="1.3"/><text x="115" y="208.6" font-size="10.5" font-weight="bold" text-anchor="middle" fill="#2b2b2b" font-family="Arial, sans-serif">10</text></g>
 <g transform="rotate(-35 55 146)"><circle cx="55" cy="146" r="8.5" fill="#fffdf6" stroke="#2b2b2b" stroke-width="1.3"/><text x="55" y="149.6" font-size="10.5" font-weight="bold" text-anchor="middle" fill="#2b2b2b" font-family="Arial, sans-serif">11</text></g>
 <g transform="rotate(-35 580 336)"><circle cx="580" cy="336" r="8.5" fill="#fffdf6" stroke="#2b2b2b" stroke-width="1.3"/><text x="580" y="339.6" font-size="10.5" font-weight="bold" text-anchor="middle" fill="#2b2b2b" font-family="Arial, sans-serif">12</text></g>
-<text x="760" y="372" font-size="13" text-anchor="middle" font-style="italic" font-weight="normal" fill="#2f5e86" transform="rotate(-35 760 372)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Weide  (fließt nach Nordwesten)</text>
+<text x="760" y="372" font-size="13" text-anchor="middle" font-style="italic" font-weight="normal" fill="#2f5e86" transform="rotate(-35 760 372)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Weide  (fließt nach Westen)</text>
 <text x="348" y="60" font-size="11" text-anchor="start" font-style="italic" font-weight="normal" fill="#2f5e86" transform="rotate(-35 348 60)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Bach</text>
-<text x="10" y="80" font-size="12" text-anchor="start" font-style="normal" font-weight="normal" fill="#5b4220" transform="rotate(-35 10 80)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Königsstraße nach Hohenfurt  (Nordwest, etwa 3 Tagesreisen)</text>
+<text x="10" y="80" font-size="12" text-anchor="start" font-style="normal" font-weight="normal" fill="#5b4220" transform="rotate(-35 10 80)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Königsstraße nach Hohenfurt  (West, etwa 3 Tagesreisen)</text>
 <text x="890" y="478" font-size="12" text-anchor="end" font-style="normal" font-weight="normal" fill="#5b4220" transform="rotate(-35 890 478)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Königsstraße nach Steinbach  (Südost, etwa 2 Tagesreisen)</text>
 <text x="545" y="300" font-size="10.5" text-anchor="start" font-style="italic" font-weight="normal" fill="#3a2f20" transform="rotate(-35 545 300)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Fähre</text>
 <text x="334" y="108" font-size="10" text-anchor="start" font-style="italic" font-weight="normal" fill="#3a2f20" transform="rotate(-35 334 108)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Steg</text>
@@ -145,7 +145,7 @@
 <text x="226" y="236" font-size="10" text-anchor="start" font-style="italic" font-weight="normal" fill="#5b4220" transform="rotate(-43 226 236)" stroke="#e6edd2" stroke-width="3" paint-order="stroke">Mühlenweg</text>
 </g>
 <text x="20" y="42" font-size="28" font-weight="bold" fill="#3b2a14">Binsenau</text><text x="21" y="62" font-size="12" font-style="italic" fill="#5b4220" stroke="#6f9cc2" stroke-width="0">Flussdorf an der Fähre</text>
-<text x="226" y="18" font-size="12" fill="#5b4220" stroke="#e6edd2" stroke-width="3" paint-order="stroke">↖ Königsstraße nach Hohenfurt (Nordwesten, etwa 3 Tagesreisen)</text>
+<text x="226" y="18" font-size="12" fill="#5b4220" stroke="#e6edd2" stroke-width="3" paint-order="stroke">← Königsstraße nach Hohenfurt (Westen, etwa 3 Tagesreisen)</text>
 <text x="524" y="592" font-size="12" fill="#5b4220" stroke="#e6edd2" stroke-width="3" paint-order="stroke">↓ Königsstraße nach Steinbach (Südosten, etwa 2 Tagesreisen)</text>
 <g transform="translate(860,50)"><circle r="22" fill="#fffdf6" stroke="#2b2b2b" stroke-width="1.2"/><path d="M0,-17 L6,4 L0,0 L-6,4 Z" fill="#2b2b2b"/><text y="-26" font-size="12" text-anchor="middle" font-weight="bold" font-family="Arial, sans-serif" fill="#2b2b2b">N</text></g>
 <rect x="12" y="336" width="318" height="256" rx="6" fill="#fffdf6" stroke="#6b5a3a" stroke-width="1.2" opacity=".96"/>

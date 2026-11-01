@@ -1,7 +1,7 @@
 # Aufgabe 1: Das Raubtier
 
 ## Die Lage
-Ein Bär holt sich nachts das Vieh. Er ist einfach da, es gibt keinen Grund und keine Vorgeschichte. Vier Tiere sind in drei Nächten gerissen worden: drei Schafe von Ruprecht Voss und eine Ziege von Hannes Lerch, zuletzt in der Nacht vor der Versammlung ein Schaf. Die Leute wissen nicht, was es ist, und sprechen von einem Monster.
+Ein Bär holt sich nachts das Vieh. Er ist einfach da, es gibt keinen Grund und keine Vorgeschichte. Vier Tiere sind in drei Nächten gerissen worden: drei Schafe von Ruprecht Voss und eine Ziege von Hannes Lerch, zuletzt in der Nacht vor der Versammlung ein Schaf. Die Leute wissen nicht, was es ist, und sprechen von einem Monster: Sie haben nur zertrampelten Boden und Reste gesehen, und niemand hat die Spuren bisher Mutter Ilse gezeigt.
 
 ## Einstieg
 Auf der Versammlung nennt der Vorsteher das Monsterproblem. Ottokar Lenz fragt die Gruppe direkt, ob sie sich darum kümmern kann. Die Belohnung ist Verhandlungssache (Überzeugen, Verhandeln). Danach ist es der Gruppe überlassen, ob und wann sie anfängt. Siehe `01-der-tag.md`.
@@ -12,7 +12,8 @@ Die Gruppe weiß zu Beginn nur, dass Vieh fehlt. Sie muss herausfinden, was es i
 - **Am Waldrand:** Der Kadaver ist zerrissen und teilweise weggeschleppt. Ein Büschel braunes Fell hängt im Dornbusch, Kratzspuren an einer Rinde in zwei Metern Höhe.
 - **Die Schleifspur** führt zum Bach, wo der Bär trinkt, und weiter ins Alte Gehölz. Daraus lässt sich ablesen, dass er nachts und früh am Morgen unterwegs ist.
 - **Der Fährmann Jorn Teich** hat nachts ein Schnauben am Ufer gehört und dachte an einen Hirsch.
-- Wer Bisswunden und Spuren einordnen kann (Bestienkunde, Jagen & Fischen), erkennt: kein Wolf, ein Bär.
+- Wer Bisswunden und Spuren einordnen kann (Bestienkunde, Jagen & Fischen), erkennt: kein Wolf, ein Bär. Mutter Ilse erkennt es auch, wenn man ihr Spuren oder das Fell zeigt.
+- **Joris** hat nachts auf dem Weg zum Schuppen ein großes Tier im Gehölz gehört und macht seitdem einen Bogen darum. Er erzählt es nur, wenn man ihn zum Schuppen in die Enge treibt (siehe `04-auftrag-raetsel.md`).
 
 ## Die Höhle
 Eine Felsspalte oder ein hohler Baum am Rand des Alten Gehölzes, etwa zwei Wegstunden vom Dorf. Tagsüber liegt der Bär dort, nachts ist er unterwegs. Nahe der Höhle liegen Knochen und Reste vom Vieh.

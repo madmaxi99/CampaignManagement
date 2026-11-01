@@ -7,7 +7,7 @@ Borbin steht im Gasthaus auf und kann den Tag so verbringen, wie er mag.
 - **Wirtin Gerlinde Haas** schäkert gerne zurück und serviert ein gutes Frühstück. Sie sagt: „Bleib doch noch einen Tag, heute Abend ist Versammlung im Gemeindehaus, da gibt es was Ordentliches zu essen.“
 - **Angeln im Fluss** (Jagen & Fischen 14) bringt einen guten Fang. Die Wirtin verrät die beste Stelle, ein Stück flussabwärts, wo auch der alte Schuppen steht. Der Fährmann Jorn Teich steht am Anleger und sagt wenig.
 - **Bäcker Wilm Kruse** und die Bauern sprechen über nächtliche Vorfälle: Ein Schaf von Ruprecht Voss ist weg, die Reste liegen am Waldrand. Sie sprechen von „einem Monster“. Wer sich die Reste oder den Pferch ansieht, kann die Spuren einordnen (Bestienkunde, Jagen & Fischen): Es waren keine Wölfe, es war ein Bär (siehe `03-auftrag-baer.md`). Ob und wann jemand dorthin geht, ist ihm überlassen.
-- Auf dem Dorfplatz streiten Ruprecht Voss und Hannes Lerch zum ersten Mal laut. Borbin kann zuhören oder sich heraushalten.
+- Auf dem Dorfplatz streiten Ruprecht Voss und Hannes Lerch zum ersten Mal laut wegen der Diebstähle (der Streit um die Weidegrenzen ist alt). Borbin kann zuhören oder sich heraushalten.
 
 ## Mittag: Zhalia (Halb-Elfe, Dieb)
 Zhalia kommt auf der Königsstraße an, wenn das Dorf auf den Beinen ist.

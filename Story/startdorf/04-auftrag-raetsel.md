@@ -1,7 +1,7 @@
 # Aufgabe 2: Das Rätsel
 
 ## Die Lage
-Zwei Bauern streiten seit Jahren und beschuldigen sich jetzt öffentlich des Diebstahls. Beide haben recht damit, dass ihnen etwas fehlt, und beide irren sich im Täter. Der wahre Dieb ist ein junger Mensch mit einem heimlichen Traum. Am Anfang gibt es keinen Verdacht gegen irgendwen aus der Gruppe. Niemand im Dorf ahnt etwas, weil der Schuppen abseits liegt.
+Zwei Bauern streiten seit Jahren und beschuldigen sich jetzt öffentlich des Diebstahls. Beide haben recht damit, dass ihnen etwas fehlt, und beide irren sich im Täter. Der wahre Dieb ist ein junger Mensch mit einem heimlichen Traum. Am Anfang gibt es keinen Verdacht gegen irgendwen aus der Gruppe. Niemand im Dorf ahnt etwas, weil der Schuppen abseits liegt und Joris nur nachts arbeitet.
 
 Die Gruppe wird nicht in die Sache gedrängt. Die Welt bietet mehrere Einstiege an, und die Gruppe entscheidet, ob und wie sie ihnen folgt.
 
@@ -10,10 +10,10 @@ Die Gruppe wird nicht in die Sache gedrängt. Die Welt bietet mehrere Einstiege 
 - von **Ruprecht Voss** (Schafe): Hammer und Zange,
 - von **Hannes Lerch** (Ziegen, Äcker): Feile, Öl und Holzkohle.
 
-Er hat sich gemerkt, dass die beiden sich ohnehin hassen: Wenn etwas fehlt, verdächtigen sie einander und niemanden sonst. Er wollte alles zurückgeben, sobald die Klinge fertig ist. Dass der Streit so laut wird, hat er nicht erwartet.
+Er hat sich gemerkt, dass die beiden sich ohnehin hassen: Wenn etwas fehlt, verdächtigen sie einander und niemanden sonst. Das Handwerk hat er als Junge einem reisenden Kesselflicker abgeschaut und sich den Rest selbst beigebracht. Er wollte alles zurückgeben oder ersetzen, sobald die Klinge fertig ist (Öl und Holzkohle sind dann verbraucht). Dass der Streit so laut wird, hat er nicht erwartet.
 
 ## Der Schuppen
-Eine verfallene Umladestation, **etwas außerhalb** am Fluss flussabwärts vom Anleger, ein Stück abseits vom Weg. Seit Jahren leer, niemand hat dort zu tun. Es gibt keine Legende und keinen Spuk: Das Dorf denkt schlicht nie daran.
+Eine verfallene Umladestation, **etwas außerhalb** am Fluss flussabwärts vom Anleger, ein Stück abseits vom Weg. Seit Jahren leer, tagsüber hat dort niemand zu tun. Es gibt keine Legende und keinen Spuk. Die Angelstelle liegt davor am Ufer, wer dort sitzt, sieht aber nur die Rückwand hinter Weiden und Schilf. Joris arbeitet erst nach Einbruch der Dunkelheit, und den Rauch hält man für Köhlerrauch aus dem Gehölz oder für Nebel vom Fluss.
 - Innen: Esse aus Feldsteinen, Werkbank, Amboss aus einem Mühlstein-Rest und Schrott, Wasserfass, Holzkohle, die halbfertige Klinge (Rohling, noch nicht gehärtet), Hammer, Zange, Feile, Öl.
 - Joris kommt in der Regel nachts, ein- bis zweimal in der Woche. Tagsüber ist der Schuppen leer, die Tür nur mit einem Holzkeil gesichert.
 - Der Gemeinde fällt der Schuppen höchstens auf, weil der Vorsteher ihn **sanieren** will, um dort Vorräte zu lagern (siehe Einstiege).
@@ -37,6 +37,7 @@ Ruprecht und Hannes verdächtigen sich ohnehin gegenseitig. Alle Spuren lassen s
 - **Ruß und Funkenlöcher.** Wer Joris in der Mühle sieht, bemerkt Brandnarben an den Händen und kleine Löcher im Hemd. Er sagt, er arbeite am Mühlenofen. Das klingt glaubwürdig.
 - **Eisenschrott.** Der Bäcker oder der Fährmann erinnern sich, dass Joris nach altem Eisen gefragt hat. Er hat gesagt, es sei für die Mühle.
 - **Die Wirtin.** Gerlinde weiß, dass Joris abends oft müde wirkt und früh von der Mühle verschwindet.
+- **Der Bär.** Joris meidet das Gehölz, seit er dort nachts ein großes Tier gehört hat (siehe `03-auftrag-baer.md`). Das passt zu einem, der nachts unterwegs ist und nicht erklären will, warum.
 
 Eine Spur allein genügt nicht. Wer zwei oder drei verbindet, kommt zum Schuppen.
 
@@ -49,7 +50,7 @@ Eine Spur allein genügt nicht. Wer zwei oder drei verbindet, kommt zum Schuppen
 
 ## Die Auflösung (neutral)
 Joris stellen und wie weiter? Es gibt keine vorbestimmte Lösung. Mögliche Wege, alle gleichwertig:
-- **Reden und Überzeugen:** Er gibt alles zurück, entschuldigt sich bei beiden und erklärt den Streit für beendet. Der Vorsteher zahlt wie vereinbart.
+- **Reden und Überzeugen:** Er gibt zurück, was er noch hat, ersetzt den Rest (Öl, Holzkohle) mit Arbeit oder Geld, entschuldigt sich bei beiden und erklärt den Streit für beendet. Der Bauer, der die Gruppe um Beweise gebeten hat, zahlt wie vereinbart.
 - **Anzeigen:** Er wird zum Müller gebracht. Der Vater ist wütend, aber der Streit der Bauern endet.
 - **Erpressen oder laufen lassen:** Joris schuldet der Gruppe etwas. Die Bauern streiten weiter, weil niemand Beweise hat.
 - **Joris mitnehmen:** Er möchte die Klinge einem Schmied zeigen. Das kann in die Stadt führen (`05-auftrag-botengang.md`), ist aber nur ein Angebot und keine Voraussetzung.
@@ -57,6 +58,6 @@ Joris stellen und wie weiter? Es gibt keine vorbestimmte Lösung. Mögliche Wege
 - **Gewalt:** Joris ist 19 und nicht kampferfahren. Wer ihn tötet, hat einen toten Müllerssohn im Dorf. Die Folgen ergeben sich aus dem Dorf (Müller, Wirtin, Vorsteher), nicht aus einem Skript.
 
 ## Ausgänge
-- **Gelöst (Streit endet):** Die beiden Bauern bekommen ihre Sachen zurück oder ihr Geld. Die Belohnung wird gezahlt.
+- **Gelöst (Streit endet):** Die beiden Bauern bekommen ihre Sachen zurück oder ihr Geld. Wer die Gruppe gebeten hat, zahlt die Belohnung. Gab es keine Bitte, gibt es nur den Dank der Bauern.
 - **Teilweise:** Die Gruppe erfährt die Wahrheit, sagt sie aber nicht. Der Streit schwelt weiter.
 - **Nicht gelöst:** Die Fehde der Bauern eskaliert, der Vorsteher kommt später darauf zurück.
