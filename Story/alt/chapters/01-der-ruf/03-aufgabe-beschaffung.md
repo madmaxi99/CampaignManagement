@@ -4,7 +4,7 @@
 
 ## Auftrag
 
-Wenzel erklärt, dass eine Lieferung überfällig ist — sie hätte längst in Corlantis ankommen sollen:
+Wenzel erklärt, dass eine Lieferung überfällig ist — sie hätte längst in Rotenmark ankommen sollen:
 
 > "Eine Lieferung ist seit Tagen überfällig. Das kommt vor, aber nicht so lange. Wir müssen wissen, was mit ihr passiert ist, und wenn möglich, bringt zurück, was noch zu retten ist."
 
@@ -16,11 +16,11 @@ Wenzel kennt selbst nur die ungefähre Route, nicht den genauen Ort:
 
 ## Erste Anlaufstelle: Verwalter Ansel Drach
 
-Bevor die PCs überhaupt losziehen können, müssen sie in der Stadt **Ansel Drach** aufsuchen — einen Verwalter, der für die (namenlose) Organisation im Hintergrund die Logistik in Corlantis regelt. Er sitzt tagsüber in einem unauffälligen Kontor nahe dem Marktplatz, umgeben von Frachtlisten und Lieferscheinen.
+Bevor die PCs überhaupt losziehen können, müssen sie in der Stadt **Ansel Drach** aufsuchen — einen Verwalter, der für die (namenlose) Organisation im Hintergrund die Logistik in Rotenmark regelt. Er sitzt tagsüber in einem unauffälligen Kontor nahe dem Marktplatz, umgeben von Frachtlisten und Lieferscheinen.
 
 Drach ist kein Hindernis, sondern eine knappe Pflichtstation: sachlich, leicht angespannt (der Verlust fällt auf ihn zurück), aber kooperativ — er will die Sache genauso schnell und leise geklärt haben wie Wenzel. Von ihm erfahren die PCs:
 
-- Die ungefähre Route und letzte bekannte Position der Lieferung — ein unwegsames Gebiet außerhalb der Stadt (Sumpf, altes Gehölz oder Steilhang, je nachdem, was zur Umgebung von Corlantis passt, siehe `../../locations.md`, ggf. ergänzen).
+- Die ungefähre Route und letzte bekannte Position der Lieferung — ein unwegsames Gebiet außerhalb der Stadt (Moorsenke, altes Gehölz oder Steilhang, je nachdem, was zur Umgebung von Rotenmark passt, siehe `../../locations.md`, ggf. ergänzen).
 - Dass der letzte Kontakt zum Fuhrmann vor mehreren Tagen abgerissen ist — keine Nachricht seither.
 - Auf Nachfrage: vage Gerüchte über "Getier", das in letzter Zeit in der Gegend Ärger gemacht hat — mehr weiß er nicht, das ist seine ehrliche Grenze.
 

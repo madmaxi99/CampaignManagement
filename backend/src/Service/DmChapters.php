@@ -97,6 +97,10 @@ final class DmChapters
                 'slug' => 'personen',
                 'title' => 'Personen',
             ],
+            [
+                'slug' => 'bund',
+                'title' => 'Der Graue Bund',
+            ],
         ];
     }
 }

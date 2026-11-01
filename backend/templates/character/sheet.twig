@@ -27,13 +27,9 @@
 <div class="sheet" data-id="{{ character.id }}">
 
     <header class="sheet-hero ui-card ui-card--raised">
-        <form class="sheet-portrait-upload" data-portrait-form>
-            <label class="ui-avatar ui-avatar--large" for="portrait-input" title="Bild ändern">
-                {% if character.portrait_path %}<img src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">{% else %}{{ ui.icon('user') }}{% endif %}
-                <span class="visually-hidden">Bild ändern</span>
-            </label>
-            <input class="visually-hidden" type="file" id="portrait-input" name="portrait" accept="image/jpeg,image/png,image/webp">
-        </form>
+        <button type="button" class="ui-avatar ui-avatar--large sheet-portrait-open" data-ui-open="#portrait-sheet" aria-label="Bild ansehen und ändern" title="Bild ansehen und ändern">
+            {% if character.portrait_path %}<img src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">{% else %}{{ ui.icon('user') }}{% endif %}
+        </button>
         <div class="sheet-hero__text">
             <h1>{{ character.name_de }}</h1>
             <p class="ui-muted">{{ character.kin_de }} · {{ character.age_de }} · {{ character.profession_de }}</p>
@@ -304,6 +300,21 @@
         </section>
     </div>
 </div>
+
+<dialog class="ui-sheet" id="portrait-sheet">
+    <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>
+    <h2>{{ ui.icon('user') }} {{ character.name_de }}</h2>
+    <div class="ui-stack">
+        <div class="sheet-portrait-full">
+            {% if character.portrait_path %}<img src="/{{ character.portrait_path }}" alt="{{ character.name_de }}">{% else %}{{ ui.icon('user') }}{% endif %}
+        </div>
+        <form class="ui-row" data-portrait-form>
+            <label class="ui-btn" for="portrait-input">{{ ui.icon('plus') }} Eigenes Bild hochladen</label>
+            <input class="visually-hidden" type="file" id="portrait-input" name="portrait" accept="image/jpeg,image/png,image/webp">
+            <button type="button" class="ui-btn ui-btn--ghost" data-ui-close>Abbrechen</button>
+        </form>
+    </div>
+</dialog>
 
 <dialog class="ui-sheet" id="profile-sheet" data-profile-sheet>
     <button type="button" class="ui-btn ui-btn--ghost ui-btn--icon ui-sheet__close" data-ui-close aria-label="Schließen">{{ ui.icon('x') }}</button>

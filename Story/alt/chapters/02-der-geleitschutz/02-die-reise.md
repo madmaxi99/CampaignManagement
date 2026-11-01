@@ -8,7 +8,7 @@ Reine Leitplanken fürs Pacing, kein fester Text zum Ablesen für jeden einzelne
 
 Am Anfang der Reise (Tag 1–2) eignet sich ein kurzer, atmosphärischer Text zum Vorlesen, der die Reise "anspringt", statt sie Schritt für Schritt abzufragen:
 
-> "Die ersten Tage vergehen in einem gleichmäßigen Rhythmus aus knarrendem Wagenholz, dem stumpfen Klappern der Hufe auf festgetretener Erde und den immer selteneren Türmen von Corlantis im Rücken. Ihr wechselt euch beim Kutschieren ab, teilt euch das karge, aber ausreichende Reiseessen, hört Wenzel abends am Feuer knappe, nüchterne Anekdoten erzählen — nie genug, um wirklich etwas über ihn zu erfahren. Die Landschaft wird hügeliger, die Straße schmaler, die Wälder am Wegesrand dichter."
+> "Die ersten Tage vergehen in einem gleichmäßigen Rhythmus aus knarrendem Wagenholz, dem stumpfen Klappern der Hufe auf festgetretener Erde und den immer selteneren Türmen von Rotenmark im Rücken. Ihr wechselt euch beim Kutschieren ab, teilt euch das karge, aber ausreichende Reiseessen, hört Wenzel abends am Feuer knappe, nüchterne Anekdoten erzählen — nie genug, um wirklich etwas über ihn zu erfahren. Die Landschaft wird hügeliger, die Straße schmaler, die Wälder am Wegesrand dichter."
 
 ## Kleine Zwischen-Encounter (optional, dosiert einsetzen)
 

@@ -56,6 +56,9 @@ const HTML = `
     <input type="number" id="coins-silver" data-coin value="2">
     <input type="number" id="coins-copper" data-coin value="">
     <button data-delete-confirm>Löschen</button>
+    <dialog id="portrait-sheet">
+        <form data-portrait-form><input type="file" id="portrait-input" name="portrait"></form>
+    </dialog>
     <form data-profile-form>
         <input name="name" value="Faela">
         <textarea name="appearance">Fell</textarea>
@@ -277,4 +280,32 @@ test('the profile form sends name, appearance and story', async () => {
         url: '/character/5/profile',
         body: { name: 'Faela Mondschatten', appearance: 'Fell', story: 'Aufgewachsen im Wald.' },
     });
+});
+
+test('uploads a chosen portrait and reloads the page', async () => {
+    const { document, fetch, location } = await openSheet({
+        'POST /character/5/portrait': { portrait_path: 'images/characters/uploads/5.png' },
+    });
+    const input = document.getElementById('portrait-input');
+    Object.defineProperty(input, 'files', { value: [new File(['x'], 'bild.png', { type: 'image/png' })] });
+
+    change(input);
+    await flush();
+
+    assert.equal(fetch.calls[0].url, '/character/5/portrait');
+    assert.equal(location.reloads, 1);
+});
+
+test('shows the server error when the portrait is rejected', async () => {
+    const { document, toasts, location } = await openSheet({
+        'POST /character/5/portrait': { error: 'Bild zu groß.' },
+    });
+    const input = document.getElementById('portrait-input');
+    Object.defineProperty(input, 'files', { value: [new File(['x'], 'bild.png', { type: 'image/png' })] });
+
+    change(input);
+    await flush();
+
+    assert.equal(toasts.at(-1).kind, 'error');
+    assert.equal(location.reloads, 0);
 });

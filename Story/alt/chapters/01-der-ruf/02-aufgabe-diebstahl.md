@@ -14,13 +14,13 @@ Diese Anweisung ist bewusst eine leise Versuchung: Die Kiste ist unauffällig, m
 
 Wenzel nennt den Ort direkt, ohne Umschweife:
 
-> "Ein altes Fischerei-Lager an der Netzgasse, unten am Hafenbecken. Ihr könnt es nicht verfehlen — die Tür ist die einzige, die noch ein Schloss hat."
+> "Ein altes Salzfisch-Lager an der Netzgasse, unten am Hafenbecken. Ihr könnt es nicht verfehlen — die Tür ist die einzige, die noch ein Schloss hat."
 
-Ein Lagerhaus mit angeschlossenem Kellerraum im **Hafenviertel** (siehe `../../locations.md`), von außen unauffällig — ein ehemaliges Fischerei-Lager, halb verlassen wirkend, aber genutzt. Vernagelte Fenster im Erdgeschoss, ein verwittertes, kaum lesbares Zunftzeichen über der Tür.
+Ein Lagerhaus mit angeschlossenem Kellerraum im **Hafenviertel** (siehe `../../locations.md`), von außen unauffällig — ein ehemaliges Salzfisch-Lager, halb verlassen wirkend, aber genutzt. Vernagelte Fenster im Erdgeschoss, ein verwittertes, kaum lesbares Gildenzeichen über der Tür (die Salzgilde, drei Wellen über einem Fass).
 
 ## Zusätzliche Recherche (optional): Der Hafenwart
 
-Wer im Hafenviertel selbst nachfragt, landet früher oder später bei **Joran Beck**, dem Hafenwart — er kennt jedes Lager, jeden Kai, jede Unregelmäßigkeit im Viertel, ob er will oder nicht. Er ist nicht misstrauisch, aber auch nicht kostenlos hilfsbereit: ein kleiner Gefallen, ein paar Münzen oder einfach ein glaubwürdiger Grund, warum man das wissen will, reichen ihm.
+Wer im Hafenviertel selbst nachfragt, landet früher oder später bei **Joran Beck**, dem Hafenwart — er kennt jedes Lager, jeden Hof, jede Unregelmäßigkeit im Viertel, ob er will oder nicht. Er ist nicht misstrauisch, aber auch nicht kostenlos hilfsbereit: ein kleiner Gefallen, ein paar Münzen oder einfach ein glaubwürdiger Grund, warum man das wissen will, reichen ihm.
 
 Von ihm (oder einer vergleichbaren Quelle im Viertel) erfahren die PCs:
 - Dass das Lagerhaus einen **unbewachten Nebenzugang** hat — eine alte Lieferluke zur Gasse hin, die die aktuellen "Mieter" offenbar nicht kennen oder nicht nutzen.

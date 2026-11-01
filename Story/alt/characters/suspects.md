@@ -2,7 +2,7 @@
 
 Diese drei sind bewusst als plausible, aber unschuldige Spuren gedacht — passend zur Vorliebe der Gruppe, Fährten gründlich bis zum Ende zu verfolgen. Jede hat ein eigenes, unabhängiges Geheimnis, das Verdacht erzeugt, aber nichts mit dem Mord zu tun hat.
 
-## 1. Halvor Brenn — Konkurrierender Zunftmeister
+## 1. Halvor Brenn — Konkurrierender Kaufmann der Hanse
 
 - Öffentlicher Streit mit Cassian um Handelsrouten/Lieferverträge, wiederholt laut und vor Zeugen (leicht zu erfahren, guter erster Faden).
 - Kein wasserdichtes Alibi für die Tatnacht.

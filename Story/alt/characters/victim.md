@@ -1,12 +1,12 @@
 # Opfer: Cassian Thorwald
 
-**Rolle:** Mitinhaber des Handelshauses "Thorwald & Kessel" (Riech- und Gewürzhandel), angesehenes Mitglied der Gewürz- und Duftgilde von Corlantis. Mitte 40, selfmade, ursprünglich aus einfachen Verhältnissen, hat sich sein Geschäft selbst aufgebaut — dadurch bei den alteingesessenen Handelsfamilien nicht überall beliebt, aber respektiert.
+**Rolle:** Mitinhaber des Handelshauses "Thorwald & Kessel" (Riech- und Gewürzhandel), Mitglied der Weidenhanse in Rotenmark (Gewürze und Düfte kommen über die Karawanengilde und die Salzgilde, eine eigene Gilde dafür gibt es nicht). Mitte 40, selfmade, ursprünglich aus einfachen Verhältnissen, hat sich sein Geschäft selbst aufgebaut — dadurch bei den alteingesessenen Handelsfamilien nicht überall beliebt, aber respektiert.
 
 **Charakter:** Umgänglich, vorsichtig-misstrauisch geworden in den letzten Wochen (seit der Entdeckung der Unterschlagung), aber niemand außerhalb weiß warum. Wirkt nach außen wie gewohnt freundlich-geschäftig, im Kern aber zunehmend isoliert, weil er niemandem traut, mit wem er über das Rutger-Problem sprechen kann.
 
 **Verbindung zum Geheimbund:** Seit ca. 8 Jahren Mitglied im Grauen Bund (siehe `secret-society.md`). Sieht den Bund eher pragmatisch als Netzwerk gegenseitiger Gefälligkeiten, nicht als Verschwörung — würde selbst nicht sagen, dass er in etwas Finsterem steckt. Genau das macht ihn im Nachhinein als Aufhänger interessant: Er ist kein Bösewicht, aber Teil von etwas, das die Gruppe erst spät versteht.
 
-**Familie:** Hat eine Tochter, Liska Thorwald (siehe `liska-thorwald.md`), die am Anwesen derer von Thorwald in [Stadtname] lebt — getrennt von Cassians Kontor in Corlantis. Hat sie kurz nach der Entdeckung von Rutgers Veruntreuung ohne konkrete Begründung gebeten, incognito zu reisen (siehe Kapitel 1b, `../chapters/01b-die-fremde/`).
+**Familie:** Hat eine Tochter, Liska Thorwald (siehe `liska-thorwald.md`), die am Anwesen derer von Thorwald in Hirschau lebt — getrennt von Cassians Kontor in Rotenmark. Hat sie kurz nach der Entdeckung von Rutgers Veruntreuung ohne konkrete Begründung gebeten, incognito zu reisen (siehe Kapitel 1b, `../chapters/01b-die-fremde/`).
 
 **Timing (wichtig):** Cassians Tod ist der **Cliffhanger am Ende von Kapitel 9** (Auflösung des Falls in Kapitel 10), nicht der ersten Begegnung. Die PCs lernen ihn ab Kapitel 3 persönlich kennen; dazwischen liegt der Bindungsbogen Kapitel 3–9 (grob umrissen in `Story/chapters/03-erste-begegnung/` bis `09-ein-tag-wie-jeder-andere/`, noch ohne ausformulierte Szenen) — die folgenden Punkte greifen erst gegen Ende dieses Bogens, kurz vor dem Cliffhanger in Kapitel 9. Wichtig fürs Pacing: Kapitel 9 selbst soll sich wie ein ganz normales Kapitel anfühlen (kein Vorwarn-Pacing/"Ruhe vor dem Sturm") — der Mord reißt die Gruppe bewusst unvorbereitet aus dem gewohnten Flow.
 

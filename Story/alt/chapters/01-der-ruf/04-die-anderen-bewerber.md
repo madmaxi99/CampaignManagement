@@ -46,7 +46,7 @@ Die Schweigsame war schon am Vorabend nicht mehr dabei.
 
 Bram schleppt sich herein, sichtlich übler dran als sonst, ein Bein notdürftig geschient — redet trotzdem:
 
-> "Drach hat uns rausgeschickt, raus zum Sumpf. Ich dachte, wir gehen einfach hin, holen's, fertig. Bin ich dann auch — allein, weil die anderen ewig getrödelt haben. War ein Fehler. Da war was im Dickicht, ich hab's nicht mal richtig gesehen, bevor es mich erwischt hat."
+> "Drach hat uns rausgeschickt, raus zur Moorsenke. Ich dachte, wir gehen einfach hin, holen's, fertig. Bin ich dann auch — allein, weil die anderen ewig getrödelt haben. War ein Fehler. Da war was im Dickicht, ich hab's nicht mal richtig gesehen, bevor es mich erwischt hat."
 
 Sella hat's immerhin bis zum Wrack geschafft. "War nicht mehr viel da", sagt sie knapp — mehr nicht, bis Drach beim Nachwiegen der zurückgebrachten Ware feststellt, dass ein Teil fehlt. Was mit dem Rest passiert ist, sagt sie nicht.
 

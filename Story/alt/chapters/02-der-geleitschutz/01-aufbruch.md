@@ -1,6 +1,6 @@
 # Szene 1 — Aufbruch
 
-## Downtime in Corlantis
+## Downtime in Rotenmark
 
 Nach der Zusage bei Wenzel Thal (`../01-der-ruf/05-abschluss.md`) müssen die PCs nicht sofort los — die Wagen sind noch nicht beladen, die Route noch nicht final abgesprochen. Ein Tag Zeit, bevor es losgeht:
 

@@ -4,10 +4,11 @@ set -euo pipefail
 # Deploys the current branch to the VPS: pulls latest, rebuilds containers,
 # installs backend dependencies, applies pending database migrations, makes the upload directories writable.
 #
-# Requires the "amt-solo-vps" entry in ~/.ssh/config
+# Runs from GitHub Actions on every push to main (.github/workflows/deploy.yml), which sets VPS_HOST.
+# Locally it requires the "amt-solo-vps" entry in ~/.ssh/config
 # (root@185.192.96.141, IdentityFile ~/.ssh/amt_solo_vps).
 
-VPS_HOST="amt-solo-vps"
+VPS_HOST="${VPS_HOST:-amt-solo-vps}"
 REMOTE_PATH="/opt/campaignManagement"
 
 # alias.sh assigns to $UID, which bash treats as readonly — run it under zsh

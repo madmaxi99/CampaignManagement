@@ -2,7 +2,7 @@
 
 ## Ausgangslage
 
-Die PCs haben Wenzels Angebot abgelehnt und verbringen den Abend auf eigene Faust — irgendeine Kneipe/Taverne in Corlantis, nicht notwendigerweise die Blaue Robbe.
+Die PCs haben Wenzels Angebot abgelehnt und verbringen den Abend auf eigene Faust — irgendeine Kneipe/Taverne in Rotenmark, nicht notwendigerweise die Blaue Robbe.
 
 ## Die Begegnung
 

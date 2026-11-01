@@ -1,3 +1,5 @@
+> **Veraltet.** Ersetzt durch `docs/lore/story.md` (Kanon: 273 Jahre nach dem Beifall). Diese Datei dient nur noch als Ideensteinbruch.
+
 # Weltübersicht
 
 Homebrew-Setting auf Basis von Dragonbane. Eigenes Original-Setting — **nicht** das offizielle Dragonbane-Setting (Misty Vale). Fokus auf glaubwürdige Geopolitik statt "die sind halt verfeindet" — Konflikte sollen sich aus tatsächlichen Nachbarschaften/Ressourcen ergeben.

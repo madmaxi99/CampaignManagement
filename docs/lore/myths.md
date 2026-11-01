@@ -1,3 +1,5 @@
+> **Veraltet.** Ersetzt durch `docs/lore/story.md` (Kanon: 273 Jahre nach dem Beifall). Diese Datei dient nur noch als Ideensteinbruch.
+
 # Mythen, Gerüchte und Volksglaube (Sammlung)
 
 Reine Sammlung, noch keine Struktur und kein Datenmodell. Zweck: Material für den Abschnitt „Was man sich erzählt“ auf `/lore` und für den Tisch. Später entscheiden wir, ob daraus ein eigener Bereich in der App wird (Arbeitsname `catalog_myth`) oder ob es bei Twig-Text bleibt.
