@@ -204,6 +204,16 @@ final class AppRoutesTest extends AppTestCase
         self::assertStringContainsString('Jaldo', $play);
     }
 
+    public function testExportIsLockedWithoutLogin(): void
+    {
+        $response = $this->request('GET', '/dm/campaign/1/export');
+        self::assertSame(302, $response->getStatusCode());
+        self::assertStringStartsWith('/dm/login', $response->getHeaderLine('Location'));
+
+        $json = $this->request('GET', '/dm/campaign/1/export', null, false, false);
+        self::assertContains($json->getStatusCode(), [302, 401]);
+    }
+
     public function testDmAreaIsLockedWithoutLogin(): void
     {
         $page = $this->request('GET', '/dm');
@@ -310,6 +320,16 @@ final class AppRoutesTest extends AppTestCase
             $this->assertCleanBody($response, $path);
             self::assertStringContainsString('Alberta II', (string) $response->getBody());
         }
+
+        // the export hands scripts the complete story content as JSON
+        $export = $this->json($this->request('GET', $base . '/export'), 200);
+        self::assertSame('Route-Test 2', $export['campaign']['name_de']);
+        self::assertSame(['Kapitel 2', 'Kapitel neu'], array_column($export['chapters'], 'title_de'));
+        self::assertSame(['Turm neu'], array_column($export['places'], 'name_de'));
+        self::assertSame('Alberta II', $export['npcs'][0]['name_de']);
+        self::assertSame('lebt', $export['npcs'][0]['notes_de']);
+        self::assertSame('Altes Buch', $export['items'][0]['name_de']);
+        self::assertSame(404, $this->request('GET', '/dm/campaign/999999/export')->getStatusCode());
 
         // chapters of the play view: /play leads to the first chapter, places belong to no chapter
         $redirect = $this->request('GET', $base . '/play');
