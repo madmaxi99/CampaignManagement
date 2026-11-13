@@ -8,7 +8,7 @@
 
 {% for m in members %}
     <article class="ui-card party-card">
-        <a class="party-card__head" href="/character/{{ m.id }}">
+        <a class="party-card__head entity-link" href="/character/{{ m.id }}" data-entity-type="party" data-entity-id="{{ m.id }}">
             <span class="ui-avatar">{% if m.portrait_path %}<img src="/{{ m.portrait_path }}" alt="" loading="lazy">{% else %}{{ ui.icon('user') }}{% endif %}</span>
             <span>
                 <strong class="party-card__name">{{ m.name_de }}</strong>
@@ -36,6 +36,69 @@
         <span>Füge die Charaktere hinzu, die heute am Tisch sitzen.</span>
     </div>
 {% endfor %}
+
+{# Short overview per member, cloned into the entity dialog on click (see campaign-play.js) #}
+<div hidden>
+    {% for m in members %}
+        <template id="tpl-party-{{ m.id }}">
+            <div class="ui-stack party-brief">
+                <div class="party-card__head">
+                    <span class="ui-avatar">{% if m.portrait_path %}<img src="/{{ m.portrait_path }}" alt="" loading="lazy">{% else %}{{ ui.icon('user') }}{% endif %}</span>
+                    <span>
+                        <strong class="party-card__name">{{ m.name_de }}</strong>
+                        <span class="ui-muted">{{ m.kin_de }} · {{ m.profession_de }}</span>
+                    </span>
+                </div>
+                <div class="ui-bar ui-bar--hp" role="meter" aria-label="Trefferpunkte" aria-valuemin="0" aria-valuemax="{{ m.hp_max }}" aria-valuenow="{{ m.hp_current }}">
+                    <div class="ui-bar__fill" style="width: {{ m.hp_max > 0 ? (m.hp_current / m.hp_max * 100)|round : 0 }}%"></div>
+                    <span class="ui-bar__label">TP {{ m.hp_current }}/{{ m.hp_max }}</span>
+                </div>
+                <div class="ui-bar ui-bar--wp" role="meter" aria-label="Willenskraft" aria-valuemin="0" aria-valuemax="{{ m.wp_max }}" aria-valuenow="{{ m.wp_current }}">
+                    <div class="ui-bar__fill" style="width: {{ m.wp_max > 0 ? (m.wp_current / m.wp_max * 100)|round : 0 }}%"></div>
+                    <span class="ui-bar__label">WP {{ m.wp_current }}/{{ m.wp_max }}</span>
+                </div>
+                <div class="ui-row">
+                    <span class="ui-badge">{{ ui.icon('shield') }} Rüstung {{ m.armor_total }}</span>
+                    {% for c in m.conditions %}<span class="ui-badge ui-badge--berry">{{ c }}</span>{% endfor %}
+                </div>
+                <dl class="party-brief__attrs">
+                    {% for a in m.attributes %}<div><dt>{{ a.code }}</dt><dd>{{ a.value }}</dd></div>{% endfor %}
+                </dl>
+                {% for group in [{'title': 'Waffenfertigkeiten', 'category': 'combat'}, {'title': 'Fertigkeiten', 'category': 'regular'}, {'title': 'Zusatzfertigkeiten', 'category': 'secondary'}] %}
+                    {% set rows = m.skills|filter(skill => skill.category == group.category) %}
+                    {% if rows %}
+                        <div class="ui-stack party-brief__block">
+                            <strong>{{ group.title }}</strong>
+                            <ul class="plain-list party-brief__skills">
+                                {% for skill in rows %}<li><span>{{ skill.name_de }}</span><strong>{{ skill.value }}</strong></li>{% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% if m.weapons %}
+                    <div class="ui-stack party-brief__block">
+                        <strong>Waffen</strong>
+                        <ul class="plain-list party-brief__weapons">
+                            {% for w in m.weapons %}
+                                <li><strong>{{ w.name_de }}</strong>{% if w.damage_de %} <span class="ui-muted">· Schaden {{ w.damage_de }}</span>{% endif %}{% if w.range_de %} <span class="ui-muted">· Reichweite {{ w.range_de }}</span>{% endif %}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                {% if m.inventory %}
+                    <div class="ui-stack party-brief__block">
+                        <strong>Inventar</strong>
+                        <div class="ui-row">{% for item in m.inventory %}<span class="ui-badge">{{ item.name_de }}{% if item.quantity > 1 %} ×{{ item.quantity }}{% endif %}</span>{% endfor %}</div>
+                    </div>
+                {% endif %}
+                <p class="ui-muted">
+                    {{ m.coins_gold }} Dukaten · {{ m.coins_silver }} Kronen · {{ m.coins_copper }} Heller
+                </p>
+                <div><a class="ui-btn ui-btn--ghost ui-btn--small" href="/character/{{ m.id }}">{{ ui.icon('scroll-text') }} Ganzen Charakterbogen öffnen</a></div>
+            </div>
+        </template>
+    {% endfor %}
+</div>
 
 <p class="ui-muted">Die Spieler pflegen ihre Werte selbst, hier siehst du den Stand beim Neuladen.</p>
 <div class="ui-row">

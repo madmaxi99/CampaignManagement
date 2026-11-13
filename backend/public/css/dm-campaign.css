@@ -306,6 +306,55 @@ a.segmented__option {
     color: var(--forest-dark);
 }
 
+.party-brief__attrs {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-2);
+    margin: 0;
+    text-align: center;
+}
+
+.party-brief__attrs dt {
+    font-size: var(--fs-small);
+    opacity: 0.7;
+}
+
+.party-brief__attrs dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: var(--fs-h3);
+}
+
+.party-brief__skills {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-1) var(--space-5);
+}
+
+/* The party overview is wider than other entity dialogs, so the skills fit in three columns. */
+#entity-sheet:has(.party-brief) {
+    width: min(960px, calc(100vw - 2 * var(--space-4)));
+}
+
+@media (width > 800px) {
+    .party-brief__skills {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.party-brief__skills li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    border-bottom: 1px solid var(--card-edge);
+}
+
+.party-brief__weapons li {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-2);
+}
+
 .party-candidates {
     display: grid;
     gap: var(--space-2);

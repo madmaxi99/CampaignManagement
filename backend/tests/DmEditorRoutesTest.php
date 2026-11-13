@@ -140,6 +140,8 @@ final class DmEditorRoutesTest extends AppTestCase
         ]), 201)['id'];
         $group = (string) $this->request('GET', '/dm/campaign/' . $campaign . '/play')->getBody();
         self::assertStringContainsString('Route-Test Held', $group);
+        self::assertStringContainsString('id="tpl-party-' . $id . '"', $group, 'the party card opens a short overview dialog');
+        self::assertStringContainsString('party-brief__attrs', $group);
         $this->json($this->request('DELETE', '/dm/party/' . $id), 200);
         $this->json($this->request('POST', '/dm/party', [
             'character_id' => $id,

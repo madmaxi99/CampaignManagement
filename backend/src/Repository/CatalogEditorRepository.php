@@ -406,8 +406,48 @@ final readonly class CatalogEditorRepository
             ORDER BY FIELD(cd.attribute_code, 'STA', 'KON', 'GEW', 'INT', 'WIL', 'CHA')
             SQL);
         $armor = $this->db->prepare('SELECT COALESCE(SUM(armor_value), 0) FROM character_armor WHERE character_id = :id');
+        $attributes = $this->db->prepare(<<<SQL
+            SELECT ca.attribute_code AS code, ca.value
+            FROM character_attributes ca
+            WHERE ca.character_id = :id
+            ORDER BY FIELD(ca.attribute_code, 'STA', 'KON', 'GEW', 'INT', 'WIL', 'CHA')
+            SQL);
+        $weapons = $this->db->prepare(<<<SQL
+            SELECT name_de, damage_de, range_de
+            FROM character_weapons
+            WHERE character_id = :id
+            ORDER BY position, id
+            SQL);
+        $skills = $this->db->prepare(<<<SQL
+            SELECT sk.name_de, sk.category, cs.value
+            FROM character_skills cs
+            JOIN catalog_skills sk ON sk.id = cs.skill_id
+            WHERE cs.character_id = :id
+            ORDER BY FIELD(sk.category, 'combat', 'regular', 'secondary'), sk.name_de
+            SQL);
+        $inventory = $this->db->prepare('SELECT name_de, quantity FROM character_inventory WHERE character_id = :id ORDER BY position');
 
         foreach ($members as &$member) {
+            $skills->execute([
+                'id' => $member['id'],
+            ]);
+            // Every skill of the sheet; magic schools and other secondary skills only when trained
+            $member['skills'] = array_values(array_filter(
+                $skills->fetchAll(),
+                static fn (array $skill): bool => $skill['category'] !== 'secondary' || (int) $skill['value'] > 0,
+            ));
+            $inventory->execute([
+                'id' => $member['id'],
+            ]);
+            $member['inventory'] = $inventory->fetchAll();
+            $attributes->execute([
+                'id' => $member['id'],
+            ]);
+            $member['attributes'] = $attributes->fetchAll();
+            $weapons->execute([
+                'id' => $member['id'],
+            ]);
+            $member['weapons'] = $weapons->fetchAll();
             $conditions->execute([
                 'id' => $member['id'],
             ]);
