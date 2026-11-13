@@ -7,3 +7,6 @@
 /backend/public/uploads/*
 !/backend/public/uploads/.gitkeep
 /backend/node_modules/
+
+# campaign import state (ids of one target)
+/docs/solo/*.state.*.json

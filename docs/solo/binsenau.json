@@ -1,0 +1,292 @@
+{
+  "campaign": {
+    "name_de": "Binsenau",
+    "teaser_de": "Ein Flussdorf an der Königsstraße, eine Versammlung am Abend: Ein Bär reißt das Vieh, zwei Bauern beschuldigen sich, und eine alte Frau bittet um einen Gefallen in der Stadt.",
+    "background_de": "✦ Ton: ruhiger Dorfalltag, gemütlich, mit Sorgen im Hintergrund. Alle Namen und Völker sind Vorschläge.\n✦ Tag: Morgen kommt Borbin an (Gasthaus, Angeln, Klatsch beim Bäcker), mittags Zhalia, im Dunkeln Faela. Abends Versammlung im Gemeindehaus. Reihenfolge ist ein Vorschlag.\n✦ Versammlung: Ottokar Lenz nennt das gerissene Vieh (4 Tiere in 3 Nächten) und den Streit der Bauern, erwähnt beiläufig den alten Schuppen und bittet die Fremden, sich um das Vieh zu kümmern (etwa 15 Kronen).\n✦ Drei Aufträge, voneinander unabhängig. Wann und wie sie beginnen, entscheidet die Spielleitung. Zwang gibt es nicht.\n✦ Auftrag 1, Bär: Ein Bär, kein Grund, keine Vorgeschichte. Lösungen: töten, weglocken, vertreiben. Wer aufgibt, dem holt er weiteres Vieh.\n✦ Auftrag 2, Rätsel: Beide Bauern vermissen wirklich etwas, beide verdächtigen den Falschen. Der Dieb ist Joris, 19, Müllerssohn, der im alten Schuppen heimlich eine Klinge schmiedet. Alle Spuren sind mehrdeutig, zwei bis drei zusammen führen zum Schuppen. Keine vorbestimmte Lösung.\n✦ Auftrag 3, Reise nach Steinbach: Adelheid bittet um einen Gefallen (unbezahlt). Der Strang bringt die Gruppe aus dem Dorf und ist unabhängig von Bär und Rätsel. Joris kann mitkommen, muss aber nicht.\n✦ Belohnung (Vorschlag): Bär etwa 15 Kronen vom Vorsteher, Rätsel etwa 8 Kronen vom bittenden Bauern, Reise nur Dank und Kekse.\n✦ Keine Uhr: Das Dorf wartet. Ungelöst eskaliert nur langsam (Vieh, Fehde).\n✦ Welt im Hintergrund: nur Gerüchte von geeinten Orks und Soldaten auf der Straße."
+  },
+  "chapter": {
+    "title_de": "Binsenau",
+    "notes_de": "Binsenau liegt dort, wo die Königsstraße über die Weide führt, mit Fähre, Gasthaus, Mühle und Bäckerei. Rund siebzig Menschen leben hier, und hier kennt jeder jeden. Fremde fallen auf der Straße nicht auf, doch heute ist das Dorf aufgeregt: Nachts ist wieder Vieh gerissen worden, und zwei Nachbarn gehen sich laut an die Gurgel. Am Abend ist Versammlung im Gemeindehaus, es gibt Essen, und alle werden da sein."
+  },
+  "places": [
+    {
+      "key": "gasthaus",
+      "parent": null,
+      "name_de": "Gasthaus „Zur Furt“",
+      "description_de": "✦ Langgestrecktes Fachwerkhaus mit tiefem Dach, gleich an der Fähre.\n✦ Niedrige, verräucherte Gaststube, großer Kamin, ein ausgestopfter Hecht an der Wand.",
+      "dm_text_de": "✦ Zwei Einzelzimmer (5 Kr), Schlafsaal mit 6 Betten (1 Kr), Stall für 4 Tiere (2 H). Eintopf 5 H, Mahlzeit 3 Kr, Met 4 H, Wein 2 Kr, Bad 6 H.\n✦ Abends: Jorn am Fenster, ein, zwei Bauern (nie Ruprecht und Hannes zusammen), Durchreisende mit Gerüchten.\n✦ Anschreiben gibt es nur mit einem Bürgen aus dem Dorf.\nOffen: Welche Durchreisenden heute da sind und was sie erzählen."
+    },
+    {
+      "key": "gemeindehaus",
+      "parent": "gasthaus",
+      "name_de": "Gemeindehaus",
+      "description_de": "✦ Großer Saal neben dem Gasthaus, lange Tische, ein Kamin.\n✦ In einer Ecke ist Platz für Musik.",
+      "dm_text_de": "✦ Ort der Versammlung: Essen, gesellige, aber angespannte Stimmung.\n✦ Lenz spricht über Vieh und Streit, dann bittet er die Fremden direkt um Hilfe (Überzeugen, Verhandeln).\nOffen: Wer sonst noch redet, wie laut der Streit wird."
+    },
+    {
+      "key": "faehre",
+      "parent": null,
+      "name_de": "Anleger und Fähre",
+      "description_de": "✦ Anleger an der breiten Weide, die Fähre trägt auch Wagen.\n✦ Flussabwärts liegt die beste Angelstelle.",
+      "dm_text_de": "✦ Überfahrt 2 H, Tier oder Karren 1 Kr. Angel 8 Kr, Netz 2 D. Angeln (Jagen & Fischen 14) bringt guten Fang.\n✦ An der Angelstelle sieht man vom Schuppen nur die Rückwand hinter Weiden und Schilf: Rußspuren am Dach, eine Trittspur zur Tür.\nOffen: Was sonst am Wasser los ist."
+    },
+    {
+      "key": "baeckerei",
+      "parent": null,
+      "name_de": "Bäckerei",
+      "description_de": "✦ Duftet früh nach Brot, Honigkuchen und Keksen.\n✦ In der Ecke sitzt oft die alte Oma.",
+      "dm_text_de": "✦ Bester Ort für Morgenklatsch. Brot, Zwiebelkuchen, Honigkuchen, Kekse: wenige Heller.\n✦ Ein Brett Brötchen steht manchmal unbeaufsichtigt (Spielerei für Diebe).\nOffen: Wer gerade zum Plaudern da ist."
+    },
+    {
+      "key": "muehle",
+      "parent": null,
+      "name_de": "Mühle am Bach",
+      "description_de": "✦ Mühlrad am Bach, Mehlstaub auf allem.\n✦ Der Müller ist streng, der Sohn arbeitet still.",
+      "dm_text_de": "✦ Mehl, Schrot, Kleie, einfache Holzarbeiten und Reparaturen (Verhandlungssache).\n✦ Joris hat Brandnarben an den Händen und kleine Löcher im Hemd. Er sagt, er arbeite am Mühlenofen.\nOffen: Was Anselm gerade zu schimpfen hat."
+    },
+    {
+      "key": "dorfplatz",
+      "parent": null,
+      "name_de": "Dorfplatz mit Brunnen",
+      "description_de": "✦ Brunnen, ein paar Bänke, Treffpunkt des Dorfes.\n✦ Kein Markt, höchstens Tauschhandel.",
+      "dm_text_de": "✦ Hier streiten Ruprecht und Hannes zum ersten Mal laut.\n✦ Man tauscht statt zu zahlen (Feilschen CHA, bei Erfolg ±20 %).\n✦ Ab und zu kommt ein Hausierer oder Fuhrmann und verkauft, was fehlt.\nOffen: Was er dabeihat."
+    },
+    {
+      "key": "kraeuterhaus",
+      "parent": null,
+      "name_de": "Kräuterhaus",
+      "description_de": "✦ Kleines Haus voller Büschel, Töpfe und Kräuterduft.",
+      "dm_text_de": "✦ Kräutersud 1 D, Salben und Verbände, oft gegen eine Gefälligkeit. Gifte nur, wenn Ilse der Gruppe traut.\n✦ Zeigt man ihr Spuren oder Fell, erkennt sie sofort: ein Bär. Sie weiß, wo sich ein großes Tier verstecken könnte.\nOffen: Welche Gefälligkeit sie verlangt."
+    },
+    {
+      "key": "hof_voss",
+      "parent": null,
+      "name_de": "Schafhof von Ruprecht Voss",
+      "description_de": "✦ Schafe, ein Pferch am Waldrand mit eingedrücktem Zaun.\n✦ Ein Kadaver liegt zerrissen am Waldrand.",
+      "dm_text_de": "✦ Bär: Zaun eingedrückt, nicht aufgebrochen. Breite Tatzenabdrücke, Kratzspuren am Pfosten, Schleifspur zum Bach und ins Alte Gehölz.\n✦ Diebstahl (Entdecken): Werkzeugkiste offen, kein Einbruch. Nur Hammer und Zange fehlen, dazu feiner Mehlstaub am Boden.\n✦ Die Bauern kaufen beide in der Mühle, Mehl beweist nichts.\nOffen: Ob Ruprecht gerade am Hof ist."
+    },
+    {
+      "key": "hof_lerch",
+      "parent": null,
+      "name_de": "Ziegenhof von Hannes Lerch",
+      "description_de": "✦ Ziegen im Pferch, Äcker rundherum, ein gepflegter Spaten an der Wand.",
+      "dm_text_de": "✦ Diebstahl (Entdecken): Feile, Öl und Holzkohle sind weg, nicht aber Geld und Spaten. Auch hier etwas Mehlstaub.\n✦ Ziegenkäse, Milch, Eier. Ein Esel kostet 12 D, wenn der Preis stimmt.\n✦ Eine Ziege hat der Bär gerissen.\nOffen: Wie Hannes die Gruppe empfängt."
+    },
+    {
+      "key": "schuppen",
+      "parent": null,
+      "name_de": "Alter Schuppen",
+      "description_de": "✦ Verfallene Umladestation am Fluss, hinter Weiden und Schilf.\n✦ Tagsüber leer, die Tür nur mit einem Holzkeil gesichert. Kein Spuk.",
+      "dm_text_de": "✦ Innen: Feldstein-Esse, Werkbank, Amboss aus einem Mühlstein-Rest, Wasserfass, Holzkohle, halbfertige Klinge (Rohling), Hammer, Zange, Feile, Öl.\n✦ Joris kommt ein- bis zweimal die Woche nachts. Zeichen: dünner Rauch, roter Schein, leises Hämmern.\n✦ Der Vorsteher will den Schuppen sanieren und als Lager nutzen.\nOffen: Wann Joris auftaucht und wie die Gruppe ihn stellt."
+    },
+    {
+      "key": "gehoelz",
+      "parent": null,
+      "name_de": "Altes Gehölz",
+      "description_de": "✦ Dichter Wald flussabwärts hinter dem Schuppen.\n✦ Ein Trampelpfad führt am Fluss entlang hinein.",
+      "dm_text_de": "✦ Der Bär ist nachts und früh am Morgen unterwegs und trinkt am Bach.\n✦ Joris meidet das Gehölz, seit er dort nachts ein großes Tier gehört hat.\nOffen: Was sonst im Unterholz lebt."
+    },
+    {
+      "key": "hoehle",
+      "parent": "gehoelz",
+      "name_de": "Höhle des Bären",
+      "description_de": "✦ Felsspalte oder hohler Baum am Rand des Gehölzes, etwa zwei Wegstunden vom Dorf.\n✦ Davor Knochen und Reste vom Vieh.",
+      "dm_text_de": "✦ Der Bär (Bestiarium, ID 37) liegt tagsüber hier und ist nachts unterwegs.\n✦ Drei Wege: töten (der Pelz bleibt, ein Gerber kann ihn verwerten), weglocken (Fischköder oder Aas weit weg vom Dorf) oder vertreiben (Feuer, Lärm, Fackeln, Musik am Trinkplatz).\n✦ Wer aufgibt, dem holt der Bär weiteres Vieh.\nOffen: Wie die Gruppe vorgeht."
+    },
+    {
+      "key": "strasse",
+      "parent": null,
+      "name_de": "Königsstraße nach Steinbach",
+      "description_de": "✦ Breite, festgestampfte Straße mit Meilensteinen, Händlern, Boten, Pilgern und Soldaten.\n✦ Erst Flussauen, dann Hügelland und Wald, vor Steinbach karg mit Erzwagen.",
+      "dm_text_de": "✦ Zwei Tagesreisen flussaufwärts. Keine Tagesabfolge ausspielen, vier bis fünf Szenen, dazwischen erzählen.\n✦ Szenen (Vorschlag): Händler mit Gerücht, Nachtlager im Wald als Kennenlernen, eingestürzte Brücke, Königswache, der Flüchtling.\n✦ Impulse am Lagerfeuer: „Wie seid ihr geworden, was ihr seid?“, „Was war das Schlimmste?“, „Was, wenn ihr morgen alles hinwerfen könntet?“\nOffen: Alles, was dazwischen passiert."
+    },
+    {
+      "key": "bruecke",
+      "parent": "strasse",
+      "name_de": "Eingestürzte Zollbrücke",
+      "description_de": "✦ Die Brücke über einen Nebenfluss der Weide ist eingebrochen, der Bach ist zu tief zum Durchwaten.\n✦ Reisende stauen sich, ein Zöllner (Zwerg im Dienst von Haus Lorn) und ein Trupp Wachen stehen dabei.",
+      "dm_text_de": "✦ Wege hinüber: Notbrücke oder Floß (Handwerk), flache Stelle suchen, Hilfe von Köhlern holen, Umweg (halber Tag). Keiner ist richtig.\n✦ Die Wache sucht drei Räuber, fragt aus und durchsucht das Gepäck. Eine Klinge ohne Schmiedezeichen ist verdächtig.\n✦ Im Gebüsch abseits versteckt sich ein junger Mann.\nOffen: Was die Gruppe bei sich trägt und was gefunden wird."
+    },
+    {
+      "key": "steinbach",
+      "parent": null,
+      "name_de": "Steinbach",
+      "description_de": "✦ Handelsstadt am Fuß des Eisenkamms, Rauch über den Dächern.\n✦ Erzwagen, Zwergenhandel, ein Tor, ein Markt, ein Gasthaus.",
+      "dm_text_de": "✦ Sitz der Erzgilde, Stadthäuser von Haus Lorn und Haus Kaltenbach.\n✦ Wiebke zu finden braucht die Hinweise der Oma (siehe Adelheid).\nOffen: Alles Weitere in der Stadt kommt später."
+    },
+    {
+      "key": "schmiede",
+      "parent": "steinbach",
+      "name_de": "Schmiede in der Gerbergasse",
+      "description_de": "✦ Schmiede bei den Gerbern am Mühltor.\n✦ Esse, Amboss, ein Haufen unerledigter Aufträge.",
+      "dm_text_de": "✦ Mögliche Lage: Konrad hat sich an der Esse schwer verbrannt, die Aufträge stauen sich, die Familie hat Schulden.\n✦ Die Gruppe kann helfen, wegschauen oder sich einmischen.\nOffen: Wie schlimm es wirklich steht."
+    }
+  ],
+  "npcs": [
+    {
+      "key": "gerlinde",
+      "place": "gasthaus",
+      "name_de": "Gerlinde Haas",
+      "description_de": "✦ Mensch, Wirtin. Warm, schlagfertig, schäkert gern.",
+      "dm_text_de": "✦ Lädt die Fremden zur Versammlung ein: „Heute Abend gibt es was Ordentliches zu essen.“\n✦ Kennt allen Klatsch und gibt ihn bei höflicher Frage weiter (Überzeugen), auch die beste Angelstelle.\n✦ Weiß, dass Joris abends oft müde wirkt und früh von der Mühle verschwindet.",
+      "found_hint_de": "Im Gasthaus"
+    },
+    {
+      "key": "tilda",
+      "place": "gasthaus",
+      "name_de": "Tilda",
+      "description_de": "✦ Mensch, 16, Magd. Schüchtern.",
+      "dm_text_de": "✦ Sieht und hört mehr, als sie sagt.",
+      "found_hint_de": "Im Gasthaus"
+    },
+    {
+      "key": "ottokar",
+      "place": "gemeindehaus",
+      "name_de": "Ottokar Lenz",
+      "description_de": "✦ Mensch, Dorfvorsteher. Bedächtig, sorgenvoll, ehrlich, hält gern Reden.",
+      "dm_text_de": "✦ Will jemanden, der das Vieh schützt, und zahlt etwa 15 Kronen (verhandelbar).\n✦ Hat wenig Mittel und hofft auf die Fremden.",
+      "found_hint_de": "Auf der Versammlung"
+    },
+    {
+      "key": "wilm",
+      "place": "baeckerei",
+      "name_de": "Wilm Kruse",
+      "description_de": "✦ Mensch, Bäcker. Früh auf, redselig.",
+      "dm_text_de": "✦ Erzählt morgens vom gerissenen Schaf und vom „Monster“.\n✦ Erinnert sich, dass Joris nach altem Eisen gefragt hat („für die Mühle“).",
+      "found_hint_de": "In der Bäckerei"
+    },
+    {
+      "key": "adelheid",
+      "place": "baeckerei",
+      "name_de": "Adelheid Kruse",
+      "description_de": "✦ Mensch, Oma des Dorfes, Mutter des Bäckers. Alt, gebrechlich, sorgt sich.",
+      "dm_text_de": "✦ Bittet um einen Gefallen (unbezahlt): in Steinbach nach ihrer Tochter Wiebke sehen. Wann, entscheidet die Spielleitung.\n✦ Gibt mit: Brief, Brot, Tuch und einen Beutel Kekse (Honig, Mandeln).\n✦ Wiebke ist mit dem Zwergenschmied Konrad Eisenhand verheiratet, die Schmiede liegt „bei den Gerbern am Mühltor“. Sie spricht leise, hat eine Narbe an der linken Hand.",
+      "found_hint_de": "Sitzt in der Bäckerei"
+    },
+    {
+      "key": "jorn",
+      "place": "faehre",
+      "name_de": "Jorn Teich",
+      "description_de": "✦ Mallard, Fährmann. Wortkarg, liebt das Wasser, Münzen offen am Gürtel.",
+      "dm_text_de": "✦ Hat nachts ein Schnauben am Ufer gehört und an einen Hirsch gedacht.\n✦ Sah manche Nächte Licht am Schuppen und hielt es für nichts Besonderes.",
+      "found_hint_de": "Am Anleger"
+    },
+    {
+      "key": "pit",
+      "place": "faehre",
+      "name_de": "Pit",
+      "description_de": "✦ Mallard, Kind, Neffe des Fährmanns. Frech, schnell, schwimmt wie ein Fisch.",
+      "dm_text_de": "✦ Trägt Klatsch weiter, spielt Verstecken, verkauft frischen Fisch.",
+      "found_hint_de": "Am Wasser"
+    },
+    {
+      "key": "lotte",
+      "place": "dorfplatz",
+      "name_de": "Lotte",
+      "description_de": "✦ Mensch, Kind. Neugierig, lauert überall.",
+      "dm_text_de": "✦ Kennt Dorfklatsch, spielt Verstecken.",
+      "found_hint_de": "Auf dem Dorfplatz"
+    },
+    {
+      "key": "anselm",
+      "place": "muehle",
+      "name_de": "Anselm Rade",
+      "description_de": "✦ Mensch, Müller. Streng, stolz.",
+      "dm_text_de": "✦ Will, dass Joris die Mühle übernimmt, und sucht ihn überall.\n✦ Wütend, aber lässt Joris ziehen, wenn man ihn überzeugt.",
+      "found_hint_de": "In der Mühle"
+    },
+    {
+      "key": "joris",
+      "place": "muehle",
+      "name_de": "Joris",
+      "description_de": "✦ Mensch, 19, Müllerssohn und Knecht. Still, geschickte Hände.",
+      "dm_text_de": "✦ Träumt vom Waffenschmied, hat sich das Handwerk bei einem Kesselflicker abgeschaut. Schämt sich und fürchtet den Vater.\n✦ Schlechter Lügner. Wollte alles zurückgeben oder ersetzen.\n✦ Will die Klinge einem Schmied zeigen (Steinbach). Nicht kampferfahren.",
+      "found_hint_de": "Arbeitet in der Mühle"
+    },
+    {
+      "key": "ilse",
+      "place": "kraeuterhaus",
+      "name_de": "Mutter Ilse",
+      "description_de": "✦ Elfe, sehr alt. Ruhig, freundlich.",
+      "dm_text_de": "✦ Kennt Tiere, Wunden, Gifte und die Gegend (Wald, Wechsel, Wasserstellen).\n✦ Im Dorf ist man an sie gewöhnt.",
+      "found_hint_de": "Im Kräuterhaus"
+    },
+    {
+      "key": "ruprecht",
+      "place": "hof_voss",
+      "name_de": "Ruprecht Voss",
+      "description_de": "✦ Mensch, Schafbauer. Aufbrausend, sicher, im Recht zu sein.",
+      "dm_text_de": "✦ Beschuldigt Hannes (Hammer und Zange fehlen).\n✦ Kann die Gruppe bitten, Beweise zu finden (etwa 8 Kronen aus eigener Tasche).\n✦ Die Fehde geht um alte Weidegrenzen.",
+      "found_hint_de": "Auf seinem Hof"
+    },
+    {
+      "key": "hannes",
+      "place": "hof_lerch",
+      "name_de": "Hannes Lerch",
+      "description_de": "✦ Zwerg, Ziegenbauer, vor Jahrzehnten aus dem Eisenkamm zugezogen. Stur, verletzt.",
+      "dm_text_de": "✦ Beschuldigt Ruprecht (Feile, Öl, Holzkohle fehlen) und will sich rächen.\n✦ Kann ebenfalls um Beweise bitten (etwa 8 Kronen). Der Streit geht um Grenzen, nicht ums Volk.",
+      "found_hint_de": "Auf seinem Hof"
+    },
+    {
+      "key": "fluechtling",
+      "place": "bruecke",
+      "name_de": "Der junge Flüchtling",
+      "description_de": "✦ Verhungerter junger Mann, versteckt im Gebüsch.\n✦ Sagt, er sei Knecht und werde zu Unrecht gesucht.",
+      "dm_text_de": "✦ Gehört zu den drei Gesuchten: Er schloss sich zwei Männern an, floh, als es gewalttätig wurde. Nahm nur Brot und ein Pferd (seine Schwester ist krank), das ihm durchging. Niemandem etwas getan.\n✦ Gruppe entscheidet: melden, verstecken, falsch lenken, mitnehmen. Keine Wahl ist richtig, Folgen kommen später.",
+      "found_hint_de": "Im Gebüsch abseits der Brücke"
+    },
+    {
+      "key": "hauptmann",
+      "place": "bruecke",
+      "name_de": "Hauptmann der Königswache",
+      "description_de": "✦ Mensch, höflich, aber bestimmt.\n✦ Dabei: ein Halb-Elf mit scharfem Blick, ein Halb-Ork, der ruhiger spricht.",
+      "dm_text_de": "✦ Sucht drei Räuber, die einen Händler überfallen haben.\n✦ Andeutung von Gefahr, die Gruppe muss nicht kämpfen.",
+      "found_hint_de": "An der Brücke"
+    },
+    {
+      "key": "konrad",
+      "place": "schmiede",
+      "name_de": "Konrad Eisenhand",
+      "description_de": "✦ Zwerg, Schmied, Wiebkes Mann.",
+      "dm_text_de": "✦ Beurteilt Joris' Klinge fachkundig und kann sie härten und stempeln.\n✦ Mögliche Folgen: Lehrling, Kauf oder Ablehnung.",
+      "found_hint_de": "In der Schmiede"
+    },
+    {
+      "key": "wiebke",
+      "place": "schmiede",
+      "name_de": "Wiebke",
+      "description_de": "✦ Mensch, spricht leise, Narbe an der linken Hand.",
+      "dm_text_de": "✦ Hat der Oma nichts geschrieben, um sie nicht zu sorgen.\n✦ Geht jeden Markttag zum Brunnenplatz, Gemüse kaufen.",
+      "found_hint_de": "In der Schmiede oder am Brunnenplatz"
+    }
+  ],
+  "items": [
+    {
+      "key": "fellbueschel",
+      "place": "hof_voss",
+      "name_de": "Büschel braunes Fell",
+      "description_de": "✦ Hängt in einem Dornbusch am Waldrand, in zwei Metern Höhe Kratzspuren in der Rinde.",
+      "dm_text_de": "✦ Wer Spuren einordnen kann (Bestienkunde, Jagen & Fischen) oder es Ilse zeigt: ein Bär, kein Wolf.",
+      "text_de": "",
+      "found_hint_de": "Im Dornbusch am Waldrand"
+    },
+    {
+      "key": "omas_brief",
+      "place": "baeckerei",
+      "name_de": "Omas Brief",
+      "description_de": "✦ Gefaltetes Blatt, mit zittriger Hand geschrieben.",
+      "dm_text_de": "✦ Für Wiebke in Steinbach.",
+      "text_de": "Liebe Wiebke,\n\nDu hast so lange nicht geschrieben. Diese Leute bringen Dir Grüße von mir und ein paar Kekse. Gib ihnen etwas zu essen, wenn sie hungrig sind. Schreib mir bald.\n\nDeine Mutter",
+      "found_hint_de": "Von Adelheid"
+    },
+    {
+      "key": "aehrentuch",
+      "place": "baeckerei",
+      "name_de": "Tuch mit gestickten Ähren",
+      "description_de": "✦ Kleines Tuch mit gestickten Ähren.",
+      "dm_text_de": "✦ Erkennungszeichen: Wiebke hat das Gegenstück von der Oma.",
+      "text_de": "",
+      "found_hint_de": "Von Adelheid"
+    }
+  ]
+}
