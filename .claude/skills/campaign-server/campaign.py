@@ -5,11 +5,14 @@ Usage (BASE_URL defaults to http://127.0.0.1:8070, the password comes from DM_PA
 for localhost it falls back to DM_PASSWORD in the project's .env):
 
   campaign.py import [--dry-run]
-  campaign.py sync                       # send every entry of the data file (NPC notes are kept)
+  campaign.py sync                       # send every entry of the data file (NPC notes are kept);
+                                         # entries that have no id yet are created
+  campaign.py image <place|item> <key> <file>   # upload a jpg/png/webp as image of an entry
   campaign.py edit <type> <key> field=value [field=value ...]
         type: campaign | chapter | place | npc | item
         value: text (\\n = line break), @path (file content), or for place_id/parent_id/chapter_id a key
   campaign.py check                      # compare counts with the server
+  campaign.py diff                       # list text fields that differ between server and data file
 
 The state (key -> id) of each target lives next to this file as story_state_<host>.json.
 """
@@ -99,6 +102,24 @@ class Client:
         return json.loads(body) if body else {}
 
 
+    def upload(self, path, file_path):
+        """multipart/form-data POST with the file as field "image"."""
+        file_path = pathlib.Path(file_path)
+        kind = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}.get(file_path.suffix.lower())
+        if kind is None:
+            fail("only jpg, png and webp can be uploaded")
+        boundary = "----campaign" + os.urandom(8).hex()
+        head = f'--{boundary}\r\nContent-Disposition: form-data; name="image"; filename="{file_path.name}"\r\nContent-Type: {kind}\r\n\r\n'
+        body = head.encode() + file_path.read_bytes() + f"\r\n--{boundary}--\r\n".encode()
+        request = urllib.request.Request(BASE_URL + path, data=body, method="POST", headers={
+            "Content-Type": f"multipart/form-data; boundary={boundary}",
+            "Accept": "application/json",
+            "X-CSRF-Token": self.csrf,
+        })
+        _, response = self._open(request)
+        return json.loads(response) if response else {}
+
+
 def load_data():
     return json.loads(DATA_FILE.read_text(encoding="utf-8"))
 
@@ -183,12 +204,28 @@ def do_sync():
     client.call("POST", f"{base}/chapters/{state['chapter']}", data["chapter"])
     for kind in ("place", "npc", "item"):
         for entry in data[COLLECTION[kind]]:
-            entry_id = state[COLLECTION[kind]][entry["key"]]
             body = payload_for(kind, entry, state)
+            entry_id = state[COLLECTION[kind]].get(entry["key"])
+            if entry_id is None:
+                state[COLLECTION[kind]][entry["key"]] = client.call("POST", f"{base}/{PLURAL_PATH[kind]}", body)["id"]
+                save_state(state)
+                print("created", kind, entry["key"])
+                continue
             if kind == "npc":
                 body["notes_de"] = notes.get(entry_id)
             client.call("POST", f"{base}/{PLURAL_PATH[kind]}/{entry_id}", body)
     print("synced")
+
+
+def do_image(kind, key, file_path):
+    if kind not in ("place", "item"):
+        fail("images: place or item")
+    client, state, base = connect()
+    entry_id = state[COLLECTION[kind]].get(key)
+    if entry_id is None:
+        fail(f"{kind} {key} is not on the server yet: run sync first")
+    result = client.upload(f"{base}/{PLURAL_PATH[kind]}/{entry_id}/image", file_path)
+    print(kind, key, "image", result.get("image_path"))
 
 
 def parse_value(name, raw, state):
@@ -252,6 +289,27 @@ def do_check():
     print("ok")
 
 
+def do_diff():
+    client, state, base = connect()
+    export = client.call("GET", base + "/export")
+    data = load_data()
+    differences = 0
+    for kind, collection in COLLECTION.items():
+        by_id = {entry["id"]: entry for entry in export[collection]}
+        for entry in data[collection]:
+            entry_id = state[collection].get(entry["key"])
+            if entry_id is None:
+                print("not on server:", kind, entry["key"])
+                continue
+            for name in FIELDS[kind]:
+                if name in ("parent_id", "chapter_id", "place_id", "encounter_table_id", "bestiary_id", "notes_de") or name not in entry:
+                    continue
+                if (by_id[entry_id].get(name) or "") != (entry[name] or ""):
+                    differences += 1
+                    print("differs:", kind, entry["key"], name)
+    print("differences:", differences)
+
+
 def main(argv):
     if len(argv) < 2:
         print(__doc__)
@@ -261,10 +319,14 @@ def main(argv):
         do_import("--dry-run" in argv)
     elif command == "sync":
         do_sync()
+    elif command == "image" and len(argv) == 5:
+        do_image(argv[2], argv[3], argv[4])
     elif command == "edit" and len(argv) >= 5:
         do_edit(argv[2], argv[3], argv[4:])
     elif command == "check":
         do_check()
+    elif command == "diff":
+        do_diff()
     else:
         print(__doc__)
 

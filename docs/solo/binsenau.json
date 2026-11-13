@@ -10,11 +10,19 @@
   },
   "places": [
     {
+      "key": "karte",
+      "parent": null,
+      "name_de": "Übersichtskarte Binsenau",
+      "description_de": "✦ Flussdorf an der Weide (fließt nach Westen), die Königsstraße quert sie per Fähre.\n✦ Nach Hohenfurt etwa 3 Tagesreisen Richtung Westen, nach Steinbach etwa 2 Tagesreisen Richtung Südosten.",
+      "dm_text_de": "✦ Nicht maßstabsgetreu. Die Nummern auf der Karte stehen im Index links neben den Orten.\n✦ Der alte Schuppen (9) liegt außerhalb am Fluss, die Bärenhöhle (11) etwa zwei Wegstunden im Gehölz."
+    },
+    {
       "key": "gasthaus",
       "parent": null,
       "name_de": "Gasthaus „Zur Furt“",
       "description_de": "✦ Langgestrecktes Fachwerkhaus mit tiefem Dach, gleich an der Fähre.\n✦ Niedrige, verräucherte Gaststube, großer Kamin, ein ausgestopfter Hecht an der Wand.",
-      "dm_text_de": "✦ Zwei Einzelzimmer (5 Kr), Schlafsaal mit 6 Betten (1 Kr), Stall für 4 Tiere (2 H). Eintopf 5 H, Mahlzeit 3 Kr, Met 4 H, Wein 2 Kr, Bad 6 H.\n✦ Abends: Jorn am Fenster, ein, zwei Bauern (nie Ruprecht und Hannes zusammen), Durchreisende mit Gerüchten.\n✦ Anschreiben gibt es nur mit einem Bürgen aus dem Dorf.\nOffen: Welche Durchreisenden heute da sind und was sie erzählen."
+      "dm_text_de": "✦ Zwei Einzelzimmer (5 Kr), Schlafsaal mit 6 Betten (1 Kr), Stall für 4 Tiere (2 H). Eintopf 5 H, Mahlzeit 3 Kr, Met 4 H, Wein 2 Kr, Bad 6 H.\n✦ Abends: Jorn am Fenster, ein, zwei Bauern (nie Ruprecht und Hannes zusammen), Durchreisende mit Gerüchten.\n✦ Anschreiben gibt es nur mit einem Bürgen aus dem Dorf.\nOffen: Welche Durchreisenden heute da sind und was sie erzählen.",
+      "number_label": "1"
     },
     {
       "key": "gemeindehaus",
@@ -28,70 +36,80 @@
       "parent": null,
       "name_de": "Anleger und Fähre",
       "description_de": "✦ Anleger an der breiten Weide, die Fähre trägt auch Wagen.\n✦ Flussabwärts liegt die beste Angelstelle.",
-      "dm_text_de": "✦ Überfahrt 2 H, Tier oder Karren 1 Kr. Angel 8 Kr, Netz 2 D. Angeln (Jagen & Fischen 14) bringt guten Fang.\n✦ An der Angelstelle sieht man vom Schuppen nur die Rückwand hinter Weiden und Schilf: Rußspuren am Dach, eine Trittspur zur Tür.\nOffen: Was sonst am Wasser los ist."
+      "dm_text_de": "✦ Überfahrt 2 H, Tier oder Karren 1 Kr. Angel 8 Kr, Netz 2 D. Angeln (Jagen & Fischen 14) bringt guten Fang.\n✦ An der Angelstelle sieht man vom Schuppen nur die Rückwand hinter Weiden und Schilf: Rußspuren am Dach, eine Trittspur zur Tür.\nOffen: Was sonst am Wasser los ist.",
+      "number_label": "8"
     },
     {
       "key": "baeckerei",
       "parent": null,
       "name_de": "Bäckerei",
       "description_de": "✦ Duftet früh nach Brot, Honigkuchen und Keksen.\n✦ In der Ecke sitzt oft die alte Oma.",
-      "dm_text_de": "✦ Bester Ort für Morgenklatsch. Brot, Zwiebelkuchen, Honigkuchen, Kekse: wenige Heller.\n✦ Ein Brett Brötchen steht manchmal unbeaufsichtigt (Spielerei für Diebe).\nOffen: Wer gerade zum Plaudern da ist."
+      "dm_text_de": "✦ Bester Ort für Morgenklatsch. Brot, Zwiebelkuchen, Honigkuchen, Kekse: wenige Heller.\n✦ Ein Brett Brötchen steht manchmal unbeaufsichtigt (Spielerei für Diebe).\nOffen: Wer gerade zum Plaudern da ist.",
+      "number_label": "3"
     },
     {
       "key": "muehle",
       "parent": null,
       "name_de": "Mühle am Bach",
       "description_de": "✦ Mühlrad am Bach, Mehlstaub auf allem.\n✦ Der Müller ist streng, der Sohn arbeitet still.",
-      "dm_text_de": "✦ Mehl, Schrot, Kleie, einfache Holzarbeiten und Reparaturen (Verhandlungssache).\n✦ Joris hat Brandnarben an den Händen und kleine Löcher im Hemd. Er sagt, er arbeite am Mühlenofen.\nOffen: Was Anselm gerade zu schimpfen hat."
+      "dm_text_de": "✦ Mehl, Schrot, Kleie, einfache Holzarbeiten und Reparaturen (Verhandlungssache).\n✦ Joris hat Brandnarben an den Händen und kleine Löcher im Hemd. Er sagt, er arbeite am Mühlenofen.\nOffen: Was Anselm gerade zu schimpfen hat.",
+      "number_label": "4"
     },
     {
       "key": "dorfplatz",
       "parent": null,
       "name_de": "Dorfplatz mit Brunnen",
       "description_de": "✦ Brunnen, ein paar Bänke, Treffpunkt des Dorfes.\n✦ Kein Markt, höchstens Tauschhandel.",
-      "dm_text_de": "✦ Hier streiten Ruprecht und Hannes zum ersten Mal laut.\n✦ Man tauscht statt zu zahlen (Feilschen CHA, bei Erfolg ±20 %).\n✦ Ab und zu kommt ein Hausierer oder Fuhrmann und verkauft, was fehlt.\nOffen: Was er dabeihat."
+      "dm_text_de": "✦ Hier streiten Ruprecht und Hannes zum ersten Mal laut.\n✦ Man tauscht statt zu zahlen (Feilschen CHA, bei Erfolg ±20 %).\n✦ Ab und zu kommt ein Hausierer oder Fuhrmann und verkauft, was fehlt.\nOffen: Was er dabeihat.",
+      "number_label": "2"
     },
     {
       "key": "kraeuterhaus",
       "parent": null,
       "name_de": "Kräuterhaus",
       "description_de": "✦ Kleines Haus voller Büschel, Töpfe und Kräuterduft.",
-      "dm_text_de": "✦ Kräutersud 1 D, Salben und Verbände, oft gegen eine Gefälligkeit. Gifte nur, wenn Ilse der Gruppe traut.\n✦ Zeigt man ihr Spuren oder Fell, erkennt sie sofort: ein Bär. Sie weiß, wo sich ein großes Tier verstecken könnte.\nOffen: Welche Gefälligkeit sie verlangt."
+      "dm_text_de": "✦ Kräutersud 1 D, Salben und Verbände, oft gegen eine Gefälligkeit. Gifte nur, wenn Ilse der Gruppe traut.\n✦ Zeigt man ihr Spuren oder Fell, erkennt sie sofort: ein Bär. Sie weiß, wo sich ein großes Tier verstecken könnte.\nOffen: Welche Gefälligkeit sie verlangt.",
+      "number_label": "5"
     },
     {
       "key": "hof_voss",
       "parent": null,
       "name_de": "Schafhof von Ruprecht Voss",
       "description_de": "✦ Schafe, ein Pferch am Waldrand mit eingedrücktem Zaun.\n✦ Ein Kadaver liegt zerrissen am Waldrand.",
-      "dm_text_de": "✦ Bär: Zaun eingedrückt, nicht aufgebrochen. Breite Tatzenabdrücke, Kratzspuren am Pfosten, Schleifspur zum Bach und ins Alte Gehölz.\n✦ Diebstahl (Entdecken): Werkzeugkiste offen, kein Einbruch. Nur Hammer und Zange fehlen, dazu feiner Mehlstaub am Boden.\n✦ Die Bauern kaufen beide in der Mühle, Mehl beweist nichts.\nOffen: Ob Ruprecht gerade am Hof ist."
+      "dm_text_de": "✦ Bär: Zaun eingedrückt, nicht aufgebrochen. Breite Tatzenabdrücke, Kratzspuren am Pfosten, Schleifspur zum Bach und ins Alte Gehölz.\n✦ Diebstahl (Entdecken): Werkzeugkiste offen, kein Einbruch. Nur Hammer und Zange fehlen, dazu feiner Mehlstaub am Boden.\n✦ Die Bauern kaufen beide in der Mühle, Mehl beweist nichts.\nOffen: Ob Ruprecht gerade am Hof ist.",
+      "number_label": "6"
     },
     {
       "key": "hof_lerch",
       "parent": null,
       "name_de": "Ziegenhof von Hannes Lerch",
       "description_de": "✦ Ziegen im Pferch, Äcker rundherum, ein gepflegter Spaten an der Wand.",
-      "dm_text_de": "✦ Diebstahl (Entdecken): Feile, Öl und Holzkohle sind weg, nicht aber Geld und Spaten. Auch hier etwas Mehlstaub.\n✦ Ziegenkäse, Milch, Eier. Ein Esel kostet 12 D, wenn der Preis stimmt.\n✦ Eine Ziege hat der Bär gerissen.\nOffen: Wie Hannes die Gruppe empfängt."
+      "dm_text_de": "✦ Diebstahl (Entdecken): Feile, Öl und Holzkohle sind weg, nicht aber Geld und Spaten. Auch hier etwas Mehlstaub.\n✦ Ziegenkäse, Milch, Eier. Ein Esel kostet 12 D, wenn der Preis stimmt.\n✦ Eine Ziege hat der Bär gerissen.\nOffen: Wie Hannes die Gruppe empfängt.",
+      "number_label": "7"
     },
     {
       "key": "schuppen",
       "parent": null,
       "name_de": "Alter Schuppen",
       "description_de": "✦ Verfallene Umladestation am Fluss, hinter Weiden und Schilf.\n✦ Tagsüber leer, die Tür nur mit einem Holzkeil gesichert. Kein Spuk.",
-      "dm_text_de": "✦ Innen: Feldstein-Esse, Werkbank, Amboss aus einem Mühlstein-Rest, Wasserfass, Holzkohle, halbfertige Klinge (Rohling), Hammer, Zange, Feile, Öl.\n✦ Joris kommt ein- bis zweimal die Woche nachts. Zeichen: dünner Rauch, roter Schein, leises Hämmern.\n✦ Der Vorsteher will den Schuppen sanieren und als Lager nutzen.\nOffen: Wann Joris auftaucht und wie die Gruppe ihn stellt."
+      "dm_text_de": "✦ Innen: Feldstein-Esse, Werkbank, Amboss aus einem Mühlstein-Rest, Wasserfass, Holzkohle, halbfertige Klinge (Rohling), Hammer, Zange, Feile, Öl.\n✦ Joris kommt ein- bis zweimal die Woche nachts. Zeichen: dünner Rauch, roter Schein, leises Hämmern.\n✦ Der Vorsteher will den Schuppen sanieren und als Lager nutzen.\nOffen: Wann Joris auftaucht und wie die Gruppe ihn stellt.",
+      "number_label": "9"
     },
     {
       "key": "gehoelz",
       "parent": null,
       "name_de": "Altes Gehölz",
       "description_de": "✦ Dichter Wald flussabwärts hinter dem Schuppen.\n✦ Ein Trampelpfad führt am Fluss entlang hinein.",
-      "dm_text_de": "✦ Der Bär ist nachts und früh am Morgen unterwegs und trinkt am Bach.\n✦ Joris meidet das Gehölz, seit er dort nachts ein großes Tier gehört hat.\nOffen: Was sonst im Unterholz lebt."
+      "dm_text_de": "✦ Der Bär ist nachts und früh am Morgen unterwegs und trinkt am Bach.\n✦ Joris meidet das Gehölz, seit er dort nachts ein großes Tier gehört hat.\nOffen: Was sonst im Unterholz lebt.",
+      "number_label": "10"
     },
     {
       "key": "hoehle",
       "parent": "gehoelz",
       "name_de": "Höhle des Bären",
       "description_de": "✦ Felsspalte oder hohler Baum am Rand des Gehölzes, etwa zwei Wegstunden vom Dorf.\n✦ Davor Knochen und Reste vom Vieh.",
-      "dm_text_de": "✦ Der Bär (Bestiarium, ID 37) liegt tagsüber hier und ist nachts unterwegs.\n✦ Drei Wege: töten (der Pelz bleibt, ein Gerber kann ihn verwerten), weglocken (Fischköder oder Aas weit weg vom Dorf) oder vertreiben (Feuer, Lärm, Fackeln, Musik am Trinkplatz).\n✦ Wer aufgibt, dem holt der Bär weiteres Vieh.\nOffen: Wie die Gruppe vorgeht."
+      "dm_text_de": "✦ Der Bär (Bestiarium, ID 37) liegt tagsüber hier und ist nachts unterwegs.\n✦ Drei Wege: töten (der Pelz bleibt, ein Gerber kann ihn verwerten), weglocken (Fischköder oder Aas weit weg vom Dorf) oder vertreiben (Feuer, Lärm, Fackeln, Musik am Trinkplatz).\n✦ Wer aufgibt, dem holt der Bär weiteres Vieh.\nOffen: Wie die Gruppe vorgeht.",
+      "number_label": "11"
     },
     {
       "key": "strasse",
@@ -120,6 +138,14 @@
       "name_de": "Schmiede in der Gerbergasse",
       "description_de": "✦ Schmiede bei den Gerbern am Mühltor.\n✦ Esse, Amboss, ein Haufen unerledigter Aufträge.",
       "dm_text_de": "✦ Mögliche Lage: Konrad hat sich an der Esse schwer verbrannt, die Aufträge stauen sich, die Familie hat Schulden.\n✦ Die Gruppe kann helfen, wegschauen oder sich einmischen.\nOffen: Wie schlimm es wirklich steht."
+    },
+    {
+      "key": "rastplatz",
+      "parent": null,
+      "number_label": "12",
+      "name_de": "Rastplatz an der Königsstraße",
+      "description_de": "✦ Kleiner Rastplatz am Straßenrand kurz hinter der Fähre.\n✦ Feuerstelle und eine verrußte Bank.",
+      "dm_text_de": "✦ Hier rasten Reisende, bevor sie ins Dorf kommen oder weiterziehen.\nOffen: Wer gerade rastet und was er erzählt."
     }
   ],
   "npcs": [

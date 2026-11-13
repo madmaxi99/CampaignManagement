@@ -58,7 +58,9 @@ Parents must come before their children in the file. Use typographic quotes („
 .claude/skills/campaign-server/run.sh import --dry-run   # list what would be created, sends nothing
 .claude/skills/campaign-server/run.sh import             # create campaign, chapter, places, NPCs, items
 .claude/skills/campaign-server/run.sh check              # compare counts with the server
-.claude/skills/campaign-server/run.sh sync               # send every entry of the data file as update
+.claude/skills/campaign-server/run.sh diff               # list text fields that differ between server and data file (run before sync)
+.claude/skills/campaign-server/run.sh sync               # send every entry of the data file as update; entries without an id are created
+.claude/skills/campaign-server/run.sh image place karte Story/startdorf/karte.png   # upload an image for a place or item (jpg/png/webp, no svg)
 .claude/skills/campaign-server/run.sh edit npc wendel description_de='neuer Text'
 
 # local dev app: same commands with BASE_URL (password comes from the project's .env)
@@ -70,7 +72,9 @@ BASE_URL=http://127.0.0.1:8070 .claude/skills/campaign-server/run.sh check
 ## Rules
 
 - **Why the whole entry is sent:** every update endpoint replaces all fields; omitted fields become empty. Never POST a partial entry by hand. `sync` keeps `notes_de` of NPCs (the DM's play notes); `edit` keeps every field it does not name.
-- **Images** (`image_path`, `portrait_path`) are not touched by updates.
+- **Images** (`image_path`, `portrait_path`) are not touched by updates. Upload them with `image`; the app rejects SVG, so render an SVG to PNG first (headless Chrome: `google-chrome --headless --screenshot=out.png file://page.html`).
+- **Maps:** a map is a place with the image (e.g. `karte`). Give places the numbers of the map as `number_label`, the index shows them next to the names.
+- **Before `sync` on production** run `diff`: `sync` overwrites every text of the data file, also edits made in the app.
 - **Production writes** happen only on explicit request, after a dry run or a stated list of changes. The first `import` per target creates the state file; a second `import` is refused (no duplicate campaign).
 - **Deleting** a campaign (`DELETE /dm/campaign/{id}`, cascades) or an entry only when the user asks for it.
 - The edit endpoints must exist on the server: `GET /dm/campaign/{id}/export` came with PR #5. After code changes to the routes, check that the deploy (GitHub Actions on push to `main`) has run: `ssh amt-solo-vps 'cd /opt/campaignManagement && git log --oneline -1'`.
