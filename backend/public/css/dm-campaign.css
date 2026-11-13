@@ -43,6 +43,7 @@
     border: var(--border);
     border-radius: var(--radius-m);
     box-shadow: var(--shadow-1);
+    cursor: zoom-in;
 }
 
 /* Text kinds: read aloud vs. DM only */

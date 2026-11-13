@@ -75,6 +75,31 @@
         }
     });
 
+    // ---- Image zoom: a click on an image of a place, item or monster shows it large; a click or Esc closes it.
+    let lightbox = null;
+    document.addEventListener('click', function (event) {
+        const image = event.target.closest('img.place-image');
+        if (!image) {
+            return;
+        }
+        if (!lightbox) {
+            lightbox = document.createElement('dialog');
+            lightbox.className = 'image-lightbox';
+            lightbox.appendChild(document.createElement('img'));
+            lightbox.addEventListener('click', function () {
+                lightbox.close();
+            });
+            document.body.appendChild(lightbox);
+        }
+        if (typeof lightbox.showModal !== 'function') {
+            return;
+        }
+        const large = lightbox.querySelector('img');
+        large.src = image.currentSrc || image.src;
+        large.alt = image.alt;
+        lightbox.showModal();
+    });
+
     // ---- Tabs: [data-ui-tabs] with .ui-tab[aria-controls] and .ui-tabpanel.
     // With data-ui-tabs-hash the selected tab lives in the URL hash (#skills),
     // so a reload or a shared link opens the same tab.

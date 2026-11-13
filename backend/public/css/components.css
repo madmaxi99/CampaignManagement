@@ -603,3 +603,24 @@
 .ui-muted {
     color: var(--ink-soft);
 }
+
+/* Image zoom (ui.js): the picture at full size on a dark backdrop, a click closes it. */
+.image-lightbox {
+    max-width: 96vw;
+    max-height: 96vh;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: zoom-out;
+}
+
+.image-lightbox::backdrop {
+    background: rgb(20 14 8 / 85%);
+}
+
+.image-lightbox img {
+    display: block;
+    max-width: 96vw;
+    max-height: 96vh;
+    border-radius: var(--radius-m);
+}
